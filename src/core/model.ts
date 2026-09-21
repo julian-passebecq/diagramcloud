@@ -6,7 +6,8 @@ const visibility = z.enum(['public','private']).default('public');
 const refs = z.array(id).max(1000).default([]);
 const point = z.object({x:z.number().finite().min(-100000).max(100000),y:z.number().finite().min(-100000).max(100000)}).strict();
 const sourceSchema = z.object({id,title:short,location:text.default(''),url:z.string().url().refine(s=>/^https?:\/\//i.test(s),'Only HTTP(S) source links').optional(),visibility}).strict();
-export const assetSchema = z.object({id,name:short,data:z.string().max(3*1024*1024).regex(/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/,'Embedded PNG, JPEG or WebP only'),rights:z.string().max(1000),visibility}).strict();
+const remoteAssetSchema=z.object({provider:z.literal('google-drive'),fileId:z.string().regex(/^[A-Za-z0-9_-]{1,256}$/,'Invalid Google Drive file ID'),fileName:short,mimeType:z.enum(['image/png','image/jpeg','image/webp']),webViewLink:z.string().url().refine(s=>/^https:\/\//i.test(s),'Drive links must use HTTPS').optional(),modifiedTime:z.string().datetime({offset:true}).optional(),size:z.string().regex(/^\d+$/).optional(),savedAt:z.string().datetime({offset:true})}).strict();
+export const assetSchema = z.object({id,name:short,data:z.string().max(3*1024*1024).regex(/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/,'Embedded PNG, JPEG or WebP only'),rights:z.string().max(1000),visibility,remote:remoteAssetSchema.optional()}).strict();
 const baseBlock = {id,title:short,visibility,sourceIds:refs,provenance:z.enum(['source-derived','synthetic','reference','author']).default('author')};
 export const blockSchema = z.discriminatedUnion('type',[
  z.object({...baseBlock,type:z.literal('text'),text}).strict(),
