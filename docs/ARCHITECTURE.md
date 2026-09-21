@@ -62,3 +62,14 @@ An edge's batch/stream/query/control/dependency type and slow/medium/fast speed 
 ## Deployment
 
 Vite builds a static site. Cloudflare static assets configuration and security headers are supplied, but no deployment or domain was provisioned. Keep local-first ownership independent of the host. Server synchronization, identity, storage and external execution adapters are optional future services, not dependencies of this root.
+
+
+## V1.1 reliability amendments
+
+The persistence status shown in the shell is now driven by a latest-snapshot save queue (`src/core/saveQueue.ts`). Saves are serialized, but completion of generation *n* is ignored for UI terminal state once generation *n+1* has been queued. This prevents a false transient `Saved locally` indicator during rapid edits. The queue does not replace IndexedDB conflict detection; it only coordinates in-tab write ordering and status.
+
+`loadWorkspace` validates stored rows independently. A corrupt row, invalid row envelope, or key/document-ID mismatch becomes a workspace warning while valid projects remain available. The raw invalid row is deliberately not deleted or rewritten automatically, preserving a future recovery path. IndexedDB `blocked` and `versionchange` events clear the cached connection state.
+
+Whole-document JSON/AI editing remains explicit and human-applied. `src/core/changePreview.ts` computes a stable-ID diff across nodes, edges, views, evidence blocks, assets and sources plus top-level metadata/story changes. Same-project input must carry the exact current revision before Apply is enabled. This prevents a stale AI/editor snapshot from silently overwriting newer edits. It is optimistic revision guarding, not semantic merge and not a JSON Patch implementation.
+
+`src/export/scene.ts` is the first shared presentation scene primitive. SVG and PowerPoint use the same node dimensions and orthogonal connector route. This deliberately stops short of claiming pixel identity with the React Flow canvas: interactive routing, measured text, provider icons and export layout still need a larger shared scene model before arbitrary-view fidelity can be guaranteed.
