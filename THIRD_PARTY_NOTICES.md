@@ -36,3 +36,8 @@ Other symbols in `src/ui/Canvas.tsx` are original generic component symbols, not
 No font binaries are distributed. The UI uses installed system fonts; exported PowerPoint refers to fonts installed on the reader's machine and may substitute them. No font files may be added to an output archive without independently verified redistribution rights.
 
 The portfolio sample descriptions derive from user-supplied PDFs. Raw PDFs and personal contact details were not added to this repository. Newly authored code, tables and financial illustrations carry explicit provenance labels and are not asserted to be confidential production data or verified employer outcomes. User-uploaded images remain subject to the uploader's rights and permissions.
+
+
+## Google Identity Services / Google Picker / Google Drive API
+
+DiagramCloud can optionally load Google-hosted Identity Services and Google Picker JavaScript at runtime and call Google Drive API endpoints after explicit user authorization. These Google services are not vendored into this MIT repository and are governed by Google's applicable API/service terms. DiagramCloud requests the per-file `drive.file` scope and keeps OAuth access tokens in browser memory only.
