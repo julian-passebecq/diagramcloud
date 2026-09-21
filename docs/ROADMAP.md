@@ -35,3 +35,19 @@ The two supplied PDFs are a starting portfolio source, not immutable production 
 ## Suggested implementation sequence
 
 Finish browser/export visual QA and storage failure tests first. Then build the shared scene/icon registry. Add the visual narrative composer and richer evidence editing. Only then add import/metadata adapters. This keeps the product small enough to understand while making it genuinely more useful than a static cloud drawing.
+
+
+## V1.1 reliability pass (2026-09-21)
+
+Implemented in `feat/diagramcloud-v1.1-reliability`:
+
+- **Latest-snapshot save queue.** IndexedDB writes remain serialized, but an older write can no longer flash `Saved locally` while a newer edit is still queued. Terminal save/error state belongs only to the newest queued generation.
+- **Rapid-edit history hardening.** Edit/undo/redo operations read and update a synchronous history ref before React rerenders, preventing back-to-back edits from being derived from a stale render snapshot.
+- **Recoverable workspace loading.** A malformed IndexedDB row is reported and left untouched while healthy projects still load. A stored key/document-ID mismatch is also isolated rather than silently accepted.
+- **Blocked-database recovery.** A blocked IndexedDB open no longer leaves a stale connection promise or later leaked handle.
+- **Whole-document AI/JSON review guard.** Same-project imports show stable-ID additions/changes/removals and project-field changes. They may only apply when the imported base revision equals the currently open revision. This is a review guard for whole-document edits, **not yet JSON Patch**.
+- **Shared export geometry.** SVG and editable PowerPoint now share node dimensions and deterministic orthogonal Manhattan connector routing. React Flow canvas geometry is still an independent interactive renderer and remains future convergence work.
+- **Mermaid hardening.** Pipe characters in labels are escaped so authored labels cannot accidentally change Mermaid edge-label syntax.
+- **Regression coverage.** Added save-queue, change-preview, shared-routing, corrupt-row and stale-revision tests. CI now uses `npm ci` and npm dependency caching for reproducible installs.
+
+Still open from P0: storage quota/fault injection beyond corrupt-row recovery; revision-guarded JSON Patch operations rather than full-document replacement; shared measured text/layout across canvas, SVG and PPTX; visual recovery UI for exporting/deleting quarantined corrupt rows.
