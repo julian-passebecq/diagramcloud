@@ -51,3 +51,30 @@ Implemented in `feat/diagramcloud-v1.1-reliability`:
 - **Regression coverage.** Added save-queue, change-preview, shared-routing, corrupt-row and stale-revision tests. CI validates from a clean runner with `npm install`; the CI artifact includes the resolved `package-lock.json`. Checking that lockfile into the repository is still required before switching branch CI to `npm ci` and dependency caching.
 
 Still open from P0: storage quota/fault injection beyond corrupt-row recovery; revision-guarded JSON Patch operations rather than full-document replacement; shared measured text/layout across canvas, SVG and PPTX; visual recovery UI for exporting/deleting quarantined corrupt rows.
+
+
+## V1.2 Drive asset pass (2026-09-21)
+
+Implemented:
+
+- optional Google Drive image asset vault using the non-sensitive `drive.file` scope;
+- Google Identity Services token flow with memory-only access tokens;
+- optional Google Picker import for PNG/JPEG/WebP;
+- app-created `DiagramCloud Assets` folder for backups;
+- refresh of cached Drive-backed images while preserving stable DiagramCloud asset IDs;
+- private remote metadata stripped from public documents;
+- explicit image provenance choice including synthetic / AI-generated;
+- image source limit raised to 8 MiB with resize/compression into the bounded embedded cache;
+- CSP/COOP updates limited to the Google origins needed by GIS, Picker and Drive REST;
+- connector unit tests and an unconfigured/optional browser UI test.
+
+Still deliberately out of scope:
+
+- storing the DiagramCloud project itself in Drive;
+- background refresh tokens or server-side Google credentials;
+- broad `drive` / `drive.readonly` scopes;
+- automatic AI image generation inside DiagramCloud;
+- exporting PPTX by live-linking remote Drive images;
+- multi-provider asset synchronization/conflict resolution.
+
+Next useful asset work: a provider-neutral asset-source interface plus optional OneDrive/R2 adapters, then an AI image generation action that feeds the same sanitize/cache/provenance pipeline.
