@@ -1,7 +1,7 @@
-name: DiagramCloud V1
+name: DiagramCloud V1.1
 on:
   push:
-    branches: [main, feat/diagramcloud-v1]
+    branches: [main, 'feat/diagramcloud-*']
   pull_request:
 permissions:
   contents: read
@@ -17,8 +17,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
       - name: Install
-        run: npm install --no-fund --no-audit
+        run: npm ci --no-fund --no-audit
       - name: Typecheck
         run: npm run check
       - name: Unit tests
@@ -33,12 +34,12 @@ jobs:
           mkdir -p release
           npm ls --depth=0 --json > release/dependency-versions.json || true
           git rev-parse HEAD > release/SOURCE_COMMIT.txt
-          tar --exclude=.git --exclude=node_modules --exclude=release --exclude=test-results --exclude=playwright-report -czf release/diagramcloud-v1-source-and-build.tar.gz .
+          tar --exclude=.git --exclude=node_modules --exclude=release --exclude=test-results --exclude=playwright-report -czf release/diagramcloud-v1.1-source-and-build.tar.gz .
           sha256sum release/diagramcloud-v1-source-and-build.tar.gz > release/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: diagramcloud-v1
+          name: diagramcloud-v1.1
           path: |
             release/
             playwright-report/
