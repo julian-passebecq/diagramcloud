@@ -2,6 +2,7 @@ import {publicDocument,positionFor} from '../core/operations';
 import type {Project,EvidenceBlock} from '../core/model';
 import {bounds} from './diagram';
 import {wrapLines,caption} from './text';
+import {NODE_HEIGHT,NODE_WIDTH,orthogonalRoute,routeLabel} from './scene';
 function textOf(b:EvidenceBlock):string{return b.type==='text'?b.text:b.type==='code'?b.code:b.type==='metrics'?b.items.map(i=>`${i.label}: ${i.value}\n${i.note}`).join('\n\n'):'';}
 
 /** Native editable objects, not screenshots. Exported code is display-only. */
@@ -32,17 +33,12 @@ export async function exportPptx(input:Project):Promise<void>{
   const slide=base(v.title,v.description),b=bounds(v),scale=Math.min((width-1.2)/b.width,4.6/b.height),left=(width-b.width*scale)/2,top=2.2;
   const pos=(id:string)=>{const p=positionFor(v,id);return{x:left+(p.x-b.x)*scale,y:top+(p.y-b.y)*scale};};
   for(const e of d.edges.filter(e=>v.edgeIds.includes(e.id))){
-   const s=pos(e.source),t=pos(e.target),w=220*scale,h=100*scale;
-   type Point={x:number;y:number};let route:Point[];
-   if(t.y>=s.y+h){const mid=(s.y+h+t.y)/2;route=[{x:s.x+w/2,y:s.y+h},{x:s.x+w/2,y:mid},{x:t.x+w/2,y:mid},{x:t.x+w/2,y:t.y}];}
-   else if(t.y+h<=s.y){const mid=(t.y+h+s.y)/2;route=[{x:s.x+w/2,y:s.y},{x:s.x+w/2,y:mid},{x:t.x+w/2,y:mid},{x:t.x+w/2,y:t.y+h}];}
-   else if(t.x>s.x+w){const mid=(s.x+w+t.x)/2;route=[{x:s.x+w,y:s.y+h/2},{x:mid,y:s.y+h/2},{x:mid,y:t.y+h/2},{x:t.x,y:t.y+h/2}];}
-   else{const mid=Math.max(s.y,t.y)+h+25*scale;route=[{x:s.x+w/2,y:s.y+h},{x:s.x+w/2,y:mid},{x:t.x+w/2,y:mid},{x:t.x+w/2,y:t.y+h}];}
+   const route=orthogonalRoute(positionFor(v,e.source),positionFor(v,e.target)).map(point=>({x:left+(point.x-b.x)*scale,y:top+(point.y-b.y)*scale}));
    for(let i=1;i<route.length;i++){const a=route[i-1],z=route[i];if(Math.abs(a.x-z.x)+Math.abs(a.y-z.y)<.0001)continue;slide.addShape(shape.line,{x:Math.min(a.x,z.x),y:Math.min(a.y,z.y),w:Math.max(.001,Math.abs(z.x-a.x)),h:Math.max(.001,Math.abs(z.y-a.y)),flipH:a.x>z.x,flipV:a.y>z.y,line:{color:'8FA2BA',width:1.5,beginArrowType:'none',endArrowType:i===route.length-1?'triangle':'none',dashType:e.kind==='control'?'dash':'solid'}});}
-   const a=route[1],z=route[2];slide.addText(caption(e.label,32,1),{x:(a.x+z.x)/2-.65,y:(a.y+z.y)/2-.2,w:1.3,h:.18,fontSize:8,color:'536780',align:'center',margin:0});
+   const label=routeLabel(route);slide.addText(caption(e.label,32,1),{x:label.x-.65,y:label.y-.2,w:1.3,h:.18,fontSize:8,color:'536780',align:'center',margin:0});
   }
   for(const n of d.nodes.filter(n=>v.nodeIds.includes(n.id))){
-   const p=pos(n.id),w=220*scale,h=100*scale;slide.addShape(shape.roundRect,{x:p.x,y:p.y,w,h,rectRadius:.12,line:{color:'CAD5E4',width:1},fill:{color:'FFFFFF'}});
+   const p=pos(n.id),w=NODE_WIDTH*scale,h=NODE_HEIGHT*scale;slide.addShape(shape.roundRect,{x:p.x,y:p.y,w,h,rectRadius:.12,line:{color:'CAD5E4',width:1},fill:{color:'FFFFFF'}});
    slide.addText(caption(n.provider.toUpperCase(),30,1),{x:p.x+.12,y:p.y+.08,w:Math.max(.01,w-.24),h:h*.17,fontSize:Math.min(9,scale*1150),color:'58718F',margin:0});
    slide.addText(caption(n.label,25,2),{x:p.x+.12,y:p.y+h*.3,w:Math.max(.01,w-.24),h:h*.3,fontSize:Math.min(14,scale*1650),bold:true,color:'172C48',margin:0,hyperlink:n.childViewId?{slide:slideNumbers.get(n.childViewId)}:undefined});
    slide.addText(caption(n.summary,36,2),{x:p.x+.12,y:p.y+h*.66,w:Math.max(.01,w-.24),h:h*.28,fontSize:Math.min(9,scale*1100),color:'536780',margin:0});
