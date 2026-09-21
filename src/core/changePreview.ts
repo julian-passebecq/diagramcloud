@@ -25,7 +25,7 @@ function byId<T extends {id:string}>(current:T[],incoming:T[]):EntityDelta{
 /** Human-review summary for whole-document JSON / AI edits. No mutation occurs here. */
 export function previewDocumentChange(current:Project,incoming:Project):DocumentChangePreview{
  const sameProject=current.id===incoming.id;
- const entities=Object.fromEntries(ENTITY_GROUPS.map(group=>[group,byId(current[group],incoming[group])])) as Record<EntityGroup,EntityDelta>;
+ const entities=Object.fromEntries(ENTITY_GROUPS.map(group=>[group,byId(current[group] as {id:string}[],incoming[group] as {id:string}[])])) as Record<EntityGroup,EntityDelta>;
  const metadata=metadataKeys.filter(key=>!same(current[key],incoming[key]));
  const storyChanged=!same(current.story,incoming.story);
  const entityChanges=ENTITY_GROUPS.reduce((sum,group)=>sum+entities[group].added.length+entities[group].removed.length+entities[group].changed.length,0);
