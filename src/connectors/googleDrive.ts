@@ -37,6 +37,7 @@ type PickerBuilder={
  setOAuthToken:(token:string)=>PickerBuilder;
  setDeveloperKey:(key:string)=>PickerBuilder;
  setAppId:(id:string)=>PickerBuilder;
+ setOrigin:(origin:string)=>PickerBuilder;
  addView:(view:PickerView)=>PickerBuilder;
  setCallback:(callback:(data:{action?:string;docs?:Array<{id?:string}>})=>void)=>PickerBuilder;
  build:()=>PickerInstance;
@@ -239,6 +240,7 @@ export async function pickDriveImage(config:DriveConfig,session:DriveSession):Pr
     .setOAuthToken(session.accessToken)
     .setDeveloperKey(config.apiKey)
     .setAppId(config.appId)
+    .setOrigin(window.location.origin)
     .addView(view)
     .setCallback(data=>{
      if(settled)return;
