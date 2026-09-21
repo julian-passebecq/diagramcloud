@@ -1,4 +1,4 @@
-name: DiagramCloud V1.1
+name: DiagramCloud CI
 on:
   push:
     branches: [main, 'feat/diagramcloud-*']
@@ -33,12 +33,12 @@ jobs:
           mkdir -p release
           npm ls --depth=0 --json > release/dependency-versions.json || true
           git rev-parse HEAD > release/SOURCE_COMMIT.txt
-          tar --exclude=.git --exclude=node_modules --exclude=release --exclude=test-results --exclude=playwright-report -czf release/diagramcloud-v1.1-source-and-build.tar.gz .
-          sha256sum release/diagramcloud-v1.1-source-and-build.tar.gz > release/SHA256SUMS.txt
+          tar --exclude=.git --exclude=node_modules --exclude=release --exclude=test-results --exclude=playwright-report -czf release/diagramcloud-source-and-build.tar.gz .
+          sha256sum release/diagramcloud-source-and-build.tar.gz > release/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: diagramcloud-v1.1
+          name: diagramcloud-ci
           path: |
             release/
             playwright-report/
