@@ -51,3 +51,39 @@ test('reduced motion and Fabric icon loading',async({browser})=>{
 test('mobile layout does not overflow viewport',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.getByRole('heading',{name:'TotalEnergies',exact:true})).toBeVisible();const dimensions=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.width+2);await page.screenshot({path:'test-results/showcase-mobile.png',fullPage:true});
 });
+
+
+test('JSON AI preview blocks stale same-project revisions',async({page})=>{
+ await page.goto('/');
+ await page.getByRole('button',{name:'JSON / AI',exact:true}).click();
+ const editor=page.getByLabel('Project JSON');
+ const current=JSON.parse(await editor.inputValue());
+ current.title='Reviewed architecture';
+ await editor.fill(JSON.stringify(current));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
+ await expect(page.locator('.change-preview')).toContainText('1 proposed change');
+ await expect(page.getByRole('button',{name:'Apply imported document',exact:true})).toBeEnabled();
+ current.revision+=1;
+ await editor.fill(JSON.stringify(current));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
+ await expect(page.locator('.revision-warning')).toContainText('Revision mismatch');
+ await expect(page.getByRole('button',{name:'Apply imported document',exact:true})).toBeDisabled();
+});
+
+test('a corrupt IndexedDB row does not disable healthy projects',async({page})=>{
+ await page.goto('/');
+ await expect(page.getByRole('tab',{name:'Edit',exact:true})).toBeEnabled();
+ await page.evaluate(async()=>new Promise<void>((resolve,reject)=>{
+  const request=indexedDB.open('diagramcloud-v1',1);
+  request.onerror=()=>reject(request.error);
+  request.onsuccess=()=>{
+   const db=request.result,tx=db.transaction('projects','readwrite');
+   tx.objectStore('projects').put({id:'corrupt-row',json:'{broken',writer:'qa',savedAt:Date.now()});
+   tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);
+  };
+ }));
+ await page.reload();
+ await expect(page.getByRole('heading',{name:'TotalEnergies',exact:true})).toBeVisible();
+ await expect(page.getByText(/saved project could not be read/)).toBeVisible();
+ await expect(page.getByRole('tab',{name:'Edit',exact:true})).toBeEnabled();
+});
