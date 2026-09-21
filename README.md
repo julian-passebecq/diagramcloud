@@ -95,3 +95,10 @@ V1 is a working foundation, not a replacement for every feature of draw.io. It d
 ### V1.1 reliability work
 
 The current reliability branch adds latest-snapshot autosave status, rapid-edit history hardening, corrupt-row isolation, same-project JSON/AI revision guards with stable-ID change previews, shared SVG/PPTX orthogonal routing, Mermaid label escaping, and regression tests. These are incremental V1 improvements; schema version remains `1` and the renderer-independent JSON contract is unchanged.
+
+
+### V1.2 optional Google Drive asset vault
+
+The `feat/diagramcloud-v1.2-drive-assets` pass adds a user-triggered Google Drive image connector without changing the local-first ownership model. Images imported from Drive are normalized and cached in the project; editable PPTX and standalone HTML exports use that cached copy and therefore remain independent of Drive authentication. Drive uses the narrow `drive.file` scope, and authoring-only Drive identifiers are removed from public documents.
+
+See [docs/GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md) for Google Cloud setup, Picker configuration, security boundaries and the AI-image workflow.
