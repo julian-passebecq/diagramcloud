@@ -73,3 +73,21 @@ The persistence status shown in the shell is now driven by a latest-snapshot sav
 Whole-document JSON/AI editing remains explicit and human-applied. `src/core/changePreview.ts` computes a stable-ID diff across nodes, edges, views, evidence blocks, assets and sources plus top-level metadata/story changes. Same-project input must carry the exact current revision before Apply is enabled. This prevents a stale AI/editor snapshot from silently overwriting newer edits. It is optimistic revision guarding, not semantic merge and not a JSON Patch implementation.
 
 `src/export/scene.ts` is the first shared presentation scene primitive. SVG and PowerPoint use the same node dimensions and orthogonal connector route. This deliberately stops short of claiming pixel identity with the React Flow canvas: interactive routing, measured text, provider icons and export layout still need a larger shared scene model before arbitrary-view fidelity can be guaranteed.
+
+
+## V1.2 optional cloud asset connector
+
+Google Drive is the first external asset provider, but it is intentionally **not** a persistence backend. The canonical project remains the validated DiagramCloud JSON document stored locally. Each Drive-linked image has two layers:
+
+```text
+asset.data   = sanitized embedded PNG/JPEG/WebP used by renderers/exporters
+asset.remote = private authoring metadata for the Google Drive source/backup
+```
+
+`asset.remote` can contain a Drive file ID, file name, MIME type, web view link, modification time, size and the last cache timestamp. `publicDocument()` deletes this remote object before any public serializer receives the project.
+
+The connector uses Google Identity Services token flow in the browser and requests only `drive.file`. Access tokens live in module memory and are never persisted. Google scripts are dynamically loaded only after the user opens/uses the Drive feature. Google Picker is additionally gated on an API key and numeric Cloud project App ID.
+
+The export boundary remains deliberately offline-first: PPTX, HTML and evidence rendering consume only `asset.data`. No exporter is permitted to dereference Drive URLs or request a Google token. This makes remote asset providers replaceable and keeps presentation generation deterministic.
+
+Future providers (OneDrive, Dropbox, S3/R2, AI image APIs) should implement the same pattern: explicit import/sync into a validated cached asset, provider metadata private by default, and no remote fetch during public export.
