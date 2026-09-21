@@ -59,7 +59,7 @@ export function DriveAssetManager(p:Props){
  const saveSettings=(event:FormEvent<HTMLFormElement>)=>{event.preventDefault();const f=new FormData(event.currentTarget),next:DriveConfig={
   clientId:String(f.get('clientId')??'').trim(),apiKey:String(f.get('apiKey')??'').trim(),appId:String(f.get('appId')??'').trim(),folderId:config.folderId
  };saveDriveConfig(next);setConfig(next);setStatus('Drive connector settings saved in this browser only.');};
- const forget=()=>{clearDriveConfig();const next={clientId:'',apiKey:'',appId:'',folderId:''};setConfig(next);setSession(null);setStatus('Local Drive connector settings cleared.');};
+ const forget=()=>run('forget',async()=>{await revokeDriveAccess(session);clearDriveConfig();setSession(null);setConfig(loadDriveConfig());setStatus('Local Drive connector overrides cleared and the active token was revoked.');});
 
  return <div className="drive-manager">
   <div className="note-card"><strong>Optional asset vault.</strong> Drive is never the project database. DiagramCloud keeps a sanitized cached image inside the authoring document, so PPTX/HTML exports do not need a live Google token.</div>
@@ -67,7 +67,7 @@ export function DriveAssetManager(p:Props){
    <label>Google OAuth client ID<input name="clientId" defaultValue={config.clientId} placeholder="...apps.googleusercontent.com" autoComplete="off"/></label>
    <label>Picker API key <span className="micro">optional for upload-only</span><input name="apiKey" defaultValue={config.apiKey} autoComplete="off"/></label>
    <label>Cloud project number / App ID <span className="micro">required for Picker</span><input name="appId" defaultValue={config.appId} inputMode="numeric" autoComplete="off"/></label>
-   <div className="toolbar"><Button type="submit">Save connector settings</Button><Button appearance="subtle" type="button" onClick={forget}>Forget settings</Button></div>
+   <div className="toolbar"><Button type="submit">Save connector settings</Button><Button appearance="subtle" type="button" onClick={forget} disabled={!!busy}>{busy==='forget'?'Forgetting…':'Forget settings'}</Button></div>
   </form>
   <p className="micro">Client ID, restricted API key and project number are public app configuration, not OAuth secrets. Access tokens stay in memory and are never written to DiagramCloud JSON or localStorage.</p>
   <div className="drive-session">
