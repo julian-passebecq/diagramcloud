@@ -1,4 +1,4 @@
-import {useMemo,useState} from 'react';
+import {useState,type FormEvent} from 'react';
 import {Button} from '@fluentui/react-components';
 import {blockSchema,newId,type Asset,type EvidenceBlock,type Project,type ProjectNode} from '../core/model';
 import {imageAsset} from '../export/browser';
@@ -24,7 +24,7 @@ export function DriveAssetManager(p:Props){
  const [status,setStatus]=useState('');
  const [provenance,setProvenance]=useState<EvidenceBlock['provenance']>('synthetic');
  const connected=driveSessionValid(session);
- const imageAssets=useMemo(()=>p.doc.assets,[p.doc.assets]);
+ const imageAssets=p.doc.assets;
 
  const run=async(label:string,work:()=>Promise<void>)=>{setBusy(label);setStatus('');try{await work();}catch(error){p.onError(error instanceof Error?error.message:String(error));}finally{setBusy('');}};
  const ensureSession=async()=>{if(driveSessionValid(session))return session;const next=await requestDriveAccess(config);setSession(next);return next;};
@@ -56,7 +56,7 @@ export function DriveAssetManager(p:Props){
   p.onAttach(asset,block);
   setStatus(`${downloaded.metadata.name} attached to ${p.selectedNode.label}. The cached copy is available to PPTX and offline HTML.`);
  });
- const saveSettings=(event:React.FormEvent<HTMLFormElement>)=>{event.preventDefault();const f=new FormData(event.currentTarget),next:DriveConfig={
+ const saveSettings=(event:FormEvent<HTMLFormElement>)=>{event.preventDefault();const f=new FormData(event.currentTarget),next:DriveConfig={
   clientId:String(f.get('clientId')??'').trim(),apiKey:String(f.get('apiKey')??'').trim(),appId:String(f.get('appId')??'').trim(),folderId:config.folderId
  };saveDriveConfig(next);setConfig(next);setStatus('Drive connector settings saved in this browser only.');};
  const forget=()=>{clearDriveConfig();const next={clientId:'',apiKey:'',appId:'',folderId:''};setConfig(next);setSession(null);setStatus('Local Drive connector settings cleared.');};
