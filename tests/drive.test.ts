@@ -71,5 +71,5 @@ test('Drive project archive accepts PDF and PPTX without treating them as image 
  await uploadDriveFile(new Blob(['pdf'],{type:'application/pdf'}),'architecture.pdf','token123','folder456');
  await uploadDriveFile(new Blob(['pptx'],{type:'application/vnd.openxmlformats-officedocument.presentationml.presentation'}),'architecture.pptx','token123','folder456');
  assert.equal(seen.length,2);
- assert.throws(()=>uploadDriveFile(new Blob(['x'],{type:'text/plain'}),'notes.txt','token123'));
+ await assert.rejects(()=>uploadDriveFile(new Blob(['x'],{type:'text/plain'}),'notes.txt','token123'),/accepts PNG/);
 });
