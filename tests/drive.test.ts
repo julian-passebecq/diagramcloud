@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {assetSchema,blockSchema,clone} from '../src/core/model';
 import {publicDocument} from '../src/core/operations';
 import {samples} from '../src/data/samples';
-import {createDriveAssetFolder,dataUrlToBlob,driveRemote,uploadDriveImage} from '../src/connectors/googleDrive';
+import {createDriveAssetFolder,dataUrlToBlob,driveRemote,uploadDriveFile,uploadDriveImage} from '../src/connectors/googleDrive';
 
 test('Drive provenance accepts supported images and rejects other file types',()=>{
  const remote=driveRemote({id:'abc_DEF-123',name:'architecture.png',mimeType:'image/png',webViewLink:'https://drive.google.com/file/d/abc/view',modifiedTime:'2026-09-21T12:00:00.000Z',size:'1200'});
@@ -58,4 +58,18 @@ test('Drive asset folder creation is app-scoped metadata, not broad listing',asy
  assert.equal(folder.id,'folder123');
  assert.match(body,/"mimeType":"application\/vnd.google-apps.folder"/);
  assert.match(body,/"diagramcloud":"assets-v1"/);
+});
+
+
+test('Drive project archive accepts PDF and PPTX without treating them as image evidence',async t=>{
+ const original=globalThis.fetch;const seen:string[]=[];
+ t.after(()=>{globalThis.fetch=original;});
+ globalThis.fetch=async(_input,init)=>{
+  const body=init?.body as Blob;seen.push(body.type);
+  return new Response(JSON.stringify({id:'archive1',name:'architecture.pdf',mimeType:'application/pdf',webViewLink:'https://drive.google.com/file/d/archive1/view'}),{status:200,headers:{'Content-Type':'application/json'}});
+ };
+ await uploadDriveFile(new Blob(['pdf'],{type:'application/pdf'}),'architecture.pdf','token123','folder456');
+ await uploadDriveFile(new Blob(['pptx'],{type:'application/vnd.openxmlformats-officedocument.presentationml.presentation'}),'architecture.pptx','token123','folder456');
+ assert.equal(seen.length,2);
+ assert.throws(()=>uploadDriveFile(new Blob(['x'],{type:'text/plain'}),'notes.txt','token123'));
 });
