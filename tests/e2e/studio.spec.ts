@@ -108,8 +108,8 @@ test('a corrupt IndexedDB row does not disable healthy projects',async({page})=>
 
 test('Google Drive asset vault is optional and disabled until configured',async({page})=>{
  await page.goto('/');
- await page.getByRole('button',{name:'Drive assets',exact:true}).click();
- await expect(page.getByRole('dialog',{name:'Google Drive image assets'})).toBeVisible();
+ await page.getByRole('button',{name:'Project files',exact:true}).click();
+ await expect(page.getByRole('dialog',{name:'Google Drive project files'})).toBeVisible();
  await expect(page.getByText('Optional Google file vault.')).toBeVisible();
  await expect(page.getByText('Not connected')).toBeVisible();
  await expect(page.getByRole('button',{name:'Connect Google Drive',exact:true})).toBeDisabled();
