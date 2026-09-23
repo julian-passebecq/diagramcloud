@@ -232,11 +232,35 @@ view(constellation,'pbilab-product','PBI / Semantic Lab | focused extraction fro
  ['dax-editor','connected-mode','query','query']
 ]);
 
-node(constellation,'datapass-vscode','Data Platform VS Code control plane','app',{provider:'datapass-vscode',summary:'Canonical developer control-plane implementation; V0.7.0 merged/CI green'});
+node(constellation,'datapass-vscode','Data Platform VS Code control plane','app',{provider:'datapass-vscode',summary:'Canonical developer control-plane implementation; V0.7.0 merged/CI green',childViewId:'datapass-vscode-detail'});
 node(constellation,'fabric-companion','Fabric DataPass Toolbox','app',{provider:'VS Code companion',summary:'Real-Fabric checklist/helpers; not FactoryLab'});
 node(constellation,'fabric-ops','Fabric Ops Studio','app',{provider:'Fabric toolbox fork',summary:'Real Fabric operations/admin/accelerator tooling'});
 node(constellation,'pbibench-tool','PbiBench','app',{provider:'Power BI engineering',summary:'Broad engineering IDE and donor to focused PBI Lab'});
 node(constellation,'provider-tools','Official provider tooling','control',{provider:'Microsoft / Google / Databricks',summary:'Prefer official explorers/extensions for live provider operations'});
+
+node(constellation,'galaxy','Galaxy','app',{provider:'DataPass VS Code',summary:'One project/platform status and control surface'});
+node(constellation,'project-manifest','Portable .datapass/project.json','storage',{provider:'JSON Schema',summary:'Git-safe project context; excludes credentials and secrets'});
+node(constellation,'fabric-adapter','Fabric adapter','control',{provider:'Official Fabric tools',summary:'Detect extensions/CLI/toolbox assets, assessment/MCP workflows and read-only environment capture'});
+node(constellation,'databricks-adapter','Databricks adapter','control',{provider:'Official Databricks extension + CLI',summary:'Detect Asset Bundles and generate safe bundle commands'});
+node(constellation,'powerbi-adapter','Power BI adapter','control',{provider:'PBIP/TMDL/PBIR + external tools',summary:'Detect source projects and route focused engineering modules'});
+node(constellation,'grafana-adapter','Observability / Grafana','report',{provider:'gcx + Foundation SDK + OpenTofu',summary:'Dashboards as code and preview/deployment command paths'});
+node(constellation,'infra-adapter','Infrastructure adapters','control',{provider:'OpenTofu / Terraform / Docker / Kubernetes / SSH',summary:'Detect peer tooling without replacing it'});
+view(constellation,'datapass-vscode-detail','DataPass VS Code | one control plane, provider-owned clients','The extension composes official/specialized tools around portable project context. It intentionally avoids forking Fabric, Databricks, Power BI, Grafana or infrastructure clients.',['galaxy','project-manifest','fabric-adapter','databricks-adapter','powerbi-adapter','grafana-adapter','infra-adapter'],[
+ ['project-manifest','galaxy','project context'],
+ ['galaxy','fabric-adapter','route','control'],
+ ['galaxy','databricks-adapter','route','control'],
+ ['galaxy','powerbi-adapter','route','control'],
+ ['galaxy','grafana-adapter','route','control'],
+ ['galaxy','infra-adapter','detect / route','control']
+],4);
+block(constellation,'datapass-vscode',{id:'datapass-vscode-boundaries',title:'Control-plane safety boundaries',type:'table',columns:['Concern','Rule'],rows:[
+ ['Credentials','vendor authentication remains vendor-owned'],
+ ['Project context','.datapass/project.json is schema-validated and secret-free'],
+ ['Cloud mutation','explicit user actions; many deploy/plan flows are copied, not silently executed'],
+ ['Missing tools','degrade to Missing/Partial capability state'],
+ ['Distribution','one VSIX first; adapters separate internally']
+],provenance:'source-derived',sourceIds:['src-registry']});
+
 view(constellation,'control-plane-view','Developer tooling | control plane and companions','The central IDE strategy is the Data Platform VS Code control plane. Provider companions stay focused and official provider tooling remains authoritative for live service operations.',['datapass-vscode','fabric-companion','fabric-ops','pbibench-tool','provider-tools'],[
  ['datapass-vscode','provider-tools','launch / coordinate','control'],
  ['fabric-companion','provider-tools','Fabric helpers','dependency'],
@@ -256,10 +280,10 @@ block(constellation,'runtimes',{id:'runtime-consumers',title:'Runtime consumers'
  ['Duckle','external candidate','FactoryLab']
 ],provenance:'source-derived',sourceIds:['src-registry']});
 
-node(constellation,'foil-control','FOIL control','control',{provider:'foil-control-v1',summary:'Control/export/schema tooling'});
+node(constellation,'foil-control','FOIL control','control',{provider:'foil-control-v1',summary:'Control/export/schema tooling',childViewId:'foil-control-detail'});
 node(constellation,'foil-ai','FOIL AI extension','app',{provider:'VS Code',summary:'Workspace navigator/binder'});
 node(constellation,'foil-vscode','Databricks VS Code FOIL fork','app',{provider:'Databricks VS Code',summary:'FOIL-specific developer workflow prototype'});
-node(constellation,'foil-dab','FOIL Databricks DAB','process',{provider:'Databricks Asset Bundles',summary:'Active domain lab with synthetic-twin and medallion branches'});
+node(constellation,'foil-dab','FOIL Databricks DAB','process',{provider:'Databricks Asset Bundles',summary:'Wind-first synthetic digital-twin lab; live-test-ready shell, no live deployment claim',childViewId:'foil-dab-detail'});
 node(constellation,'foil-data-plane','FOIL multi-platform data plane','process',{provider:'Architecture plan',summary:'Oracle/Kafka/Fabric/BigQuery/DuckLake/Databricks responsibilities',childViewId:'foil-data-plane-view'});
 view(constellation,'foil-family-view','FOIL | domain proof environment','FOIL validates the tooling in a real domain. Its repos are domain/supporting projects rather than another general-purpose product family.',['foil-control','foil-ai','foil-vscode','foil-dab','foil-data-plane'],[
  ['foil-control','foil-ai','workspace context'],
@@ -267,6 +291,50 @@ view(constellation,'foil-family-view','FOIL | domain proof environment','FOIL va
  ['foil-vscode','foil-dab','bundle / deploy'],
  ['foil-dab','foil-data-plane','domain workloads','dependency']
 ]);
+
+node(constellation,'foil-pm','FOIL Project Management','app',{provider:'Authority layer',summary:'Routing, scorecards and backlog'});
+node(constellation,'foil-mongo-truth','Domain Mongo Core Truth','storage',{provider:'MongoDB',summary:'Canonical mutable engineering/evidence state'});
+node(constellation,'foil-github','GitHub implementation','storage',{provider:'GitHub',summary:'Code, schemas, tests and deployment configuration'});
+node(constellation,'foil-archive','Work Archive','storage',{provider:'Archive',summary:'Checkpoints, history and provenance'});
+node(constellation,'foil-exports','Deterministic JSON/XLSX/visual exports','report',{provider:'foil-control-v1',summary:'Human-review interfaces; never independent authority'});
+view(constellation,'foil-control-detail','FOIL control | authority and export boundaries','The control repository explicitly separates routing, canonical domain truth, implementation code and historical archive. Generated spreadsheets/visuals are snapshots, not mutable truth.',['foil-pm','foil-mongo-truth','foil-github','foil-archive','foil-exports'],[
+ ['foil-pm','foil-mongo-truth','route to authority','control'],
+ ['foil-mongo-truth','foil-github','schemas / implementation contract','dependency'],
+ ['foil-mongo-truth','foil-exports','deterministic snapshot'],
+ ['foil-github','foil-exports','export tooling','dependency'],
+ ['foil-mongo-truth','foil-archive','checkpoint / provenance']
+]);
+
+node(constellation,'dab-source','Databricks Asset Bundle','control',{provider:'databricks.yml',summary:'Deployment configuration as code'});
+node(constellation,'uc','Unity Catalog','storage',{provider:'Databricks',summary:'bronze / silver / gold / ml schemas + volumes'});
+node(constellation,'spark-pipeline','Spark Declarative Pipeline','process',{provider:'Serverless PySpark',summary:'landing → Bronze → Silver with expectations'});
+node(constellation,'lakeflow-job','Lakeflow Job','control',{provider:'Databricks',summary:'Sequential Free-friendly orchestration of synthetic lab'});
+node(constellation,'dbt-gold-foil','dbt Gold marts','process',{provider:'dbt + SQL warehouse',summary:'Tested analytics marts over curated twin data'});
+node(constellation,'mlflow-foil','MLflow','model',{provider:'MLflow',summary:'Scenario/model metrics and artifacts'});
+node(constellation,'aibi','AI/BI dashboards','report',{provider:'Databricks',summary:'Operations, engineering and scenario comparison assets'});
+node(constellation,'db-app','Optional Databricks App','app',{provider:'Databricks Apps',summary:'Virtual-lab scenario configuration → Job request'});
+node(constellation,'neon-export','Optional Neon result export','storage',{provider:'Neon Postgres',summary:'Compact cross-run SQL/AI inspection; does not replace Databricks Gold or Mongo truth'});
+view(constellation,'foil-dab-detail','FOIL Databricks DAB | synthetic Wind lab','Repository target architecture for a deterministic, synthetic-only Free Edition workflow. The shell is live-test-ready; a successful workspace execution is still required before calling it deployed.',['dab-source','uc','spark-pipeline','lakeflow-job','dbt-gold-foil','mlflow-foil','aibi','db-app','neon-export'],[
+ ['dab-source','lakeflow-job','deploy resources','control'],
+ ['dab-source','uc','declare schemas / volumes','control'],
+ ['lakeflow-job','spark-pipeline','refresh','control'],
+ ['spark-pipeline','uc','Bronze + Silver'],
+ ['uc','dbt-gold-foil','SQL / dbt'],
+ ['dbt-gold-foil','uc','Gold marts'],
+ ['lakeflow-job','mlflow-foil','optional experiment','control'],
+ ['uc','aibi','dashboard queries','query'],
+ ['db-app','lakeflow-job','scenario request','control'],
+ ['dbt-gold-foil','neon-export','optional compact export','batch']
+],3);
+block(constellation,'foil-dab',{id:'foil-dab-status',title:'FOIL DAB implementation boundary',type:'table',columns:['Concern','Current rule'],rows:[
+ ['Data','synthetic or explicitly sanitized only'],
+ ['Deployment','live-test-ready shell; no live deployment claim yet'],
+ ['Compute','serverless / Free Edition oriented'],
+ ['Identity','scenario/run IDs + configuration hashes append-only'],
+ ['Source of truth','DAB for Databricks deployment configuration'],
+ ['Optional Neon','inspection/export only; not Databricks Gold replacement']
+],provenance:'source-derived',sourceIds:['src-registry']});
+
 node(constellation,'foil-oracle','Oracle operational state','storage',{provider:'Oracle',summary:'Machine/run/config/maintenance operational records'});
 node(constellation,'foil-kafka','Kafka telemetry bus','process',{provider:'Kafka',summary:'High-frequency event transport'});
 node(constellation,'foil-fabric','Fabric real-time','report',{provider:'Fabric',summary:'Eventstream/Eventhouse/KQL/Power BI live operations'});
