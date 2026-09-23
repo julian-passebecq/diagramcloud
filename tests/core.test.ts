@@ -7,6 +7,7 @@ import {svgDiagram,documentFromSvg,mermaidDiagram,xml} from '../src/export/diagr
 import {portfolioHtml} from '../src/export/html';
 const total=samples.find(d=>d.id==='total-project-controls')!;
 const platform=samples.find(d=>d.id==='datapass-platform')!;
+const constellation=samples.find(d=>d.id==='project-constellation')!;
 for(const sample of samples)test(`valid gallery: ${sample.id}`,()=>assert.equal(validateDocument(sample).id,sample.id));
 test('authoring JSON round trip preserves the document',()=>{for(const sample of samples)assert.deepEqual(parseDocument(JSON.stringify(sample)),sample);});
 test('reject unknown schema versions and fields',()=>{assert.throws(()=>validateDocument({...total,schemaVersion:2}));assert.throws(()=>validateDocument({...total,script:'alert(1)'}));});
@@ -28,6 +29,8 @@ test('node deletion does not mutate source',()=>{removeNode(total,'checks');asse
 test('trace respects direction and view boundaries',()=>{assert.deepEqual([...traceNodes(total,'overview','oracle','upstream')].sort(),['business','excel','oracle']);assert.deepEqual([...traceNodes(total,'overview','oracle','downstream')].sort(),['checks','oracle','powerbi']);});
 test('path reaches the third-level code view',()=>assert.deepEqual(pathToView(total,'check-detail'),['overview','validation','check-detail']));
 test('platform map reaches BigQuery task-level drilldown',()=>assert.deepEqual(pathToView(platform,'bq-telemetry-table'),['overview','foil-platform','bigquery-detail','bq-telemetry-table']));
+test('constellation reaches Contoso model detail',()=>assert.deepEqual(pathToView(constellation,'contoso-models'),['overview','core-products','contoso-product','contoso-models']));
+test('constellation reaches Atlas Mongo detail',()=>assert.deepEqual(pathToView(constellation,'atlasmongo-detail'),['overview','atlas-family-view','atlasmongo-detail']));
 test('undo and redo preserve data and branching clears future',()=>{const initial:History={past:[],present:clone(total),future:[]};const h=commitHistory(initial,{...initial.present,title:'Edited'});assert.equal(h.present.revision,1);assert.equal(undo(h).present.title,total.title);assert.equal(redo(undo(h)).present.title,'Edited');assert.equal(commitHistory(undo(h),{...initial.present,title:'Branch'}).future.length,0);});
 test('history is bounded',()=>{let h:History={past:[],present:clone(total),future:[]};for(let i=0;i<40;i++)h=commitHistory(h,{...h.present,title:`Title ${i}`});assert.equal(h.past.length,25);});
 test('SVG metadata round trip equals the public document',()=>{for(const d of samples)assert.deepEqual(documentFromSvg(svgDiagram(d)),publicDocument(d));});
