@@ -5,7 +5,7 @@ import {imageAsset} from '../export/browser';
 import {
  assetDriveStatus,clearDriveConfig,createDriveAssetFolder,currentDriveSession,dataUrlToBlob,
  downloadDriveImage,drivePickerConfigured,driveRemote,driveSessionValid,loadDriveConfig,
- pickDriveImage,requestDriveAccess,revokeDriveAccess,saveDriveConfig,uploadDriveImage,
+ pickDriveImage,requestDriveAccess,revokeDriveAccess,saveDriveConfig,uploadDriveFile,uploadDriveImage,
  type DriveConfig,type DriveSession
 } from '../connectors/googleDrive';
 
@@ -22,6 +22,7 @@ export function DriveAssetManager(p:Props){
  const [session,setSession]=useState<DriveSession|null>(()=>currentDriveSession());
  const [busy,setBusy]=useState('');
  const [status,setStatus]=useState('');
+ const [archiveLink,setArchiveLink]=useState('');
  const [provenance,setProvenance]=useState<EvidenceBlock['provenance']>('synthetic');
  const connected=driveSessionValid(session);
  const imageAssets=p.doc.assets;
@@ -56,13 +57,19 @@ export function DriveAssetManager(p:Props){
   p.onAttach(asset,block);
   setStatus(`${downloaded.metadata.name} attached to ${p.selectedNode.label}. The cached copy is available to PPTX and offline HTML.`);
  });
+ const archiveProjectFile=(file:File)=>run('archive',async()=>{
+  const active=await ensureSession(),folder=await ensureFolder(active.accessToken);
+  const uploaded=await uploadDriveFile(file,file.name,active.accessToken,folder);
+  setArchiveLink(uploaded.webViewLink??'');
+  setStatus(`${uploaded.name} archived in Google Drive. It is not embedded in DiagramCloud JSON.`);
+ });
  const saveSettings=(event:FormEvent<HTMLFormElement>)=>{event.preventDefault();const f=new FormData(event.currentTarget),next:DriveConfig={
   clientId:String(f.get('clientId')??'').trim(),apiKey:String(f.get('apiKey')??'').trim(),appId:String(f.get('appId')??'').trim(),folderId:config.folderId
  };saveDriveConfig(next);setConfig(next);setStatus('Drive connector settings saved in this browser only.');};
  const forget=()=>run('forget',async()=>{await revokeDriveAccess(session);clearDriveConfig();setSession(null);setConfig(loadDriveConfig());setStatus('Local Drive connector overrides cleared and the active token was revoked.');});
 
  return <div className="drive-manager">
-  <div className="note-card"><strong>Optional asset vault.</strong> Drive is never the project database. DiagramCloud keeps a sanitized cached image inside the authoring document, so PPTX/HTML exports do not need a live Google token.</div>
+  <div className="note-card"><strong>Optional Google file vault.</strong> Cached image evidence stays inside DiagramCloud for offline HTML/PPTX. PNG, PDF and PPTX files can also be archived in Drive without embedding those binaries in project JSON. Drive is not the DiagramCloud database.</div>
   <form className="property-form drive-config" onSubmit={saveSettings}>
    <label>Google OAuth client ID<input name="clientId" defaultValue={config.clientId} placeholder="...apps.googleusercontent.com" autoComplete="off"/></label>
    <label>Picker API key <span className="micro">optional for upload-only</span><input name="apiKey" defaultValue={config.apiKey} autoComplete="off"/></label>
@@ -81,7 +88,12 @@ export function DriveAssetManager(p:Props){
   {!p.selectedNode&&<p className="micro">Select a component first; imported images become evidence on that component.</p>}
   {!drivePickerConfigured(config)&&<p className="micro">Picker import needs client ID + API key + project number. Upload/back-up only needs the OAuth client ID.</p>}
   <hr/>
-  <div className="drive-heading"><h3>Project image assets</h3><span className="micro">{imageAssets.length} cached</span></div>
+  <h3>Archive generated project files</h3>
+  <p className="micro">Upload an exported PNG, browser-saved PDF or editable PPTX to the same DiagramCloud Assets folder. These files are cloud archives only; they are not copied into the project model.</p>
+  <label className="file-button">+ PNG / PDF / PPTX archive<input aria-label="Archive project file to Drive" type="file" accept=".png,.jpg,.jpeg,.webp,.pdf,.pptx" disabled={!connected||!!busy} onChange={e=>{const file=e.target.files?.[0];if(file)void archiveProjectFile(file);e.target.value='';}}/></label>
+  {archiveLink&&<p className="micro"><a href={archiveLink} target="_blank" rel="noopener noreferrer">Open last archived file in Drive ↗</a></p>}
+  <hr/>
+  <div className="drive-heading"><h3>Project image evidence</h3><span className="micro">{imageAssets.length} cached</span></div>
   {imageAssets.length===0?<p className="muted">No project images yet. Attach or import an image to create the first asset.</p>:<div className="drive-asset-list">{imageAssets.map(asset=><div className="drive-asset-row" key={asset.id}>
    <img src={asset.data} alt=""/>
    <div><strong>{asset.name}</strong><small>{assetDriveStatus(asset)==='drive'?'Drive-backed · local cache retained':'Local only'}</small>{asset.remote?.webViewLink&&<a href={asset.remote.webViewLink} target="_blank" rel="noopener noreferrer">Open in Drive ↗</a>}</div>
