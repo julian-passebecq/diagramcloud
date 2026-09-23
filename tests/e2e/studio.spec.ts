@@ -38,7 +38,7 @@ test('edit, undo and persistence survive reload',async({page})=>{
  await page.getByRole('button',{name:'Explore SQL quality checks',exact:true}).click();await page.getByLabel('Component label').fill('Reviewed SQL checks');await page.getByRole('button',{name:'Apply component',exact:true}).click();
  await expect(page.getByRole('button',{name:'Explore Reviewed SQL checks',exact:true})).toBeVisible();await page.getByRole('button',{name:'Undo',exact:true}).click();
  await expect(page.getByRole('button',{name:'Explore SQL quality checks',exact:true})).toBeVisible();await page.getByRole('button',{name:'Redo',exact:true}).click();
- await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();await page.reload();await expect(page.getByRole('button',{name:'Explore Reviewed SQL checks',exact:true})).toBeVisible();
+ await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();await page.reload();await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();await expect(page.getByRole('button',{name:'Explore Reviewed SQL checks',exact:true})).toBeVisible();
 });
 test('invalid imports cannot mutate the document',async({page})=>{
  await page.goto('/');await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();await page.getByRole('button',{name:'JSON / AI',exact:true}).click();await page.getByLabel('Project JSON').fill('{"schemaVersion":9000}');await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
