@@ -39,6 +39,7 @@ Explore is read-only. Edit enables dragging, handle-to-handle connections, node 
 
 | Project | Scope | Provenance |
 |---|---|---|
+| Datapass architecture map | Overall platform → Foil macro → BigQuery/GCP/DuckLake/Databricks sub-architectures → static task/table examples | Author-created current-state planning model |
 | TotalEnergies | Cost/schedule flow, SQL checks, sample model and reporting | Reconstructed from two supplied PDFs; synthetic code and rows |
 | Foil'O Ecologie | Physical hydrofoil, Databricks workflow, governance, scenario assumptions | Reconstructed from the PDFs; not a verified scientific solver |
 | Microsoft Fabric | Medallion architecture, ingestion and Silver transformation | Independently authored reference with official documentation links |
@@ -102,3 +103,10 @@ The current reliability branch adds latest-snapshot autosave status, rapid-edit 
 The `feat/diagramcloud-v1.2-drive-assets` pass adds a user-triggered Google Drive image connector without changing the local-first ownership model. Images imported from Drive are normalized and cached in the project; editable PPTX and standalone HTML exports use that cached copy and therefore remain independent of Drive authentication. Drive uses the narrow `drive.file` scope, and authoring-only Drive identifiers are removed from public documents.
 
 See [docs/GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md) for Google Cloud setup, Picker configuration, security boundaries and the AI-image workflow.
+
+
+### V1.3 architecture lab
+
+The `feat/diagramcloud-v1.3-architecture-lab` branch turns DiagramCloud into the working architecture map for the current Datapass/Foil environment. The default sample drills from the overall project map into the Foil multi-cloud macro architecture, then into provider responsibilities such as BigQuery historical analytics, and finally into static table rows, SQL tasks and expected outputs. The app remains explanatory: it does not execute BigQuery, Oracle, Fabric, Databricks or Airflow.
+
+Google Drive is widened from image-only backup into a user-triggered project file archive for PNG/JPEG/WebP/PDF/PPTX. Binary exports remain outside the DiagramCloud JSON document; image evidence still uses the bounded sanitized local cache. The architecture sample models Cloud Storage as the optional object layer and BigQuery as searchable metadata/historical analytics rather than a binary file store or duplicate medallion lakehouse.
