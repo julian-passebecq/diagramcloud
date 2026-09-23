@@ -6,7 +6,7 @@ const total=samples.find(d=>d.id==='total-project-controls')!;
 
 test('gallery and three-level drilldown retain the architecture',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');
- await expect(page.getByRole('heading',{name:'Datapass | project architecture map',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Data Projects | constellation',exact:true})).toBeVisible();
  await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();
  await expect(page.getByRole('heading',{name:'TotalEnergies',exact:true})).toBeVisible();
  await expect(page.getByTestId('view-overview')).toBeVisible();
@@ -22,6 +22,8 @@ test('gallery and three-level drilldown retain the architecture',async({page})=>
 
 test('Datapass map drills from overall architecture to BigQuery task rows',async({page})=>{
  await page.goto('/');
+ await expect(page.getByRole('heading',{name:'Data Projects | constellation',exact:true})).toBeVisible();
+ await page.locator('.project-card').filter({hasText:'Datapass | project architecture map'}).click();
  await expect(page.getByRole('heading',{name:'Datapass | project architecture map',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Explore Foil data platform',exact:true}).click();
  await expect(page.getByTestId('view-foil-platform')).toBeVisible();
@@ -31,6 +33,20 @@ test('Datapass map drills from overall architecture to BigQuery task rows',async
  await expect(page.getByTestId('view-bq-telemetry-table')).toBeVisible();
  await page.getByRole('button',{name:'Explore Historical SQL task',exact:true}).click();
  await expect(page.getByTestId('block-bq-history-sql')).toContainText('AVG(power_kw)');
+});
+
+
+test('project constellation drills into implemented Contoso and Atlas architectures',async({page})=>{
+ await page.goto('/');
+ await expect(page.getByRole('heading',{name:'Data Projects | constellation',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Explore Core learning products',exact:true}).click();
+ await expect(page.getByTestId('view-core-products')).toBeVisible();
+ await page.getByRole('button',{name:'Explore Contoso Data Studio',exact:true}).click();
+ await expect(page.getByTestId('view-contoso-product')).toBeVisible();
+ await page.getByRole('button',{name:'Explore DuckLake Bronze',exact:true}).click();
+ await expect(page.getByTestId('view-contoso-models')).toBeVisible();
+ await page.getByText('contoso.gold.monthly_sales',{exact:true}).first().scrollIntoViewIfNeeded();
+ await expect(page.getByText('contoso.gold.monthly_sales',{exact:true}).first()).toBeVisible();
 });
 
 test('edit, undo and persistence survive reload',async({page})=>{
@@ -66,7 +82,7 @@ test('reduced motion and Fabric icon loading',async({browser})=>{
  await expect.poll(()=>page.locator('.official-icon').evaluate((img:HTMLImageElement)=>img.complete&&img.naturalWidth>0)).toBe(true);await page.screenshot({path:'test-results/showcase-fabric.png',fullPage:true});await context.close();
 });
 test('mobile layout does not overflow viewport',async({page})=>{
- await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.getByRole('heading',{name:'Datapass | project architecture map',exact:true})).toBeVisible();const dimensions=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.width+2);await page.screenshot({path:'test-results/showcase-mobile.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.getByRole('heading',{name:'Data Projects | constellation',exact:true})).toBeVisible();const dimensions=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.width+2);await page.screenshot({path:'test-results/showcase-mobile.png',fullPage:true});
 });
 
 
@@ -100,7 +116,7 @@ test('a corrupt IndexedDB row does not disable healthy projects',async({page})=>
   };
  }));
  await page.reload();
- await expect(page.getByRole('heading',{name:'Datapass | project architecture map',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Data Projects | constellation',exact:true})).toBeVisible();
  await expect(page.getByText(/saved project could not be read/)).toBeVisible();
  await expect(page.getByRole('tab',{name:'Edit',exact:true})).toBeEnabled();
 });
