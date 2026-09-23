@@ -5,6 +5,7 @@ import {previewDocumentChange} from '../src/core/changePreview';
 import {clone} from '../src/core/model';
 import {samples} from '../src/data/samples';
 import {NODE_HEIGHT,NODE_WIDTH,orthogonalRoute,routeIsOrthogonal,routeLabel,sceneBounds} from '../src/export/scene';
+const total=samples.find(d=>d.id==='total-project-controls')!;
 
 test('save queue never reports saved while a newer edit is queued',async()=>{
  const states:string[]=[];
@@ -36,7 +37,7 @@ test('only the newest save failure is surfaced',async()=>{
 });
 
 test('document preview reports stable-id edits and revision compatibility',()=>{
- const current=clone(samples[0]);current.revision=7;
+ const current=clone(total);current.revision=7;
  const incoming=clone(current);incoming.title='Reviewed architecture';incoming.nodes.find(node=>node.id==='checks')!.label='Reviewed SQL checks';incoming.nodes.push({...clone(incoming.nodes[0]),id:'new-node',label:'New task'});
  const preview=previewDocumentChange(current,incoming);
  assert.equal(preview.sameProject,true);
@@ -50,7 +51,7 @@ test('document preview reports stable-id edits and revision compatibility',()=>{
 });
 
 test('documents with a different project id are treated as new imports',()=>{
- const current=clone(samples[0]),incoming=clone(samples[0]);incoming.id='new-project';incoming.revision=999;
+ const current=clone(total),incoming=clone(total);incoming.id='new-project';incoming.revision=999;
  const preview=previewDocumentChange(current,incoming);
  assert.equal(preview.sameProject,false);
  assert.equal(preview.revision.compatible,true);
