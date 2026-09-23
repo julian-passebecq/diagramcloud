@@ -191,15 +191,30 @@ export async function createDriveAssetFolder(token:string,name='DiagramCloud Ass
  if(!response.ok)throw await driveError(response);
  return await response.json() as DriveFile;
 }
-export async function uploadDriveImage(blob:Blob,name:string,token:string,parentId=''):Promise<DriveFile>{
- if(!['image/png','image/jpeg','image/webp'].includes(blob.type))throw new Error('Only PNG, JPEG and WebP can be uploaded to the DiagramCloud Drive vault');
- const boundary=`diagramcloud_${crypto.randomUUID().replaceAll('-','')}`;
- const metadata:{name:string;parents?:string[]}={name:name.slice(0,160)||'diagramcloud-image.png'};
+const DRIVE_ARCHIVE_TYPES=new Set([
+ 'image/png','image/jpeg','image/webp',
+ 'application/pdf',
+ 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+]);
+function archiveMime(blob:Blob,name:string):string{
+ const lower=name.toLowerCase(),mime=blob.type||
+  (lower.endsWith('.pdf')?'application/pdf':
+   lower.endsWith('.pptx')?'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+   lower.endsWith('.png')?'image/png':
+   lower.endsWith('.jpg')||lower.endsWith('.jpeg')?'image/jpeg':
+   lower.endsWith('.webp')?'image/webp':'');
+ if(!DRIVE_ARCHIVE_TYPES.has(mime))throw new Error('Drive archive accepts PNG, JPEG, WebP, PDF or PPTX files');
+ if(blob.size>25*1024*1024)throw new Error('Drive archive files are limited to 25 MiB');
+ return mime;
+}
+export async function uploadDriveFile(blob:Blob,name:string,token:string,parentId=''):Promise<DriveFile>{
+ const mime=archiveMime(blob,name),boundary=`diagramcloud_${crypto.randomUUID().replaceAll('-','')}`;
+ const metadata:{name:string;parents?:string[]}={name:name.slice(0,160)||'diagramcloud-export'};
  if(parentId)metadata.parents=[parentId];
  const body=new Blob([
   `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n`,
   JSON.stringify(metadata),
-  `\r\n--${boundary}\r\nContent-Type: ${blob.type}\r\n\r\n`,
+  `\r\n--${boundary}\r\nContent-Type: ${mime}\r\n\r\n`,
   blob,
   `\r\n--${boundary}--`
  ],{type:`multipart/related; boundary=${boundary}`});
@@ -208,6 +223,10 @@ export async function uploadDriveImage(blob:Blob,name:string,token:string,parent
  });
  if(!response.ok)throw await driveError(response);
  return await response.json() as DriveFile;
+}
+export async function uploadDriveImage(blob:Blob,name:string,token:string,parentId=''):Promise<DriveFile>{
+ if(!['image/png','image/jpeg','image/webp'].includes(blob.type))throw new Error('Only PNG, JPEG and WebP can be uploaded as DiagramCloud image evidence');
+ return uploadDriveFile(blob,name,token,parentId);
 }
 export async function getDriveFileMetadata(fileId:string,token:string):Promise<DriveFile>{
  const response=await fetch(`${DRIVE_API}/files/${encodeURIComponent(fileId)}?fields=id,name,mimeType,webViewLink,modifiedTime,size`,{headers:authHeaders(token)});
