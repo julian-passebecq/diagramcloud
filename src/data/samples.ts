@@ -85,6 +85,198 @@ function medallion(platform:'Microsoft Fabric'|'Databricks'):Project{
  block(d,'contract',{id:'silver-contract',title:'Illustrative table contract',type:'table',columns:['Property','Definition'],rows:[['Grain','One current row per order'],['Business key','order_id'],['Ordering','updated_at, then unique ingestion_id'],['Quality','order_id is present; totals meet business rules'],['Security','No real customer rows in this demo']],provenance:'synthetic'});
  d.story=[{title:'Three responsibilities, not three colours',viewId:'overview',nodeId:'bronze',narration:'Raw records, validated data and business-ready models have different responsibilities.',highlightEdgeIds:[]},{title:'Explain a transformation',viewId:'silver-detail',nodeId:'dedup',narration:'A declared key and deterministic ordering are more useful than an unexplained Spark icon.',highlightEdgeIds:[]}];return validateDocument(d);
 }
+
+const platform=project(
+ 'datapass-platform',
+ 'Datapass | project architecture map',
+ 'A clickable map of the current learning and portfolio infrastructure. Start at the overall platform, open Foil or the GCP asset hub, then continue to a concrete table, task or example row.',
+ 'Reference',
+ ['Datapass','Foil','GCP','BigQuery','Fabric','Databricks','DuckLake','Airflow']
+);
+platform.provenance='Author-created architecture plan for the Datapass/Foil lab. Product names describe intended responsibilities; static example rows and tasks are pedagogical and do not imply live cloud connections.';
+
+node(platform,'workstation','VS Code + local tools','app',{provider:'VS Code',summary:'Authoring surface for DiagramCloud, Datapass Studio and project code',childViewId:'studio-workspace'});
+node(platform,'foil-project','Foil data platform','process',{provider:'Multi-cloud',summary:'Operational data, streaming, historical analytics and ML',childViewId:'foil-platform'});
+node(platform,'gcp-hub','GCP asset + analytics hub','storage',{provider:'Google Cloud',summary:'Drive archives, object storage and BigQuery metadata/analytics',childViewId:'gcp-assets'});
+node(platform,'portfolio','Portfolio + CV + website','app',{provider:'DiagramCloud',summary:'Architecture stories and generated PNG/PDF/PPTX artifacts',childViewId:'portfolio-flow'});
+node(platform,'learning','Datapass Studio','app',{provider:'Local-first',summary:'Notebook, Spark, dbt, Airflow, Fabric and warehouse learning surface',childViewId:'learning-stack'});
+view(platform,'overview','Datapass | overall architecture','Use this as the top-level map. Each major project opens into its own macro architecture; leaf components expose static task tables, code or example data rather than querying a live system.',['workstation','foil-project','gcp-hub','portfolio','learning'],[
+ ['workstation','foil-project','develop'],
+ ['workstation','portfolio','author'],
+ ['workstation','learning','learn'],
+ ['portfolio','gcp-hub','archive outputs'],
+ ['foil-project','gcp-hub','historical analytics']
+],3);
+
+node(platform,'dc','DiagramCloud','app',{provider:'React + Fluent UI',summary:'Architecture editor, drilldown model and export engine'});
+node(platform,'google-ext','Official Google tooling','control',{provider:'Google Cloud',summary:'Use official BigQuery/Cloud tooling rather than rebuild a SQL explorer'});
+node(platform,'project-json','Project JSON','storage',{provider:'Local',summary:'Validated source-of-truth documents and AI-editable architecture state'});
+node(platform,'exports','PNG / PDF / PPTX','report',{provider:'DiagramCloud',summary:'Generated project artifacts for sharing and portfolio use'});
+view(platform,'studio-workspace','VS Code workspace | author and inspect','DiagramCloud owns project storytelling and exports. Official provider extensions own provider-specific browsing/query experiences.',['dc','project-json','google-ext','exports'],[
+ ['project-json','dc','load/edit'],
+ ['dc','exports','generate'],
+ ['google-ext','dc','reference architecture','dependency']
+]);
+
+node(platform,'simulator','Wind / hydrofoil simulator','source',{provider:'Foil lab',summary:'Synthetic machine and sensor events'});
+node(platform,'oracle-op','Oracle operational DB','storage',{provider:'Oracle',summary:'Machine config, maintenance, runs and operational state',childViewId:'oracle-tables'});
+node(platform,'kafka','Kafka event bus','process',{provider:'Kafka',summary:'Transport high-frequency telemetry to real-time consumers'});
+node(platform,'fabric-rt','Fabric real-time analytics','report',{provider:'Microsoft Fabric',summary:'Eventstream / Eventhouse / KQL / Power BI for live operational views',childViewId:'fabric-tasks'});
+node(platform,'airflow','Airflow orchestration','control',{provider:'Apache Airflow',summary:'Scheduled extraction, aggregation and cross-system jobs',childViewId:'airflow-tasks'});
+node(platform,'bigquery','BigQuery historical analytics','storage',{provider:'Google Cloud',summary:'Serverless SQL for curated logs, JSON and telemetry history',childViewId:'bigquery-detail'});
+node(platform,'ducklake','MotherDuck / DuckLake','storage',{provider:'MotherDuck',summary:'Separate Bronze / Silver / Gold learning lakehouse',childViewId:'ducklake-detail'});
+node(platform,'databricks-ml','Databricks ML','model',{provider:'Databricks',summary:'PySpark feature engineering, experiments and MLflow',childViewId:'databricks-detail'});
+view(platform,'foil-platform','Foil | macro data architecture','The same Foil source can feed different responsibilities: Oracle for operational state, Kafka/Fabric for real time, Airflow/BigQuery for historical analytics, DuckLake for medallion practice and Databricks for ML.',['simulator','oracle-op','kafka','fabric-rt','airflow','bigquery','ducklake','databricks-ml'],[
+ ['simulator','oracle-op','operational writes'],
+ ['simulator','kafka','telemetry','stream'],
+ ['kafka','fabric-rt','live events','stream'],
+ ['oracle-op','airflow','scheduled extract','batch'],
+ ['airflow','bigquery','logs + snapshots','batch'],
+ ['airflow','ducklake','training pipeline','batch'],
+ ['ducklake','databricks-ml','curated features','dependency']
+],4);
+
+node(platform,'oracle-machine','machines','table',{provider:'Oracle',summary:'Machine identity, deployment and configuration'});
+node(platform,'oracle-run','simulation_runs','table',{provider:'Oracle',summary:'One operational run with status, timestamps and version'});
+node(platform,'oracle-maint','maintenance_events','table',{provider:'Oracle',summary:'Inspection and maintenance state'});
+view(platform,'oracle-tables','Oracle | operational schema examples','Static example tables clarify what belongs in the operational system.',['oracle-machine','oracle-run','oracle-maint'],[
+ ['oracle-machine','oracle-run','machine_id','dependency'],
+ ['oracle-machine','oracle-maint','machine_id','dependency']
+]);
+block(platform,'oracle-run',{id:'oracle-run-table',title:'simulation_runs example',type:'table',columns:['run_id','machine_id','started_at','status','config_version'],rows:[
+ ['run-1042','foil-01','2026-09-23T11:00:00Z','completed','cfg-18'],
+ ['run-1043','foil-01','2026-09-23T12:00:00Z','running','cfg-18']
+],provenance:'synthetic'});
+
+node(platform,'eventstream','Eventstream ingestion','process',{provider:'Microsoft Fabric',summary:'Receive Kafka/event source and route operational events'});
+node(platform,'eventhouse','Eventhouse / KQL','storage',{provider:'Microsoft Fabric',summary:'Low-latency event analytics'});
+node(platform,'live-bi','Power BI live dashboard','report',{provider:'Power BI',summary:'Current machine status, alerts and recent telemetry'});
+view(platform,'fabric-tasks','Fabric | real-time responsibility','Keep this branch focused on current operational visibility rather than historical lakehouse duplication.',['eventstream','eventhouse','live-bi'],[
+ ['eventstream','eventhouse','ingest','stream'],
+ ['eventhouse','live-bi','KQL model','query']
+]);
+block(platform,'live-bi',{id:'live-kpis',title:'Illustrative live KPI panel',type:'table',columns:['KPI','Example','Refresh intent'],rows:[
+ ['active_machine','foil-01','near real time'],
+ ['power_kw','18.7','near real time'],
+ ['current_velocity_ms','1.6','near real time'],
+ ['open_alerts','1','near real time']
+],provenance:'synthetic'});
+
+node(platform,'extract-job','Oracle snapshot DAG','process',{provider:'Airflow',summary:'Extract changed operational rows on a schedule'});
+node(platform,'log-job','Log aggregation DAG','process',{provider:'Airflow',summary:'Aggregate API/job logs into analytical records'});
+node(platform,'catalog-job','Asset catalog DAG','process',{provider:'Airflow',summary:'Index generated file metadata for the GCP catalog'});
+view(platform,'airflow-tasks','Airflow | orchestration examples','Airflow schedules repeatable work. It is deliberately not the telemetry message bus.',['extract-job','log-job','catalog-job'],[
+ ['extract-job','log-job','independent schedule','dependency'],
+ ['log-job','catalog-job','shared run metadata','dependency']
+]);
+block(platform,'extract-job',{id:'airflow-extract-task',title:'DAG task contract',type:'table',columns:['Task','Input','Output','Cadence'],rows:[
+ ['extract_oracle_telemetry','Oracle telemetry rows','staged Parquet/JSON','15 min'],
+ ['load_bigquery_history','staged batch','foil.telemetry_history','15 min'],
+ ['compact_training_snapshot','validated batch','DuckLake Bronze','hourly']
+],provenance:'synthetic'});
+
+node(platform,'bq-telemetry','foil.telemetry_history','table',{provider:'BigQuery',summary:'Partitioned historical telemetry for serverless SQL',childViewId:'bq-telemetry-table'});
+node(platform,'bq-logs','foil.job_logs','table',{provider:'BigQuery',summary:'Analytical job/API log events'});
+node(platform,'bq-assets','datapass.asset_catalog','table',{provider:'BigQuery',summary:'Searchable metadata for generated project artifacts',childViewId:'bq-asset-table'});
+node(platform,'bq-json','JSON / nested examples','function',{provider:'BigQuery',summary:'Practice STRUCT, ARRAY and JSON without duplicating the lakehouse'});
+view(platform,'bigquery-detail','BigQuery | historical + metadata layer','BigQuery is not the binary file store and not a second Bronze/Silver/Gold system. It holds queryable history and metadata around project assets.',['bq-telemetry','bq-logs','bq-assets','bq-json'],[
+ ['bq-telemetry','bq-json','analyze','query'],
+ ['bq-logs','bq-json','analyze','query'],
+ ['bq-assets','bq-json','search','query']
+]);
+
+node(platform,'telemetry-row','Example telemetry rows','table',{summary:'Static synthetic rows at five-minute grain'});
+node(platform,'telemetry-sql','Historical SQL task','function',{provider:'GoogleSQL',summary:'Example aggregation task; displayed only'});
+node(platform,'telemetry-output','Expected result','table',{summary:'Expected result from the synthetic rows'});
+view(platform,'bq-telemetry-table','BigQuery | from table to task','This leaf demonstrates the final drill-down level: table rows, a query task and the expected output. DiagramCloud displays them; it does not execute BigQuery.',['telemetry-row','telemetry-sql','telemetry-output'],[
+ ['telemetry-row','telemetry-sql','input rows','query'],
+ ['telemetry-sql','telemetry-output','expected result','query']
+]);
+block(platform,'telemetry-row',{id:'bq-telemetry-rows',title:'Synthetic telemetry_history rows',type:'table',columns:['event_ts','machine_id','power_kw','velocity_ms','status'],rows:[
+ ['2026-09-23T12:00:00Z','foil-01',18.2,1.55,'ok'],
+ ['2026-09-23T12:05:00Z','foil-01',18.7,1.60,'ok'],
+ ['2026-09-23T12:10:00Z','foil-01',0,1.61,'alert']
+],provenance:'synthetic'});
+block(platform,'telemetry-sql',{id:'bq-history-sql',title:'Example GoogleSQL task',type:'code',language:'sql',code:"SELECT\n  machine_id,\n  DATE(event_ts) AS day,\n  AVG(power_kw) AS avg_power_kw,\n  COUNTIF(status = 'alert') AS alerts\nFROM foil.telemetry_history\nGROUP BY machine_id, day;",provenance:'synthetic'});
+block(platform,'telemetry-output',{id:'bq-history-result',title:'Expected aggregation',type:'table',columns:['machine_id','day','avg_power_kw','alerts'],rows:[
+ ['foil-01','2026-09-23',12.3,1]
+],provenance:'synthetic'});
+
+node(platform,'asset-row','Asset catalog rows','table',{summary:'Metadata points to files stored elsewhere'});
+node(platform,'asset-search','Search task','function',{provider:'GoogleSQL',summary:'Find architecture outputs by project and type'});
+view(platform,'bq-asset-table','BigQuery | project asset catalog','Binary files remain in Drive or Cloud Storage. BigQuery stores searchable metadata, provenance and lifecycle information.',['asset-row','asset-search'],[
+ ['asset-row','asset-search','filter metadata','query']
+]);
+block(platform,'asset-row',{id:'asset-catalog-rows',title:'Synthetic asset metadata',type:'table',columns:['project','file_name','mime_type','storage','version'],rows:[
+ ['foil','foil_macro_v3.pptx','application/pptx','Google Drive','v3'],
+ ['portfolio','cloud_architecture.png','image/png','Cloud Storage','v5'],
+ ['cv','cv_cloud_bi.pdf','application/pdf','Google Drive','2026-09']
+],provenance:'synthetic'});
+block(platform,'asset-search',{id:'asset-search-sql',title:'Find architecture exports',type:'code',language:'sql',code:"SELECT project, file_name, storage, version\nFROM datapass.asset_catalog\nWHERE REGEXP_CONTAINS(LOWER(file_name), r'architecture|macro')\nORDER BY project, version DESC;",provenance:'synthetic'});
+
+node(platform,'drive-vault','Google Drive archive','storage',{provider:'Google Drive',summary:'Human-accessible PNG/PDF/PPTX archive created from DiagramCloud'});
+node(platform,'gcs-objects','Cloud Storage objects','storage',{provider:'Google Cloud Storage',summary:'Optional object layer for scalable asset/object workflows'});
+node(platform,'bq-catalog','BigQuery asset catalog','storage',{provider:'BigQuery',summary:'Metadata, logs, JSON and analytical history'});
+node(platform,'object-link','Object metadata link','process',{provider:'GCP',summary:'URI + metadata connects files to queryable catalog records'});
+view(platform,'gcp-assets','GCP | assets and analytics','Drive is the convenient archive already integrated in V1.2. Cloud Storage is the object layer when needed; BigQuery indexes/query metadata rather than holding PPTX/PDF/PNG bytes.',['drive-vault','gcs-objects','object-link','bq-catalog'],[
+ ['drive-vault','object-link','archive metadata'],
+ ['gcs-objects','object-link','object URI'],
+ ['object-link','bq-catalog','catalog row','batch']
+]);
+block(platform,'drive-vault',{id:'drive-export-contract',title:'DiagramCloud export archive',type:'table',columns:['Artifact','Generated by','Archive target','Queryable metadata'],rows:[
+ ['PNG','DiagramCloud','Google Drive / optional GCS','BigQuery asset_catalog'],
+ ['PDF','Browser print','Google Drive / optional GCS','BigQuery asset_catalog'],
+ ['PPTX','DiagramCloud','Google Drive / optional GCS','BigQuery asset_catalog']
+],provenance:'synthetic'});
+
+node(platform,'bronze-local','Bronze','storage',{provider:'DuckLake',summary:'Raw files/events with ingestion context'});
+node(platform,'silver-local','Silver','storage',{provider:'DuckLake',summary:'Validated and conformed data'});
+node(platform,'gold-local','Gold','storage',{provider:'DuckLake',summary:'Business-ready learning datasets'});
+view(platform,'ducklake-detail','DuckLake | medallion responsibility','This is the dedicated Bronze/Silver/Gold learning path. BigQuery does not duplicate it.',['bronze-local','silver-local','gold-local'],[
+ ['bronze-local','silver-local','validate'],
+ ['silver-local','gold-local','model']
+]);
+
+node(platform,'features','Feature dataset','table',{provider:'Databricks',summary:'Curated training features from stable inputs'});
+node(platform,'experiment','ML experiment','model',{provider:'MLflow',summary:'Parameters, metrics and model version'});
+node(platform,'scored','Scored scenarios','table',{provider:'Databricks',summary:'Predictions or experiment outputs for comparison'});
+view(platform,'databricks-detail','Databricks | ML responsibility','Keep Databricks focused on PySpark/ML/MLflow experimentation rather than duplicating BigQuery historical SQL or Fabric real-time dashboards.',['features','experiment','scored'],[
+ ['features','experiment','train'],
+ ['experiment','scored','score']
+]);
+block(platform,'features',{id:'feature-contract',title:'Example feature contract',type:'table',columns:['feature','type','meaning'],rows:[
+ ['velocity_mean_15m','DOUBLE','Recent mean current velocity'],
+ ['power_std_15m','DOUBLE','Recent output variability'],
+ ['alert_count_1h','INT','Recent operational alerts']
+],provenance:'synthetic'});
+
+node(platform,'notebook','Notebook / Mosaic','app',{provider:'Datapass Studio',summary:'Flexible notebook and explanation surface'});
+node(platform,'sparklab','SparkLab','process',{provider:'PySpark',summary:'Simulated Spark learning kernel'});
+node(platform,'dbt-lab','dbt + lineage','process',{provider:'dbt',summary:'Transformations, tests and model graph'});
+node(platform,'fabric-lab','Fabric lab','app',{provider:'Microsoft Fabric',summary:'Notebook/pipeline/event architecture exercises'});
+view(platform,'learning-stack','Datapass Studio | learning toolbox','One teaching platform composes reusable tools instead of splitting each technology into a separate app.',['notebook','sparklab','dbt-lab','fabric-lab'],[
+ ['notebook','sparklab','execute'],
+ ['sparklab','dbt-lab','dataset'],
+ ['dbt-lab','fabric-lab','architecture exercise','dependency']
+]);
+
+node(platform,'diagram-author','DiagramCloud model','app',{provider:'DiagramCloud',summary:'Author project architecture and evidence'});
+node(platform,'artifact-export','Generate PNG/PDF/PPTX','report',{provider:'DiagramCloud',summary:'Create static/shareable project outputs'});
+node(platform,'archive-file','Archive output','storage',{provider:'Google Drive',summary:'Keep human-readable project versions'});
+node(platform,'catalog-file','Catalog metadata','storage',{provider:'BigQuery',summary:'Index project, type, version and URI'});
+view(platform,'portfolio-flow','Portfolio artifacts | author to archive','Use the same architecture model to generate portfolio visuals, then archive the files and optionally catalog their metadata.',['diagram-author','artifact-export','archive-file','catalog-file'],[
+ ['diagram-author','artifact-export','export'],
+ ['artifact-export','archive-file','upload'],
+ ['archive-file','catalog-file','metadata record','batch']
+]);
+
+platform.story=[
+ {title:'Start from the overall map',viewId:'overview',nodeId:'foil-project',narration:'The top layer separates projects and shared infrastructure before opening provider detail.',highlightEdgeIds:[]},
+ {title:'Open the Foil macro architecture',viewId:'foil-platform',nodeId:'bigquery',narration:'Assign one primary responsibility to each platform: operational, streaming, historical SQL, medallion learning or ML.',highlightEdgeIds:[]},
+ {title:'Go down to a concrete BigQuery task',viewId:'bq-telemetry-table',nodeId:'telemetry-sql',narration:'Finish the explanation on synthetic rows, a displayed GoogleSQL task and its expected result rather than an abstract product box.',highlightEdgeIds:[]},
+ {title:'Show how project artifacts are managed',viewId:'gcp-assets',nodeId:'drive-vault',narration:'Generated PNG, PDF and PPTX files can be archived in Drive while BigQuery catalogs metadata around them.',highlightEdgeIds:[]}
+];
+
 const blank=project('blank-project','Start from a blank project','Build a small architecture, attach evidence, then add one drilldown at a time.','Blank',['Your project']);
 node(blank,'first-node','Your first component','process',{summary:'Switch to Edit to change this component.'});view(blank,'overview','Architecture overview','A diagram is the entry point; the evidence explains the work.',['first-node'],[]);
-export const samples:Project[]=[validateDocument(total),validateDocument(foilo),medallion('Microsoft Fabric'),medallion('Databricks'),validateDocument(blank)];
+export const samples:Project[]=[validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),validateDocument(blank)];
