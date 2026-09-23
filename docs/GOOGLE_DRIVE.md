@@ -1,6 +1,6 @@
-# Google Drive image assets
+# Google Drive project files
 
-DiagramCloud V1.2 can use Google Drive as an **optional image asset vault**. Drive is not the project database and is not required for PowerPoint or HTML export.
+DiagramCloud V1.3 can use Google Drive as an **optional project file archive** and image-evidence source. Drive is not the project database and is not required for PowerPoint or HTML export.
 
 ## Security model
 
@@ -37,6 +37,10 @@ VITE_GOOGLE_APP_ID=...
 ```
 
 No Google client secret belongs in a Vite/browser bundle.
+
+## V1.3 project file archive
+
+After connecting Drive, DiagramCloud can upload PNG, JPEG, WebP, PDF and PPTX files to the app-created `DiagramCloud Assets` folder. These archive files stay outside the DiagramCloud JSON model. Use this for generated architecture images, browser-saved PDFs and editable PPTX decks. Cloud Storage and BigQuery are modeled separately in the architecture sample: Cloud Storage is the optional object layer; BigQuery catalogs/query metadata and historical analytical data.
 
 ## User workflow
 
@@ -82,4 +86,4 @@ The hosted app permits only the Google origins required by Identity Services, Pi
 
 ## Current boundary
 
-V1.2 does not generate images itself. AI image generation can happen in ChatGPT or another image tool, after which the PNG can be uploaded to Drive or attached locally. A future image-generation provider should plug into the same asset-normalization contract rather than bypass it.
+V1.3 does not generate images itself. AI image generation can happen in ChatGPT or another image tool, after which the PNG can be uploaded to Drive or attached locally. A future image-generation provider should plug into the same asset-normalization contract rather than bypass it.
