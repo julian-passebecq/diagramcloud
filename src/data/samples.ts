@@ -98,7 +98,12 @@ constellation.provenance='Architecture reconstructed from julian-passebecq/datap
 constellation.sources=[
  {id:'src-registry',title:'julian-passebecq/dataprojects',location:'GitHub registry/constellation.json, tooling.json, services.json, domain-projects.json and repo-cartography.json',visibility:'public'},
  {id:'src-contoso',title:'julian-passebecq/contoso-data-studio',location:'GitHub README and implementation tree',visibility:'public'},
- {id:'src-atlas',title:'julian-passebecq/atlasmongov3',location:'GitHub README and docs/SCHEMA.md',visibility:'public'}
+ {id:'src-atlas',title:'julian-passebecq/atlasmongov3',location:'GitHub README and docs/SCHEMA.md',visibility:'public'},
+ {id:'src-vscode',title:'julian-passebecq/datapass-vscode',location:'GitHub README and implementation status',visibility:'public'},
+ {id:'src-foil-control',title:'julian-passebecq/foil-control-v1',location:'Private GitHub README reviewed with repository access; architecture summary only',visibility:'private'},
+ {id:'src-foil-dab',title:'julian-passebecq/foil_databrick_dab',location:'Private GitHub README reviewed with repository access; synthetic-lab architecture summary only',visibility:'private'},
+ {id:'src-pbibench',title:'julian-passebecq/powerbi_enhanced_dev',location:'GitHub README_RUN, V2 verification and architecture files',visibility:'public'},
+ {id:'src-factory',title:'julian-passebecq/fastapi-fabric',location:'GitHub README and V0.1 API scope',visibility:'public'}
 ];
 
 node(constellation,'core','Core learning products','app',{provider:'Portfolio registry',summary:'Canonical products and planned focused labs',childViewId:'core-products',sourceIds:['src-registry']});
@@ -163,7 +168,27 @@ view(constellation,'airflowlab-product','Airflow Lab | planned focused product',
 ]);
 
 node(constellation,'factory-ui','Fabric / ADF donor UI','app',{provider:'React Flow',summary:'Rich visual pipeline donor already exists'});
-node(constellation,'fabric-api','fastapi-fabric','process',{provider:'FastAPI',summary:'Implemented V0 Fabric semantics/control adapter'});
+node(constellation,'fabric-api','fastapi-fabric','process',{provider:'FastAPI',summary:'Implemented V0.1 pipeline semantics/control backend',childViewId:'fastapi-fabric-detail',sourceIds:['src-factory']});
+
+node(constellation,'pipeline-crud','Pipeline definitions','storage',{provider:'FastAPI API',summary:'CRUD for pipelines, parameters, variables and dependencies'});
+node(constellation,'pipeline-validate','Validate pipeline','function',{provider:'FastAPI API',summary:'POST pipeline validation before a simulated run'});
+node(constellation,'pipeline-runs','Run lifecycle','process',{provider:'Deterministic simulator',summary:'Create/list/get/cancel pipeline runs'});
+node(constellation,'expression-eval','Expression evaluator','function',{provider:'FastAPI API',summary:'Evaluate Data Factory-style expressions'});
+node(constellation,'adapter-seams','Execution adapter seams','control',{provider:'Architecture boundary',summary:'Optional Datapass Spark and future real Fabric execution remain adapters'});
+view(constellation,'fastapi-fabric-detail','fastapi-fabric | current V0.1 contract','This backend already owns orchestration semantics and a deterministic simulated run API. Persistent metadata, activity executors and real/local execution are later milestones.',['pipeline-crud','pipeline-validate','pipeline-runs','expression-eval','adapter-seams'],[
+ ['pipeline-crud','pipeline-validate','definition'],
+ ['pipeline-validate','pipeline-runs','validated run'],
+ ['expression-eval','pipeline-runs','expression semantics','dependency'],
+ ['adapter-seams','pipeline-runs','future executor','dependency']
+]);
+block(constellation,'fabric-api',{id:'factory-api-contract',title:'Implemented V0.1 endpoints',type:'table',columns:['Capability','API'],rows:[
+ ['Health/capabilities','GET /health, GET /api/v1/capabilities'],
+ ['Pipeline definitions','CRUD /api/v1/pipelines'],
+ ['Validation','POST /api/v1/pipelines/{pipeline_id}/validate'],
+ ['Runs','POST pipeline runs; GET runs/run; POST cancel'],
+ ['Expressions','POST /api/v1/expressions/evaluate']
+],provenance:'source-derived',sourceIds:['src-factory']});
+
 node(constellation,'duckle','Duckle','process',{provider:'External candidate',summary:'Potential local ETL/data-flow engine over DuckDB/DuckLake'});
 node(constellation,'factory-preview','Data Preview + Inspect','report',{provider:'Target product',summary:'Preview pipeline outputs and transformation evidence'});
 node(constellation,'factory-monitor','Monitor','report',{provider:'Target product',summary:'Runs, task state and execution evidence'});
@@ -221,10 +246,32 @@ block(constellation,'gold-monthly',{id:'gold-monthly-contract',title:'Documented
 ],provenance:'source-derived',sourceIds:['src-contoso']});
 
 node(constellation,'te2','TabularEditor_J / TE2 donor','process',{provider:'TOM',summary:'Implemented semantic-model engine donor'});
-node(constellation,'pbibench-donor','PbiBench donor','app',{provider:'powerbi_enhanced_dev',summary:'Broad Power BI engineering IDE donor'});
-node(constellation,'semantic-diagram','Semantic model diagram','model',{provider:'Planned React Flow',summary:'Relationships, cardinality and filter direction'});
-node(constellation,'dax-editor','DAX editor / query results','function',{provider:'Planned',summary:'Formatting, lineage, exercises and query results'});
+node(constellation,'pbibench-donor','PbiBench donor','app',{provider:'powerbi_enhanced_dev',summary:'Implemented broad Power BI engineering IDE donor',childViewId:'pbibench-detail',sourceIds:['src-pbibench']});
+node(constellation,'semantic-diagram','Focused Semantic Lab diagram','model',{provider:'Planned extraction',summary:'Focused learning view should reuse existing PbiBench relationship-diagram capability'});
+node(constellation,'dax-editor','Focused DAX learning workbench','function',{provider:'Planned extraction',summary:'Reuse the existing PbiBench DAX query/language-service capability in a smaller learning product'});
 node(constellation,'connected-mode','Real TOM / ADOMD mode','process',{provider:'Planned',summary:'Connected semantic-model/DAX execution'});
+
+node(constellation,'semantic-view-real','Semantic View / relationship diagram','model',{provider:'PbiBench',summary:'Implemented table roles, cardinality, active/inactive relationships and filter arrows'});
+node(constellation,'dax-workbench-real','DAX Workbench','function',{provider:'PbiBench',summary:'Implemented editor/query workspace with model context, results and language services'});
+node(constellation,'pbip-git','PBIP / Git','storage',{provider:'PbiBench',summary:'Detect PBIP, semantic folders, TMDL/PBIR, branch/dirty state; no automatic commits'});
+node(constellation,'report-impact','Report usage / lineage','process',{provider:'PbiBench.Pbir',summary:'Semantic-to-report usage, immutable indexing and reviewed change plans'});
+node(constellation,'external-hub','External Tool Hub','control',{provider:'DAX Studio / Bravo / Desktop / VS Code',summary:'Distinct bridge lanes; tool authentication remains external'});
+node(constellation,'report-studio','Report Studio','app',{provider:'.NET 10 WPF',summary:'Separate process for report-oriented work; not merged into semantic engine'});
+view(constellation,'pbibench-detail','PbiBench | implemented engineering donor','PbiBench already contains the semantic and DAX capabilities that the focused PBI Lab should extract rather than reimplement. Live Desktop/DAX Studio/Bravo/XMLA execution remains a separate external boundary when not connected.',['semantic-view-real','dax-workbench-real','pbip-git','report-impact','external-hub','report-studio'],[
+ ['semantic-view-real','dax-workbench-real','model context'],
+ ['pbip-git','semantic-view-real','semantic source'],
+ ['semantic-view-real','report-impact','structural references'],
+ ['dax-workbench-real','external-hub','analyze externally','control'],
+ ['pbip-git','report-studio','report source','dependency']
+],3);
+block(constellation,'pbibench-donor',{id:'pbibench-current-capability',title:'Verified donor capabilities',type:'table',columns:['Capability','Current evidence'],rows:[
+ ['Semantic View','relationship metadata, table roles, cardinality, active/inactive styles, filter arrows'],
+ ['DAX','query engine, editor/workbench, language-service regressions, DAX Studio bridge'],
+ ['PBIP / Git','PBIP/TMDL/PBIR/project state detection; no automatic commits'],
+ ['Lineage / impact','report usage + reviewed semantic/report change planning'],
+ ['External tools','DAX Studio, Bravo, Power BI Desktop and VS Code remain distinct bridge lanes']
+],provenance:'source-derived',sourceIds:['src-pbibench']});
+
 view(constellation,'pbilab-product','PBI / Semantic Lab | focused extraction from donors','The focused learning product should reuse the existing TE2/PbiBench capability without becoming another giant engineering IDE.',['te2','pbibench-donor','semantic-diagram','dax-editor','connected-mode'],[
  ['te2','semantic-diagram','model engine','dependency'],
  ['pbibench-donor','dax-editor','editor donor','dependency'],
@@ -333,7 +380,7 @@ block(constellation,'foil-dab',{id:'foil-dab-status',title:'FOIL DAB implementat
  ['Identity','scenario/run IDs + configuration hashes append-only'],
  ['Source of truth','DAB for Databricks deployment configuration'],
  ['Optional Neon','inspection/export only; not Databricks Gold replacement']
-],provenance:'source-derived',sourceIds:['src-registry']});
+],provenance:'source-derived',sourceIds:['src-foil-dab']});
 
 node(constellation,'foil-oracle','Oracle operational state','storage',{provider:'Oracle',summary:'Machine/run/config/maintenance operational records'});
 node(constellation,'foil-kafka','Kafka telemetry bus','process',{provider:'Kafka',summary:'High-frequency event transport'});
