@@ -110,3 +110,21 @@ See [docs/GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md) for Google Cloud setup, Picker 
 The `feat/diagramcloud-v1.3-architecture-lab` branch turns DiagramCloud into the working architecture map for the current Datapass/Foil environment. The default sample drills from the overall project map into the Foil multi-cloud macro architecture, then into provider responsibilities such as BigQuery historical analytics, and finally into static table rows, SQL tasks and expected outputs. The app remains explanatory: it does not execute BigQuery, Oracle, Fabric, Databricks or Airflow.
 
 Google Drive is widened from image-only backup into a user-triggered project file archive for PNG/JPEG/WebP/PDF/PPTX. Binary exports remain outside the DiagramCloud JSON document; image evidence still uses the bounded sanitized local cache. The architecture sample models Cloud Storage as the optional object layer and BigQuery as searchable metadata/historical analytics rather than a binary file store or duplicate medallion lakehouse.
+
+
+## Deploy on Vercel
+
+V1.3 includes a root `vercel.json` for the Vite application:
+
+- install: `npm ci`
+- build: `npm run build`
+- output: `dist`
+- framework: Vite
+
+Use Vercel's Git import / Deploy Button with the V1.3 branch:
+
+`https://github.com/julian-passebecq/diagramcloud/tree/feat/diagramcloud-v1.3-architecture-lab`
+
+The application itself requires no server or database. Google Drive support is optional. To enable Drive on the deployed site, configure `VITE_GOOGLE_CLIENT_ID`, `VITE_GOOGLE_PICKER_API_KEY`, and `VITE_GOOGLE_APP_ID` in Vercel and add the final Vercel origin to the Google OAuth Authorized JavaScript origins / Picker website restrictions.
+
+See `docs/VERCEL.md`.
