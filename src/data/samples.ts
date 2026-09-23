@@ -86,6 +86,245 @@ function medallion(platform:'Microsoft Fabric'|'Databricks'):Project{
  d.story=[{title:'Three responsibilities, not three colours',viewId:'overview',nodeId:'bronze',narration:'Raw records, validated data and business-ready models have different responsibilities.',highlightEdgeIds:[]},{title:'Explain a transformation',viewId:'silver-detail',nodeId:'dedup',narration:'A declared key and deterministic ordering are more useful than an unexplained Spark icon.',highlightEdgeIds:[]}];return validateDocument(d);
 }
 
+
+const constellation=project(
+ 'project-constellation',
+ 'Data Projects | constellation',
+ 'A repo-grounded map of the current data-engineering portfolio. Drill from core products into implementation, runtimes, domain labs and donor tooling without treating planned work as already shipped.',
+ 'Reference',
+ ['Portfolio','Datapass','Contoso','Fabric','Power BI','FOIL','MongoDB','VS Code']
+);
+constellation.provenance='Architecture reconstructed from julian-passebecq/dataprojects registry plus owning repository READMEs as reviewed on 2026-09-23. Nodes explicitly distinguish current, donor/prototype and planned responsibilities.';
+constellation.sources=[
+ {id:'src-registry',title:'julian-passebecq/dataprojects',location:'GitHub registry/constellation.json, tooling.json, services.json, domain-projects.json and repo-cartography.json',visibility:'public'},
+ {id:'src-contoso',title:'julian-passebecq/contoso-data-studio',location:'GitHub README and implementation tree',visibility:'public'},
+ {id:'src-atlas',title:'julian-passebecq/atlasmongov3',location:'GitHub README and docs/SCHEMA.md',visibility:'public'}
+];
+
+node(constellation,'core','Core learning products','app',{provider:'Portfolio registry',summary:'Canonical products and planned focused labs',childViewId:'core-products',sourceIds:['src-registry']});
+node(constellation,'control-plane','Developer control plane','app',{provider:'VS Code',summary:'Canonical IDE/control-plane plus real-provider companions',childViewId:'control-plane-view',sourceIds:['src-registry']});
+node(constellation,'runtimes','Runtime services','process',{provider:'FastAPI + local engines',summary:'Reusable execution and simulation services',childViewId:'runtime-view',sourceIds:['src-registry']});
+node(constellation,'foil-family','FOIL domain family','process',{provider:'Databricks + domain tools',summary:'Domain proof environment and developer workflow',childViewId:'foil-family-view',sourceIds:['src-registry']});
+node(constellation,'atlas-family','Atlas knowledge family','storage',{provider:'MongoDB Atlas',summary:'Separate notes/code/knowledge product family',childViewId:'atlas-family-view',sourceIds:['src-atlas']});
+node(constellation,'registry','Project registry + architecture','control',{provider:'GitHub JSON',summary:'Scope, status and anti-duplication source of truth',childViewId:'registry-view',sourceIds:['src-registry']});
+view(constellation,'overview','Portfolio constellation | products, tools and runtimes','This top layer is organized by responsibility, not repository count. Click a category to inspect the real implementation status and canonical ownership.',['core','control-plane','runtimes','foil-family','atlas-family','registry'],[
+ ['registry','core','defines scope','control'],
+ ['registry','control-plane','classifies tools','control'],
+ ['runtimes','core','execution services','dependency'],
+ ['control-plane','core','developer workflow','dependency'],
+ ['foil-family','control-plane','uses developer tooling','dependency'],
+ ['atlas-family','registry','separate family','dependency']
+],3);
+
+node(constellation,'datapass','Datapass','app',{provider:'ducklabms_code',summary:'Qualified broad V1; refocus planned',childViewId:'datapass-product',sourceIds:['src-registry']});
+node(constellation,'caselab','CaseLab / Zilla','app',{provider:'Planned',summary:'Multi-step DE take-home assignment simulator; canonical repo not assigned',sourceIds:['src-registry']});
+node(constellation,'airflowlab','Airflow Lab','app',{provider:'Planned',summary:'Deep DAG/scheduler learning product; runtime contract not yet built',childViewId:'airflowlab-product',sourceIds:['src-registry']});
+node(constellation,'factorylab','Fabric Factory Lab','app',{provider:'Fabric/ADF-style',summary:'Donor UI + backend exist; standalone assembly still planned',childViewId:'factorylab-product',sourceIds:['src-registry']});
+node(constellation,'contoso','Contoso Data Studio','app',{provider:'DuckDB + DuckLake + dbt',summary:'Active local-first analytics platform',childViewId:'contoso-product',sourceIds:['src-registry','src-contoso']});
+node(constellation,'pbilab','PBI / Semantic Lab','app',{provider:'Power BI / TOM / DAX',summary:'Focused product planned from substantial donor tooling',childViewId:'pbilab-product',sourceIds:['src-registry']});
+view(constellation,'core-products','Core products | canonical scope','These are the products the registry treats as the main learning/product family. Planned labs remain visibly planned instead of being drawn as finished systems.',['datapass','caselab','airflowlab','factorylab','contoso','pbilab'],[
+ ['datapass','caselab','coding → cases'],
+ ['caselab','airflowlab','deep orchestration practice','dependency'],
+ ['caselab','factorylab','visual pipeline practice','dependency'],
+ ['factorylab','contoso','pipelines use realistic data','dependency'],
+ ['contoso','pbilab','facts/marts feed semantic model','dependency']
+],3);
+block(constellation,'core',{id:'core-product-status',title:'Registry status snapshot',type:'table',columns:['Product','Canonical ownership','State'],rows:[
+ ['Datapass','ducklabms_code','qualified broad V1; refocus planned'],
+ ['CaseLab / Zilla','not assigned','planned'],
+ ['Airflow Lab','not assigned','planned'],
+ ['Fabric Factory Lab','frontend/backend donors','prototype assembly'],
+ ['Contoso Data Studio','contoso-data-studio','active'],
+ ['PBI / Semantic Lab','not assigned','planned from donors']
+],provenance:'source-derived',sourceIds:['src-registry']});
+
+node(constellation,'arena','Arena + grading','app',{provider:'Datapass',summary:'Qualified attempts/grading experience'});
+node(constellation,'notebook-core','Notebook / Monaco','app',{provider:'Monaco',summary:'Qualified notebook/coding surface'});
+node(constellation,'sql-python','SQL + Python + pandas + Polars','process',{provider:'Local runtimes',summary:'Qualified core interview/practice stack'});
+node(constellation,'bounded-spark','Bounded PySpark','process',{provider:'fastapispark',summary:'Implemented reusable Spark execution'});
+node(constellation,'tsql-mode','T-SQL interview mode','app',{provider:'Planned',summary:'Target refocus feature'});
+node(constellation,'thin-airflow','Thin Airflow scratchpad','app',{provider:'Planned',summary:'Small DAG scratchpad only; deep Airflow belongs in Airflow Lab'});
+view(constellation,'datapass-product','Datapass | focused coding studio','The canonical Datapass remains the coding/interview studio. Deep visual pipeline, warehouse and full Airflow products stay outside its target scope.',['arena','notebook-core','sql-python','bounded-spark','tsql-mode','thin-airflow'],[
+ ['arena','notebook-core','exercise opens editor'],
+ ['notebook-core','sql-python','execute'],
+ ['notebook-core','bounded-spark','PySpark mode'],
+ ['tsql-mode','arena','future interview track','dependency'],
+ ['thin-airflow','arena','future scratchpad','dependency']
+],3);
+
+node(constellation,'dag-ui','DAG / Graph / Grid / Runs UI','app',{provider:'Planned React Flow',summary:'Airflow 3-inspired learning surface'});
+node(constellation,'scheduler-sim','Scheduler semantics','process',{provider:'fastapiflow candidate',summary:'Retries, trigger rules, pools, catchup and backfill simulation'});
+node(constellation,'taskflow-editor','Python / TaskFlow editor','function',{provider:'Planned',summary:'Parse, validate and explain DAG behavior'});
+node(constellation,'airflow-exercises','Airflow exercises','app',{provider:'Planned',summary:'Branching, sensors, concurrency, logs and XCom-like teaching'});
+view(constellation,'airflowlab-product','Airflow Lab | planned focused product','The runtime candidate exists, but the product is not implemented yet. This view captures the agreed target without presenting it as shipped.',['dag-ui','taskflow-editor','scheduler-sim','airflow-exercises'],[
+ ['taskflow-editor','scheduler-sim','parse + schedule'],
+ ['scheduler-sim','dag-ui','runs/timeline'],
+ ['dag-ui','airflow-exercises','guided practice','dependency']
+]);
+
+node(constellation,'factory-ui','Fabric / ADF donor UI','app',{provider:'React Flow',summary:'Rich visual pipeline donor already exists'});
+node(constellation,'fabric-api','fastapi-fabric','process',{provider:'FastAPI',summary:'Implemented V0 Fabric semantics/control adapter'});
+node(constellation,'duckle','Duckle','process',{provider:'External candidate',summary:'Potential local ETL/data-flow engine over DuckDB/DuckLake'});
+node(constellation,'factory-preview','Data Preview + Inspect','report',{provider:'Target product',summary:'Preview pipeline outputs and transformation evidence'});
+node(constellation,'factory-monitor','Monitor','report',{provider:'Target product',summary:'Runs, task state and execution evidence'});
+node(constellation,'factory-app','Standalone FactoryLab','app',{provider:'Planned',summary:'Assembly pending after execution-layer spike'});
+view(constellation,'factorylab-product','Fabric Factory Lab | donor UI + execution layers','FactoryLab should assemble existing UI and semantic/runtime layers rather than create another executor from scratch.',['factory-ui','fabric-api','duckle','factory-preview','factory-monitor','factory-app'],[
+ ['factory-ui','fabric-api','pipeline IR'],
+ ['fabric-api','duckle','execution adapter','dependency'],
+ ['duckle','factory-preview','data output'],
+ ['fabric-api','factory-monitor','run state'],
+ ['factory-ui','factory-app','assemble','dependency']
+],3);
+
+node(constellation,'generator','Retail baseline generator','source',{provider:'Contoso generator',summary:'Deterministic synthetic retail data'});
+node(constellation,'staging','Parquet staging','storage',{provider:'Parquet',summary:'Generated run files before lakehouse registration'});
+node(constellation,'ducklake-bronze','DuckLake Bronze','storage',{provider:'DuckLake',summary:'Five raw/registered source tables',childViewId:'contoso-models'});
+node(constellation,'dbt-silver','dbt Silver','process',{provider:'dbt-duckdb 1.11',summary:'Validated reusable models with data tests'});
+node(constellation,'dbt-gold','dbt Gold','storage',{provider:'dbt + DuckLake',summary:'Business-ready models and KPIs'});
+node(constellation,'duckdb-query','DuckDB SQL workbench','app',{provider:'DuckDB',summary:'Read-only SQL over the local lakehouse'});
+node(constellation,'dbt-charts','dbt Charts','report',{provider:'dbt Charts 0.8',summary:'Validated Executive Sales board and Gold KPI preview'});
+node(constellation,'contoso-shell','React + Fluent UI shell','app',{provider:'Vite + Fluent UI',summary:'Projects, Generate, Lakehouse, Transform, Query, Explore, Charts, Canvas'});
+view(constellation,'contoso-product','Contoso Data Studio | implemented local data platform','This branch follows the current repository: generate realistic data, inspect files, register DuckLake, transform with dbt, query Gold and validate/open the official dbt Charts board.',['generator','staging','ducklake-bronze','dbt-silver','dbt-gold','duckdb-query','dbt-charts','contoso-shell'],[
+ ['generator','staging','write parquet'],
+ ['staging','ducklake-bronze','register'],
+ ['ducklake-bronze','dbt-silver','dbt build'],
+ ['dbt-silver','dbt-gold','model + test'],
+ ['dbt-gold','duckdb-query','SQL'],
+ ['dbt-gold','dbt-charts','KPI source'],
+ ['contoso-shell','generator','control','control'],
+ ['contoso-shell','duckdb-query','workbench','control']
+],4);
+block(constellation,'contoso',{id:'contoso-current-features',title:'Implemented Contoso foundation',type:'table',columns:['Layer','Implementation'],rows:[
+ ['Generation','deterministic retail-baseline generator'],
+ ['Files','Parquet + JSON + CSV + XLSX Explorer'],
+ ['Lakehouse','DuckLake with SQLite metadata + managed Parquet'],
+ ['SQL','DuckDB read-only workbench'],
+ ['Transform','dbt-duckdb 1.11 build/test'],
+ ['Charts','dbt Charts 0.8 + Executive Sales board'],
+ ['UI','React + Fluent UI project shell']
+],provenance:'source-derived',sourceIds:['src-contoso']});
+node(constellation,'customers-bronze','bronze.customers','table',{summary:'Raw customer source'});
+node(constellation,'products-bronze','bronze.products','table',{summary:'Raw product source'});
+node(constellation,'sales-bronze','bronze.sales','table',{summary:'Raw sales source'});
+node(constellation,'silver-orders','silver orders/models','table',{summary:'Validated reusable dbt model'});
+node(constellation,'gold-monthly','gold.monthly_sales','table',{summary:'Business-ready monthly KPI model'});
+view(constellation,'contoso-models','Contoso | from source tables to Gold','A concrete drill-down beneath the lakehouse icon. Exact model names beyond documented examples are illustrative when not explicitly present in the README.',['customers-bronze','products-bronze','sales-bronze','silver-orders','gold-monthly'],[
+ ['customers-bronze','silver-orders','join/validate'],
+ ['products-bronze','silver-orders','join/validate'],
+ ['sales-bronze','silver-orders','transform'],
+ ['silver-orders','gold-monthly','aggregate']
+]);
+block(constellation,'gold-monthly',{id:'gold-monthly-contract',title:'Documented Gold query target',type:'table',columns:['Property','Value'],rows:[
+ ['Object','contoso.gold.monthly_sales'],
+ ['Engine','DuckDB through DuckLake'],
+ ['Purpose','monthly sales KPI / chart source']
+],provenance:'source-derived',sourceIds:['src-contoso']});
+
+node(constellation,'te2','TabularEditor_J / TE2 donor','process',{provider:'TOM',summary:'Implemented semantic-model engine donor'});
+node(constellation,'pbibench-donor','PbiBench donor','app',{provider:'powerbi_enhanced_dev',summary:'Broad Power BI engineering IDE donor'});
+node(constellation,'semantic-diagram','Semantic model diagram','model',{provider:'Planned React Flow',summary:'Relationships, cardinality and filter direction'});
+node(constellation,'dax-editor','DAX editor / query results','function',{provider:'Planned',summary:'Formatting, lineage, exercises and query results'});
+node(constellation,'connected-mode','Real TOM / ADOMD mode','process',{provider:'Planned',summary:'Connected semantic-model/DAX execution'});
+view(constellation,'pbilab-product','PBI / Semantic Lab | focused extraction from donors','The focused learning product should reuse the existing TE2/PbiBench capability without becoming another giant engineering IDE.',['te2','pbibench-donor','semantic-diagram','dax-editor','connected-mode'],[
+ ['te2','semantic-diagram','model engine','dependency'],
+ ['pbibench-donor','dax-editor','editor donor','dependency'],
+ ['semantic-diagram','connected-mode','model context','dependency'],
+ ['dax-editor','connected-mode','query','query']
+]);
+
+node(constellation,'datapass-vscode','Data Platform VS Code control plane','app',{provider:'datapass-vscode',summary:'Canonical developer control-plane implementation; V0.7.0 merged/CI green'});
+node(constellation,'fabric-companion','Fabric DataPass Toolbox','app',{provider:'VS Code companion',summary:'Real-Fabric checklist/helpers; not FactoryLab'});
+node(constellation,'fabric-ops','Fabric Ops Studio','app',{provider:'Fabric toolbox fork',summary:'Real Fabric operations/admin/accelerator tooling'});
+node(constellation,'pbibench-tool','PbiBench','app',{provider:'Power BI engineering',summary:'Broad engineering IDE and donor to focused PBI Lab'});
+node(constellation,'provider-tools','Official provider tooling','control',{provider:'Microsoft / Google / Databricks',summary:'Prefer official explorers/extensions for live provider operations'});
+view(constellation,'control-plane-view','Developer tooling | control plane and companions','The central IDE strategy is the Data Platform VS Code control plane. Provider companions stay focused and official provider tooling remains authoritative for live service operations.',['datapass-vscode','fabric-companion','fabric-ops','pbibench-tool','provider-tools'],[
+ ['datapass-vscode','provider-tools','launch / coordinate','control'],
+ ['fabric-companion','provider-tools','Fabric helpers','dependency'],
+ ['fabric-ops','provider-tools','ops/admin','dependency'],
+ ['pbibench-tool','provider-tools','Power BI tooling','dependency']
+],3);
+
+node(constellation,'fastapispark','fastapispark','process',{provider:'FastAPI',summary:'Implemented bounded Spark/PySpark execution'});
+node(constellation,'fastapi-fabric-runtime','fastapi-fabric','process',{provider:'FastAPI',summary:'Implemented V0 Fabric semantics/control simulation'});
+node(constellation,'fastapiflow','datapass-airflow-runner','process',{provider:'Candidate',summary:'Planned/near-empty Airflow semantics runtime'});
+node(constellation,'duckle-runtime','Duckle','process',{provider:'External',summary:'Candidate local ETL/data-flow engine over DuckDB/DuckLake'});
+view(constellation,'runtime-view','Shared runtime/service layer','Runtimes are implementation services consumed by products; they are not extra products in the portfolio.',['fastapispark','fastapi-fabric-runtime','fastapiflow','duckle-runtime'],[]);
+block(constellation,'runtimes',{id:'runtime-consumers',title:'Runtime consumers',type:'table',columns:['Runtime','State','Consumers'],rows:[
+ ['fastapispark','implemented','Datapass, CaseLab'],
+ ['fastapi-fabric','implemented V0','FactoryLab'],
+ ['datapass-airflow-runner','planned candidate','Airflow Lab, CaseLab'],
+ ['Duckle','external candidate','FactoryLab']
+],provenance:'source-derived',sourceIds:['src-registry']});
+
+node(constellation,'foil-control','FOIL control','control',{provider:'foil-control-v1',summary:'Control/export/schema tooling'});
+node(constellation,'foil-ai','FOIL AI extension','app',{provider:'VS Code',summary:'Workspace navigator/binder'});
+node(constellation,'foil-vscode','Databricks VS Code FOIL fork','app',{provider:'Databricks VS Code',summary:'FOIL-specific developer workflow prototype'});
+node(constellation,'foil-dab','FOIL Databricks DAB','process',{provider:'Databricks Asset Bundles',summary:'Active domain lab with synthetic-twin and medallion branches'});
+node(constellation,'foil-data-plane','FOIL multi-platform data plane','process',{provider:'Architecture plan',summary:'Oracle/Kafka/Fabric/BigQuery/DuckLake/Databricks responsibilities',childViewId:'foil-data-plane-view'});
+view(constellation,'foil-family-view','FOIL | domain proof environment','FOIL validates the tooling in a real domain. Its repos are domain/supporting projects rather than another general-purpose product family.',['foil-control','foil-ai','foil-vscode','foil-dab','foil-data-plane'],[
+ ['foil-control','foil-ai','workspace context'],
+ ['foil-ai','foil-vscode','open developer workflow'],
+ ['foil-vscode','foil-dab','bundle / deploy'],
+ ['foil-dab','foil-data-plane','domain workloads','dependency']
+]);
+node(constellation,'foil-oracle','Oracle operational state','storage',{provider:'Oracle',summary:'Machine/run/config/maintenance operational records'});
+node(constellation,'foil-kafka','Kafka telemetry bus','process',{provider:'Kafka',summary:'High-frequency event transport'});
+node(constellation,'foil-fabric','Fabric real-time','report',{provider:'Fabric',summary:'Eventstream/Eventhouse/KQL/Power BI live operations'});
+node(constellation,'foil-bq','BigQuery historical analytics','storage',{provider:'GCP',summary:'Serverless historical telemetry/log/JSON analytics'});
+node(constellation,'foil-ducklake','DuckLake medallion lab','storage',{provider:'DuckLake',summary:'Separate Bronze/Silver/Gold DE practice'});
+node(constellation,'foil-dbml','Databricks ML','model',{provider:'Databricks',summary:'PySpark features, experiments and MLflow'});
+view(constellation,'foil-data-plane-view','FOIL | planned multi-platform responsibility split','This is the current architecture plan, not a claim that every integration is already live. Each platform has a distinct responsibility.',['foil-oracle','foil-kafka','foil-fabric','foil-bq','foil-ducklake','foil-dbml'],[
+ ['foil-oracle','foil-bq','scheduled history','batch'],
+ ['foil-kafka','foil-fabric','live telemetry','stream'],
+ ['foil-ducklake','foil-dbml','curated features','dependency']
+],3);
+
+node(constellation,'atlasnote','AtlasNote','app',{provider:'Separate product family',summary:'Knowledge/notebook product with large branch stack'});
+node(constellation,'atlascode','AtlasCode','app',{provider:'Studio companion',summary:'Code/studio companion for Atlas family'});
+node(constellation,'atlasmongo','Atlas Mongo foundation','storage',{provider:'MongoDB Atlas 8.0',summary:'Canonical Mongo-backed foundation',childViewId:'atlasmongo-detail',sourceIds:['src-atlas']});
+view(constellation,'atlas-family-view','Atlas family | separate from data-learning products','Atlas is intentionally a separate knowledge/product family. The Mongo foundation supplies canonical storage semantics.',['atlasnote','atlascode','atlasmongo'],[
+ ['atlasnote','atlasmongo','canonical persistence'],
+ ['atlascode','atlasmongo','shared knowledge context','dependency']
+]);
+node(constellation,'next-app','Next.js + React + Fluent UI','app',{provider:'Next.js 16 / React 19 / Fluent UI v9',summary:'Application shell'});
+node(constellation,'mongo-resources','MongoDB resources','storage',{provider:'MongoDB Atlas',summary:'Current resource snapshot stored for fast reads'});
+node(constellation,'gridfs','GridFS assets','storage',{provider:'GridFS',summary:'Immutable PDFs/assets'});
+node(constellation,'vector-search','Vector Search','process',{provider:'MongoDB Atlas',summary:'Semantic retrieval'});
+node(constellation,'immutable-history','Immutable revisions','storage',{provider:'MongoDB',summary:'AI acceptance creates new revision; restore creates another revision'});
+node(constellation,'browser-cache','Browser cache','storage',{provider:'Client',summary:'Cache only; never canonical'});
+view(constellation,'atlasmongo-detail','Atlas Mongo foundation | canonical data path','The repository explicitly keeps browser storage as a cache while Atlas owns canonical resources, assets, vector retrieval and version history.',['next-app','mongo-resources','gridfs','vector-search','immutable-history','browser-cache'],[
+ ['next-app','mongo-resources','read/write'],
+ ['mongo-resources','gridfs','asset refs','dependency'],
+ ['mongo-resources','vector-search','index/retrieve','query'],
+ ['mongo-resources','immutable-history','append revision'],
+ ['mongo-resources','browser-cache','cache snapshot']
+],3);
+block(constellation,'atlasmongo',{id:'atlas-foundation-contract',title:'Mongo foundation contract',type:'table',columns:['Concern','Implementation'],rows:[
+ ['Canonical database','MongoDB Atlas 8.0'],
+ ['Binary assets','GridFS'],
+ ['Semantic retrieval','MongoDB Vector Search'],
+ ['Versioning','immutable revisions / restore-as-new'],
+ ['Client storage','cache only']
+],provenance:'source-derived',sourceIds:['src-atlas']});
+
+node(constellation,'dataprojects-reg','dataprojects','storage',{provider:'GitHub JSON',summary:'Global categories, scope boundaries and status vocabulary'});
+node(constellation,'datapasscontrol-reg','datapasscontrol','storage',{provider:'GitHub JSON',summary:'Detailed historical/sub-registry for learning family'});
+node(constellation,'owning-repos','Owning repositories','storage',{provider:'GitHub',summary:'Implementation/test truth for each product'});
+node(constellation,'diagramcloud-reg','DiagramCloud','app',{provider:'React/Vite',summary:'Interactive architecture view over curated project truth'});
+view(constellation,'registry-view','Registry | source of truth → implementation → visualization','The registry describes ownership/status, owning repos prove implementation, and DiagramCloud turns that into a navigable architecture without becoming a second source of truth.',['dataprojects-reg','datapasscontrol-reg','owning-repos','diagramcloud-reg'],[
+ ['dataprojects-reg','datapasscontrol-reg','learning detail','dependency'],
+ ['dataprojects-reg','owning-repos','points to canonical repo','dependency'],
+ ['owning-repos','diagramcloud-reg','architecture evidence','dependency']
+]);
+
+constellation.story=[
+ {title:'Start with portfolio ownership',viewId:'overview',nodeId:'core',narration:'Separate products, tools, runtimes, domain labs and registries before discussing vendor technology.',highlightEdgeIds:[]},
+ {title:'Open the product family',viewId:'core-products',nodeId:'contoso',narration:'The core family has mixed maturity: qualified Datapass, active Contoso, donor-backed FactoryLab and planned focused labs.',highlightEdgeIds:[]},
+ {title:'Inspect a real implementation',viewId:'contoso-product',nodeId:'dbt-gold',narration:'Contoso is implemented as a local Parquet + DuckLake + dbt platform, not just a cloud architecture concept.',highlightEdgeIds:[]},
+ {title:'Keep supporting services separate',viewId:'runtime-view',nodeId:'fastapispark',narration:'Execution runtimes support products; they are not additional portfolio products.',highlightEdgeIds:[]},
+ {title:'Show a separate product family',viewId:'atlasmongo-detail',nodeId:'mongo-resources',narration:'AtlasNote uses MongoDB Atlas, GridFS, Vector Search and immutable revision history as a separate knowledge architecture.',highlightEdgeIds:[]}
+];
+
 const platform=project(
  'datapass-platform',
  'Datapass | project architecture map',
@@ -279,4 +518,4 @@ platform.story=[
 
 const blank=project('blank-project','Start from a blank project','Build a small architecture, attach evidence, then add one drilldown at a time.','Blank',['Your project']);
 node(blank,'first-node','Your first component','process',{summary:'Switch to Edit to change this component.'});view(blank,'overview','Architecture overview','A diagram is the entry point; the evidence explains the work.',['first-node'],[]);
-export const samples:Project[]=[validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),validateDocument(blank)];
+export const samples:Project[]=[validateDocument(constellation),validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),validateDocument(blank)];
