@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "repository": "julian-passebecq/datapass-vscode",
   "branch": "docs/diagramcloud-bridge-v1",
-  "commit": "7bd433b520676f1dc2d024511f2abbe89fd228a7",
+  "commit": "fde955ab4617ef0a9c6c82ac6727fad14cf67a81",
   "pullRequest": 9,
   "paths": {
     "spec": "contracts/diagramcloud/README.md",
