@@ -331,3 +331,9 @@ Not included: many-to-many bridge routing hints, cross-filter direction arrows, 
 In **Edit board**, every panel has a ⠿ grip (top-right) to move it and a corner handle (bottom-right) to resize it. While dragging, a ghost outline snaps to the 12-column grid and names the target cell. It turns red and states the reason when the drop would overlap another panel or leave the grid, and dropping there changes nothing. With keyboard focus on the grip, arrow keys move by one cell; on the corner handle, they change width and height. A status line reports every result.
 
 The geometry lives in `src/experience/layout.ts` (pure, unit-tested; its limits mirror `packSchema`). Commits go through the usual `change()` → `validatePack` path, so a dragged layout is validated like any other edit, and **Save in current project** persists it. The numeric Layout form still works. Report view and the HTML/PowerPoint exports use the new positions. Dragging is off in Report view, read-only modes and item focus.
+
+### Undo and redo for board edits (2026-09-25)
+
+Every edit in Evidence workspaces can be undone and redone: moves, resizes, added or removed panels, layout presets, board settings, new boards, attached images and applied imports. The **↶ Undo** and **↷ Redo** buttons in Edit board name the step ("Undo: Resized 'SQL validation rule'"). Ctrl/Cmd+Z undoes; Ctrl/Cmd+Shift+Z or Ctrl+Y redoes. Shortcuts are ignored while typing in a field, where Ctrl+Z stays text undo.
+
+`src/experience/history.ts` is pure and unit-tested. Labels come from comparing the pack before and after an edit, so new edit types are labelled automatically. History holds 50 steps. Undo and redo restore content but always issue a new, higher revision, so an AI import prepared against an older revision is still refused (tested). History lives while the Evidence workspaces dialog is open. After **Save in current project**, the project-level Undo in Edit mode can revert the whole saved change.

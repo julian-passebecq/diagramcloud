@@ -224,3 +224,39 @@ test('edit board: drag to move, drag corner to resize, overlap refused, arrow ke
  await expect(d.locator('.xp-grip')).toHaveCount(0);
  expect(errors).toEqual([]);
 });
+
+test('undo and redo board edits with buttons and keyboard; typing in a field is left alone',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});
+ await d.locator('.xp-nav').getByRole('button',{name:'Portfolio remix',exact:true}).first().click();
+ await d.getByRole('button',{name:'Edit board',exact:true}).click();
+ const col=(id:string)=>d.getByTestId(`item-${id}`).evaluate(el=>(el as HTMLElement).style.gridColumn);
+ await expect(d.getByRole('button',{name:'↶ Undo',exact:true})).toBeDisabled();
+
+ await d.getByRole('button',{name:'Resize panel SQL validation rule',exact:true}).focus();
+ await page.keyboard.press('ArrowLeft');
+ expect(await col('quality-sql')).toBe('1 / span 5');
+ const undo=d.getByRole('button',{name:/^↶ Undo: Resized “SQL validation rule”/});
+ await undo.click();
+ expect(await col('quality-sql')).toBe('1 / span 6');
+ await expect(d.getByRole('status').filter({hasText:'Undone'})).toContainText('Undone: Resized “SQL validation rule”.');
+ await d.getByRole('button',{name:/^↷ Redo: Resized/}).click();
+ expect(await col('quality-sql')).toBe('1 / span 5');
+
+ // Keyboard: remove a panel, Ctrl+Z brings it back, Ctrl+Y removes it again.
+ await d.getByTestId('item-foil-chart').getByRole('button',{name:'Remove placement',exact:true}).click();
+ await expect(d.getByTestId('item-foil-chart')).toHaveCount(0);
+ await d.getByRole('button',{name:'Move panel Delivery schedule',exact:true}).focus();
+ await page.keyboard.press('Control+z');
+ await expect(d.getByTestId('item-foil-chart')).toHaveCount(1);
+ await page.keyboard.press('Control+y');
+ await expect(d.getByTestId('item-foil-chart')).toHaveCount(0);
+
+ // Ctrl+Z inside the search field is text undo, not board undo.
+ const search=d.getByLabel('Search reusable items');
+ await search.fill('Gantt');await search.press('Control+z');
+ await expect(d.getByTestId('item-foil-chart')).toHaveCount(0);
+ expect(errors).toEqual([]);
+});
