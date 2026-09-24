@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {examplePack} from '../src/experience/sample';
-import {parsePack,publicPack,reviewReplacement,validatePack} from '../src/experience/model';
+import {entityPath,parsePack,publicPack,reviewReplacement,validatePack} from '../src/experience/model';
 import {importCodeWiki,importDataPass} from '../src/experience/adapters';
 import {samples} from '../src/data/samples';
 import {validateDocument} from '../src/core/model';
@@ -60,4 +60,19 @@ test('canonical project persistence validates workspace links and redacts nested
  d.experience.items.find(i=>i.id==='quality-sql')!.visibility='private';
  const safe=publicDocument(d);assert(!safe.experience?.items.some(i=>i.id==='quality-sql'));
  d.nodes[0].experienceWorkspaceId='unknown';assert.throws(()=>validateDocument(d),/workspace/i);
+});
+
+test('deep-linked workspaces get a full root-to-scope breadcrumb',()=>{
+ const p=examplePack();
+ assert.deepEqual(entityPath(p,'galaxy-task'),['all-projects','datapass','galaxy-task']);
+ assert.deepEqual(entityPath(p,'quality-task'),['all-projects','total','project-controls','quality-task']);
+ assert.deepEqual(entityPath(p,'missing-entity'),['all-projects']);
+});
+
+test('sample nodes linking a workspace resolve inside their project experience',()=>{
+ for(const d of samples)for(const n of d.nodes)if(n.experienceWorkspaceId){
+  const w=d.experience?.workspaces.find(w=>w.id===n.experienceWorkspaceId);
+  assert.ok(w,`${d.id}/${n.id} -> ${n.experienceWorkspaceId}`);
+  assert.equal(entityPath(d.experience!,w!.entityId).at(-1),w!.entityId,`${n.experienceWorkspaceId} reachable from ${d.experience!.rootId}`);
+ }
 });

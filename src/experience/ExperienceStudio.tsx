@@ -4,13 +4,13 @@ import {documentSchema} from '../core/model';
 import {DiagramCanvas} from '../ui/Canvas';
 import {download,imageAsset,pngFromSvg} from '../export/browser';
 import {examplePack} from './sample';
-import {parsePack,publicPack,reviewReplacement,validatePack,type ExperiencePack} from './model';
+import {entityPath,parsePack,publicPack,reviewReplacement,validatePack,type ExperiencePack} from './model';
 import {importCodeWiki,importDataPass} from './adapters';
 import {itemBody,itemSvg,workspaceHtml,workspaceStyles} from './render';
 
 /** Bounded in-app pilot. No cloud credentials, query engine, autonomous agent or second backend. */
 export function ExperienceStudio(props:{readOnly?:boolean;initial?:ExperiencePack;startWorkspaceId?:string;onSave:(pack:ExperiencePack,workspaceId?:string)=>void}){
- const [pack,setPack]=useState(()=>props.initial||examplePack()),[path,setPath]=useState(()=>{const p=props.initial||examplePack(),w=p.workspaces.find(w=>w.id===props.startWorkspaceId);return w?[p.rootId,w.entityId]:[p.rootId];}),[spaceId,setSpaceId]=useState(props.startWorkspaceId||''),[focus,setFocus]=useState('');
+ const [pack,setPack]=useState(()=>props.initial||examplePack()),[path,setPath]=useState(()=>{const p=props.initial||examplePack(),w=p.workspaces.find(w=>w.id===props.startWorkspaceId);return w?entityPath(p,w.entityId):[p.rootId];}),[spaceId,setSpaceId]=useState(props.startWorkspaceId||''),[focus,setFocus]=useState('');
  const [error,setError]=useState(''),[jsonOpen,setJsonOpen]=useState(false),[raw,setRaw]=useState(''),[flavor,setFlavor]=useState('experience'),[staged,setStaged]=useState<ExperiencePack|null>(null),[panelId,setPanelId]=useState(''),[addId,setAddId]=useState(''),[itemQuery,setItemQuery]=useState(''),[itemType,setItemType]=useState('all'),[workspaceEdit,setWorkspaceEdit]=useState(false);
  const entity=pack.entities.find(e=>e.id===path.at(-1))||pack.entities[0];
  const workspace=pack.workspaces.find(w=>w.id===spaceId),panel=workspace?.placements.find(s=>s.id===panelId);

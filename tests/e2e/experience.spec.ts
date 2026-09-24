@@ -14,7 +14,7 @@ test('in-app workspace drills into SQL task and remixes shared items',async({pag
  await nav.getByRole('button',{name:'Portfolio remix',exact:true}).first().click();
  await expect(d.getByTestId('item-capex-curve')).toBeVisible();
  await expect(d.getByTestId('item-quality-sql')).toBeVisible();
- await d.getByLabel('Search reusable items').fill('Portable project');await d.getByLabel('Reusable item').selectOption('manifest-code');await d.getByRole('button',{name:'Add reference',exact:true}).click();await expect(d.getByTestId('item-manifest-code')).toBeVisible();
+ await d.getByLabel('Search reusable items').fill('Portable project');await d.getByLabel('Reusable item',{exact:true}).selectOption('manifest-code');await d.getByRole('button',{name:'Add reference',exact:true}).click();await expect(d.getByTestId('item-manifest-code')).toBeVisible();
  await d.getByTestId('item-manifest-code').getByRole('button',{name:'Focus item',exact:true}).click();await expect(d.getByTestId('item-quality-sql')).toHaveCount(0);await d.getByRole('button',{name:'Exit item focus',exact:true}).click();
  await d.getByRole('button',{name:'Two-column layout',exact:true}).click();
  await expect(d.getByTestId('item-quality-sql')).toHaveCSS('grid-column-start','1');
@@ -26,7 +26,7 @@ test('in-app workspace drills into SQL task and remixes shared items',async({pag
  await d.getByRole('button',{name:'Board settings',exact:true}).click();await d.getByLabel('Board title').fill('Interview evidence board');await d.getByLabel('Board description').fill('Curated reusable evidence for an interview walkthrough.');await d.getByRole('button',{name:'Save board settings',exact:true}).click();await expect(d.getByRole('heading',{name:'Interview evidence board',exact:true})).toBeVisible();
  await d.getByTestId('item-quality-sql').getByRole('button',{name:'Remove placement',exact:true}).click();
  await expect(d.getByTestId('item-quality-sql')).toHaveCount(0);
- await d.getByLabel('Search reusable items').fill('SQL validation');await d.getByLabel('Reusable item type').selectOption('code');await d.getByLabel('Reusable item').selectOption('quality-sql');
+ await d.getByLabel('Search reusable items').fill('SQL validation');await d.getByLabel('Reusable item type').selectOption('code');await d.getByLabel('Reusable item',{exact:true}).selectOption('quality-sql');
  await d.getByRole('button',{name:'Add reference',exact:true}).click();
  await expect(d.getByTestId('item-quality-sql')).toBeVisible();
  mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/experience-remix.png',fullPage:true});expect(errors).toEqual([]);
@@ -42,21 +42,34 @@ test('workspace import validates before apply and rejects overlapping panels',as
 });
 
 
-test('architecture nodes open their linked task workspaces directly',async({page})=>{
+test('architecture drilldown and task workspace are separate explicit actions',async({page})=>{
  await page.goto('/');
- await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();
- await page.getByRole('button',{name:'Explore SQL quality checks',exact:true}).click();
  const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});
- await expect(d).toBeVisible();
+ await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();
+
+ // Card click = Explore architecture only.
+ await page.getByRole('button',{name:'Explore SQL quality checks',exact:true}).click();
+ await expect(page.getByTestId('view-validation')).toBeVisible();
+ await expect(d).toHaveCount(0);
+
+ // Sibling card action = Open task workspace only (deep-linked, full breadcrumb, no extra drill level).
+ await page.getByRole('button',{name:'Open task workspace for SQL quality checks',exact:true}).click();
  await expect(d.getByRole('heading',{name:'SQL quality task | input, code, output',exact:true})).toBeVisible();
  await expect(d.getByTestId('item-quality-sql')).toContainText('start_date > finish_date');
+ await expect(d.getByRole('navigation',{name:'Workspace path'}).getByRole('button')).toHaveText(['TotalEnergies','Project controls','Validate schedule rows']);
  await d.getByRole('button',{name:'Close dialog'}).click();
+ await expect(d).toHaveCount(0);
+ await expect(page.getByTestId('view-check-detail')).toHaveCount(0);
 
+ // Same contract from the Inspector for a DataPass node reached by drilldown.
+ await page.getByRole('button',{name:'Project gallery',exact:true}).click();
  await page.locator('.project-card').filter({hasText:'Data Projects | constellation'}).click();
  await page.getByRole('button',{name:'Explore Developer control plane',exact:true}).click();
  await page.getByRole('button',{name:'Explore Data Platform VS Code control plane',exact:true}).click();
- const d2=page.getByRole('dialog',{name:'Evidence workspace pilot'});
- await expect(d2.getByRole('heading',{name:'DataPass | Galaxy control-plane screen',exact:true})).toBeVisible();
- await expect(d2.getByTestId('item-galaxy-surfaces')).toContainText('Fabric');
- await expect(d2.getByTestId('item-galaxy-safety')).toContainText('vendor authentication');
+ await expect(page.getByTestId('view-datapass-vscode-detail')).toBeVisible();
+ await expect(d).toHaveCount(0);
+ await page.getByRole('button',{name:'Open task workspace',exact:true}).click();
+ await expect(d.getByRole('heading',{name:'DataPass | Galaxy control-plane screen',exact:true})).toBeVisible();
+ await expect(d.getByTestId('item-galaxy-surfaces')).toContainText('Fabric');
+ await expect(d.getByTestId('item-galaxy-safety')).toContainText('vendor authentication');
 });

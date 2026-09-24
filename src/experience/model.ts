@@ -73,3 +73,10 @@ export function reviewReplacement(current:ExperiencePack,incoming:ExperiencePack
  if(current.id===incoming.id&&current.revision!==incoming.revision)throw new Error(`Revision conflict: current ${current.revision}, imported ${incoming.revision}. Export current context first.`);
  return {entities:incoming.entities.length,items:incoming.items.length,workspaces:incoming.workspaces.length};
 }
+
+/** Root-to-entity chain for breadcrumbs, e.g. [all-projects, datapass, galaxy-task]. Falls back to [root] if unreachable. */
+export function entityPath(pack:ExperiencePack,entityId:string):string[]{
+ const byId=new Map(pack.entities.map(e=>[e.id,e])),seen=new Set<string>(),queue:string[][]=[[pack.rootId]];
+ while(queue.length){const path=queue.shift()!,id=path.at(-1)!;if(id===entityId)return path;if(seen.has(id))continue;seen.add(id);for(const child of byId.get(id)?.children??[])queue.push([...path,child]);}
+ return [pack.rootId];
+}

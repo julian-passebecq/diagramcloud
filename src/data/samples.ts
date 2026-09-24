@@ -98,7 +98,9 @@ const constellation=project(
  ['Portfolio','Datapass','Contoso','Fabric','Power BI','FOIL','MongoDB','VS Code']
 );
 constellation.provenance='Architecture reconstructed from julian-passebecq/dataprojects registry plus owning repository READMEs as reviewed on 2026-09-23. Nodes explicitly distinguish current, donor/prototype and planned responsibilities.';
-constellation.experience=experience('datapass','datapass-vscode-experience','DataPass VS Code implementation experience');
+// The constellation is the portfolio-level project, so its experience starts at the atlas root (all project scopes +
+// Portfolio remix). Node links such as datapass-vscode -> galaxy-screen still deep-link into the DataPass scope.
+constellation.experience=experience('all-projects','constellation-experience','Data Projects experience atlas');
 constellation.sources=[
  {id:'src-registry',title:'julian-passebecq/dataprojects',location:'GitHub registry/constellation.json, tooling.json, services.json, domain-projects.json and repo-cartography.json',visibility:'public'},
  {id:'src-contoso',title:'julian-passebecq/contoso-data-studio',location:'GitHub README and implementation tree',visibility:'public'},
