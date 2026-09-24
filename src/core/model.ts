@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import {packSchema,validatePack} from '../experience/model';
 export const MAX_DOCUMENT_BYTES = 12 * 1024 * 1024;
 const id = z.string().regex(/^[a-z][a-z0-9_.-]{0,79}$/, 'Use a stable lowercase ID');
 const text = z.string().max(50000), short = z.string().min(1).max(160);
@@ -16,11 +17,11 @@ export const blockSchema = z.discriminatedUnion('type',[
  z.object({...baseBlock,type:z.literal('image'),assetId:id,caption:text.default('')}).strict(),
  z.object({...baseBlock,type:z.literal('metrics'),items:z.array(z.object({label:short,value:z.string().max(80),note:z.string().max(500).default('')}).strict()).max(12)}).strict()
 ]);
-export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),visibility}).strict();
+export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),visibility}).strict();
 export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),visibility}).strict();
 export const viewSchema=z.object({id,title:short,description:z.string().max(2000).default(''),nodeIds:refs,edgeIds:refs,positions:z.record(id,point).default({}),visibility}).strict();
 const stepSchema=z.object({title:short,viewId:id,nodeId:id.optional(),narration:z.string().max(2000),highlightEdgeIds:refs}).strict();
-export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([])}).strict();
+export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([]),experience:packSchema.optional()}).strict();
 export type Project=z.infer<typeof documentSchema>;
 export type ProjectNode=z.infer<typeof nodeSchema>;
 export type ProjectEdge=z.infer<typeof edgeSchema>;
@@ -31,6 +32,8 @@ export type Asset=z.infer<typeof assetSchema>;
 /** Every import and edit crosses the same structural and relational boundary. */
 export function validateDocument(input:unknown):Project {
  const d=documentSchema.parse(input), errors:string[]=[];
+ if(d.experience)validatePack(d.experience);
+ for(const node of d.nodes)if(node.experienceWorkspaceId&&!d.experience?.workspaces.some(w=>w.id===node.experienceWorkspaceId))errors.push(`${node.id}: unknown experience workspace ${node.experienceWorkspaceId}`);
  function ids(items:{id:string}[],kind:string){const seen=new Set<string>();for(const i of items){if(seen.has(i.id))errors.push(`Duplicate ${kind} ID: ${i.id}`);seen.add(i.id);}return seen;}
  const nodes=ids(d.nodes,'node'),edges=ids(d.edges,'edge'),views=ids(d.views,'view'),blocks=ids(d.blocks,'block'),assets=ids(d.assets,'asset'),sources=ids(d.sources,'source');
  function check(ref:string,set:Set<string>,label:string){if(!set.has(ref))errors.push(`${label}: unknown reference ${ref}`);}
