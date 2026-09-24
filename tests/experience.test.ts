@@ -40,7 +40,7 @@ test('SVG charts remain finite with zero/negative input',()=>{
  if(t?.type==='table')t.rows=[['A',-5,-5],['B',0,-5]];if(c?.type==='chart'){const s=chartSvg(validatePack(p),c);assert(!/NaN|Infinity/.test(s));}
 });
 test('stale AI imports cannot replace a newer draft',()=>{
- const p=examplePack(),old=examplePack();p.revision=4;assert.throws(()=>reviewReplacement(p,old),/Revision conflict/);old.revision=4;assert.equal(reviewReplacement(p,old).workspaces,6);
+ const p=examplePack(),old=examplePack();p.revision=4;assert.throws(()=>reviewReplacement(p,old),/Revision conflict/);old.revision=4;assert.equal(reviewReplacement(p,old).workspaces,old.workspaces.length);
 });
 test('source-derived DataPass Galaxy workspace keeps repository provenance',()=>{const p=examplePack(),w=p.workspaces.find(w=>w.id==='galaxy-screen');assert(w);assert(w.placements.some(x=>x.itemId==='galaxy-surfaces'));const item=p.items.find(i=>i.id==='galaxy-surfaces');assert.equal(item?.provenance,'source-derived');assert(item?.sourceIds.includes('datapass-readme'));});
 

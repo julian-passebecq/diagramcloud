@@ -11,9 +11,12 @@ test('in-app workspace drills into SQL task and remixes shared items',async({pag
  await nav.getByRole('button',{name:/Validate schedule rows/}).click();
  await expect(d.getByTestId('item-quality-sql')).toContainText('start_date > finish_date');
  await expect(d.getByTestId('item-quality-output')).toContainText('wbs-02');
+ // Report view hides the scope navigator; go back to the scope map to switch project.
+ await d.getByRole('button',{name:'Back to scope map',exact:true}).click();
  await nav.getByRole('button',{name:'Portfolio remix',exact:true}).first().click();
  await expect(d.getByTestId('item-capex-curve')).toBeVisible();
  await expect(d.getByTestId('item-quality-sql')).toBeVisible();
+ await d.getByRole('button',{name:'Edit board',exact:true}).click();
  await d.getByLabel('Search reusable items').fill('Portable project');await d.getByLabel('Reusable item',{exact:true}).selectOption('manifest-code');await d.getByRole('button',{name:'Add reference',exact:true}).click();await expect(d.getByTestId('item-manifest-code')).toBeVisible();
  await d.getByTestId('item-manifest-code').getByRole('button',{name:'Focus item',exact:true}).click();await expect(d.getByTestId('item-quality-sql')).toHaveCount(0);await d.getByRole('button',{name:'Exit item focus',exact:true}).click();
  await d.getByRole('button',{name:'Two-column layout',exact:true}).click();
@@ -34,6 +37,7 @@ test('in-app workspace drills into SQL task and remixes shared items',async({pag
 test('experience mini document, panel PNG and stable-ID JSON are downloadable',async({page})=>{
  await page.goto('/');await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});await d.getByRole('button',{name:'Portfolio remix',exact:true}).click();mkdirSync('test-results/experience-exports',{recursive:true});
  let wait=page.waitForEvent('download');await d.getByRole('button',{name:'Export mini document',exact:true}).click();let file=await wait;await file.saveAs('test-results/experience-exports/remix.html');expect(readFileSync('test-results/experience-exports/remix.html','utf8')).toContain('data-document-role="page"');
+ await d.getByRole('button',{name:'Edit board',exact:true}).click();
  wait=page.waitForEvent('download');await d.getByTestId('item-capex-curve').getByRole('button',{name:'PNG',exact:true}).click();file=await wait;await file.saveAs('test-results/experience-exports/curve.png');expect(readFileSync('test-results/experience-exports/curve.png').subarray(1,4).toString()).toBe('PNG');
  wait=page.waitForEvent('download');await d.getByRole('button',{name:'Export workspace pack',exact:true}).click();file=await wait;await file.saveAs('test-results/experience-exports/pack.json');expect(JSON.parse(readFileSync('test-results/experience-exports/pack.json','utf8')).format).toBe('diagramcloud.experience');
 });
@@ -72,4 +76,40 @@ test('architecture drilldown and task workspace are separate explicit actions',a
  await expect(d.getByRole('heading',{name:'DataPass | Galaxy control-plane screen',exact:true})).toBeVisible();
  await expect(d.getByTestId('item-galaxy-surfaces')).toContainText('Fabric');
  await expect(d.getByTestId('item-galaxy-safety')).toContainText('vendor authentication');
+});
+
+test('report screens: KPI trends, charts, status badges, CSS tabs, edit toggle and matching export',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();
+ await page.getByRole('button',{name:'Open task workspace for Power BI reporting',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});
+ await expect(d.getByRole('heading',{name:'BI quicklook | executive dashboard',exact:true})).toBeVisible();
+ await expect(d.locator('.xp-rail')).toContainText('Executive quicklook dashboard');
+ await expect(d.locator('.xp-nav')).toBeHidden();
+ await expect(d.getByTestId('item-ql-kpi-prod')).toContainText('+2.1%');
+ await expect(d.getByTestId('item-ql-kpi-prod').locator('.xp-delta.xp-good')).toBeVisible();
+ await expect(d.getByTestId('item-ql-by-region').locator('svg path')).toHaveCount(5);
+ await expect(d.getByTestId('item-ql-loads').locator('.xp-status.xp-warn')).toHaveText('Pending');
+ await expect(d.getByTestId('item-ql-kpi-prod').getByRole('button')).toHaveCount(0);
+ await expect(d.locator('.xp-screen-foot')).toContainText('nothing on this screen is a live query');
+ const wait=page.waitForEvent('download');await d.getByRole('button',{name:'Export mini document',exact:true}).click();
+ mkdirSync('test-results/experience-exports',{recursive:true});const file=await wait;await file.saveAs('test-results/experience-exports/quicklook.html');
+ const html=readFileSync('test-results/experience-exports/quicklook.html','utf8');
+ expect(html).toContain('class="xp-rail"');expect(html).toContain('xp-status xp-warn');expect(html).not.toMatch(/<script/i);
+ await d.getByRole('button',{name:'Edit board',exact:true}).click();
+ await expect(d.getByTestId('item-ql-kpi-prod').getByRole('button',{name:'Focus item',exact:true})).toBeVisible();
+ await d.getByRole('button',{name:'Report view',exact:true}).click();
+ await expect(d.locator('.xp-rail')).toBeVisible();
+ await d.getByRole('button',{name:'Back to scope map',exact:true}).click();
+ await d.locator('.xp-nav').getByRole('button',{name:'BI reporting and data model',exact:true}).click();
+ await d.locator('.xp-nav').getByRole('button',{name:/Define a revenue measure/}).click();
+ const tabs=d.getByTestId('item-dax-tabs');
+ await expect(tabs.locator('.xp-tab-panels>section').first()).toContainText('TOTALYTD');
+ await expect(tabs.getByText('FROM dbo.Fact_Energy f')).toBeHidden();
+ await tabs.getByText('SQL source query',{exact:true}).click();
+ await expect(tabs.getByText('FROM dbo.Fact_Energy f')).toBeVisible();
+ await expect(d.getByTestId('item-dax-fact')).toContainText('20250101');
+ mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/report-daxsql.png',fullPage:true});
+ expect(errors).toEqual([]);
 });

@@ -255,3 +255,25 @@ A second DataPass source was pinned to repository commit `5af14e5e9a5e825b5c3e5d
 ### Board composition
 
 A workspace can now be duplicated into a new private board while retaining the same item IDs. Removing a placement does not remove the underlying item; it can be added back or reused elsewhere. Users can also create an empty private board and apply two-column or single-column layout presets. This is the first concrete implementation of the portfolio-remix idea and should be evolved toward drag/dock layouts rather than replaced with a separate Canva-style source of truth.
+
+## Report and task screens (2026-09-24)
+
+Workspaces now open in **Report view**: a screen styled after the 18-page portfolio slides. It has a dark context rail (scope trail, workspace `context` sections and cited sources), a title, panels without editing controls, and a footer that repeats each provenance class and the "no live query" statement. **Edit board** switches to the previous editing tools (focus, placement, add/remove references, per-item PNG/SVG); **Report view** switches back. The in-app screen and the exported mini document come from the same `reportScreenHtml`, so the export matches what was on screen. The export has no script, and the tabs are CSS-only.
+
+New grammar, all optional (existing packs stay valid):
+
+| Where | Added |
+| --- | --- |
+| `kpi` | `delta`, `trend` (up/down/flat), `tone`, `comparison`: a displayed comparison, not a computed one |
+| `chart.chartType` | `hbar`, `stacked`, `donut` (one value column), `scatter` (x and y value columns, coloured by label) |
+| `table` | `statusColumn` → status badges; numeric columns right-aligned; key/ID/year columns unformatted |
+| `gantt` | task `id`, `group` (colour and legend), `dependsOn`; `milestones` |
+| new `filters` | displayed slicer state ("not a live filter") |
+| new `callouts` | insight cards with tone |
+| new `steps` | numbered process strip (e.g. Input → Rule → Exceptions → Decision) |
+| new `tabs` | 2–6 existing items as tabs; no nesting; public export keeps only public children and drops a set left with fewer than two |
+| workspace | `context` rail sections and `accent` (blue/teal/orange/violet) |
+
+Showcase screens (invented values, generic asset names, labelled synthetic; the slides are layout references only): **BI quicklook** (portfolio p.6), **DAX & SQL** (p.9) and **Gantt planning & delivery** (p.10). The SQL quality task gained a step strip and context rail. The TotalEnergies "Power BI reporting" node opens the quicklook screen.
+
+Not yet: editable PPTX for composed workspaces, drag/resize in Report view, FOIL (Streamlit/Databricks, pp.13–18) and model/semantic-diagram screens (p.8), and live filtering.
