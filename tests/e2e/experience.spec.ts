@@ -21,6 +21,13 @@ test('in-app workspace drills into SQL task and remixes shared items',async({pag
  await expect(d.getByTestId('item-capex-curve')).toHaveCSS('grid-column-start','7');
  await d.getByRole('button',{name:'Single-column layout',exact:true}).click();
  await expect(d.getByTestId('item-capex-curve')).toHaveCSS('grid-column-start','1');
+ await d.getByRole('button',{name:'Duplicate as board',exact:true}).click();
+ await expect(d.getByRole('heading',{name:/Portfolio \| mixed evidence board \| remix/})).toBeVisible();
+ await d.getByTestId('item-quality-sql').getByRole('button',{name:'Remove placement',exact:true}).click();
+ await expect(d.getByTestId('item-quality-sql')).toHaveCount(0);
+ await d.getByLabel('Reusable item').selectOption('quality-sql');
+ await d.getByRole('button',{name:'Add reference',exact:true}).click();
+ await expect(d.getByTestId('item-quality-sql')).toBeVisible();
  mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/experience-remix.png',fullPage:true});expect(errors).toEqual([]);
 });
 test('experience mini document, panel PNG and stable-ID JSON are downloadable',async({page})=>{
