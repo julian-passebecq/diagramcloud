@@ -2,9 +2,9 @@
   "contract": "datapass-diagramcloud-bridge",
   "schemaVersion": 1,
   "repository": "julian-passebecq/datapass-vscode",
-  "branch": "docs/diagramcloud-bridge-v1",
-  "commit": "fde955ab4617ef0a9c6c82ac6727fad14cf67a81",
-  "pullRequest": 9,
+  "branch": "main",
+  "commit": "83c41e02cde596b2502b9d4dc1b8049c0d5fd974",
+  "pullRequest": 13,
   "paths": {
     "spec": "contracts/diagramcloud/README.md",
     "aiContextSchema": "contracts/diagramcloud/datapass-ai-context-v1.schema.json",
@@ -29,5 +29,13 @@
     "repository": "julian-passebecq/diagramcloud",
     "branch": "feat/diagramcloud-experience-pro-pass"
   },
-  "note": "Pin this contract revision in tests/adapters. Update only through an explicit reviewed contract bump: re-download the vendored schemas at the new commit and update both gitBlob values (they must equal the upstream Git blob IDs)."
+  "note": "Pinned to the merged datapass-vscode main commit. Schemas are byte-identical to the fde955a draft (same Git blobs). Update only through an explicit reviewed contract bump: re-download the vendored schemas at the new commit and update both gitBlob values (they must equal the upstream Git blob IDs).",
+  "history": [
+    {
+      "commit": "fde955ab4617ef0a9c6c82ac6727fad14cf67a81",
+      "branch": "docs/diagramcloud-bridge-v1",
+      "pullRequest": 9,
+      "note": "Draft contract; closed as superseded by #13 with identical schemas."
+    }
+  ]
 }

@@ -186,6 +186,8 @@ Do not hard-code one fixed company hierarchy into the DiagramCloud schema.
 
 - 2026-09-25: PR #5 (V1.4 constellation) merged into `main` (merge commit `5377551`); PR #6 retargeted to `main` and marked ready for review.
 
+- 2026-09-25: PR #6 merged into diagramcloud `main` (`43f3d95`). DataPass bridge merged into datapass-vscode `main` via PR #13 (`83c41e0`), which superseded PR #9 and #11 (both closed). The contract lock now pins datapass-vscode `main` @ `83c41e0`; the schemas are unchanged.
+
 ## Immediate blocker (resolved, kept for history)
 
 Current exact code head 8cc0363:
