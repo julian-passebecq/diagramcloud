@@ -45,7 +45,7 @@ test('project constellation drills into implemented Contoso and Atlas architectu
  await expect(page.getByTestId('view-contoso-product')).toBeVisible();
  await page.getByRole('button',{name:'Explore DuckLake Bronze',exact:true}).click();
  await expect(page.getByTestId('view-contoso-models')).toBeVisible();
- await page.getByText('contoso.gold.monthly_sales',{exact:true}).first().scrollIntoViewIfNeeded();
+ await page.getByRole('button',{name:'Explore gold.monthly_sales',exact:true}).click();
  await expect(page.getByText('contoso.gold.monthly_sales',{exact:true}).first()).toBeVisible();
 });
 
