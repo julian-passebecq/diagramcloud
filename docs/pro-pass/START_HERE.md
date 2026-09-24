@@ -4,7 +4,7 @@ Date: 2026-09-24
 Status: product contract and bounded implementation pilot, not a completed release.
 Base: the existing V1.4 architecture-content branch. Preserve the existing React/Fluent shell and React Flow canvas.
 
-> **Continuation entry point:** read [CLAUDE_CONTINUATION.md](CLAUDE_CONTINUATION.md) before making new changes. It records the current Browser-test blocker, the DataPass ↔ DiagramCloud Bridge V1 contract location, exact Git/PR topology, PDF guidance, and the next implementation sequence. The pinned bridge revision is in `docs/contracts/datapass-diagramcloud-bridge.lock.json`.
+> **Continuation entry point:** read [CLAUDE_CONTINUATION.md](CLAUDE_CONTINUATION.md) before making new changes. It records the current Browser-test blocker, the DataPass ↔ DiagramCloud Bridge V1 contract location, exact Git/PR topology, PDF guidance, and the next implementation sequence. The pinned bridge revision is in `docs/contracts/datapass-diagramcloud-bridge.lock.json`. For a ready-to-paste next-agent instruction, use [PROMPT_FOR_CLAUDE.md](PROMPT_FOR_CLAUDE.md).
 
 ## The decision that unblocks this project
 
