@@ -1,18 +1,21 @@
 import {documentSchema,nodeSchema,edgeSchema,viewSchema,blockSchema,validateDocument,type Project,type ProjectNode,type ProjectEdge,type EvidenceBlock} from '../core/model';
+import {examplePack} from '../experience/sample';
 
 function project(id:string,title:string,summary:string,category:Project['category'],tags:string[]):Project{return documentSchema.parse({schemaVersion:1,id,title,summary,category,tags,rootViewId:'overview',author:category==='Portfolio'?'Julian Passebecq':'DiagramCloud reference library',provenance:category==='Portfolio'?'Reconstructed from the user-provided portfolio PDFs. Tables, code and visual flow speeds in this app are synthetic teaching examples, not verified employer data or measured performance.':'Independently authored educational example. Not an official or vendor-approved architecture.',nodes:[],edges:[],views:[{id:'overview',title:'Architecture overview'}]});}
 function node(d:Project,id:string,label:string,kind:ProjectNode['kind'],options:Partial<ProjectNode>={}){d.nodes.push(nodeSchema.parse({id,label,kind,...options}));return id;}
 function view(d:Project,id:string,title:string,description:string,names:string[],links:[string,string,string,ProjectEdge['kind']?][],columns=3){const edgeIds=links.map(([source,target,label,kind],i)=>{const eid=`${id}-e${i}`;d.edges.push(edgeSchema.parse({id:eid,source,target,label,kind:kind??'batch',speed:kind==='stream'?'fast':kind==='control'?'slow':'medium'}));return eid;});const v=viewSchema.parse({id,title,description,nodeIds:names,edgeIds,positions:Object.fromEntries(names.map((id,i)=>[id,{x:(i%columns)*300,y:Math.floor(i/columns)*180}]))});const old=d.views.findIndex(v=>v.id===id);if(old<0)d.views.push(v);else d.views[old]=v;}
 function block(d:Project,nodeId:string,value:unknown){const b=blockSchema.parse(value);d.blocks.push(b);d.nodes.find(n=>n.id===nodeId)!.blockIds.push(b.id);}
 function note(d:Project,nodeId:string,id:string,title:string,text:string,provenance:EvidenceBlock['provenance']='synthetic',sourceIds:string[]=[]){block(d,nodeId,{id,title,type:'text',text,provenance,sourceIds});}
+function experience(rootId:string,id:string,title:string){const p=examplePack();p.rootId=rootId;p.id=id;p.title=title;return p;}
 const portfolioSources=[{id:'pdf-six',title:'Total_Foilo_Portfolio_6_pages (2).pdf',location:'User-supplied six-page portfolio; illustrative/synthetic labels retained.',visibility:'public' as const},{id:'pdf-eighteen',title:'Julian_Passebecq_Portfolio_TotalEnergies_First_NoGlossary (2).pdf',location:'User-supplied 18-page portfolio; TotalEnergies first, then Foil\u2019O.',visibility:'public' as const}];
 
 const total=project('total-project-controls','TotalEnergies','From cost and schedule updates to a report a project controller can trust. Explore the architecture, then open the validation work behind it.','Portfolio',['Project controls','Oracle','SQL','Power BI']);
 total.sources=structuredClone(portfolioSources);
+total.experience=experience('total','total-project-experience','TotalEnergies project experience');
 node(total,'business','Business inputs','source',{summary:'Planning, drilling, cost estimates and revisions',sourceIds:['pdf-six']});
 node(total,'excel','Excel preparation','process',{provider:'Excel',summary:'Assumptions, structures and update files',sourceIds:['pdf-six'],role:'Data maintenance and schedule coordination'});
 node(total,'oracle','Oracle project database','storage',{provider:'Oracle',summary:'Consolidated project cost and schedule',childViewId:'data-model',sourceIds:['pdf-six']});
-node(total,'checks','SQL quality checks','control',{provider:'SQL',summary:'Validate, reconcile and explain discrepancies',childViewId:'validation',status:'running',sourceIds:['pdf-six'],role:'Checked data consistency and prepared reporting views'});
+node(total,'checks','SQL quality checks','control',{provider:'SQL',summary:'Validate, reconcile and explain discrepancies',childViewId:'validation',experienceWorkspaceId:'quality-screen',status:'running',sourceIds:['pdf-six'],role:'Checked data consistency and prepared reporting views'});
 node(total,'powerbi','Power BI reporting','report',{provider:'Power BI',summary:'Planning snapshots, CAPEX phasing, variance',childViewId:'reporting',sourceIds:['pdf-six','pdf-eighteen']});
 view(total,'overview','Project controls | end-to-end','A readable overview. Click SQL quality checks to open the task underneath, then a check to inspect its SQL and sample rows.',['business','excel','oracle','checks','powerbi'],[['business','excel','update files'],['excel','oracle','load'],['oracle','checks','validate','query'],['checks','powerbi','trusted views']]);
 node(total,'mandatory','Required fields','function',{provider:'SQL',summary:'WBS, dates and costs must be populated',childViewId:'check-detail'});
@@ -95,6 +98,7 @@ const constellation=project(
  ['Portfolio','Datapass','Contoso','Fabric','Power BI','FOIL','MongoDB','VS Code']
 );
 constellation.provenance='Architecture reconstructed from julian-passebecq/dataprojects registry plus owning repository READMEs as reviewed on 2026-09-23. Nodes explicitly distinguish current, donor/prototype and planned responsibilities.';
+constellation.experience=experience('datapass','datapass-vscode-experience','DataPass VS Code implementation experience');
 constellation.sources=[
  {id:'src-registry',title:'julian-passebecq/dataprojects',location:'GitHub registry/constellation.json, tooling.json, services.json, domain-projects.json and repo-cartography.json',visibility:'public'},
  {id:'src-contoso',title:'julian-passebecq/contoso-data-studio',location:'GitHub README and implementation tree',visibility:'public'},
@@ -279,7 +283,7 @@ view(constellation,'pbilab-product','PBI / Semantic Lab | focused extraction fro
  ['dax-editor','connected-mode','query','query']
 ]);
 
-node(constellation,'datapass-vscode','Data Platform VS Code control plane','app',{provider:'datapass-vscode',summary:'Canonical developer control-plane implementation; V0.7.0 merged/CI green',childViewId:'datapass-vscode-detail'});
+node(constellation,'datapass-vscode','Data Platform VS Code control plane','app',{provider:'datapass-vscode',summary:'Canonical developer control-plane implementation; source-derived Galaxy workspace available',childViewId:'datapass-vscode-detail',experienceWorkspaceId:'galaxy-screen'});
 node(constellation,'fabric-companion','Fabric DataPass Toolbox','app',{provider:'VS Code companion',summary:'Real-Fabric checklist/helpers; not FactoryLab'});
 node(constellation,'fabric-ops','Fabric Ops Studio','app',{provider:'Fabric toolbox fork',summary:'Real Fabric operations/admin/accelerator tooling'});
 node(constellation,'pbibench-tool','PbiBench','app',{provider:'Power BI engineering',summary:'Broad engineering IDE and donor to focused PBI Lab'});
