@@ -113,3 +113,25 @@ test('report screens: KPI trends, charts, status badges, CSS tabs, edit toggle a
  mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/report-daxsql.png',fullPage:true});
  expect(errors).toEqual([]);
 });
+
+test('FOIL diagram boxes open their report screens: physics formula, economics tornado, pipeline runs',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await page.locator('.project-card').filter({has:page.locator('strong',{hasText:/^Foil/})}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});
+ await page.getByRole('button',{name:'Open task workspace for PySpark simulation',exact:true}).click();
+ await expect(d.getByRole('heading',{name:'FOIL | physics, Monte Carlo and Spark',exact:true})).toBeVisible();
+ await expect(d.getByTestId('item-fp-formula').locator('.xp-formula')).toHaveText('P = ½ · ρ · A · Cp · V³');
+ await expect(d.getByTestId('item-fp-method')).toContainText('1,000 draws per design');
+ await d.getByRole('button',{name:'Back to scope map',exact:true}).click();
+ await d.locator('.xp-nav').getByRole('button',{name:/Turn outputs into investment indicators/}).click();
+ await expect(d.getByTestId('item-fe-tornado')).toContainText('-21 / +21');
+ await expect(d.getByTestId('item-fe-scenarios').locator('.xp-neg')).toHaveText('-3.4');
+ await expect(d.getByTestId('item-fe-boundary')).toContainText('Two decks, two illustrative sets');
+ await d.getByRole('button',{name:'Close dialog'}).click();
+ await page.getByRole('button',{name:'Open task workspace for Jobs, catalog and tracking',exact:true}).click();
+ await expect(d.getByTestId('item-fl-runs').locator('.xp-status.xp-bad')).toHaveText('Failed');
+ await expect(d.getByTestId('item-fl-mlflow')).toContainText('0.118');
+ mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/report-foil-pipeline.png',fullPage:true});
+ expect(errors).toEqual([]);
+});

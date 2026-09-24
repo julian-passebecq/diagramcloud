@@ -71,3 +71,27 @@ test('report screens keep synthetic labelling, sources and the no-live-query sta
  assert.match(workspaceHtml(p,'quicklook-screen'),/TotalEnergies-first 18-page portfolio p\.6/);
  assert.match(workspaceHtml(p,'planning-screen'),/xp-status xp-bad">Blocked/);
 });
+
+test('formula items escape their text and range bars draw both sides of zero',()=>{
+ const p=examplePack();
+ const f=item(p,'fp-formula') as {expression:string;symbols:{symbol:string;meaning:string}[]};
+ assert.match(itemBody(p,f as never),/P = ½ · ρ · A · Cp · V³/);
+ f.expression=hostile;f.symbols[0].meaning=hostile;
+ const body=itemBody(p,f as never);assert.doesNotMatch(body,/<img src=x/);assert.match(body,/&lt;img/);
+ const t=chartSvg(p,item(p,'fe-tornado') as never,{cols:6});
+ assert.doesNotMatch(t,/NaN/);assert.match(t,/-21 \/ \+21/);assert.equal((t.match(/<rect /g)??[]).length,1+6*2);
+ const q=structuredClone(p);(item(q,'fe-tornado') as {valueColumns:string[]}).valueColumns.push('Driver');
+ assert.throws(()=>validatePack(q),/hbar takes one value column, or two/);
+});
+
+test('every FOIL screen keeps synthetic labelling, cites its deck page and uses neither deck\'s headline figures',()=>{
+ const p=examplePack();
+ const pages:Record<string,RegExp>={'foil-system-screen':/six-page portfolio p\.6/,'foil-physics-screen':/six-page portfolio p\.5/,'foil-economics-screen':/six-page portfolio p\.4/,'foil-pipeline-screen':/18-page portfolio p\.13/,'foil-screen':/18-page portfolio p\.17/};
+ for(const [id,page] of Object.entries(pages)){
+  const html=workspaceHtml(p,id,['FOIL']);
+  assert.match(html,/xp-prov-synthetic/,id);assert.match(html,page,id);assert.match(html,/nothing on this screen is a live query/,id);
+  // Headline figures from the two decks must not reappear as if they were results.
+  assert.doesNotMatch(html,/823|12\.4 M|€27 M|320 €\/MWh|6\.8 years/,id);
+ }
+ assert.match(workspaceHtml(p,'foil-economics-screen'),/Two decks, two illustrative sets/);
+});

@@ -277,3 +277,19 @@ New grammar, all optional (existing packs stay valid):
 Showcase screens (invented values, generic asset names, labelled synthetic; the slides are layout references only): **BI quicklook** (portfolio p.6), **DAX & SQL** (p.9) and **Gantt planning & delivery** (p.10). The SQL quality task gained a step strip and context rail. The TotalEnergies "Power BI reporting" node opens the quicklook screen.
 
 Not yet: editable PPTX for composed workspaces, drag/resize in Report view, FOIL (Streamlit/Databricks, pp.13–18) and model/semantic-diagram screens (p.8), and live filtering.
+
+### FOIL screens (2026-09-24)
+
+Five report screens under the FOIL scope, modelled on the six-page (pp.4–6) and 18-page (pp.13, 17, 18) portfolios:
+
+| Screen | Foil'O diagram box that opens it | Reference page |
+| --- | --- | --- |
+| Oscillating hydrofoil system: conversion chain, active control, machine data contract, what was modelled | Site and machine inputs | 6-page p.6 |
+| Physics, Monte Carlo and Spark: power formula, P ∝ V³ curve, design grid, 1,000-draw AEP distribution, P90/P50/P10 | PySpark simulation | 6-page p.5 |
+| Techno-economic modelling: AEP/LCOE/NPV/payback, scenario table, LCOE formula, sensitivity tornado, LCOE by discount rate | Gold scenario outputs | 6-page p.4 |
+| Databricks pipeline: medallion strip, Bronze→Silver PySpark notebook, Unity Catalog objects, job runs, MLflow runs, volume by layer | Jobs, catalog and tracking | 18-page pp.13, 18 |
+| Scenario decision app: parameters, KPIs, production vs installed power, cost by stage (upgrades the earlier FOIL screen; its items are kept) | Streamlit decision app | 18-page p.17 |
+
+The two decks use different illustrative figures (for example NPV). These screens use a third, invented set, and a unit test checks that neither deck's headline figures appear. The P ∝ V³ curve is computed from the formula with stated constants (available power, not machine output). "Role", "What was modelled", "Monte Carlo method" and "What was delivered" repeat portfolio wording and are labelled *reconstruction* with the page cited. Photos from the decks are not reused (image rights unknown).
+
+New grammar: a `formula` item (plain-text equation plus symbol legend, nothing evaluated) and `hbar` with two value columns for low/high range bars (tornado). Tables show negative numbers in red.

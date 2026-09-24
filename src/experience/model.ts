@@ -22,6 +22,8 @@ export const itemSchema=z.discriminatedUnion('type',[
  z.object({...base,type:z.literal('callouts'),entries:z.array(z.object({title:z.string().min(1).max(120),text:z.string().max(600),tone:z.enum(['good','bad','neutral','info']).default('info')}).strict()).min(1).max(8)}).strict(),
  z.object({...base,type:z.literal('steps'),steps:z.array(z.object({title:z.string().min(1).max(60),caption:z.string().max(200).default('')}).strict()).min(2).max(8)}).strict(),
  z.object({...base,type:z.literal('tabs'),itemIds:z.array(id).min(2).max(6)}).strict(),
+ // Displayed equation as plain text (no TeX engine, nothing evaluated) plus a symbol legend.
+ z.object({...base,type:z.literal('formula'),expression:z.string().min(1).max(300),symbols:z.array(z.object({symbol:z.string().min(1).max(24),meaning:z.string().max(160)}).strict()).max(12).default([])}).strict(),
  z.object({...base,type:z.literal('image'),data:z.string().max(2800000).regex(/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/),caption:z.string().max(1000),rights:z.string().max(1000)}).strict()
 ]);
 export const packSchema=z.object({
@@ -55,7 +57,8 @@ export function validatePack(input:unknown):ExperiencePack{
   if(i.type==='table'){if(new Set(i.columns).size!==i.columns.length)errors.push(`Duplicate column in ${i.id}`);if(i.rows.some(r=>r.length!==i.columns.length))errors.push(`Row width mismatch in ${i.id}`);}
   if(i.type==='chart'){const t=p.items.find(x=>x.id===i.dataItemId);if(t?.type!=='table')errors.push(`${i.id}: chart requires a table`);else{for(const c of [i.labelColumn,...i.valueColumns])if(!t.columns.includes(c))errors.push(`${i.id}: unknown column ${c}`);for(const c of i.valueColumns){const n=t.columns.indexOf(c);if(t.rows.some(r=>typeof r[n]!=='number'))errors.push(`${i.id}: numeric series required for ${c}`);}}}
   if(i.type==='chart'&&i.chartType==='scatter'&&i.valueColumns.length<2)errors.push(`${i.id}: scatter needs x and y value columns`);
-  if(i.type==='chart'&&(i.chartType==='donut'||i.chartType==='hbar')&&i.valueColumns.length!==1)errors.push(`${i.id}: ${i.chartType} needs exactly one value column`);
+  if(i.type==='chart'&&i.chartType==='donut'&&i.valueColumns.length!==1)errors.push(`${i.id}: donut needs exactly one value column`);
+  if(i.type==='chart'&&i.chartType==='hbar'&&i.valueColumns.length>2)errors.push(`${i.id}: hbar takes one value column, or two for low/high range bars`);
   if(i.type==='table'&&i.statusColumn&&!i.columns.includes(i.statusColumn))errors.push(`${i.id}: unknown status column ${i.statusColumn}`);
   if(i.type==='gantt'){if(i.tasks.some(t=>t.end<t.start))errors.push(`${i.id}: Gantt end precedes start`);const taskIds=new Set(i.tasks.flatMap(t=>t.id?[t.id]:[]));if(taskIds.size!==i.tasks.filter(t=>t.id).length)errors.push(`${i.id}: duplicate Gantt task id`);for(const t of i.tasks)for(const d of t.dependsOn??[])if(!taskIds.has(d)||d===t.id)errors.push(`${i.id}: invalid dependency ${d}`);}
   if(i.type==='tabs'){if(new Set(i.itemIds).size!==i.itemIds.length)errors.push(`${i.id}: duplicate tab`);for(const t of i.itemIds){const target=p.items.find(x=>x.id===t);if(!target)errors.push(`${i.id}: unknown tab item ${t}`);else if(target.type==='tabs')errors.push(`${i.id}: tabs cannot contain tabs`);}}

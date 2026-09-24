@@ -94,4 +94,6 @@ Next, in order:
 
 Done: Report view (context rail, provenance footer, export parity), KPI trends, hbar/stacked/donut/scatter charts, status badges, a Gantt with groups/milestones/dependencies, and filters/callouts/steps/tabs items. There are three TotalEnergies showcase screens from portfolio pp.6/9/10. Details are in `docs/pro-pass/START_HERE.md`.
 
-Next candidates: FOIL screens (Databricks catalog/notebook/MLflow composition p.13, Streamlit scenario app p.17, medallion p.18) using the compact 6-page PDF for the Foil story; a semantic-model (star schema) item for p.8; composed-workspace PPTX export; drag/resize placement in Edit board.
+FOIL screens are done: five report screens linked from the Foil'O diagram (see START_HERE, "FOIL screens").
+
+Next candidates: a semantic-model (star schema) item for p.8; composed-workspace PPTX export; drag/resize placement in Edit board; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.

@@ -7,14 +7,14 @@ import {publicPack,type ExperiencePack,type ExperienceItem,type ExperienceWorksp
 export const escape=(s:unknown)=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 const attr=(s:string)=>s.replace(/[^a-zA-Z0-9_-]/g,'-');
 const colors=['#1f5fa8','#34a3d8','#1f9e79','#e0892c','#8a63c9','#cf4a5c'];
-const fmt=(n:number)=>n.toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<10?2:Math.abs(n)<1000?1:0});
+const fmt=(n:number)=>n.toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<1?3:Math.abs(n)<10?2:Math.abs(n)<1000?1:0});
 const svg=(body:string,w:number,h:number)=>`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" class="xp-svg">${body}</svg>`;
 const txt=(x:number,y:number,s:unknown,size=11,fill='#52637a',anchor='start',weight=400)=>`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-family="Segoe UI,Arial,sans-serif" font-size="${size}" fill="${fill}" text-anchor="${anchor}" font-weight="${weight}">${escape(s)}</text>`;
 const clip=(s:unknown,max:number)=>{const v=String(s??'');return v.length>max?v.slice(0,max-1)+'…':v;};
 
 export type RenderOptions={cols?:number;uid?:string};
 /** Drawing width from the panel's grid span, so small panels get proportionally larger text. */
-const sizeFor=(cols=12)=>cols>=9?{w:760,h:280}:cols>=6?{w:540,h:270}:{w:400,h:250};
+const sizeFor=(cols=12)=>cols>=9?{w:760,h:280}:cols>=6?{w:540,h:270}:cols>=4?{w:400,h:250}:{w:300,h:250};
 
 function niceTicks(min:number,max:number,count=4){
  if(min===max){max=min+1;}
@@ -61,10 +61,24 @@ export function chartSvg(p:ExperiencePack,i:Extract<ExperienceItem,{type:'chart'
  return svg(out,w,h);
 }
 function hbarSvg(i:Extract<ExperienceItem,{type:'chart'}>,t:NonNullable<ReturnType<typeof tableFor>>,w:number){
+ if(t.values.length===2)return rangeSvg(i,t,w);
  const col=t.values[0],vals=t.rows.map(r=>Number(r[col])),{hi}=niceTicks(0,Math.max(0,...vals));
  const L=Math.min(160,14+Math.max(...t.rows.map(r=>String(r[t.label]).length))*7),R=50,row=28,h=16+t.rows.length*row;
  let out=`<rect width="${w}" height="${h}" fill="white"/>`;
  t.rows.forEach((r,k)=>{const y=8+k*row,len=Math.max(1,(Number(r[col])/hi)*(w-L-R));out+=txt(L-8,y+15,clip(r[t.label],24),12,'#34465e','end')+`<rect x="${L}" y="${y+3}" width="${len.toFixed(1)}" height="${row-9}" rx="3" fill="${colors[0]}"/>`+txt(L+len+6,y+15,fmt(Number(r[col])),11.5,'#34465e','start',600);});
+ return svg(out,w,h);
+}
+/** Two value columns = low/high range per row around zero, e.g. a sensitivity tornado. */
+function rangeSvg(i:Extract<ExperienceItem,{type:'chart'}>,t:NonNullable<ReturnType<typeof tableFor>>,w:number){
+ const [a,b]=t.values,lows=t.rows.map(r=>Math.min(Number(r[a]),Number(r[b]))),highs=t.rows.map(r=>Math.max(Number(r[a]),Number(r[b])));
+ const {lo,hi,ticks}=niceTicks(Math.min(0,...lows),Math.max(0,...highs));
+ const L=Math.min(160,14+Math.max(...t.rows.map(r=>String(r[t.label]).length))*7),R=90,row=26,top=10,h=top+t.rows.length*row+26,xx=(v:number)=>L+(v-lo)/(hi-lo)*(w-L-R);
+ let out=`<rect width="${w}" height="${h}" fill="white"/>`;
+ for(const v of ticks)out+=`<path d="M${xx(v).toFixed(1)} ${top}V${h-22}" stroke="${v===0?'#8795a8':'#edf1f5'}"/>`+txt(xx(v),h-8,fmt(v),10,'#6b7b90','middle');
+ t.rows.forEach((r,k)=>{const y=top+k*row,x0=xx(lows[k]),x1=xx(highs[k]),z=xx(0);
+  out+=txt(L-8,y+16,clip(r[t.label],24),12,'#34465e','end');
+  out+=`<rect x="${Math.min(x0,z).toFixed(1)}" y="${y+4}" width="${(z-Math.min(x0,z)).toFixed(1)}" height="${row-9}" fill="${colors[1]}"/><rect x="${z.toFixed(1)}" y="${y+4}" width="${Math.max(0,x1-z).toFixed(1)}" height="${row-9}" fill="${colors[0]}"/>`;
+  out+=txt(w-R+10,y+16,`${fmt(lows[k])} / ${highs[k]>0?'+':''}${fmt(highs[k])}`,11,'#34465e','start',600);});
  return svg(out,w,h);
 }
 function donutSvg(i:Extract<ExperienceItem,{type:'chart'}>,t:NonNullable<ReturnType<typeof tableFor>>,w:number,h0:number){
@@ -114,7 +128,7 @@ const statusClass=(v:unknown)=>STATUS.find(([re])=>re.test(String(v).trim()))?.[
 function tableHtml(i:Extract<ExperienceItem,{type:'table'}>){
  // Identifier-like numbers (DateKey 20250101, Rank 3) are shown as-is, not with thousands separators.
  const status=i.statusColumn?i.columns.indexOf(i.statusColumn):-1,plain=i.columns.map(c=>/(key|id|year|code|rank)$/i.test(c.trim()));
- const cell=(c:unknown,k:number)=>k===status?`<td><span class="xp-status xp-${statusClass(c)}">${escape(c)}</span></td>`:typeof c==='number'?`<td class="xp-num">${escape(plain[k]?String(c):fmt(c))}</td>`:`<td>${escape(c)}</td>`;
+ const cell=(c:unknown,k:number)=>k===status?`<td><span class="xp-status xp-${statusClass(c)}">${escape(c)}</span></td>`:typeof c==='number'?`<td class="xp-num${c<0?' xp-neg':''}">${escape(plain[k]?String(c):fmt(c))}</td>`:`<td>${escape(c)}</td>`;
  const numeric=i.columns.map((_,k)=>i.rows.length>0&&i.rows.every(r=>typeof r[k]==='number'||r[k]===null));
  return `<div class="xp-table-wrap"><table><thead><tr>${i.columns.map((c,k)=>`<th${numeric[k]?' class="xp-num"':''}>${escape(c)}</th>`).join('')}</tr></thead><tbody>${i.rows.map(r=>`<tr>${r.map(cell).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
@@ -133,6 +147,7 @@ export function itemBody(p:ExperiencePack,i:ExperienceItem,opts:RenderOptions={}
   case 'steps':return `<ol class="xp-steps">${i.steps.map((s,k)=>`<li><span class="xp-step-n">${k+1}</span><div><strong>${escape(s.title)}</strong>${s.caption?`<small>${escape(s.caption)}</small>`:''}</div></li>`).join('')}</ol>`;
   case 'tabs':{const uid=attr(`${opts.uid??'tabs'}-${i.id}`),children=i.itemIds.map(id=>p.items.find(x=>x.id===id)).filter((x):x is ExperienceItem=>!!x&&x.type!=='tabs');
    return `<div class="xp-tabs">${children.map((c,k)=>`<input type="radio" name="${uid}" id="${uid}-${k}"${k===0?' checked':''}><label for="${uid}-${k}">${escape(c.title)}</label>`).join('')}<div class="xp-tab-panels">${children.map(c=>`<section data-tab-title="${escape(c.title)}">${itemBody(p,c,opts)}</section>`).join('')}</div></div>`;}
+  case 'formula':return `<div class="xp-formula${[...i.expression].length>28?' xp-formula-long':''}">${escape(i.expression)}</div>${i.symbols.length?`<dl class="xp-symbols">${i.symbols.map(s=>`<dt>${escape(s.symbol)}</dt><dd>${escape(s.meaning)}</dd>`).join('')}</dl>`:''}`;
   default:return `<p class="xp-note">${escape(i.text)}</p>`;
  }
 }
@@ -140,7 +155,7 @@ export function itemSvg(p:ExperiencePack,i:ExperienceItem):string{
  if(i.type==='chart')return chartSvg(p,i,{cols:12});if(i.type==='gantt')return ganttSvg(i,{cols:12});
  if(i.type==='image')return svg(`<image href="${i.data}" width="640" height="400" preserveAspectRatio="xMidYMid meet"/>`,640,400);
  const lines=i.type==='code'?i.code.split('\n'):i.type==='table'?[i.columns.join(' | '),...i.rows.map(r=>r.join(' | '))]:i.type==='kpi'?[`${i.value} ${i.unit}`,[i.trend?ARROW[i.trend]:'',i.delta,i.comparison].filter(Boolean).join(' '),i.note]
-  :i.type==='filters'?i.fields.map(f=>`${f.label}: ${f.value}`):i.type==='callouts'?i.entries.flatMap(e=>[e.title,e.text,'']):i.type==='steps'?i.steps.map((s,k)=>`${k+1}. ${s.title}${s.caption?` — ${s.caption}`:''}`):i.type==='tabs'?i.itemIds.map(id=>`Tab: ${p.items.find(x=>x.id===id)?.title??id}`):i.text.split('\n');
+  :i.type==='filters'?i.fields.map(f=>`${f.label}: ${f.value}`):i.type==='callouts'?i.entries.flatMap(e=>[e.title,e.text,'']):i.type==='steps'?i.steps.map((s,k)=>`${k+1}. ${s.title}${s.caption?` — ${s.caption}`:''}`):i.type==='tabs'?i.itemIds.map(id=>`Tab: ${p.items.find(x=>x.id===id)?.title??id}`):i.type==='formula'?[i.expression,'',...i.symbols.map(s=>`${s.symbol}: ${s.meaning}`)]:i.text.split('\n');
  const wrapped=lines.flatMap(l=>l.match(/.{1,88}/g)||['']);const h=90+wrapped.length*19;
  return svg(`<rect width="900" height="${h}" rx="12" fill="white" stroke="#d9e2ee"/>${txt(24,32,i.title,20,'#172b45')}${txt(24,54,`${i.type} | ${i.provenance} | ${i.approval}`,11)}${wrapped.map((l,k)=>txt(24,84+k*19,l,13)).join('')}`,900,h);
 }
@@ -169,7 +184,7 @@ export const workspaceStyles=`
 .xp small{color:#596b80}.xp img{max-width:100%;height:auto;display:block}.xp-note{white-space:pre-wrap;margin:0;font-size:13px;line-height:1.65}.xp-caption{display:block;font-size:11px;color:#6b7b90;margin-top:4px}.xp-svg{display:block;width:100%;height:auto}
 .xp-filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px 12px}.xp-filter span{display:block;font-size:11px;color:#5b6f88;margin-bottom:3px}.xp-select{display:flex;justify-content:space-between;align-items:center;border:1px solid #cdd8e5;border-radius:5px;padding:4px 8px;font-size:12px;background:#fbfcfe}.xp-select i{font-style:normal;color:#7a8ba0;font-size:10px}
 .xp-callouts{display:flex;flex-direction:column;gap:10px}.xp-callout{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:8px;background:#f5f8fc;border-left:3px solid #1f5fa8}.xp-callout>b{flex-shrink:0;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#1f5fa8;color:white;font-size:12px}.xp-callout strong{font-size:13px}.xp-callout p{margin:2px 0 0;font-size:12px;color:#4e6179}.xp-callout.xp-good{border-color:#16774f}.xp-callout.xp-good>b{background:#16774f}.xp-callout.xp-bad{border-color:#b3263b}.xp-callout.xp-bad>b{background:#b3263b}.xp-callout.xp-neutral{border-color:#7a8ba0}.xp-callout.xp-neutral>b{background:#7a8ba0}
-.xp-steps{list-style:none;margin:0;padding:0;display:flex;gap:6px;flex-wrap:wrap}.xp-steps li{flex:1 1 140px;display:flex;gap:9px;align-items:center;padding:10px 16px 10px 12px;background:#eef4fb;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%,12px 50%);min-height:58px}.xp-steps li:first-child{clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%)}.xp-step-n{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#1f5fa8;color:white;font-weight:700;font-size:12px}.xp-steps strong{display:block;font-size:13px}.xp-steps small{display:block;font-size:11px;color:#5b6f88;line-height:1.35}
+.xp-formula{font:italic 600 24px/1.4 Cambria,'Times New Roman',serif;color:#13294a;background:#eef4fb;border-radius:8px;padding:14px 18px;text-align:center;letter-spacing:.5px;overflow-wrap:anywhere}.xp-formula-long{font-size:17px}.xp-neg{color:#b3263b}.xp-symbols{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;margin:12px 4px 0;font-size:12px}.xp-symbols dt{font:italic 600 14px Cambria,'Times New Roman',serif;color:#13294a}.xp-symbols dd{margin:0;color:#4e6179}.xp-steps{list-style:none;margin:0;padding:0;display:flex;gap:6px;flex-wrap:wrap}.xp-steps li{flex:1 1 140px;display:flex;gap:9px;align-items:center;padding:10px 16px 10px 12px;background:#eef4fb;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%,12px 50%);min-height:58px}.xp-steps li:first-child{clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%)}.xp-step-n{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#1f5fa8;color:white;font-weight:700;font-size:12px}.xp-steps strong{display:block;font-size:13px}.xp-steps small{display:block;font-size:11px;color:#5b6f88;line-height:1.35}
 .xp-tabs{position:relative}.xp-tabs>input{position:absolute;opacity:0;pointer-events:none}.xp-tabs>label{display:inline-block;padding:6px 12px;margin:0 2px 8px 0;border:1px solid #d4dee9;border-radius:6px 6px 0 0;border-bottom-width:2px;font-size:12px;cursor:pointer;background:#f5f8fc;color:#4e6179}.xp-tabs>input:checked+label{background:white;color:#13294a;font-weight:600;border-bottom-color:#1f5fa8}.xp-tabs>input:focus-visible+label{outline:3px solid #4c82e5;outline-offset:1px}.xp-tab-panels>section{display:none}
 ${[1,2,3,4,5,6].map(k=>`.xp-tabs>input:nth-of-type(${k}):checked~.xp-tab-panels>section:nth-of-type(${k})`).join(',')}{display:block}
 .xp-screen{display:grid;grid-template-columns:210px minmax(0,1fr);background:#eef2f7;border-radius:12px;overflow:hidden;border:1px solid #d6dfea;--accent:#3fb4e8}.xp-accent-teal{--accent:#2bb3a3}.xp-accent-orange{--accent:#f28c28}.xp-accent-violet{--accent:#9b7be0}
