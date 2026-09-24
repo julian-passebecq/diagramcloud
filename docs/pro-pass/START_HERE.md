@@ -276,7 +276,7 @@ New grammar, all optional (existing packs stay valid):
 
 Showcase screens (invented values, generic asset names, labelled synthetic; the slides are layout references only): **BI quicklook** (portfolio p.6), **DAX & SQL** (p.9) and **Gantt planning & delivery** (p.10). The SQL quality task gained a step strip and context rail. The TotalEnergies "Power BI reporting" node opens the quicklook screen.
 
-Not yet: editable PPTX for composed workspaces, drag/resize in Report view, FOIL (Streamlit/Databricks, pp.13–18) and model/semantic-diagram screens (p.8), and live filtering.
+Not yet (editable PPTX was added later; see "PowerPoint export" below): drag/resize in Report view, FOIL (Streamlit/Databricks, pp.13–18) and model/semantic-diagram screens (p.8), and live filtering.
 
 ### FOIL screens (2026-09-24)
 
@@ -293,3 +293,14 @@ Five report screens under the FOIL scope, modelled on the six-page (pp.4–6) an
 The two decks use different illustrative figures (for example NPV). These screens use a third, invented set, and a unit test checks that neither deck's headline figures appear. The P ∝ V³ curve is computed from the formula with stated constants (available power, not machine output). "Role", "What was modelled", "Monte Carlo method" and "What was delivered" repeat portfolio wording and are labelled *reconstruction* with the page cited. Photos from the decks are not reused (image rights unknown).
 
 New grammar: a `formula` item (plain-text equation plus symbol legend, nothing evaluated) and `hbar` with two value columns for low/high range bars (tornado). Tables show negative numbers in red.
+
+### PowerPoint export of report screens (2026-09-25)
+
+**Export PowerPoint** (report and edit views) downloads `<workspace>.pptx`, built by `src/experience/pptx.ts` with the same rail, title, 12-column grid, provenance chips and footer as the Report view. It uses only `publicPack` content, like the HTML export.
+
+- Charts are native, editable PowerPoint charts (bar, stacked, horizontal, range/tornado, line, doughnut, scatter), each with its data sheet. Tables are native tables with status colours and negative numbers in red. The Gantt, steps, filters, callouts, formula and KPI tiles are shapes and text. Nothing is a screenshot.
+- A tall screen splits across slides at row boundaries no panel crosses (at most 9 grid rows per slide when possible). A tab set shows its first tab; the other tabs follow on their own slides.
+- A long table, code block or note is shortened on the slide with an explicit "… N more / continued" marker. The full content, plus sources and provenance, is in the speaker notes.
+- Verified by opening the generated decks, including the one the browser downloads, in desktop PowerPoint and exporting every slide to PNG. That check found a stacked chart with `outEnd` data labels, which made PowerPoint refuse the whole file; `tests/pptx.test.ts` now guards against it.
+
+Limits: text sizes are estimated (there is no font measurement in the browser), so a very dense panel can still look crowded. Gantt dependency lines are simple elbows, and images are placed with contain-sizing.

@@ -7,10 +7,10 @@ import {publicPack,type ExperiencePack,type ExperienceItem,type ExperienceWorksp
 export const escape=(s:unknown)=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 const attr=(s:string)=>s.replace(/[^a-zA-Z0-9_-]/g,'-');
 const colors=['#1f5fa8','#34a3d8','#1f9e79','#e0892c','#8a63c9','#cf4a5c'];
-const fmt=(n:number)=>n.toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<1?3:Math.abs(n)<10?2:Math.abs(n)<1000?1:0});
+export const fmt=(n:number)=>n.toLocaleString('en-US',{maximumFractionDigits:Math.abs(n)<1?3:Math.abs(n)<10?2:Math.abs(n)<1000?1:0});
 const svg=(body:string,w:number,h:number)=>`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" class="xp-svg">${body}</svg>`;
 const txt=(x:number,y:number,s:unknown,size=11,fill='#52637a',anchor='start',weight=400)=>`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-family="Segoe UI,Arial,sans-serif" font-size="${size}" fill="${fill}" text-anchor="${anchor}" font-weight="${weight}">${escape(s)}</text>`;
-const clip=(s:unknown,max:number)=>{const v=String(s??'');return v.length>max?v.slice(0,max-1)+'…':v;};
+export const clip=(s:unknown,max:number)=>{const v=String(s??'');return v.length>max?v.slice(0,max-1)+'…':v;};
 
 export type RenderOptions={cols?:number;uid?:string};
 /** Drawing width from the panel's grid span, so small panels get proportionally larger text. */
@@ -124,10 +124,11 @@ export function ganttSvg(i:Extract<ExperienceItem,{type:'gantt'}>,opts:RenderOpt
 }
 
 const STATUS:[RegExp,string][]=[[/^(success|succeeded|done|ok|passed|complete|completed|ready|approved)$/i,'good'],[/^(fail|failed|error|blocked|rejected|missing)$/i,'bad'],[/^(in progress|running|pending|partial|attention|review|needs review)$/i,'warn']];
-const statusClass=(v:unknown)=>STATUS.find(([re])=>re.test(String(v).trim()))?.[1]??'neutral';
+export const PLAIN_NUMBER_COLUMN=/(key|id|year|code|rank)$/i;
+export const statusClass=(v:unknown)=>STATUS.find(([re])=>re.test(String(v).trim()))?.[1]??'neutral';
 function tableHtml(i:Extract<ExperienceItem,{type:'table'}>){
  // Identifier-like numbers (DateKey 20250101, Rank 3) are shown as-is, not with thousands separators.
- const status=i.statusColumn?i.columns.indexOf(i.statusColumn):-1,plain=i.columns.map(c=>/(key|id|year|code|rank)$/i.test(c.trim()));
+ const status=i.statusColumn?i.columns.indexOf(i.statusColumn):-1,plain=i.columns.map(c=>PLAIN_NUMBER_COLUMN.test(c.trim()));
  const cell=(c:unknown,k:number)=>k===status?`<td><span class="xp-status xp-${statusClass(c)}">${escape(c)}</span></td>`:typeof c==='number'?`<td class="xp-num${c<0?' xp-neg':''}">${escape(plain[k]?String(c):fmt(c))}</td>`:`<td>${escape(c)}</td>`;
  const numeric=i.columns.map((_,k)=>i.rows.length>0&&i.rows.every(r=>typeof r[k]==='number'||r[k]===null));
  return `<div class="xp-table-wrap"><table><thead><tr>${i.columns.map((c,k)=>`<th${numeric[k]?' class="xp-num"':''}>${escape(c)}</th>`).join('')}</tr></thead><tbody>${i.rows.map(r=>`<tr>${r.map(cell).join('')}</tr>`).join('')}</tbody></table></div>`;
@@ -160,7 +161,7 @@ export function itemSvg(p:ExperiencePack,i:ExperienceItem):string{
  return svg(`<rect width="900" height="${h}" rx="12" fill="white" stroke="#d9e2ee"/>${txt(24,32,i.title,20,'#172b45')}${txt(24,54,`${i.type} | ${i.provenance} | ${i.approval}`,11)}${wrapped.map((l,k)=>txt(24,84+k*19,l,13)).join('')}`,900,h);
 }
 
-const PROVENANCE_NOTE:Record<ExperienceItem['provenance'],string>={synthetic:'Invented example values',reconstruction:'Reconstructed from the portfolio, not a capture','source-derived':'Derived from a cited source',author:'Authored explanation'};
+export const PROVENANCE_NOTE:Record<ExperienceItem['provenance'],string>={synthetic:'Invented example values',reconstruction:'Reconstructed from the portfolio, not a capture','source-derived':'Derived from a cited source',author:'Authored explanation'};
 /** The report screen: context rail + title + panel grid + provenance footer. Used in-app and in exports. */
 export function reportScreenHtml(p:ExperiencePack,w:ExperienceWorkspace,trail:string[]=[]):string{
  const placed=w.placements.map(s=>({s,i:p.items.find(i=>i.id===s.itemId)})).filter((x):x is {s:typeof x.s;i:ExperienceItem}=>!!x.i);

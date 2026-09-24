@@ -97,6 +97,9 @@ test('report screens: KPI trends, charts, status badges, CSS tabs, edit toggle a
  mkdirSync('test-results/experience-exports',{recursive:true});const file=await wait;await file.saveAs('test-results/experience-exports/quicklook.html');
  const html=readFileSync('test-results/experience-exports/quicklook.html','utf8');
  expect(html).toContain('class="xp-rail"');expect(html).toContain('xp-status xp-warn');expect(html).not.toMatch(/<script/i);
+ const deckWait=page.waitForEvent('download');await d.getByRole('button',{name:'Export PowerPoint',exact:true}).click();
+ const deck=await deckWait;expect(deck.suggestedFilename()).toBe('quicklook-screen.pptx');await deck.saveAs('test-results/experience-exports/quicklook-screen.pptx');
+ expect(readFileSync('test-results/experience-exports/quicklook-screen.pptx').subarray(0,2).toString()).toBe('PK');
  await d.getByRole('button',{name:'Edit board',exact:true}).click();
  await expect(d.getByTestId('item-ql-kpi-prod').getByRole('button',{name:'Focus item',exact:true})).toBeVisible();
  await d.getByRole('button',{name:'Report view',exact:true}).click();

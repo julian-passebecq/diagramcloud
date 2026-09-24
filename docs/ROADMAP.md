@@ -96,4 +96,6 @@ Done: Report view (context rail, provenance footer, export parity), KPI trends, 
 
 FOIL screens are done: five report screens linked from the Foil'O diagram (see START_HERE, "FOIL screens").
 
-Next candidates: a semantic-model (star schema) item for p.8; composed-workspace PPTX export; drag/resize placement in Edit board; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+Composed-workspace PPTX export is done (native charts and tables; see START_HERE, "PowerPoint export").
+
+Next candidates: a semantic-model (star schema) item for p.8; drag/resize placement in Edit board; a multi-screen deck (for example a whole project as one PowerPoint); a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
