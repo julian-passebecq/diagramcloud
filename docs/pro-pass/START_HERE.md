@@ -182,11 +182,12 @@ A public item citing a private source must not leak that source or its content t
 ## Pilot delivered by this branch
 
 - one Evidence workspaces entry inside the existing app;
-- architecture navigation reuses the existing DiagramCanvas;
-- five example workspaces and fifteen reusable items;
+- architecture nodes can link directly to an experience workspace with `experienceWorkspaceId`; the first wired paths are TotalEnergies SQL quality checks -> `quality-screen` and Data Projects constellation / DataPass VS Code -> `galaxy-screen`;
+- architecture navigation reuses the existing DiagramCanvas, with containment fixes for nested modal maps;
+- six seeded example workspaces plus a source-derived DataPass Galaxy screen; reusable items include SQL, tables, KPI, bar/line charts, Gantt, narrative and bounded images;
 - task-level SQL input/rule/expected-output composition;
 - reference reuse across a mixed portfolio board;
-- focus/restore and numeric grid placement editing;
+- focus/restore, numeric grid placement editing, two-column/single-column layout presets, empty custom-board creation and duplicate-as-board composition;
 - image attachment using the existing bounded normalizer, private/draft by default;
 - manual experience/DataPass/CodeWiki JSON import;
 - save into the existing canonical project/IndexedDB flow;
@@ -232,3 +233,23 @@ Implement GCS upload/read/signing boundary and Drive final publication. Add hash
 8. Export a mini document and individual chart PNG. Inspect readability, provenance and clipping. Do not describe a static export as interactive.
 
 Run `npm run check`, `npm test`, `npm run build`, then `npm run test:e2e` with Playwright Chromium. Local browser-policy blocks are environment failures, not passing browser evidence. Prefer the hosted CI artifact for interaction proof when the local environment blocks localhost.
+
+
+## Latest continuation after recovery
+
+The recovered Pro branch was continued without changing the product direction.
+
+### Direct architecture-to-workspace vertical slices
+
+- The TotalEnergies `SQL quality checks` architecture node carries `experienceWorkspaceId: quality-screen`.
+- The constellation's `Data Platform VS Code control plane` node carries `experienceWorkspaceId: galaxy-screen`.
+- Linked nodes are labelled **Open task workspace** in the architecture card rather than pretending the click only opens a subdiagram.
+- Closing a linked workspace leaves the user on the associated deeper architecture path underneath.
+
+### Source-derived DataPass Galaxy screen
+
+A second DataPass source was pinned to repository commit `5af14e5e9a5e825b5c3e5d1854cde04b35be5e4b` and is used for a source-derived Galaxy task workspace. The workspace records the implemented README-level surfaces (Galaxy, project manifests, Fabric, Databricks, Power BI, Grafana and infrastructure), their provider-tool boundaries, and the repository's explicit safety contract. It is documentation of repository behavior, not a live environment-health capture.
+
+### Board composition
+
+A workspace can now be duplicated into a new private board while retaining the same item IDs. Removing a placement does not remove the underlying item; it can be added back or reused elsewhere. Users can also create an empty private board and apply two-column or single-column layout presets. This is the first concrete implementation of the portfolio-remix idea and should be evolved toward drag/dock layouts rather than replaced with a separate Canva-style source of truth.
