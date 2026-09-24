@@ -325,3 +325,9 @@ New `model` item for star schemas (portfolio p.8):
 - The showcase task is **BI reporting → Design the semantic model**: three facts and seven shared dimensions, consistent with the DAX & SQL screen's `Fact_Energy` / `DimProduct` / `DimRegion` / `DimDate`. It reuses that screen's DAX measures item by reference. "What the model serves" repeats portfolio p.8 wording (reconstruction); the "Design rules" are an authored explanation.
 
 Not included: many-to-many bridge routing hints, cross-filter direction arrows, and an editor. Change the model through Workspace JSON / AI.
+
+### Drag to move and resize panels (2026-09-25)
+
+In **Edit board**, every panel has a ⠿ grip (top-right) to move it and a corner handle (bottom-right) to resize it. While dragging, a ghost outline snaps to the 12-column grid and names the target cell. It turns red and states the reason when the drop would overlap another panel or leave the grid, and dropping there changes nothing. With keyboard focus on the grip, arrow keys move by one cell; on the corner handle, they change width and height. A status line reports every result.
+
+The geometry lives in `src/experience/layout.ts` (pure, unit-tested; its limits mirror `packSchema`). Commits go through the usual `change()` → `validatePack` path, so a dragged layout is validated like any other edit, and **Save in current project** persists it. The numeric Layout form still works. Report view and the HTML/PowerPoint exports use the new positions. Dragging is off in Report view, read-only modes and item focus.

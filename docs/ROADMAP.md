@@ -102,4 +102,6 @@ Project and scope decks are done (see START_HERE, "Project and scope decks").
 
 The semantic-model (star schema) item is done (see START_HERE, "Semantic model item").
 
-Next candidates: drag/resize placement in Edit board; a small in-app editor for model items; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+Drag-to-move and drag-to-resize in Edit board are done.
+
+Next candidates: a small in-app editor for model items; multi-select and align in Edit board; undo for board edits; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
