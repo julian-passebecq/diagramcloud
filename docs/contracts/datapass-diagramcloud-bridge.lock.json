@@ -1,0 +1,19 @@
+{
+  "contract": "datapass-diagramcloud-bridge",
+  "schemaVersion": 1,
+  "repository": "julian-passebecq/datapass-vscode",
+  "branch": "docs/diagramcloud-bridge-v1",
+  "commit": "7bd433b520676f1dc2d024511f2abbe89fd228a7",
+  "pullRequest": 9,
+  "paths": {
+    "spec": "contracts/diagramcloud/README.md",
+    "aiContextSchema": "contracts/diagramcloud/datapass-ai-context-v1.schema.json",
+    "aiPlanSchema": "contracts/diagramcloud/datapass-ai-plan-v1.schema.json",
+    "handoff": "handoff/DIAGRAMCLOUD_BRIDGE_V1.md"
+  },
+  "consumer": {
+    "repository": "julian-passebecq/diagramcloud",
+    "branch": "feat/diagramcloud-experience-pro-pass"
+  },
+  "note": "Pin this contract revision in tests/adapters. Update only through an explicit reviewed contract bump."
+}
