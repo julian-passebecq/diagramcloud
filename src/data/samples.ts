@@ -86,6 +86,360 @@ function medallion(platform:'Microsoft Fabric'|'Databricks'):Project{
  d.story=[{title:'Three responsibilities, not three colours',viewId:'overview',nodeId:'bronze',narration:'Raw records, validated data and business-ready models have different responsibilities.',highlightEdgeIds:[]},{title:'Explain a transformation',viewId:'silver-detail',nodeId:'dedup',narration:'A declared key and deterministic ordering are more useful than an unexplained Spark icon.',highlightEdgeIds:[]}];return validateDocument(d);
 }
 
+
+const constellation=project(
+ 'project-constellation',
+ 'Data Projects | constellation',
+ 'A repo-grounded map of the current data-engineering portfolio. Drill from core products into implementation, runtimes, domain labs and donor tooling without treating planned work as already shipped.',
+ 'Reference',
+ ['Portfolio','Datapass','Contoso','Fabric','Power BI','FOIL','MongoDB','VS Code']
+);
+constellation.provenance='Architecture reconstructed from julian-passebecq/dataprojects registry plus owning repository READMEs as reviewed on 2026-09-23. Nodes explicitly distinguish current, donor/prototype and planned responsibilities.';
+constellation.sources=[
+ {id:'src-registry',title:'julian-passebecq/dataprojects',location:'GitHub registry/constellation.json, tooling.json, services.json, domain-projects.json and repo-cartography.json',visibility:'public'},
+ {id:'src-contoso',title:'julian-passebecq/contoso-data-studio',location:'GitHub README and implementation tree',visibility:'public'},
+ {id:'src-atlas',title:'julian-passebecq/atlasmongov3',location:'GitHub README and docs/SCHEMA.md',visibility:'public'},
+ {id:'src-vscode',title:'julian-passebecq/datapass-vscode',location:'GitHub README and implementation status',visibility:'public'},
+ {id:'src-foil-control',title:'julian-passebecq/foil-control-v1',location:'Private GitHub README reviewed with repository access; architecture summary only',visibility:'private'},
+ {id:'src-foil-dab',title:'julian-passebecq/foil_databrick_dab',location:'Private GitHub README reviewed with repository access; synthetic-lab architecture summary only',visibility:'private'},
+ {id:'src-pbibench',title:'julian-passebecq/powerbi_enhanced_dev',location:'GitHub README_RUN, V2 verification and architecture files',visibility:'public'},
+ {id:'src-factory',title:'julian-passebecq/fastapi-fabric',location:'GitHub README and V0.1 API scope',visibility:'public'}
+];
+
+node(constellation,'core','Core learning products','app',{provider:'Portfolio registry',summary:'Canonical products and planned focused labs',childViewId:'core-products',sourceIds:['src-registry']});
+node(constellation,'control-plane','Developer control plane','app',{provider:'VS Code',summary:'Canonical IDE/control-plane plus real-provider companions',childViewId:'control-plane-view',sourceIds:['src-registry']});
+node(constellation,'runtimes','Runtime services','process',{provider:'FastAPI + local engines',summary:'Reusable execution and simulation services',childViewId:'runtime-view',sourceIds:['src-registry']});
+node(constellation,'foil-family','FOIL domain family','process',{provider:'Databricks + domain tools',summary:'Domain proof environment and developer workflow',childViewId:'foil-family-view',sourceIds:['src-registry']});
+node(constellation,'atlas-family','Atlas knowledge family','storage',{provider:'MongoDB Atlas',summary:'Separate notes/code/knowledge product family',childViewId:'atlas-family-view',sourceIds:['src-atlas']});
+node(constellation,'registry','Project registry + architecture','control',{provider:'GitHub JSON',summary:'Scope, status and anti-duplication source of truth',childViewId:'registry-view',sourceIds:['src-registry']});
+view(constellation,'overview','Portfolio constellation | products, tools and runtimes','This top layer is organized by responsibility, not repository count. Click a category to inspect the real implementation status and canonical ownership.',['core','control-plane','runtimes','foil-family','atlas-family','registry'],[
+ ['registry','core','defines scope','control'],
+ ['registry','control-plane','classifies tools','control'],
+ ['runtimes','core','execution services','dependency'],
+ ['control-plane','core','developer workflow','dependency'],
+ ['foil-family','control-plane','uses developer tooling','dependency'],
+ ['atlas-family','registry','separate family','dependency']
+],3);
+
+node(constellation,'datapass','Datapass','app',{provider:'ducklabms_code',summary:'Qualified broad V1; refocus planned',childViewId:'datapass-product',sourceIds:['src-registry']});
+node(constellation,'caselab','CaseLab / Zilla','app',{provider:'Planned',summary:'Multi-step DE take-home assignment simulator; canonical repo not assigned',sourceIds:['src-registry']});
+node(constellation,'airflowlab','Airflow Lab','app',{provider:'Planned',summary:'Deep DAG/scheduler learning product; runtime contract not yet built',childViewId:'airflowlab-product',sourceIds:['src-registry']});
+node(constellation,'factorylab','Fabric Factory Lab','app',{provider:'Fabric/ADF-style',summary:'Donor UI + backend exist; standalone assembly still planned',childViewId:'factorylab-product',sourceIds:['src-registry']});
+node(constellation,'contoso','Contoso Data Studio','app',{provider:'DuckDB + DuckLake + dbt',summary:'Active local-first analytics platform',childViewId:'contoso-product',sourceIds:['src-registry','src-contoso']});
+node(constellation,'pbilab','PBI / Semantic Lab','app',{provider:'Power BI / TOM / DAX',summary:'Focused product planned from substantial donor tooling',childViewId:'pbilab-product',sourceIds:['src-registry']});
+view(constellation,'core-products','Core products | canonical scope','These are the products the registry treats as the main learning/product family. Planned labs remain visibly planned instead of being drawn as finished systems.',['datapass','caselab','airflowlab','factorylab','contoso','pbilab'],[
+ ['datapass','caselab','coding → cases'],
+ ['caselab','airflowlab','deep orchestration practice','dependency'],
+ ['caselab','factorylab','visual pipeline practice','dependency'],
+ ['factorylab','contoso','pipelines use realistic data','dependency'],
+ ['contoso','pbilab','facts/marts feed semantic model','dependency']
+],3);
+block(constellation,'core',{id:'core-product-status',title:'Registry status snapshot',type:'table',columns:['Product','Canonical ownership','State'],rows:[
+ ['Datapass','ducklabms_code','qualified broad V1; refocus planned'],
+ ['CaseLab / Zilla','not assigned','planned'],
+ ['Airflow Lab','not assigned','planned'],
+ ['Fabric Factory Lab','frontend/backend donors','prototype assembly'],
+ ['Contoso Data Studio','contoso-data-studio','active'],
+ ['PBI / Semantic Lab','not assigned','planned from donors']
+],provenance:'source-derived',sourceIds:['src-registry']});
+
+node(constellation,'arena','Arena + grading','app',{provider:'Datapass',summary:'Qualified attempts/grading experience'});
+node(constellation,'notebook-core','Notebook / Monaco','app',{provider:'Monaco',summary:'Qualified notebook/coding surface'});
+node(constellation,'sql-python','SQL + Python + pandas + Polars','process',{provider:'Local runtimes',summary:'Qualified core interview/practice stack'});
+node(constellation,'bounded-spark','Bounded PySpark','process',{provider:'fastapispark',summary:'Implemented reusable Spark execution'});
+node(constellation,'tsql-mode','T-SQL interview mode','app',{provider:'Planned',summary:'Target refocus feature'});
+node(constellation,'thin-airflow','Thin Airflow scratchpad','app',{provider:'Planned',summary:'Small DAG scratchpad only; deep Airflow belongs in Airflow Lab'});
+view(constellation,'datapass-product','Datapass | focused coding studio','The canonical Datapass remains the coding/interview studio. Deep visual pipeline, warehouse and full Airflow products stay outside its target scope.',['arena','notebook-core','sql-python','bounded-spark','tsql-mode','thin-airflow'],[
+ ['arena','notebook-core','exercise opens editor'],
+ ['notebook-core','sql-python','execute'],
+ ['notebook-core','bounded-spark','PySpark mode'],
+ ['tsql-mode','arena','future interview track','dependency'],
+ ['thin-airflow','arena','future scratchpad','dependency']
+],3);
+
+node(constellation,'dag-ui','DAG / Graph / Grid / Runs UI','app',{provider:'Planned React Flow',summary:'Airflow 3-inspired learning surface'});
+node(constellation,'scheduler-sim','Scheduler semantics','process',{provider:'fastapiflow candidate',summary:'Retries, trigger rules, pools, catchup and backfill simulation'});
+node(constellation,'taskflow-editor','Python / TaskFlow editor','function',{provider:'Planned',summary:'Parse, validate and explain DAG behavior'});
+node(constellation,'airflow-exercises','Airflow exercises','app',{provider:'Planned',summary:'Branching, sensors, concurrency, logs and XCom-like teaching'});
+view(constellation,'airflowlab-product','Airflow Lab | planned focused product','The runtime candidate exists, but the product is not implemented yet. This view captures the agreed target without presenting it as shipped.',['dag-ui','taskflow-editor','scheduler-sim','airflow-exercises'],[
+ ['taskflow-editor','scheduler-sim','parse + schedule'],
+ ['scheduler-sim','dag-ui','runs/timeline'],
+ ['dag-ui','airflow-exercises','guided practice','dependency']
+]);
+
+node(constellation,'factory-ui','Fabric / ADF donor UI','app',{provider:'React Flow',summary:'Rich visual pipeline donor already exists'});
+node(constellation,'fabric-api','fastapi-fabric','process',{provider:'FastAPI',summary:'Implemented V0.1 pipeline semantics/control backend',childViewId:'fastapi-fabric-detail',sourceIds:['src-factory']});
+
+node(constellation,'pipeline-crud','Pipeline definitions','storage',{provider:'FastAPI API',summary:'CRUD for pipelines, parameters, variables and dependencies'});
+node(constellation,'pipeline-validate','Validate pipeline','function',{provider:'FastAPI API',summary:'POST pipeline validation before a simulated run'});
+node(constellation,'pipeline-runs','Run lifecycle','process',{provider:'Deterministic simulator',summary:'Create/list/get/cancel pipeline runs'});
+node(constellation,'expression-eval','Expression evaluator','function',{provider:'FastAPI API',summary:'Evaluate Data Factory-style expressions'});
+node(constellation,'adapter-seams','Execution adapter seams','control',{provider:'Architecture boundary',summary:'Optional Datapass Spark and future real Fabric execution remain adapters'});
+view(constellation,'fastapi-fabric-detail','fastapi-fabric | current V0.1 contract','This backend already owns orchestration semantics and a deterministic simulated run API. Persistent metadata, activity executors and real/local execution are later milestones.',['pipeline-crud','pipeline-validate','pipeline-runs','expression-eval','adapter-seams'],[
+ ['pipeline-crud','pipeline-validate','definition'],
+ ['pipeline-validate','pipeline-runs','validated run'],
+ ['expression-eval','pipeline-runs','expression semantics','dependency'],
+ ['adapter-seams','pipeline-runs','future executor','dependency']
+]);
+block(constellation,'fabric-api',{id:'factory-api-contract',title:'Implemented V0.1 endpoints',type:'table',columns:['Capability','API'],rows:[
+ ['Health/capabilities','GET /health, GET /api/v1/capabilities'],
+ ['Pipeline definitions','CRUD /api/v1/pipelines'],
+ ['Validation','POST /api/v1/pipelines/{pipeline_id}/validate'],
+ ['Runs','POST pipeline runs; GET runs/run; POST cancel'],
+ ['Expressions','POST /api/v1/expressions/evaluate']
+],provenance:'source-derived',sourceIds:['src-factory']});
+
+node(constellation,'duckle','Duckle','process',{provider:'External candidate',summary:'Potential local ETL/data-flow engine over DuckDB/DuckLake'});
+node(constellation,'factory-preview','Data Preview + Inspect','report',{provider:'Target product',summary:'Preview pipeline outputs and transformation evidence'});
+node(constellation,'factory-monitor','Monitor','report',{provider:'Target product',summary:'Runs, task state and execution evidence'});
+node(constellation,'factory-app','Standalone FactoryLab','app',{provider:'Planned',summary:'Assembly pending after execution-layer spike'});
+view(constellation,'factorylab-product','Fabric Factory Lab | donor UI + execution layers','FactoryLab should assemble existing UI and semantic/runtime layers rather than create another executor from scratch.',['factory-ui','fabric-api','duckle','factory-preview','factory-monitor','factory-app'],[
+ ['factory-ui','fabric-api','pipeline IR'],
+ ['fabric-api','duckle','execution adapter','dependency'],
+ ['duckle','factory-preview','data output'],
+ ['fabric-api','factory-monitor','run state'],
+ ['factory-ui','factory-app','assemble','dependency']
+],3);
+
+node(constellation,'generator','Retail baseline generator','source',{provider:'Contoso generator',summary:'Deterministic synthetic retail data'});
+node(constellation,'staging','Parquet staging','storage',{provider:'Parquet',summary:'Generated run files before lakehouse registration'});
+node(constellation,'ducklake-bronze','DuckLake Bronze','storage',{provider:'DuckLake',summary:'Five raw/registered source tables',childViewId:'contoso-models'});
+node(constellation,'dbt-silver','dbt Silver','process',{provider:'dbt-duckdb 1.11',summary:'Validated reusable models with data tests'});
+node(constellation,'dbt-gold','dbt Gold','storage',{provider:'dbt + DuckLake',summary:'Business-ready models and KPIs'});
+node(constellation,'duckdb-query','DuckDB SQL workbench','app',{provider:'DuckDB',summary:'Read-only SQL over the local lakehouse'});
+node(constellation,'dbt-charts','dbt Charts','report',{provider:'dbt Charts 0.8',summary:'Validated Executive Sales board and Gold KPI preview'});
+node(constellation,'contoso-shell','React + Fluent UI shell','app',{provider:'Vite + Fluent UI',summary:'Projects, Generate, Lakehouse, Transform, Query, Explore, Charts, Canvas'});
+view(constellation,'contoso-product','Contoso Data Studio | implemented local data platform','This branch follows the current repository: generate realistic data, inspect files, register DuckLake, transform with dbt, query Gold and validate/open the official dbt Charts board.',['generator','staging','ducklake-bronze','dbt-silver','dbt-gold','duckdb-query','dbt-charts','contoso-shell'],[
+ ['generator','staging','write parquet'],
+ ['staging','ducklake-bronze','register'],
+ ['ducklake-bronze','dbt-silver','dbt build'],
+ ['dbt-silver','dbt-gold','model + test'],
+ ['dbt-gold','duckdb-query','SQL'],
+ ['dbt-gold','dbt-charts','KPI source'],
+ ['contoso-shell','generator','control','control'],
+ ['contoso-shell','duckdb-query','workbench','control']
+],4);
+block(constellation,'contoso',{id:'contoso-current-features',title:'Implemented Contoso foundation',type:'table',columns:['Layer','Implementation'],rows:[
+ ['Generation','deterministic retail-baseline generator'],
+ ['Files','Parquet + JSON + CSV + XLSX Explorer'],
+ ['Lakehouse','DuckLake with SQLite metadata + managed Parquet'],
+ ['SQL','DuckDB read-only workbench'],
+ ['Transform','dbt-duckdb 1.11 build/test'],
+ ['Charts','dbt Charts 0.8 + Executive Sales board'],
+ ['UI','React + Fluent UI project shell']
+],provenance:'source-derived',sourceIds:['src-contoso']});
+node(constellation,'customers-bronze','bronze.customers','table',{summary:'Raw customer source'});
+node(constellation,'products-bronze','bronze.products','table',{summary:'Raw product source'});
+node(constellation,'sales-bronze','bronze.sales','table',{summary:'Raw sales source'});
+node(constellation,'silver-orders','silver orders/models','table',{summary:'Validated reusable dbt model'});
+node(constellation,'gold-monthly','gold.monthly_sales','table',{summary:'Business-ready monthly KPI model'});
+view(constellation,'contoso-models','Contoso | from source tables to Gold','A concrete drill-down beneath the lakehouse icon. Exact model names beyond documented examples are illustrative when not explicitly present in the README.',['customers-bronze','products-bronze','sales-bronze','silver-orders','gold-monthly'],[
+ ['customers-bronze','silver-orders','join/validate'],
+ ['products-bronze','silver-orders','join/validate'],
+ ['sales-bronze','silver-orders','transform'],
+ ['silver-orders','gold-monthly','aggregate']
+]);
+block(constellation,'gold-monthly',{id:'gold-monthly-contract',title:'Documented Gold query target',type:'table',columns:['Property','Value'],rows:[
+ ['Object','contoso.gold.monthly_sales'],
+ ['Engine','DuckDB through DuckLake'],
+ ['Purpose','monthly sales KPI / chart source']
+],provenance:'source-derived',sourceIds:['src-contoso']});
+
+node(constellation,'te2','TabularEditor_J / TE2 donor','process',{provider:'TOM',summary:'Implemented semantic-model engine donor'});
+node(constellation,'pbibench-donor','PbiBench donor','app',{provider:'powerbi_enhanced_dev',summary:'Implemented broad Power BI engineering IDE donor',childViewId:'pbibench-detail',sourceIds:['src-pbibench']});
+node(constellation,'semantic-diagram','Focused Semantic Lab diagram','model',{provider:'Planned extraction',summary:'Focused learning view should reuse existing PbiBench relationship-diagram capability'});
+node(constellation,'dax-editor','Focused DAX learning workbench','function',{provider:'Planned extraction',summary:'Reuse the existing PbiBench DAX query/language-service capability in a smaller learning product'});
+node(constellation,'connected-mode','Real TOM / ADOMD mode','process',{provider:'Planned',summary:'Connected semantic-model/DAX execution'});
+
+node(constellation,'semantic-view-real','Semantic View / relationship diagram','model',{provider:'PbiBench',summary:'Implemented table roles, cardinality, active/inactive relationships and filter arrows'});
+node(constellation,'dax-workbench-real','DAX Workbench','function',{provider:'PbiBench',summary:'Implemented editor/query workspace with model context, results and language services'});
+node(constellation,'pbip-git','PBIP / Git','storage',{provider:'PbiBench',summary:'Detect PBIP, semantic folders, TMDL/PBIR, branch/dirty state; no automatic commits'});
+node(constellation,'report-impact','Report usage / lineage','process',{provider:'PbiBench.Pbir',summary:'Semantic-to-report usage, immutable indexing and reviewed change plans'});
+node(constellation,'external-hub','External Tool Hub','control',{provider:'DAX Studio / Bravo / Desktop / VS Code',summary:'Distinct bridge lanes; tool authentication remains external'});
+node(constellation,'report-studio','Report Studio','app',{provider:'.NET 10 WPF',summary:'Separate process for report-oriented work; not merged into semantic engine'});
+view(constellation,'pbibench-detail','PbiBench | implemented engineering donor','PbiBench already contains the semantic and DAX capabilities that the focused PBI Lab should extract rather than reimplement. Live Desktop/DAX Studio/Bravo/XMLA execution remains a separate external boundary when not connected.',['semantic-view-real','dax-workbench-real','pbip-git','report-impact','external-hub','report-studio'],[
+ ['semantic-view-real','dax-workbench-real','model context'],
+ ['pbip-git','semantic-view-real','semantic source'],
+ ['semantic-view-real','report-impact','structural references'],
+ ['dax-workbench-real','external-hub','analyze externally','control'],
+ ['pbip-git','report-studio','report source','dependency']
+],3);
+block(constellation,'pbibench-donor',{id:'pbibench-current-capability',title:'Verified donor capabilities',type:'table',columns:['Capability','Current evidence'],rows:[
+ ['Semantic View','relationship metadata, table roles, cardinality, active/inactive styles, filter arrows'],
+ ['DAX','query engine, editor/workbench, language-service regressions, DAX Studio bridge'],
+ ['PBIP / Git','PBIP/TMDL/PBIR/project state detection; no automatic commits'],
+ ['Lineage / impact','report usage + reviewed semantic/report change planning'],
+ ['External tools','DAX Studio, Bravo, Power BI Desktop and VS Code remain distinct bridge lanes']
+],provenance:'source-derived',sourceIds:['src-pbibench']});
+
+view(constellation,'pbilab-product','PBI / Semantic Lab | focused extraction from donors','The focused learning product should reuse the existing TE2/PbiBench capability without becoming another giant engineering IDE.',['te2','pbibench-donor','semantic-diagram','dax-editor','connected-mode'],[
+ ['te2','semantic-diagram','model engine','dependency'],
+ ['pbibench-donor','dax-editor','editor donor','dependency'],
+ ['semantic-diagram','connected-mode','model context','dependency'],
+ ['dax-editor','connected-mode','query','query']
+]);
+
+node(constellation,'datapass-vscode','Data Platform VS Code control plane','app',{provider:'datapass-vscode',summary:'Canonical developer control-plane implementation; V0.7.0 merged/CI green',childViewId:'datapass-vscode-detail'});
+node(constellation,'fabric-companion','Fabric DataPass Toolbox','app',{provider:'VS Code companion',summary:'Real-Fabric checklist/helpers; not FactoryLab'});
+node(constellation,'fabric-ops','Fabric Ops Studio','app',{provider:'Fabric toolbox fork',summary:'Real Fabric operations/admin/accelerator tooling'});
+node(constellation,'pbibench-tool','PbiBench','app',{provider:'Power BI engineering',summary:'Broad engineering IDE and donor to focused PBI Lab'});
+node(constellation,'provider-tools','Official provider tooling','control',{provider:'Microsoft / Google / Databricks',summary:'Prefer official explorers/extensions for live provider operations'});
+
+node(constellation,'galaxy','Galaxy','app',{provider:'DataPass VS Code',summary:'One project/platform status and control surface'});
+node(constellation,'project-manifest','Portable .datapass/project.json','storage',{provider:'JSON Schema',summary:'Git-safe project context; excludes credentials and secrets'});
+node(constellation,'fabric-adapter','Fabric adapter','control',{provider:'Official Fabric tools',summary:'Detect extensions/CLI/toolbox assets, assessment/MCP workflows and read-only environment capture'});
+node(constellation,'databricks-adapter','Databricks adapter','control',{provider:'Official Databricks extension + CLI',summary:'Detect Asset Bundles and generate safe bundle commands'});
+node(constellation,'powerbi-adapter','Power BI adapter','control',{provider:'PBIP/TMDL/PBIR + external tools',summary:'Detect source projects and route focused engineering modules'});
+node(constellation,'grafana-adapter','Observability / Grafana','report',{provider:'gcx + Foundation SDK + OpenTofu',summary:'Dashboards as code and preview/deployment command paths'});
+node(constellation,'infra-adapter','Infrastructure adapters','control',{provider:'OpenTofu / Terraform / Docker / Kubernetes / SSH',summary:'Detect peer tooling without replacing it'});
+view(constellation,'datapass-vscode-detail','DataPass VS Code | one control plane, provider-owned clients','The extension composes official/specialized tools around portable project context. It intentionally avoids forking Fabric, Databricks, Power BI, Grafana or infrastructure clients.',['galaxy','project-manifest','fabric-adapter','databricks-adapter','powerbi-adapter','grafana-adapter','infra-adapter'],[
+ ['project-manifest','galaxy','project context'],
+ ['galaxy','fabric-adapter','route','control'],
+ ['galaxy','databricks-adapter','route','control'],
+ ['galaxy','powerbi-adapter','route','control'],
+ ['galaxy','grafana-adapter','route','control'],
+ ['galaxy','infra-adapter','detect / route','control']
+],4);
+block(constellation,'datapass-vscode',{id:'datapass-vscode-boundaries',title:'Control-plane safety boundaries',type:'table',columns:['Concern','Rule'],rows:[
+ ['Credentials','vendor authentication remains vendor-owned'],
+ ['Project context','.datapass/project.json is schema-validated and secret-free'],
+ ['Cloud mutation','explicit user actions; many deploy/plan flows are copied, not silently executed'],
+ ['Missing tools','degrade to Missing/Partial capability state'],
+ ['Distribution','one VSIX first; adapters separate internally']
+],provenance:'source-derived',sourceIds:['src-registry']});
+
+view(constellation,'control-plane-view','Developer tooling | control plane and companions','The central IDE strategy is the Data Platform VS Code control plane. Provider companions stay focused and official provider tooling remains authoritative for live service operations.',['datapass-vscode','fabric-companion','fabric-ops','pbibench-tool','provider-tools'],[
+ ['datapass-vscode','provider-tools','launch / coordinate','control'],
+ ['fabric-companion','provider-tools','Fabric helpers','dependency'],
+ ['fabric-ops','provider-tools','ops/admin','dependency'],
+ ['pbibench-tool','provider-tools','Power BI tooling','dependency']
+],3);
+
+node(constellation,'fastapispark','fastapispark','process',{provider:'FastAPI',summary:'Implemented bounded Spark/PySpark execution'});
+node(constellation,'fastapi-fabric-runtime','fastapi-fabric','process',{provider:'FastAPI',summary:'Implemented V0 Fabric semantics/control simulation'});
+node(constellation,'fastapiflow','datapass-airflow-runner','process',{provider:'Candidate',summary:'Planned/near-empty Airflow semantics runtime'});
+node(constellation,'duckle-runtime','Duckle','process',{provider:'External',summary:'Candidate local ETL/data-flow engine over DuckDB/DuckLake'});
+view(constellation,'runtime-view','Shared runtime/service layer','Runtimes are implementation services consumed by products; they are not extra products in the portfolio.',['fastapispark','fastapi-fabric-runtime','fastapiflow','duckle-runtime'],[]);
+block(constellation,'runtimes',{id:'runtime-consumers',title:'Runtime consumers',type:'table',columns:['Runtime','State','Consumers'],rows:[
+ ['fastapispark','implemented','Datapass, CaseLab'],
+ ['fastapi-fabric','implemented V0','FactoryLab'],
+ ['datapass-airflow-runner','planned candidate','Airflow Lab, CaseLab'],
+ ['Duckle','external candidate','FactoryLab']
+],provenance:'source-derived',sourceIds:['src-registry']});
+
+node(constellation,'foil-control','FOIL control','control',{provider:'foil-control-v1',summary:'Control/export/schema tooling',childViewId:'foil-control-detail'});
+node(constellation,'foil-ai','FOIL AI extension','app',{provider:'VS Code',summary:'Workspace navigator/binder'});
+node(constellation,'foil-vscode','Databricks VS Code FOIL fork','app',{provider:'Databricks VS Code',summary:'FOIL-specific developer workflow prototype'});
+node(constellation,'foil-dab','FOIL Databricks DAB','process',{provider:'Databricks Asset Bundles',summary:'Wind-first synthetic digital-twin lab; live-test-ready shell, no live deployment claim',childViewId:'foil-dab-detail'});
+node(constellation,'foil-data-plane','FOIL multi-platform data plane','process',{provider:'Architecture plan',summary:'Oracle/Kafka/Fabric/BigQuery/DuckLake/Databricks responsibilities',childViewId:'foil-data-plane-view'});
+view(constellation,'foil-family-view','FOIL | domain proof environment','FOIL validates the tooling in a real domain. Its repos are domain/supporting projects rather than another general-purpose product family.',['foil-control','foil-ai','foil-vscode','foil-dab','foil-data-plane'],[
+ ['foil-control','foil-ai','workspace context'],
+ ['foil-ai','foil-vscode','open developer workflow'],
+ ['foil-vscode','foil-dab','bundle / deploy'],
+ ['foil-dab','foil-data-plane','domain workloads','dependency']
+]);
+
+node(constellation,'foil-pm','FOIL Project Management','app',{provider:'Authority layer',summary:'Routing, scorecards and backlog'});
+node(constellation,'foil-mongo-truth','Domain Mongo Core Truth','storage',{provider:'MongoDB',summary:'Canonical mutable engineering/evidence state'});
+node(constellation,'foil-github','GitHub implementation','storage',{provider:'GitHub',summary:'Code, schemas, tests and deployment configuration'});
+node(constellation,'foil-archive','Work Archive','storage',{provider:'Archive',summary:'Checkpoints, history and provenance'});
+node(constellation,'foil-exports','Deterministic JSON/XLSX/visual exports','report',{provider:'foil-control-v1',summary:'Human-review interfaces; never independent authority'});
+view(constellation,'foil-control-detail','FOIL control | authority and export boundaries','The control repository explicitly separates routing, canonical domain truth, implementation code and historical archive. Generated spreadsheets/visuals are snapshots, not mutable truth.',['foil-pm','foil-mongo-truth','foil-github','foil-archive','foil-exports'],[
+ ['foil-pm','foil-mongo-truth','route to authority','control'],
+ ['foil-mongo-truth','foil-github','schemas / implementation contract','dependency'],
+ ['foil-mongo-truth','foil-exports','deterministic snapshot'],
+ ['foil-github','foil-exports','export tooling','dependency'],
+ ['foil-mongo-truth','foil-archive','checkpoint / provenance']
+]);
+
+node(constellation,'dab-source','Databricks Asset Bundle','control',{provider:'databricks.yml',summary:'Deployment configuration as code'});
+node(constellation,'uc','Unity Catalog','storage',{provider:'Databricks',summary:'bronze / silver / gold / ml schemas + volumes'});
+node(constellation,'spark-pipeline','Spark Declarative Pipeline','process',{provider:'Serverless PySpark',summary:'landing → Bronze → Silver with expectations'});
+node(constellation,'lakeflow-job','Lakeflow Job','control',{provider:'Databricks',summary:'Sequential Free-friendly orchestration of synthetic lab'});
+node(constellation,'dbt-gold-foil','dbt Gold marts','process',{provider:'dbt + SQL warehouse',summary:'Tested analytics marts over curated twin data'});
+node(constellation,'mlflow-foil','MLflow','model',{provider:'MLflow',summary:'Scenario/model metrics and artifacts'});
+node(constellation,'aibi','AI/BI dashboards','report',{provider:'Databricks',summary:'Operations, engineering and scenario comparison assets'});
+node(constellation,'db-app','Optional Databricks App','app',{provider:'Databricks Apps',summary:'Virtual-lab scenario configuration → Job request'});
+node(constellation,'neon-export','Optional Neon result export','storage',{provider:'Neon Postgres',summary:'Compact cross-run SQL/AI inspection; does not replace Databricks Gold or Mongo truth'});
+view(constellation,'foil-dab-detail','FOIL Databricks DAB | synthetic Wind lab','Repository target architecture for a deterministic, synthetic-only Free Edition workflow. The shell is live-test-ready; a successful workspace execution is still required before calling it deployed.',['dab-source','uc','spark-pipeline','lakeflow-job','dbt-gold-foil','mlflow-foil','aibi','db-app','neon-export'],[
+ ['dab-source','lakeflow-job','deploy resources','control'],
+ ['dab-source','uc','declare schemas / volumes','control'],
+ ['lakeflow-job','spark-pipeline','refresh','control'],
+ ['spark-pipeline','uc','Bronze + Silver'],
+ ['uc','dbt-gold-foil','SQL / dbt'],
+ ['dbt-gold-foil','uc','Gold marts'],
+ ['lakeflow-job','mlflow-foil','optional experiment','control'],
+ ['uc','aibi','dashboard queries','query'],
+ ['db-app','lakeflow-job','scenario request','control'],
+ ['dbt-gold-foil','neon-export','optional compact export','batch']
+],3);
+block(constellation,'foil-dab',{id:'foil-dab-status',title:'FOIL DAB implementation boundary',type:'table',columns:['Concern','Current rule'],rows:[
+ ['Data','synthetic or explicitly sanitized only'],
+ ['Deployment','live-test-ready shell; no live deployment claim yet'],
+ ['Compute','serverless / Free Edition oriented'],
+ ['Identity','scenario/run IDs + configuration hashes append-only'],
+ ['Source of truth','DAB for Databricks deployment configuration'],
+ ['Optional Neon','inspection/export only; not Databricks Gold replacement']
+],provenance:'source-derived',sourceIds:['src-foil-dab']});
+
+node(constellation,'foil-oracle','Oracle operational state','storage',{provider:'Oracle',summary:'Machine/run/config/maintenance operational records'});
+node(constellation,'foil-kafka','Kafka telemetry bus','process',{provider:'Kafka',summary:'High-frequency event transport'});
+node(constellation,'foil-fabric','Fabric real-time','report',{provider:'Fabric',summary:'Eventstream/Eventhouse/KQL/Power BI live operations'});
+node(constellation,'foil-bq','BigQuery historical analytics','storage',{provider:'GCP',summary:'Serverless historical telemetry/log/JSON analytics'});
+node(constellation,'foil-ducklake','DuckLake medallion lab','storage',{provider:'DuckLake',summary:'Separate Bronze/Silver/Gold DE practice'});
+node(constellation,'foil-dbml','Databricks ML','model',{provider:'Databricks',summary:'PySpark features, experiments and MLflow'});
+view(constellation,'foil-data-plane-view','FOIL | planned multi-platform responsibility split','This is the current architecture plan, not a claim that every integration is already live. Each platform has a distinct responsibility.',['foil-oracle','foil-kafka','foil-fabric','foil-bq','foil-ducklake','foil-dbml'],[
+ ['foil-oracle','foil-bq','scheduled history','batch'],
+ ['foil-kafka','foil-fabric','live telemetry','stream'],
+ ['foil-ducklake','foil-dbml','curated features','dependency']
+],3);
+
+node(constellation,'atlasnote','AtlasNote','app',{provider:'Separate product family',summary:'Knowledge/notebook product with large branch stack'});
+node(constellation,'atlascode','AtlasCode','app',{provider:'Studio companion',summary:'Code/studio companion for Atlas family'});
+node(constellation,'atlasmongo','Atlas Mongo foundation','storage',{provider:'MongoDB Atlas 8.0',summary:'Canonical Mongo-backed foundation',childViewId:'atlasmongo-detail',sourceIds:['src-atlas']});
+view(constellation,'atlas-family-view','Atlas family | separate from data-learning products','Atlas is intentionally a separate knowledge/product family. The Mongo foundation supplies canonical storage semantics.',['atlasnote','atlascode','atlasmongo'],[
+ ['atlasnote','atlasmongo','canonical persistence'],
+ ['atlascode','atlasmongo','shared knowledge context','dependency']
+]);
+node(constellation,'next-app','Next.js + React + Fluent UI','app',{provider:'Next.js 16 / React 19 / Fluent UI v9',summary:'Application shell'});
+node(constellation,'mongo-resources','MongoDB resources','storage',{provider:'MongoDB Atlas',summary:'Current resource snapshot stored for fast reads'});
+node(constellation,'gridfs','GridFS assets','storage',{provider:'GridFS',summary:'Immutable PDFs/assets'});
+node(constellation,'vector-search','Vector Search','process',{provider:'MongoDB Atlas',summary:'Semantic retrieval'});
+node(constellation,'immutable-history','Immutable revisions','storage',{provider:'MongoDB',summary:'AI acceptance creates new revision; restore creates another revision'});
+node(constellation,'browser-cache','Browser cache','storage',{provider:'Client',summary:'Cache only; never canonical'});
+view(constellation,'atlasmongo-detail','Atlas Mongo foundation | canonical data path','The repository explicitly keeps browser storage as a cache while Atlas owns canonical resources, assets, vector retrieval and version history.',['next-app','mongo-resources','gridfs','vector-search','immutable-history','browser-cache'],[
+ ['next-app','mongo-resources','read/write'],
+ ['mongo-resources','gridfs','asset refs','dependency'],
+ ['mongo-resources','vector-search','index/retrieve','query'],
+ ['mongo-resources','immutable-history','append revision'],
+ ['mongo-resources','browser-cache','cache snapshot']
+],3);
+block(constellation,'atlasmongo',{id:'atlas-foundation-contract',title:'Mongo foundation contract',type:'table',columns:['Concern','Implementation'],rows:[
+ ['Canonical database','MongoDB Atlas 8.0'],
+ ['Binary assets','GridFS'],
+ ['Semantic retrieval','MongoDB Vector Search'],
+ ['Versioning','immutable revisions / restore-as-new'],
+ ['Client storage','cache only']
+],provenance:'source-derived',sourceIds:['src-atlas']});
+
+node(constellation,'dataprojects-reg','dataprojects','storage',{provider:'GitHub JSON',summary:'Global categories, scope boundaries and status vocabulary'});
+node(constellation,'datapasscontrol-reg','datapasscontrol','storage',{provider:'GitHub JSON',summary:'Detailed historical/sub-registry for learning family'});
+node(constellation,'owning-repos','Owning repositories','storage',{provider:'GitHub',summary:'Implementation/test truth for each product'});
+node(constellation,'diagramcloud-reg','DiagramCloud','app',{provider:'React/Vite',summary:'Interactive architecture view over curated project truth'});
+view(constellation,'registry-view','Registry | source of truth → implementation → visualization','The registry describes ownership/status, owning repos prove implementation, and DiagramCloud turns that into a navigable architecture without becoming a second source of truth.',['dataprojects-reg','datapasscontrol-reg','owning-repos','diagramcloud-reg'],[
+ ['dataprojects-reg','datapasscontrol-reg','learning detail','dependency'],
+ ['dataprojects-reg','owning-repos','points to canonical repo','dependency'],
+ ['owning-repos','diagramcloud-reg','architecture evidence','dependency']
+]);
+
+constellation.story=[
+ {title:'Start with portfolio ownership',viewId:'overview',nodeId:'core',narration:'Separate products, tools, runtimes, domain labs and registries before discussing vendor technology.',highlightEdgeIds:[]},
+ {title:'Open the product family',viewId:'core-products',nodeId:'contoso',narration:'The core family has mixed maturity: qualified Datapass, active Contoso, donor-backed FactoryLab and planned focused labs.',highlightEdgeIds:[]},
+ {title:'Inspect a real implementation',viewId:'contoso-product',nodeId:'dbt-gold',narration:'Contoso is implemented as a local Parquet + DuckLake + dbt platform, not just a cloud architecture concept.',highlightEdgeIds:[]},
+ {title:'Keep supporting services separate',viewId:'runtime-view',nodeId:'fastapispark',narration:'Execution runtimes support products; they are not additional portfolio products.',highlightEdgeIds:[]},
+ {title:'Show a separate product family',viewId:'atlasmongo-detail',nodeId:'mongo-resources',narration:'AtlasNote uses MongoDB Atlas, GridFS, Vector Search and immutable revision history as a separate knowledge architecture.',highlightEdgeIds:[]}
+];
+
 const platform=project(
  'datapass-platform',
  'Datapass | project architecture map',
@@ -94,6 +448,11 @@ const platform=project(
  ['Datapass','Foil','GCP','BigQuery','Fabric','Databricks','DuckLake','Airflow']
 );
 platform.provenance='Author-created architecture plan for the Datapass/Foil lab. Product names describe intended responsibilities; static example rows and tasks are pedagogical and do not imply live cloud connections.';
+platform.sources=[
+ {id:'src-opendesign',title:'clawnify/OpenDesign',url:'https://github.com/clawnify/OpenDesign',location:'MIT-licensed Preact + Fabric.js visual-editor donor. Current upstream focuses on social graphics and PNG export; PDF/PPTX/CV support described here is a Datapass architecture plan, not an upstream feature.',visibility:'public'},
+ {id:'src-gcs',title:'Google Cloud Storage documentation',url:'https://cloud.google.com/storage/docs',location:'Reference for object storage, object generations and lifecycle controls.',visibility:'public'},
+ {id:'src-drive-help',title:'Google Drive storage help',url:'https://support.google.com/drive/answer/9312312',location:'Reference for Drive as a user-facing file library; account quota depends on the Google account.',visibility:'public'}
+];
 
 node(platform,'workstation','VS Code + local tools','app',{provider:'VS Code',summary:'Authoring surface for DiagramCloud, Datapass Studio and project code',childViewId:'studio-workspace'});
 node(platform,'foil-project','Foil data platform','process',{provider:'Multi-cloud',summary:'Operational data, streaming, historical analytics and ML',childViewId:'foil-platform'});
@@ -214,20 +573,29 @@ block(platform,'asset-row',{id:'asset-catalog-rows',title:'Synthetic asset metad
 ],provenance:'synthetic'});
 block(platform,'asset-search',{id:'asset-search-sql',title:'Find architecture exports',type:'code',language:'sql',code:"SELECT project, file_name, storage, version\nFROM datapass.asset_catalog\nWHERE REGEXP_CONTAINS(LOWER(file_name), r'architecture|macro')\nORDER BY project, version DESC;",provenance:'synthetic'});
 
-node(platform,'drive-vault','Google Drive archive','storage',{provider:'Google Drive',summary:'Human-accessible PNG/PDF/PPTX archive created from DiagramCloud'});
-node(platform,'gcs-objects','Cloud Storage objects','storage',{provider:'Google Cloud Storage',summary:'Optional object layer for scalable asset/object workflows'});
-node(platform,'bq-catalog','BigQuery asset catalog','storage',{provider:'BigQuery',summary:'Metadata, logs, JSON and analytical history'});
-node(platform,'object-link','Object metadata link','process',{provider:'GCP',summary:'URI + metadata connects files to queryable catalog records'});
-view(platform,'gcp-assets','GCP | assets and analytics','Drive is the convenient archive already integrated in V1.2. Cloud Storage is the object layer when needed; BigQuery indexes/query metadata rather than holding PPTX/PDF/PNG bytes.',['drive-vault','gcs-objects','object-link','bq-catalog'],[
- ['drive-vault','object-link','archive metadata'],
- ['gcs-objects','object-link','object URI'],
+node(platform,'drive-vault','Google Drive published library','storage',{provider:'Google Drive',summary:'Human-facing final PDFs, editable PPTX files, CVs and portfolio exports; sharing and preview layer',sourceIds:['src-drive-help']});
+node(platform,'gcs-objects','GCS artifact bucket','storage',{provider:'Google Cloud Storage',summary:'Canonical machine-facing binary store for PNG/JPEG/WebP/SVG/source images and generated previews',sourceIds:['src-gcs']});
+node(platform,'bq-catalog','BigQuery artifact catalog','storage',{provider:'BigQuery',summary:'Searchable metadata: project, artifact id, version, hash, GCS URI, Drive file id, tags and provenance'});
+node(platform,'object-link','Artifact manifest','process',{provider:'GCP',summary:'Stable artifact id connects source design, immutable object versions and published Drive files'});
+view(platform,'gcp-assets','GCP | artifact storage and publication','Cloud Storage is the canonical object layer for generated images and binary assets. Google Drive is the convenient publication/share library for finished PDF/PPTX/CV/portfolio deliverables. BigQuery catalogs metadata rather than storing the binaries.',['gcs-objects','object-link','drive-vault','bq-catalog'],[
+ ['gcs-objects','object-link','object generation + hash'],
+ ['drive-vault','object-link','published file id'],
  ['object-link','bq-catalog','catalog row','batch']
 ]);
-block(platform,'drive-vault',{id:'drive-export-contract',title:'DiagramCloud export archive',type:'table',columns:['Artifact','Generated by','Archive target','Queryable metadata'],rows:[
- ['PNG','DiagramCloud','Google Drive / optional GCS','BigQuery asset_catalog'],
- ['PDF','Browser print','Google Drive / optional GCS','BigQuery asset_catalog'],
- ['PPTX','DiagramCloud','Google Drive / optional GCS','BigQuery asset_catalog']
-],provenance:'synthetic'});
+block(platform,'gcs-objects',{id:'gcs-artifact-layout',title:'Proposed object-key convention',type:'table',columns:['Level','Example'],rows:[
+ ['workspace','datapass / foil / career / website'],
+ ['project','diagramcloud / cv / portfolio / foil-wind'],
+ ['artifact kind','images / screenshots / diagrams / previews / source-assets'],
+ ['artifact id','stable logical id, independent from filename'],
+ ['version','v001 / v002 / content hash']
+],provenance:'author',sourceIds:['src-gcs']});
+block(platform,'drive-vault',{id:'drive-export-contract',title:'Published deliverable policy',type:'table',columns:['Artifact','Primary home','Why'],rows:[
+ ['PNG/JPEG/WebP/SVG assets','GCS','machine access, immutable object generations, predictable URIs'],
+ ['PDF CV / portfolio','Google Drive','preview, sharing and manual organization'],
+ ['Editable PPTX','Google Drive','human editing and delivery'],
+ ['Final website export bundle','Google Drive + optional GCS snapshot','human archive plus reproducible binary snapshot'],
+ ['Metadata / hashes / links','BigQuery','cross-project search and catalog queries']
+],provenance:'author',sourceIds:['src-gcs','src-drive-help']});
 
 node(platform,'bronze-local','Bronze','storage',{provider:'DuckLake',summary:'Raw files/events with ingestion context'});
 node(platform,'silver-local','Silver','storage',{provider:'DuckLake',summary:'Validated and conformed data'});
@@ -260,23 +628,59 @@ view(platform,'learning-stack','Datapass Studio | learning toolbox','One teachin
  ['dbt-lab','fabric-lab','architecture exercise','dependency']
 ]);
 
-node(platform,'diagram-author','DiagramCloud model','app',{provider:'DiagramCloud',summary:'Author project architecture and evidence'});
-node(platform,'artifact-export','Generate PNG/PDF/PPTX','report',{provider:'DiagramCloud',summary:'Create static/shareable project outputs'});
-node(platform,'archive-file','Archive output','storage',{provider:'Google Drive',summary:'Keep human-readable project versions'});
-node(platform,'catalog-file','Catalog metadata','storage',{provider:'BigQuery',summary:'Index project, type, version and URI'});
-view(platform,'portfolio-flow','Portfolio artifacts | author to archive','Use the same architecture model to generate portfolio visuals, then archive the files and optionally catalog their metadata.',['diagram-author','artifact-export','archive-file','catalog-file'],[
- ['diagram-author','artifact-export','export'],
- ['artifact-export','archive-file','upload'],
- ['archive-file','catalog-file','metadata record','batch']
-]);
+node(platform,'diagram-author','Structured source + templates','storage',{provider:'GitHub / JSON',summary:'CV sections, portfolio content, design templates and project manifests remain deterministic and diffable'});
+node(platform,'artifact-canvas','Artifact Studio canvas','app',{provider:'OpenDesign / Fabric.js donor',summary:'Free-form visual editing for portfolio pages, covers, diagrams and image compositions',childViewId:'artifact-canvas-detail',sourceIds:['src-opendesign']});
+node(platform,'artifact-export','Multi-format render pipeline','report',{provider:'Artifact Studio',summary:'Render from one scene/document model to PNG/WebP, PDF and editable PPTX'});
+node(platform,'archive-file','Published deliverables','storage',{provider:'Google Drive',summary:'Final CV, portfolio PDF, PPTX deck and reviewable client/project outputs',sourceIds:['src-drive-help']});
+node(platform,'asset-bucket','Binary artifact store','storage',{provider:'Google Cloud Storage',summary:'All reusable source images and generated PNG/preview objects live here',sourceIds:['src-gcs']});
+node(platform,'catalog-file','Artifact metadata catalog','storage',{provider:'BigQuery',summary:'Index artifact id, project, version, hash, GCS URI, Drive file id and publication state'});
+node(platform,'publish-surfaces','Portfolio / CV / project docs','report',{provider:'Website + Drive',summary:'Website, CV, portfolio deck and project documentation consume the same approved artifacts'});
+view(platform,'portfolio-flow','Artifact Studio | author → render → store → publish','Use a structured source for repeatability, an OpenDesign-style Fabric.js canvas for visual composition, GCS for machine-facing image assets, Drive for final human-facing deliverables, and BigQuery for cross-project metadata/search.',['diagram-author','artifact-canvas','artifact-export','asset-bucket','archive-file','catalog-file','publish-surfaces'],[
+ ['diagram-author','artifact-canvas','load template/content'],
+ ['artifact-canvas','artifact-export','scene/document model'],
+ ['artifact-export','asset-bucket','PNG / preview objects'],
+ ['artifact-export','archive-file','PDF / PPTX / final exports'],
+ ['asset-bucket','catalog-file','object URI + hash','batch'],
+ ['archive-file','catalog-file','Drive file id','batch'],
+ ['archive-file','publish-surfaces','share / deliver'],
+ ['asset-bucket','publish-surfaces','website images','dependency']
+],4);
+
+node(platform,'canvas-scene','Shared scene/document model','model',{provider:'Datapass',summary:'Pages, text, shapes, images, guides and reusable components; canonical input to all renderers'});
+node(platform,'canvas-fabric','Fabric.js editor','app',{provider:'OpenDesign donor',summary:'Selection, drag/resize, text editing, undo/redo, zoom, templates and HiDPI preview',sourceIds:['src-opendesign']});
+node(platform,'canvas-templates','Document templates','storage',{provider:'Datapass',summary:'A4 CV, A4 portfolio, 16:9 deck, architecture one-pager and social/post formats'});
+node(platform,'canvas-images','GCS asset browser','storage',{provider:'Google Cloud Storage',summary:'Insert source PNG/JPEG/WebP/SVG by project/tag without embedding every binary in design JSON',sourceIds:['src-gcs']});
+node(platform,'canvas-renderers','Renderer adapters','process',{provider:'PNG / PDF / PPTX',summary:'Each export consumes the same scene model; editable PPTX should map text/shapes/images rather than flatten every page to one bitmap'});
+view(platform,'artifact-canvas-detail','Artifact Studio | OpenDesign donor plus document renderers','OpenDesign is a strong visual-editor donor, but upstream currently targets social graphics and high-resolution PNG export. Datapass should reuse its Fabric.js interaction model while adding page/document templates, external object storage and deterministic PDF/PPTX renderers.',['canvas-scene','canvas-fabric','canvas-templates','canvas-images','canvas-renderers'],[
+ ['canvas-templates','canvas-scene','instantiate'],
+ ['canvas-images','canvas-scene','asset refs'],
+ ['canvas-scene','canvas-fabric','edit'],
+ ['canvas-fabric','canvas-scene','save scene'],
+ ['canvas-scene','canvas-renderers','render']
+],3);
+block(platform,'artifact-canvas',{id:'opendesign-reuse',title:'What to reuse from OpenDesign',type:'table',columns:['Upstream capability','Datapass treatment'],rows:[
+ ['Fabric.js object manipulation','reuse/adapt'],
+ ['text, shapes, image uploads, backgrounds','reuse/adapt'],
+ ['undo/redo, zoom, templates','reuse/adapt'],
+ ['agent-friendly explicit controls','reuse concept for AI automation'],
+ ['SQLite-only design persistence','replace/abstract behind our project storage contract'],
+ ['social-only canvas sizes','extend with A4, Letter and 16:9 document templates'],
+ ['2x PNG export','keep for preview; add PDF and editable PPTX renderers']
+],provenance:'source-derived',sourceIds:['src-opendesign']});
+block(platform,'artifact-export',{id:'renderer-contract',title:'Renderer contract',type:'table',columns:['Output','Primary use','Rule'],rows:[
+ ['PNG/WebP','website, architecture images, thumbnails','store canonical binary in GCS'],
+ ['PDF','CV, portfolio, printable project brief','publish to Drive; preserve text/vector quality where possible'],
+ ['PPTX','editable portfolio/deck/client handoff','publish to Drive; create native text/shapes/images where practical'],
+ ['HTML','portfolio preview / reusable web page','generated from same structured content and asset references']
+],provenance:'author'});
 
 platform.story=[
  {title:'Start from the overall map',viewId:'overview',nodeId:'foil-project',narration:'The top layer separates projects and shared infrastructure before opening provider detail.',highlightEdgeIds:[]},
  {title:'Open the Foil macro architecture',viewId:'foil-platform',nodeId:'bigquery',narration:'Assign one primary responsibility to each platform: operational, streaming, historical SQL, medallion learning or ML.',highlightEdgeIds:[]},
  {title:'Go down to a concrete BigQuery task',viewId:'bq-telemetry-table',nodeId:'telemetry-sql',narration:'Finish the explanation on synthetic rows, a displayed GoogleSQL task and its expected result rather than an abstract product box.',highlightEdgeIds:[]},
- {title:'Show how project artifacts are managed',viewId:'gcp-assets',nodeId:'drive-vault',narration:'Generated PNG, PDF and PPTX files can be archived in Drive while BigQuery catalogs metadata around them.',highlightEdgeIds:[]}
+ {title:'Show how project artifacts are managed',viewId:'portfolio-flow',nodeId:'artifact-canvas',narration:'Author once: structured content feeds an OpenDesign-style canvas, renderers create PNG/PDF/PPTX, GCS stores machine-facing assets, Drive publishes final documents and BigQuery indexes the catalog.',highlightEdgeIds:[]}
 ];
 
 const blank=project('blank-project','Start from a blank project','Build a small architecture, attach evidence, then add one drilldown at a time.','Blank',['Your project']);
 node(blank,'first-node','Your first component','process',{summary:'Switch to Edit to change this component.'});view(blank,'overview','Architecture overview','A diagram is the entry point; the evidence explains the work.',['first-node'],[]);
-export const samples:Project[]=[validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),validateDocument(blank)];
+export const samples:Project[]=[validateDocument(constellation),validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),validateDocument(blank)];
