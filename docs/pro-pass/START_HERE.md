@@ -304,3 +304,13 @@ New grammar: a `formula` item (plain-text equation plus symbol legend, nothing e
 - Verified by opening the generated decks, including the one the browser downloads, in desktop PowerPoint and exporting every slide to PNG. That check found a stacked chart with `outEnd` data labels, which made PowerPoint refuse the whole file; `tests/pptx.test.ts` now guards against it.
 
 Limits: text sizes are estimated (there is no font measurement in the browser), so a very dense panel can still look crowded. Gantt dependency lines are simple elbows, and images are placed with contain-sizing.
+
+### Project and scope decks (2026-09-25)
+
+- **Export & share → Project deck (PowerPoint)** downloads `<project>.deck.pptx`. It contains a cover, a contents slide with clickable links, an Architecture section (the public views, with box → child-view links kept), one section per scope group with every public report screen reachable from the project's experience root, and a sources-and-provenance table.
+- **Evidence workspaces → scope map → Export scope deck** does the same for the selected scope (report screens only), for example FOIL alone.
+- Groups are the scope's direct children. When every group would hold a single screen, they merge into one section named after the scope, so the deck has no divider per screen. A screen shared by two scopes appears once.
+- Built by `src/export/deck.ts` on top of `addArchitectureSlides` (src/export/pptx.ts) and `addWorkspaceSlides` (src/experience/pptx.ts). Everything passes through `publicDocument` / `publicPack`. The limit is 180 slides; above it, the export asks for a scope deck instead.
+- Tests resolve every hyperlink in the saved file to its target slide. Downloaded decks were opened in desktop PowerPoint, which confirmed the link targets.
+
+Not included in the project deck: node evidence blocks (they remain in the architecture-only PowerPoint), and links from a diagram box straight to its task-screen slide.

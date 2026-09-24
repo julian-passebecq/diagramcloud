@@ -195,17 +195,25 @@ function noteText(p:ExperiencePack,i:ExperienceItem):string{
 export function buildWorkspaceDeck(PptxCtor:typeof PptxGenJS,input:ExperiencePack,workspaceIds:string[],trail:string[]=[]):Pptx{
  const p=publicPack(input),pptx=new PptxCtor();
  pptx.layout='LAYOUT_WIDE';pptx.title=p.title;pptx.company='DiagramCloud';pptx.author='DiagramCloud';pptx.subject='Report screens: displayed examples, not live queries';
+ addWorkspaceSlides(pptx,p,workspaceIds,()=>trail);
+ return pptx;
+}
+
+/** Report-screen slides into an existing deck. `p` must already be publicPack output. Returns slides added per workspace, in order. */
+export function addWorkspaceSlides(pptx:Pptx,p:ExperiencePack,workspaceIds:string[],trailFor:(workspaceId:string)=>string[]):number[]{
+ const counts:number[]=[];
  for(const id of workspaceIds){
+  const trail=trailFor(id);
   const w=p.workspaces.find(x=>x.id===id);if(!w)throw new Error(`Workspace ${id} is not approved for public export`);
   const placed=w.placements.filter(s=>p.items.some(i=>i.id===s.itemId));
   const items=placed.map(s=>p.items.find(i=>i.id===s.itemId)!),srcIds=new Set(items.flatMap(i=>[...i.sourceIds,...(i.type==='tabs'?i.itemIds.flatMap(t=>p.items.find(x=>x.id===t)?.sourceIds??[]):[])]));
   const sources=p.sources.filter(s=>srcIds.has(s.id)),sourceLines=sources.map(s=>`${s.title}${s.page?` · p.${s.page}`:''}`),kinds=[...new Set(items.map(i=>i.provenance))];
   const footer=`${kinds.map(k=>`${k.toUpperCase()}: ${PROVENANCE_NOTE[k]}`).join(' · ')}. Displayed data and code; nothing here is a live query or proof of deployment.`;
   const notesBase=`Sources:\n${sources.map(s=>`- ${s.title}${s.page?` p.${s.page}`:''}: ${s.locator}${s.revision?` (${s.revision})`:''}`).join('\n')||'- none cited'}\n\n${footer}`;
-  const bands=rowBands(placed),appendix:ExperienceItem[]=[];
+  const bands=rowBands(placed),appendix:ExperienceItem[]=[];let added=0;
   const colW=(MAIN_W-11*GAP)/12;
   bands.forEach(([from,to],k)=>{
-   const s=frame(pptx,w,trail,sourceLines,bands.length>1?`   ·   PART ${k+1} OF ${bands.length}`:''),rows=to-from,rowH=Math.min(MAX_ROW_H,(BOARD_H-(rows-1)*GAP)/rows);
+   added++;const s=frame(pptx,w,trail,sourceLines,bands.length>1?`   ·   PART ${k+1} OF ${bands.length}`:''),rows=to-from,rowH=Math.min(MAX_ROW_H,(BOARD_H-(rows-1)*GAP)/rows);
    const inBand=placed.filter(pl=>pl.y>=from&&pl.y+pl.h<=to);
    for(const pl of inBand){const i=p.items.find(x=>x.id===pl.itemId)!;
     const b={x:MAIN_X+pl.x*(colW+GAP),y:BOARD_Y+(pl.y-from)*(rowH+GAP),w:pl.w*colW+(pl.w-1)*GAP,h:pl.h*rowH+(pl.h-1)*GAP};
@@ -214,13 +222,32 @@ export function buildWorkspaceDeck(PptxCtor:typeof PptxGenJS,input:ExperiencePac
    s.addNotes(`${w.title}${bands.length>1?` (part ${k+1} of ${bands.length})`:''}\n\n${inBand.map(pl=>noteText(p,p.items.find(x=>x.id===pl.itemId)!)).join('\n\n')}\n\n${notesBase}`);
   });
   for(const [k,i] of appendix.entries()){
-   const s=frame(pptx,w,trail,sourceLines,`   ·   TAB ${k+2}`);
+   added++;const s=frame(pptx,w,trail,sourceLines,`   ·   TAB ${k+2}`);
    body(pptx,s,p,i,panel(pptx,s,i,{x:MAIN_X,y:BOARD_Y,w:MAIN_W,h:BOARD_H}),[]);
    s.addText(clip(footer,260),{x:MAIN_X,y:7.02,w:MAIN_W,h:.3,fontSize:7,color:MUTED,fontFace:FONT,margin:0,valign:'top'});
    s.addNotes(`${noteText(p,i)}\n\n${notesBase}`);
   }
+  counts.push(added);
  }
- return pptx;
+ return counts;
+}
+
+/** Public workspaces reachable from an entity, depth-first in navigation order, grouped by the scope's direct children. */
+export type DeckGroup={entityId:string;label:string;summary:string;screens:{workspaceId:string;title:string;trail:string[]}[]};
+export function workspaceGroups(p:ExperiencePack,scopeId:string=p.rootId):DeckGroup[]{
+ const byId=new Map(p.entities.map(e=>[e.id,e])),spaces=new Map(p.workspaces.map(w=>[w.id,w])),seen=new Set<string>();
+ const collect=(id:string,trail:string[],out:DeckGroup['screens'])=>{const e=byId.get(id);if(!e||seen.has(id))return;seen.add(id);const here=[...trail,e.label];
+  for(const w of e.workspaceIds)if(spaces.has(w)&&!out.some(x=>x.workspaceId===w))out.push({workspaceId:w,title:spaces.get(w)!.title,trail:here});
+  for(const c of e.children)collect(c,here,out);};
+ const scope=byId.get(scopeId);if(!scope)return [];
+ const groups:DeckGroup[]=[];
+ const own:DeckGroup['screens']=[];for(const w of scope.workspaceIds)if(spaces.has(w))own.push({workspaceId:w,title:spaces.get(w)!.title,trail:[scope.label]});
+ if(own.length)groups.push({entityId:scope.id,label:scope.label,summary:scope.summary,screens:own});
+ seen.add(scope.id);
+ for(const c of scope.children){const screens:DeckGroup['screens']=[];collect(c,[scope.label],screens);const e=byId.get(c);if(e&&screens.length)groups.push({entityId:c,label:e.label,summary:e.summary,screens});}
+ // A screen reachable twice (shared across scopes) is shown once, in its first group.
+ const shown=new Set<string>();for(const g of groups)g.screens=g.screens.filter(x=>!shown.has(x.workspaceId)&&shown.add(x.workspaceId));
+ return groups.filter(g=>g.screens.length);
 }
 
 export async function exportWorkspacePptx(pack:ExperiencePack,workspaceId:string,trail:string[]):Promise<void>{

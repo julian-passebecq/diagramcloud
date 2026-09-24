@@ -138,3 +138,21 @@ test('FOIL diagram boxes open their report screens: physics formula, economics t
  mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/report-foil-pipeline.png',fullPage:true});
  expect(errors).toEqual([]);
 });
+
+test('project deck and scope deck download as PowerPoint files',async({page})=>{
+ await page.goto('/');
+ await page.locator('.project-card').filter({has:page.locator('strong',{hasText:/^Foil/})}).click();
+ await page.getByRole('button',{name:'Export & share',exact:true}).click();
+ mkdirSync('test-results/decks',{recursive:true});
+ let wait=page.waitForEvent('download');await page.getByRole('button',{name:/Project deck \(PowerPoint\)/}).click();
+ let file=await wait;expect(file.suggestedFilename()).toBe('foilo-databricks.deck.pptx');await file.saveAs('test-results/decks/foilo.deck.pptx');
+ expect(readFileSync('test-results/decks/foilo.deck.pptx').subarray(0,2).toString()).toBe('PK');
+ await expect(page.getByRole('status')).toContainText('Project deck created: 20 slides');
+ await page.getByRole('dialog',{name:'Export & share'}).getByRole('button',{name:'Close dialog'}).click();
+ await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});
+ await d.locator('.xp-nav').getByRole('button',{name:'All project scopes',exact:true}).click();
+ wait=page.waitForEvent('download');await d.getByRole('button',{name:'Export scope deck',exact:true}).click();
+ file=await wait;expect(file.suggestedFilename()).toBe('foil.deck.pptx');await file.saveAs('test-results/decks/foil-scope.deck.pptx');
+ expect(readFileSync('test-results/decks/foil-scope.deck.pptx').subarray(0,2).toString()).toBe('PK');
+});
