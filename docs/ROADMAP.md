@@ -78,3 +78,14 @@ Still deliberately out of scope:
 - multi-provider asset synchronization/conflict resolution.
 
 Next useful asset work: a provider-neutral asset-source interface plus optional OneDrive/R2 adapters, then an AI image generation action that feeds the same sanitize/cache/provenance pipeline.
+
+## Bridge V1 pass (2026-09-24)
+
+Done on the DiagramCloud side: explicit Explore vs Open task workspace actions (PR #6 CI green), repository sidecar open/review/apply, conflict-guarded save back to `.datapass/diagramcloud.json`, create-if-missing, and contract tests pinned to DataPass `fde955a`.
+
+Next, in order:
+
+1. DataPass side (datapass-vscode): detect `.datapass/diagramcloud.json`, **Open architecture**, **Copy AI context** (validate against the context schema, use DiagramCloud's `contextBlock` shape), **Import AI plan** with base-revision check and per-operation review.
+2. Define DiagramCloud payload shapes for the `diagramcloud-document` plan actions (`link-node-workspace`, `add-item`, `add-placement`, …) as a reviewed contract bump, then a shared apply function both products can test.
+3. Persist the folder handle in IndexedDB so the link survives a reload (with a permission re-prompt).
+4. VS Code webview hosting: DataPass posts the sidecar text to an embedded DiagramCloud with an origin-checked message channel.

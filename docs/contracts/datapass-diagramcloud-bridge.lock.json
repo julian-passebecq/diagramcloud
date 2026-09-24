@@ -11,9 +11,23 @@
     "aiPlanSchema": "contracts/diagramcloud/datapass-ai-plan-v1.schema.json",
     "handoff": "handoff/DIAGRAMCLOUD_BRIDGE_V1.md"
   },
+  "vendored": {
+    "aiContextSchema": {
+      "path": "docs/contracts/datapass-bridge-v1/datapass-ai-context-v1.schema.json",
+      "gitBlob": "1900b25ac9345270fd7e7738f45ea2284a3a7cf7"
+    },
+    "aiPlanSchema": {
+      "path": "docs/contracts/datapass-bridge-v1/datapass-ai-plan-v1.schema.json",
+      "gitBlob": "0116b99c3a4c5a43abd79361d8ca5c23bf7563e4"
+    }
+  },
+  "sidecar": {
+    "path": ".datapass/diagramcloud.json",
+    "document": "one validateDocument() DiagramCloud project, including optional experience pack"
+  },
   "consumer": {
     "repository": "julian-passebecq/diagramcloud",
     "branch": "feat/diagramcloud-experience-pro-pass"
   },
-  "note": "Pin this contract revision in tests/adapters. Update only through an explicit reviewed contract bump."
+  "note": "Pin this contract revision in tests/adapters. Update only through an explicit reviewed contract bump: re-download the vendored schemas at the new commit and update both gitBlob values (they must equal the upstream Git blob IDs)."
 }

@@ -178,7 +178,12 @@ DiagramCloud consumes reviewed generic entities/tasks/evidence. It does not exec
 
 Do not hard-code one fixed company hierarchy into the DiagramCloud schema.
 
-## Immediate blocker — fix this before adding more features
+## Status update (2026-09-24, later)
+
+- The browser-test blocker below is **fixed** (commit `97e0bb9`): card click = Explore architecture only; the sibling "Open task workspace" strip and the Inspector button open the workspace only. PR #6 CI is green.
+- DiagramCloud-side Bridge V1 is implemented: open/review/apply `.datapass/diagramcloud.json`, conflict-guarded save back, create-if-missing, and contract tests pinned to `fde955a`. See `docs/ARCHITECTURE.md` → "DataPass repository bridge" and `docs/ROADMAP.md` → "Bridge V1 pass" for the next steps (DataPass-side actions come next).
+
+## Immediate blocker (resolved, kept for history)
 
 Current exact code head 8cc0363:
 
