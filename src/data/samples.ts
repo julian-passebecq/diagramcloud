@@ -1,19 +1,22 @@
 import {documentSchema,nodeSchema,edgeSchema,viewSchema,blockSchema,validateDocument,type Project,type ProjectNode,type ProjectEdge,type EvidenceBlock} from '../core/model';
+import {examplePack} from '../experience/sample';
 
 function project(id:string,title:string,summary:string,category:Project['category'],tags:string[]):Project{return documentSchema.parse({schemaVersion:1,id,title,summary,category,tags,rootViewId:'overview',author:category==='Portfolio'?'Julian Passebecq':'DiagramCloud reference library',provenance:category==='Portfolio'?'Reconstructed from the user-provided portfolio PDFs. Tables, code and visual flow speeds in this app are synthetic teaching examples, not verified employer data or measured performance.':'Independently authored educational example. Not an official or vendor-approved architecture.',nodes:[],edges:[],views:[{id:'overview',title:'Architecture overview'}]});}
 function node(d:Project,id:string,label:string,kind:ProjectNode['kind'],options:Partial<ProjectNode>={}){d.nodes.push(nodeSchema.parse({id,label,kind,...options}));return id;}
 function view(d:Project,id:string,title:string,description:string,names:string[],links:[string,string,string,ProjectEdge['kind']?][],columns=3){const edgeIds=links.map(([source,target,label,kind],i)=>{const eid=`${id}-e${i}`;d.edges.push(edgeSchema.parse({id:eid,source,target,label,kind:kind??'batch',speed:kind==='stream'?'fast':kind==='control'?'slow':'medium'}));return eid;});const v=viewSchema.parse({id,title,description,nodeIds:names,edgeIds,positions:Object.fromEntries(names.map((id,i)=>[id,{x:(i%columns)*300,y:Math.floor(i/columns)*180}]))});const old=d.views.findIndex(v=>v.id===id);if(old<0)d.views.push(v);else d.views[old]=v;}
 function block(d:Project,nodeId:string,value:unknown){const b=blockSchema.parse(value);d.blocks.push(b);d.nodes.find(n=>n.id===nodeId)!.blockIds.push(b.id);}
 function note(d:Project,nodeId:string,id:string,title:string,text:string,provenance:EvidenceBlock['provenance']='synthetic',sourceIds:string[]=[]){block(d,nodeId,{id,title,type:'text',text,provenance,sourceIds});}
+function experience(rootId:string,id:string,title:string){const p=examplePack();p.rootId=rootId;p.id=id;p.title=title;return p;}
 const portfolioSources=[{id:'pdf-six',title:'Total_Foilo_Portfolio_6_pages (2).pdf',location:'User-supplied six-page portfolio; illustrative/synthetic labels retained.',visibility:'public' as const},{id:'pdf-eighteen',title:'Julian_Passebecq_Portfolio_TotalEnergies_First_NoGlossary (2).pdf',location:'User-supplied 18-page portfolio; TotalEnergies first, then Foil\u2019O.',visibility:'public' as const}];
 
 const total=project('total-project-controls','TotalEnergies','From cost and schedule updates to a report a project controller can trust. Explore the architecture, then open the validation work behind it.','Portfolio',['Project controls','Oracle','SQL','Power BI']);
 total.sources=structuredClone(portfolioSources);
+total.experience=experience('total','total-project-experience','TotalEnergies project experience');
 node(total,'business','Business inputs','source',{summary:'Planning, drilling, cost estimates and revisions',sourceIds:['pdf-six']});
 node(total,'excel','Excel preparation','process',{provider:'Excel',summary:'Assumptions, structures and update files',sourceIds:['pdf-six'],role:'Data maintenance and schedule coordination'});
 node(total,'oracle','Oracle project database','storage',{provider:'Oracle',summary:'Consolidated project cost and schedule',childViewId:'data-model',sourceIds:['pdf-six']});
-node(total,'checks','SQL quality checks','control',{provider:'SQL',summary:'Validate, reconcile and explain discrepancies',childViewId:'validation',status:'running',sourceIds:['pdf-six'],role:'Checked data consistency and prepared reporting views'});
-node(total,'powerbi','Power BI reporting','report',{provider:'Power BI',summary:'Planning snapshots, CAPEX phasing, variance',childViewId:'reporting',sourceIds:['pdf-six','pdf-eighteen']});
+node(total,'checks','SQL quality checks','control',{provider:'SQL',summary:'Validate, reconcile and explain discrepancies',childViewId:'validation',experienceWorkspaceId:'quality-screen',status:'running',sourceIds:['pdf-six'],role:'Checked data consistency and prepared reporting views'});
+node(total,'powerbi','Power BI reporting','report',{provider:'Power BI',summary:'Planning snapshots, CAPEX phasing, variance',childViewId:'reporting',experienceWorkspaceId:'quicklook-screen',sourceIds:['pdf-six','pdf-eighteen']});
 view(total,'overview','Project controls | end-to-end','A readable overview. Click SQL quality checks to open the task underneath, then a check to inspect its SQL and sample rows.',['business','excel','oracle','checks','powerbi'],[['business','excel','update files'],['excel','oracle','load'],['oracle','checks','validate','query'],['checks','powerbi','trusted views']]);
 node(total,'mandatory','Required fields','function',{provider:'SQL',summary:'WBS, dates and costs must be populated',childViewId:'check-detail'});
 node(total,'dates','Date sequence','function',{provider:'SQL',summary:'Start date must not follow finish date'});
@@ -43,12 +46,13 @@ total.story=[{title:'Start with the business problem',viewId:'overview',nodeId:'
 
 const foilo=project('foilo-databricks','Foil\u2019O \u00c9cologie','Connect the physical energy system to a reproducible Databricks workflow and a decision-support application.','Portfolio',['Databricks','PySpark','Delta','MLflow','Streamlit']);
 foilo.sources=structuredClone(portfolioSources);
-node(foilo,'site','Site and machine inputs','source',{summary:'Hydrology, telemetry and machine configuration',childViewId:'hydrofoil',sourceIds:['pdf-six']});
+foilo.experience=experience('foil','foilo-experience','Foil\u2019O project experience');
+node(foilo,'site','Site and machine inputs','source',{summary:'Hydrology, telemetry and machine configuration',childViewId:'hydrofoil',experienceWorkspaceId:'foil-system-screen',sourceIds:['pdf-six']});
 node(foilo,'bronze','Bronze | raw inputs','storage',{provider:'Databricks',summary:'Preserve source values and ingestion context'});
-node(foilo,'spark','PySpark simulation','process',{provider:'Databricks',summary:'Parameter sweeps and derived outputs',childViewId:'simulation',status:'running',role:'Databricks development, PySpark workflow and modelling inputs',sourceIds:['pdf-eighteen','pdf-six']});
-node(foilo,'gold','Gold | scenario outputs','storage',{provider:'Delta Lake',summary:'Curated technical and economic datasets',childViewId:'economics'});
-node(foilo,'streamlit','Streamlit decision app','app',{provider:'Streamlit',summary:'Compare assumptions and explain results'});
-node(foilo,'governance','Jobs, catalog and tracking','control',{provider:'Databricks',summary:'Unity Catalog, Lakeflow Jobs and MLflow',childViewId:'governance'});
+node(foilo,'spark','PySpark simulation','process',{provider:'Databricks',summary:'Parameter sweeps and derived outputs',childViewId:'simulation',experienceWorkspaceId:'foil-physics-screen',status:'running',role:'Databricks development, PySpark workflow and modelling inputs',sourceIds:['pdf-eighteen','pdf-six']});
+node(foilo,'gold','Gold | scenario outputs','storage',{provider:'Delta Lake',summary:'Curated technical and economic datasets',childViewId:'economics',experienceWorkspaceId:'foil-economics-screen'});
+node(foilo,'streamlit','Streamlit decision app','app',{provider:'Streamlit',summary:'Compare assumptions and explain results',experienceWorkspaceId:'foil-screen'});
+node(foilo,'governance','Jobs, catalog and tracking','control',{provider:'Databricks',summary:'Unity Catalog, Lakeflow Jobs and MLflow',childViewId:'governance',experienceWorkspaceId:'foil-pipeline-screen'});
 view(foilo,'overview','From water current to decision support','Reconstructed architecture from the supplied PDFs. Animated flow is authored illustration, not a running Databricks job.',['site','bronze','spark','governance','gold','streamlit'],[['site','bronze','ingest'],['bronze','spark','prepared inputs'],['spark','gold','scenario outputs'],['gold','streamlit','curated data','query'],['governance','spark','orchestrate','control']]);
 node(foilo,'water','Water current','physics',{summary:'River or tidal flow resource'});node(foilo,'foil','Lift and foil motion','physics',{summary:'Controlled heave and pitch'});node(foilo,'pto','Power take-off','physics',{summary:'Motion transferred into usable power'});node(foilo,'electricity','Electricity','physics',{summary:'Generator and electrical output'});
 view(foilo,'hydrofoil','Physical system | the project behind the cloud','The six-page portfolio, page 6, explains an oscillating hydrofoil rather than a conventional turbine. This is a conceptual chain, not a validated physics simulator.',['water','foil','pto','electricity'],[['water','foil','flow energy','stream'],['foil','pto','mechanical motion'],['pto','electricity','conversion']]);
@@ -95,6 +99,9 @@ const constellation=project(
  ['Portfolio','Datapass','Contoso','Fabric','Power BI','FOIL','MongoDB','VS Code']
 );
 constellation.provenance='Architecture reconstructed from julian-passebecq/dataprojects registry plus owning repository READMEs as reviewed on 2026-09-23. Nodes explicitly distinguish current, donor/prototype and planned responsibilities.';
+// The constellation is the portfolio-level project, so its experience starts at the atlas root (all project scopes +
+// Portfolio remix). Node links such as datapass-vscode -> galaxy-screen still deep-link into the DataPass scope.
+constellation.experience=experience('all-projects','constellation-experience','Data Projects experience atlas');
 constellation.sources=[
  {id:'src-registry',title:'julian-passebecq/dataprojects',location:'GitHub registry/constellation.json, tooling.json, services.json, domain-projects.json and repo-cartography.json',visibility:'public'},
  {id:'src-contoso',title:'julian-passebecq/contoso-data-studio',location:'GitHub README and implementation tree',visibility:'public'},
@@ -279,7 +286,7 @@ view(constellation,'pbilab-product','PBI / Semantic Lab | focused extraction fro
  ['dax-editor','connected-mode','query','query']
 ]);
 
-node(constellation,'datapass-vscode','Data Platform VS Code control plane','app',{provider:'datapass-vscode',summary:'Canonical developer control-plane implementation; V0.7.0 merged/CI green',childViewId:'datapass-vscode-detail'});
+node(constellation,'datapass-vscode','Data Platform VS Code control plane','app',{provider:'datapass-vscode',summary:'Canonical developer control-plane implementation; source-derived Galaxy workspace available',childViewId:'datapass-vscode-detail',experienceWorkspaceId:'galaxy-screen'});
 node(constellation,'fabric-companion','Fabric DataPass Toolbox','app',{provider:'VS Code companion',summary:'Real-Fabric checklist/helpers; not FactoryLab'});
 node(constellation,'fabric-ops','Fabric Ops Studio','app',{provider:'Fabric toolbox fork',summary:'Real Fabric operations/admin/accelerator tooling'});
 node(constellation,'pbibench-tool','PbiBench','app',{provider:'Power BI engineering',summary:'Broad engineering IDE and donor to focused PBI Lab'});

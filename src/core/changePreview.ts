@@ -12,7 +12,7 @@ export type DocumentChangePreview={
  totalChanges:number;
 };
 
-const metadataKeys=['title','summary','author','category','tags','rootViewId','provenance','privateNotes'] as const;
+const metadataKeys=['title','summary','author','category','tags','rootViewId','provenance','privateNotes','experience'] as const;
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 function byId<T extends {id:string}>(current:T[],incoming:T[]):EntityDelta{
  const before=new Map(current.map(item=>[item.id,item])),after=new Map(incoming.map(item=>[item.id,item]));

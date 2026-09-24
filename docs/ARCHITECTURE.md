@@ -91,3 +91,16 @@ The connector uses Google Identity Services token flow in the browser and reques
 The export boundary remains deliberately offline-first: PPTX, HTML and evidence rendering consume only `asset.data`. No exporter is permitted to dereference Drive URLs or request a Google token. This makes remote asset providers replaceable and keeps presentation generation deterministic.
 
 Future providers (OneDrive, Dropbox, S3/R2, AI image APIs) should implement the same pattern: explicit import/sync into a validated cached asset, provider metadata private by default, and no remote fetch during public export.
+
+## DataPass repository bridge (Bridge V1, DiagramCloud side)
+
+Contract: DataPass PR #9 at `fde955a`, pinned in `docs/contracts/datapass-diagramcloud-bridge.lock.json`. The two schemas are vendored under `docs/contracts/datapass-bridge-v1/`; `tests/bridge.test.ts` fails if a vendored copy differs from the pinned upstream Git blob.
+
+- `src/bridge/sidecar.ts` is React-free. It reads and writes `<repo>/.datapass/diagramcloud.json` through a minimal File System Access interface, so unit tests use in-memory folders.
+- Opening: the JSON / AI dialog's **Open project folder…** reads the sidecar as text and places it in the ordinary `parseDocument` → stable-ID change preview → revision check → apply path. A repository file never reaches React state unvalidated. From `.datapass/project.json`, only `project.id` and `project.title` are read, to confirm the folder.
+- Applying a sidecar opens it at its own revision (history resets) and links the project to that folder. If a stored local copy with the same ID has a different revision, apply is blocked; the only override is **Back up local copy, then open repository version**, which downloads the local authoring JSON first.
+- Saving: **Save to repository** re-reads the file and compares its SHA-256 with the hash recorded at open/last save. Any difference (a DataPass plan applied, Git pull, another editor) refuses the write and leaves the file untouched; the alert offers a backup and a reopen for review.
+- The sidecar is the full authoring document (the contract allows private presentation data in a repository). Review notes flag private objects and sidecars above 1 MiB before commit. Public exports remain separate and still go through `publicDocument`.
+- `contextBlock()` is the `diagramCloud` member DiagramCloud guarantees for a `datapass.ai-context` V1 envelope and is tested against the pinned schema.
+
+Limits: folder access needs a Chromium browser (Edge/Chrome); elsewhere use Import JSON and **Download diagramcloud.json**. The folder link is kept in memory only and must be reopened after a page reload. DiagramCloud does not apply `datapass.ai-plan` operations; that stays with DataPass per the contract.

@@ -78,3 +78,32 @@ Still deliberately out of scope:
 - multi-provider asset synchronization/conflict resolution.
 
 Next useful asset work: a provider-neutral asset-source interface plus optional OneDrive/R2 adapters, then an AI image generation action that feeds the same sanitize/cache/provenance pipeline.
+
+## Bridge V1 pass (2026-09-24)
+
+Done on the DiagramCloud side: explicit Explore vs Open task workspace actions (PR #6 CI green), repository sidecar open/review/apply, conflict-guarded save back to `.datapass/diagramcloud.json`, create-if-missing, and contract tests pinned to DataPass `fde955a`.
+
+Next, in order:
+
+1. ~~DataPass side~~ done in julian-passebecq/datapass-vscode#11 (branch `feat/diagramcloud-bridge-v1`, CI green): sidecar detection, Open architecture, Copy AI context (JSON), Import AI plan with base-revision checks, per-operation approval and a journaled write. V1 applies `set-project-metadata` and `link-node-workspace` only; its output bytes equal `serializeSidecar`. After that PR merges, bump `docs/contracts/datapass-diagramcloud-bridge.lock.json` to the merged commit (the contract README gained additive V1 notes; the schemas are unchanged).
+2. Define DiagramCloud payload shapes for the `diagramcloud-document` plan actions (`link-node-workspace`, `add-item`, `add-placement`, …) as a reviewed contract bump, then a shared apply function both products can test.
+3. Persist the folder handle in IndexedDB so the link survives a reload (with a permission re-prompt).
+4. VS Code webview hosting: DataPass posts the sidecar text to an embedded DiagramCloud with an origin-checked message channel.
+
+## Report screens pass (2026-09-24)
+
+Done: Report view (context rail, provenance footer, export parity), KPI trends, hbar/stacked/donut/scatter charts, status badges, a Gantt with groups/milestones/dependencies, and filters/callouts/steps/tabs items. There are three TotalEnergies showcase screens from portfolio pp.6/9/10. Details are in `docs/pro-pass/START_HERE.md`.
+
+FOIL screens are done: five report screens linked from the Foil'O diagram (see START_HERE, "FOIL screens").
+
+Composed-workspace PPTX export is done (native charts and tables; see START_HERE, "PowerPoint export").
+
+Project and scope decks are done (see START_HERE, "Project and scope decks").
+
+The semantic-model (star schema) item is done (see START_HERE, "Semantic model item").
+
+Drag-to-move and drag-to-resize in Edit board are done.
+
+Undo and redo for board edits are done.
+
+Next candidates: a small in-app editor for model items; multi-select and align in Edit board; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.

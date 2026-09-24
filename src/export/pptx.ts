@@ -5,6 +5,9 @@ import {wrapLines,caption} from './text';
 import {NODE_HEIGHT,NODE_WIDTH,orthogonalRoute,routeLabel} from './scene';
 function textOf(b:EvidenceBlock):string{return b.type==='text'?b.text:b.type==='code'?b.code:b.type==='metrics'?b.items.map(i=>`${i.label}: ${i.value}\n${i.note}`).join('\n\n'):'';}
 
+type Pptx=InstanceType<typeof import('pptxgenjs').default>;
+export type ArchitectureParts={cover:boolean;evidence:boolean;sources:boolean;firstViewSlide:number};
+
 /** Native editable objects, not screenshots. Exported code is display-only. */
 export async function exportPptx(input:Project):Promise<void>{
  const d=publicDocument(input),attached=new Set(d.nodes.flatMap(n=>n.blockIds)),blocks=d.blocks.filter(b=>attached.has(b.id));
@@ -12,6 +15,13 @@ export async function exportPptx(input:Project):Promise<void>{
  if(estimate>180)throw new Error('This project would create more than 180 slides. Export a smaller public project or use HTML.');
  const {default:PptxGenJS}=await import('pptxgenjs');const pptx=new PptxGenJS();
  pptx.layout='LAYOUT_WIDE';pptx.author=d.author||'DiagramCloud';pptx.subject=d.summary;pptx.title=d.title;pptx.company='DiagramCloud';pptx.theme={headFontFace:'Aptos Display',bodyFontFace:'Aptos'};
+ await addArchitectureSlides(pptx,d,{cover:true,evidence:true,sources:true,firstViewSlide:2});
+ await pptx.writeFile({fileName:`${d.id}.pptx`});
+}
+
+/** Architecture slides into an existing deck. `d` must already be publicDocument output; view links assume views are consecutive from firstViewSlide. */
+export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:ArchitectureParts):Promise<void>{
+ const attached=new Set(d.nodes.flatMap(n=>n.blockIds)),blocks=parts.evidence?d.blocks.filter(b=>attached.has(b.id)):[];
  const width=40/3,shape=pptx.ShapeType;
  const sourceNotes='[Sources]\n'+d.sources.map(s=>`${s.title}\n${s.location}${s.url?'\n'+s.url:''}`).join('\n\n')+'\n[/Sources]';
  const notes=(parts:string[])=>[d.provenance,sourceNotes,...parts].join('\n\n');
@@ -23,12 +33,12 @@ export async function exportPptx(input:Project):Promise<void>{
   s.addText('Public export · Source labels retained · No live telemetry',{x:.6,y:7.13,w:12.1,h:.18,fontSize:9,color:'6F8197',margin:0});
   s.addNotes(notes([title,subtitle]));return s;
  }
- const cover=base(d.title,d.summary);
+ if(parts.cover){const cover=base(d.title,d.summary);
  cover.addText('Architecture. The work behind it. The evidence.',{x:.6,y:2.45,w:11.8,h:1.05,fontSize:32,color:'254E88',bold:true,margin:0});
  cover.addText(d.author,{x:.6,y:3.8,w:11.8,h:.45,fontSize:20,color:'172C48',margin:0});
  cover.addText(caption(d.provenance,130,6),{x:.6,y:4.55,w:11.8,h:1.35,fontSize:13,color:'536780',margin:0});
- cover.addText(caption(d.tags.join('  /  '),145,2),{x:.6,y:6.25,w:11.8,h:.45,fontSize:12,color:'536780',margin:0});
- const slideNumbers=new Map(d.views.map((v,i)=>[v.id,i+2]));
+ cover.addText(caption(d.tags.join('  /  '),145,2),{x:.6,y:6.25,w:11.8,h:.45,fontSize:12,color:'536780',margin:0});}
+ const slideNumbers=new Map(d.views.map((v,i)=>[v.id,i+parts.firstViewSlide]));
  for(const v of d.views){
   const slide=base(v.title,v.description),b=bounds(v),scale=Math.min((width-1.2)/b.width,4.6/b.height),left=(width-b.width*scale)/2,top=2.2;
   const pos=(id:string)=>{const p=positionFor(v,id);return{x:left+(p.x-b.x)*scale,y:top+(p.y-b.y)*scale};};
@@ -56,6 +66,5 @@ export async function exportPptx(input:Project):Promise<void>{
   const full=textOf(b),lines=wrapLines(full,95,b.type==='code'),size=b.type==='code'?23:18;
   for(let start=0;start<Math.max(1,lines.length);start+=size){const slide=base(b.title+(start?' (continued)':''),subtitle);slide.addText(lines.slice(start,start+size).join('\n'),{x:.8,y:2.35,w:11.7,h:4.35,fontSize:b.type==='code'?12:16,fontFace:b.type==='code'?'Consolas':'Aptos',color:'243B58',valign:'top',margin:0,paraSpaceAfter:0});slide.addNotes(notes([b.title,subtitle,'Original evidence content:',full]));}
  }
- if(d.sources.length){const lines=wrapLines(d.sources.map(s=>`${s.title}\n${s.location}${s.url?'\n'+s.url:''}`).join('\n\n'),135);for(let start=0;start<lines.length;start+=23){const slide=base('Sources and provenance','Source-derived descriptions and synthetic teaching material are distinct.');slide.addText(lines.slice(start,start+23).join('\n'),{x:.7,y:2.25,w:11.9,h:4.5,fontSize:12,color:'536780',valign:'top',margin:0});}}
- await pptx.writeFile({fileName:`${d.id}.pptx`});
+ if(parts.sources&&d.sources.length){const lines=wrapLines(d.sources.map(s=>`${s.title}\n${s.location}${s.url?'\n'+s.url:''}`).join('\n\n'),135);for(let start=0;start<lines.length;start+=23){const slide=base('Sources and provenance','Source-derived descriptions and synthetic teaching material are distinct.');slide.addText(lines.slice(start,start+23).join('\n'),{x:.7,y:2.25,w:11.9,h:4.5,fontSize:12,color:'536780',valign:'top',margin:0});}}
 }
