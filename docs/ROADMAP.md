@@ -100,4 +100,6 @@ Composed-workspace PPTX export is done (native charts and tables; see START_HERE
 
 Project and scope decks are done (see START_HERE, "Project and scope decks").
 
-Next candidates: a semantic-model (star schema) item for p.8; drag/resize placement in Edit board; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+The semantic-model (star schema) item is done (see START_HERE, "Semantic model item").
+
+Next candidates: drag/resize placement in Edit board; a small in-app editor for model items; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.

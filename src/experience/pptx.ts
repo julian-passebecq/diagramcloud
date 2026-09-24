@@ -1,6 +1,7 @@
 import type PptxGenJS from 'pptxgenjs';
 import {publicPack,type ExperienceItem,type ExperiencePack,type ExperienceWorkspace} from './model';
-import {PLAIN_NUMBER_COLUMN,PROVENANCE_NOTE,clip,fmt,statusClass} from './render';
+import {MODEL_KIND_COLOR,PLAIN_NUMBER_COLUMN,PROVENANCE_NOTE,clip,fmt,statusClass} from './render';
+import {MODEL_HEADER,MODEL_ROW,modelLayout,type ModelItem} from './semantic';
 
 /**
  * Report screens as native, editable PowerPoint: the same rail + 12-column grid as the in-app Report view.
@@ -140,6 +141,22 @@ function gantt(pptx:Pptx,s:Slide,i:Extract<ExperienceItem,{type:'gantt'}>,b:Box)
  groups.forEach((g,k)=>{const x=b.x+k*1.35;s.addShape(pptx.ShapeType.rect,{x,y:b.y+b.h-.15,w:.1,h:.1,fill:{color:SERIES[k%SERIES.length]},line:{color:SERIES[k%SERIES.length]}});s.addText(clip(g,18),{x:x+.14,y:b.y+b.h-.19,w:1.2,h:.18,fontSize:7,color:BODY,fontFace:FONT,margin:0});});
 }
 
+/** Same layout as the HTML diagram, scaled into the panel: boxes, key-first columns, relationship lines and cardinality. */
+function model(pptx:Pptx,s:Slide,i:ModelItem,b:Box){
+ const measuresH=i.measures.length?.3:0,L=modelLayout(i,Math.max(560,Math.round(b.w*72))),k=Math.min(b.w/L.w,(b.h-measuresH)/L.h),ox=b.x+(b.w-L.w*k)/2,oy=b.y;
+ const X=(v:number)=>ox+v*k,Y=(v:number)=>oy+v*k,pt=(px:number)=>Math.max(5.5,px*k*72);
+ for(const l of L.links){const x1=X(l.x1),y1=Y(l.y1),x2=X(l.x2),y2=Y(l.y2),len=Math.hypot(x2-x1,y2-y1)||1,ux=(x2-x1)/len,uy=(y2-y1)/len;
+  s.addShape(pptx.ShapeType.line,{x:Math.min(x1,x2),y:Math.min(y1,y2),w:Math.max(.001,Math.abs(x2-x1)),h:Math.max(.001,Math.abs(y2-y1)),flipH:x1>x2,flipV:y1>y2,line:{color:'8795A8',width:1,dashType:l.active?'solid':'dash'}});
+  for(const [mark,x,y] of [[l.fromMark,x1+ux*.13-uy*.08,y1+uy*.13+ux*.08],[l.toMark,x2-ux*.13-uy*.08,y2-uy*.13+ux*.08]] as [string,number,number][])
+   s.addText(mark,{x:x-.08,y:y-.08,w:.16,h:.16,fontSize:pt(10),bold:true,color:BODY,align:'center',valign:'middle',fontFace:FONT,margin:0});}
+ for(const t of L.boxes){const color=MODEL_KIND_COLOR[t.kind];
+  s.addShape(pptx.ShapeType.roundRect,{x:X(t.x),y:Y(t.y),w:t.w*k,h:t.h*k,rectRadius:.04,fill:{color:'FFFFFF'},line:{color:'CBD6E4',width:.75}});
+  s.addText(clip(t.name,40),{x:X(t.x),y:Y(t.y),w:t.w*k,h:MODEL_HEADER*k,fontSize:pt(11),bold:true,color:'FFFFFF',fill:{color},fontFace:FONT,margin:4,valign:'middle'});
+  const rows=[...t.rows.map(r=>({text:`${clip(r.name,32)}${r.key?`  ${r.key.toUpperCase()}`:''}`,options:{bold:!!r.key,color:r.key?INK:MUTED,breakLine:true}})),...(t.more?[{text:`… ${t.more} more`,options:{italic:true,color:'8795A8'}}]:[])];
+  s.addText(rows,{x:X(t.x),y:Y(t.y+MODEL_HEADER),w:t.w*k,h:(t.h-MODEL_HEADER)*k,fontSize:pt(9.5),fontFace:FONT,margin:4,valign:'top',paraSpaceAfter:0,lineSpacing:MODEL_ROW*k*72});}
+ if(i.measures.length)s.addText([{text:'Measures  ',options:{bold:true,color:'4E6179'}},{text:i.measures.map(m=>`Σ ${m.name}`).join('   ·   '),options:{color:INK}}],{x:b.x,y:b.y+b.h-.26,w:b.w,h:.26,fontSize:8,fontFace:FONT,margin:0,valign:'middle'});
+}
+
 function body(pptx:Pptx,s:Slide,p:ExperiencePack,i:ExperienceItem,b:Box,appendix:ExperienceItem[]){
  switch(i.type){
   case 'note':{const size=fitFont(i.text,b.w,b.h,11,7);s.addText(fitProse(i.text,b.w,b.h,size),{...b,fontSize:size,color:BODY,valign:'top',fontFace:FONT,margin:0,paraSpaceAfter:2});return;}
@@ -157,6 +174,7 @@ function body(pptx:Pptx,s:Slide,p:ExperiencePack,i:ExperienceItem,b:Box,appendix
    if(i.note)lines.push({text:clip(i.note,120),options:{color:MUTED}});
    if(lines.length)s.addText(lines,{x:b.x,y:b.y+Math.min(.55,b.h*.55),w:b.w,h:b.h-Math.min(.55,b.h*.55),fontSize:8,fontFace:FONT,margin:0,valign:'top'});return;}
   case 'chart':chart(pptx,s,p,i,b);return;
+  case 'model':model(pptx,s,i,b);return;
   case 'gantt':gantt(pptx,s,i,b);return;
   case 'image':s.addImage({data:i.data,x:b.x,y:b.y,w:b.w,h:b.h-.2,sizing:{type:'contain',w:b.w,h:b.h-.2}});s.addText(clip(i.caption,140),{x:b.x,y:b.y+b.h-.18,w:b.w,h:.18,fontSize:7,color:MUTED,fontFace:FONT,margin:0});return;
   case 'filters':{const cols=b.w>2.6?2:1,rows=Math.ceil(i.fields.length/cols),rh=Math.min(.52,(b.h-.2)/rows),cw=(b.w-(cols-1)*.12)/cols;
@@ -186,6 +204,7 @@ function noteText(p:ExperiencePack,i:ExperienceItem):string{
  if(i.type==='code')return `${head}\n${i.code}`;
  if(i.type==='table')return `${head}\n${[i.columns,...i.rows].map(r=>r.map(c=>c??'—').join(' | ')).join('\n')}`;
  if(i.type==='note')return `${head}\n${i.text}`;
+ if(i.type==='model')return `${head}\nTables:\n${i.tables.map(t=>`- ${t.name} (${t.kind}): ${t.columns.map(c=>c.name+(c.key?` [${c.key}]`:'')).join(', ')}`).join('\n')}\nRelationships:\n${i.relationships.map(r=>`- ${r.from} -> ${r.to} (${r.cardinality}${r.active?'':', inactive'})`).join('\n')}${i.measures.length?`\nMeasures: ${i.measures.map(m=>m.name).join(', ')}`:''}`;
  if(i.type==='tabs')return `${head}\n${i.itemIds.map(id=>p.items.find(x=>x.id===id)).filter((x):x is ExperienceItem=>!!x&&x.type!=='tabs').map(c=>`--- Tab: ${noteText(p,c)}`).join('\n\n')}`;
  if(i.type==='chart'){const t=p.items.find(x=>x.id===i.dataItemId);return `${head}\nData: ${t?.title??i.dataItemId}${i.unit?` · ${i.unit}`:''}`;}
  return head;

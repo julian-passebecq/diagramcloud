@@ -23,6 +23,13 @@ export const itemSchema=z.discriminatedUnion('type',[
  z.object({...base,type:z.literal('steps'),steps:z.array(z.object({title:z.string().min(1).max(60),caption:z.string().max(200).default('')}).strict()).min(2).max(8)}).strict(),
  z.object({...base,type:z.literal('tabs'),itemIds:z.array(id).min(2).max(6)}).strict(),
  // Displayed equation as plain text (no TeX engine, nothing evaluated) plus a symbol legend.
+ // Semantic model (star schema): tables, relationships "Table.Column" -> "Table.Column", and measure names. Display only.
+ z.object({...base,type:z.literal('model'),
+  tables:z.array(z.object({name:z.string().min(1).max(80).regex(/^[^.]+$/,'Table names cannot contain a dot'),kind:z.enum(['fact','dimension','bridge','other']).default('dimension'),
+   columns:z.array(z.object({name:z.string().min(1).max(80),type:z.string().max(30).default(''),key:z.enum(['pk','fk']).optional()}).strict()).max(60).default([]),
+   col:z.number().int().min(0).max(11).optional(),row:z.number().int().min(0).max(8).optional()}).strict()).min(1).max(40),
+  relationships:z.array(z.object({from:z.string().min(3).max(161),to:z.string().min(3).max(161),cardinality:z.enum(['*:1','1:1','*:*']).default('*:1'),active:z.boolean().default(true)}).strict()).max(120).default([]),
+  measures:z.array(z.object({name:z.string().min(1).max(120),table:z.string().max(80).optional(),format:z.string().max(40).optional()}).strict()).max(100).default([])}).strict(),
  z.object({...base,type:z.literal('formula'),expression:z.string().min(1).max(300),symbols:z.array(z.object({symbol:z.string().min(1).max(24),meaning:z.string().max(160)}).strict()).max(12).default([])}).strict(),
  z.object({...base,type:z.literal('image'),data:z.string().max(2800000).regex(/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/),caption:z.string().max(1000),rights:z.string().max(1000)}).strict()
 ]);
@@ -61,6 +68,14 @@ export function validatePack(input:unknown):ExperiencePack{
   if(i.type==='chart'&&i.chartType==='hbar'&&i.valueColumns.length>2)errors.push(`${i.id}: hbar takes one value column, or two for low/high range bars`);
   if(i.type==='table'&&i.statusColumn&&!i.columns.includes(i.statusColumn))errors.push(`${i.id}: unknown status column ${i.statusColumn}`);
   if(i.type==='gantt'){if(i.tasks.some(t=>t.end<t.start))errors.push(`${i.id}: Gantt end precedes start`);const taskIds=new Set(i.tasks.flatMap(t=>t.id?[t.id]:[]));if(taskIds.size!==i.tasks.filter(t=>t.id).length)errors.push(`${i.id}: duplicate Gantt task id`);for(const t of i.tasks)for(const d of t.dependsOn??[])if(!taskIds.has(d)||d===t.id)errors.push(`${i.id}: invalid dependency ${d}`);}
+  if(i.type==='model'){
+   const tables=new Map<string,Set<string>>();
+   for(const t of i.tables){if(tables.has(t.name))errors.push(`${i.id}: duplicate table ${t.name}`);const cols=new Set<string>();for(const c of t.columns){if(cols.has(c.name))errors.push(`${i.id}: duplicate column ${t.name}.${c.name}`);cols.add(c.name);}tables.set(t.name,cols);}
+   const ref=(r:string)=>{const dot=r.indexOf('.'),t=r.slice(0,dot),c=r.slice(dot+1);if(dot<1||!tables.get(t)?.has(c))errors.push(`${i.id}: unknown column ${r}`);return t;};
+   for(const r of i.relationships)if(ref(r.from)===ref(r.to))errors.push(`${i.id}: relationship ${r.from} -> ${r.to} stays inside one table`);
+   for(const m of i.measures)if(m.table&&!tables.has(m.table))errors.push(`${i.id}: measure ${m.name} names unknown table ${m.table}`);
+   if(i.tables.some(t=>(t.col===undefined)!==(t.row===undefined)))errors.push(`${i.id}: a table position needs both col and row`);
+  }
   if(i.type==='tabs'){if(new Set(i.itemIds).size!==i.itemIds.length)errors.push(`${i.id}: duplicate tab`);for(const t of i.itemIds){const target=p.items.find(x=>x.id===t);if(!target)errors.push(`${i.id}: unknown tab item ${t}`);else if(target.type==='tabs')errors.push(`${i.id}: tabs cannot contain tabs`);}}
  }
  for(const w of p.workspaces){check(w.entityId,entities,w.id);index(w.placements,`placement in ${w.id}`);for(const s of w.placements){check(s.itemId,items,w.id);if(s.x+s.w>12)errors.push(`${w.id}: panel outside 12-column grid`);}for(let a=0;a<w.placements.length;a++)for(let b=a+1;b<w.placements.length;b++){const x=w.placements[a],y=w.placements[b];if(x.x<y.x+y.w&&x.x+x.w>y.x&&x.y<y.y+y.h&&x.y+x.h>y.y)errors.push(`${w.id}: overlapping panels ${x.id}/${y.id}`);}}

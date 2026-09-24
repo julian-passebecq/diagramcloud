@@ -156,3 +156,20 @@ test('project deck and scope deck download as PowerPoint files',async({page})=>{
  file=await wait;expect(file.suggestedFilename()).toBe('foil.deck.pptx');await file.saveAs('test-results/decks/foil-scope.deck.pptx');
  expect(readFileSync('test-results/decks/foil-scope.deck.pptx').subarray(0,2).toString()).toBe('PK');
 });
+
+test('semantic model screen draws the star schema with keys, relationships and reused measures',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'}),nav=d.locator('.xp-nav');
+ await nav.getByRole('button',{name:'TotalEnergies',exact:true}).first().click();
+ await nav.getByRole('button',{name:/^BI reporting and data model/}).click();
+ await nav.getByRole('button',{name:/Design the semantic model/}).click();
+ await expect(d.getByRole('heading',{name:'Semantic data model | star schema',exact:true})).toBeVisible();
+ const star=d.getByTestId('item-sm-model');
+ for(const t of ['Fact_Energy','FactCapex','DimDate','DimProject'])await expect(star.locator('svg text',{hasText:new RegExp(`^${t}$`)})).toHaveCount(1);
+ await expect(star.locator('svg path[stroke="#8795a8"]')).toHaveCount(10);
+ await expect(star.locator('.xp-measures code')).toHaveCount(6);
+ await expect(d.getByTestId('item-dax-measure')).toContainText('TOTALYTD');
+ expect(errors).toEqual([]);
+});

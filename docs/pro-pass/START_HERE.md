@@ -314,3 +314,14 @@ Limits: text sizes are estimated (there is no font measurement in the browser), 
 - Tests resolve every hyperlink in the saved file to its target slide. Downloaded decks were opened in desktop PowerPoint, which confirmed the link targets.
 
 Not included in the project deck: node evidence blocks (they remain in the architecture-only PowerPoint), and links from a diagram box straight to its task-screen slide.
+
+### Semantic model item (2026-09-25)
+
+New `model` item for star schemas (portfolio p.8):
+
+- `tables` have a kind (fact/dimension/bridge/other) and columns with optional `pk`/`fk` markers. `relationships` are `"Table.Column" → "Table.Column"` with cardinality `*:1`, `1:1` or `*:*`, and `active` (inactive relationships are drawn dashed). `measures` hold names with an optional home table.
+- Validation checks duplicate tables and columns, unknown `Table.Column` references, relationships inside one table, dots in table names, half-given positions, and measures that name an unknown table.
+- `src/experience/semantic.ts` computes one layout shared by the in-app view, the HTML export and the PowerPoint export. Facts sit in the middle band and each dimension goes above or below, near the facts it relates to. When a row is too wide it falls back to even spacing. Setting `col`/`row` on every table overrides the automatic layout. Keys are listed first; wide tables show five columns plus a "… N more" line. PowerPoint notes carry the full table, column and relationship list.
+- The showcase task is **BI reporting → Design the semantic model**: three facts and seven shared dimensions, consistent with the DAX & SQL screen's `Fact_Energy` / `DimProduct` / `DimRegion` / `DimDate`. It reuses that screen's DAX measures item by reference. "What the model serves" repeats portfolio p.8 wording (reconstruction); the "Design rules" are an authored explanation.
+
+Not included: many-to-many bridge routing hints, cross-filter direction arrows, and an editor. Change the model through Workspace JSON / AI.

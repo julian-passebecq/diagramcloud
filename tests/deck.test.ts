@@ -22,7 +22,7 @@ async function open(plan:DeckPlan){
 
 test('project plan groups screens by scope and merges one-screen sections',()=>{
  const t=projectPlan(total);
- assert.deepEqual(t.groups.map(g=>[g.label,g.screens.length]),[['Project controls',3],['BI reporting and data model',2]]);
+ assert.deepEqual(t.groups.map(g=>[g.label,g.screens.length]),[['Project controls',3],['BI reporting and data model',3]]);
  const f=projectPlan(foilo);
  assert.deepEqual(f.groups.map(g=>[g.label,g.screens.map(s=>s.workspaceId)]),[['FOIL',['foil-system-screen','foil-physics-screen','foil-economics-screen','foil-pipeline-screen','foil-screen']]]);
  assert.equal(f.architecture?.views.length,foilo.views.length);
