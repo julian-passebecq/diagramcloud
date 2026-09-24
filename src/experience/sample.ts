@@ -7,7 +7,8 @@ export function examplePack():ExperiencePack{
  sources:[
   {id:'portfolio-six',title:'Total / Foilo six-page portfolio',kind:'pdf',locator:'User-supplied portfolio: illustrative structure and synthetic examples',page:2,visibility:'public'},
   {id:'portfolio-wide',title:'TotalEnergies-first 18-page portfolio',kind:'pdf',locator:'User-supplied portfolio: DAX/SQL workspace composition reference',page:9,visibility:'public'},
-  {id:'datapass-manifest',title:'DataPass VS Code manifest schema',kind:'repository',locator:'julian-passebecq/datapass-vscode / schemas/datapass-project.schema.json',revision:'blob:5415629f43b79137765becf8ec62bbd1fb7a7378',visibility:'public'}
+  {id:'datapass-manifest',title:'DataPass VS Code manifest schema',kind:'repository',locator:'julian-passebecq/datapass-vscode / schemas/datapass-project.schema.json',revision:'blob:5415629f43b79137765becf8ec62bbd1fb7a7378',visibility:'public'},
+  {id:'datapass-readme',title:'DataPass VS Code control-plane README',kind:'repository',locator:'julian-passebecq/datapass-vscode / README.md',revision:'5af14e5e9a5e825b5c3e5d1854cde04b35be5e4b',visibility:'public'}
  ],
  entities:[
   {id:'all-projects',label:'Project experience atlas',type:'project',children:['total','foil','datapass','portfolio-remix'],workspaceIds:[],visibility:'public',summary:'Architecture is navigation. Workspaces show the work, not just more boxes.'},
@@ -17,10 +18,11 @@ export function examplePack():ExperiencePack{
   {id:'quality-task',label:'Validate schedule rows',type:'task',workspaceIds:['quality-screen'],visibility:'public',summary:'Input rows -> validation rule -> expected exceptions -> decision.'},
   {id:'foil',label:'FOIL',type:'organization',children:['foil-scenarios'],visibility:'public'},
   {id:'foil-scenarios',label:'Scenario comparison',type:'task',workspaceIds:['foil-screen'],visibility:'public',summary:'New synthetic teaching example; no live Databricks run or validated physical model.'},
-  {id:'datapass',label:'DataPass VS Code',type:'project',children:['manifest-task'],visibility:'public'},
+  {id:'datapass',label:'DataPass VS Code',type:'project',children:['manifest-task','galaxy-task'],visibility:'public'},
   {id:'manifest-task',label:'Project manifest and official tools',type:'task',workspaceIds:['manifest-screen'],sourceIds:['datapass-manifest'],visibility:'public',assertion:'verified-in-source'},
+  {id:'galaxy-task',label:'Operate the Galaxy control plane',type:'task',workspaceIds:['galaxy-screen'],sourceIds:['datapass-readme'],visibility:'public',assertion:'verified-in-source',summary:'Repository-backed view of the implemented control-plane surfaces and their safety boundaries.'},
   {id:'portfolio-remix',label:'Portfolio remix',type:'project',workspaceIds:['remix-screen'],visibility:'public',summary:'References existing items from different workspaces. No copied data and no implied data join.'}
- ],relations:[{id:'report-quality',source:'quality-task',target:'reporting',kind:'validates',assertion:'illustrative',visibility:'public'}],
+ ],relations:[{id:'report-quality',source:'quality-task',target:'reporting',kind:'validates',assertion:'illustrative',visibility:'public'},{id:'manifest-galaxy',source:'manifest-task',target:'galaxy-task',kind:'documents',assertion:'verified-in-source',sourceIds:['datapass-readme'],visibility:'public'}],
  items:[
   {...shared,id:'capex-kpi',title:'Illustrative CAPEX phasing',entityId:'reporting',type:'kpi',value:'780',unit:'EUR million',note:'Sum of the four illustrated quarters, not a verified project investment.'},
   {...shared,id:'capex-data',title:'Quarterly CAPEX source table',entityId:'reporting',type:'table',columns:['Quarter','CAPEX','Cumulative'],rows:[['Q1',120,120],['Q2',180,300],['Q3',220,520],['Q4',260,780]]},
@@ -36,12 +38,30 @@ export function examplePack():ExperiencePack{
   {...shared,id:'foil-chart',title:'Scenario comparison',entityId:'foil-scenarios',type:'chart',chartType:'bar',dataItemId:'foil-data',labelColumn:'Scenario',valueColumns:['Proxy_kW'],unit:'Invented power proxy - not machine performance',sourceIds:[]},
   {...shared,id:'foil-note',title:'Interpretation boundary',entityId:'foil-scenarios',type:'note',text:'This screen demonstrates the layout pattern in the Streamlit portfolio page: parameters, result table, comparison chart and interpretation.\n\nThe three values are newly invented UI fixtures. They do not reproduce a simulation, measured performance, financial return or historical result.',sourceIds:[]},
   {...shared,id:'manifest-code',title:'Portable project context',entityId:'manifest-task',type:'code',language:'json',file:'.datapass/project.json (sanitized teaching example)',code:JSON.stringify({schemaVersion:1,project:{id:'foil',title:'FOIL'},repositories:{databricks:{path:'../foil_databrick_dab'}},platforms:{fabric:{},databricks:{},grafana:{}}},null,2),sourceIds:['datapass-manifest']},
-  {...shared,id:'manifest-contract',title:'What the manifest proves',entityId:'manifest-task',type:'note',provenance:'source-derived',text:'The inspected v1 schema describes project identity, repository bindings, platform configuration and links.\n\nA declaration does NOT prove the cloud resource exists, is authenticated or is deployed.\n\nThe importer deliberately drops local paths, URLs, commands and environment values. The V2 typed-graph handoff is a target contract, not a claim that current exports already implement it.',sourceIds:['datapass-manifest']}
+  {...shared,id:'manifest-contract',title:'What the manifest proves',entityId:'manifest-task',type:'note',provenance:'source-derived',text:'The inspected v1 schema describes project identity, repository bindings, platform configuration and links.\n\nA declaration does NOT prove the cloud resource exists, is authenticated or is deployed.\n\nThe importer deliberately drops local paths, URLs, commands and environment values. The V2 typed-graph handoff is a target contract, not a claim that current exports already implement it.',sourceIds:['datapass-manifest']},
+  {id:'galaxy-surfaces',title:'Implemented Galaxy surfaces',entityId:'galaxy-task',type:'table',columns:['Surface','Implemented responsibility','Boundary'],rows:[
+   ['Galaxy','health-first control plane, readiness, attention queue, grouped platform cards','status/control surface; not a provider client'],
+   ['Projects','.datapass/project.json manifests with schema validation','Git-safe context; no credentials'],
+   ['Fabric','detect official tools, toolbox assets, assessment/MCP workflows, read-only capture','official Fabric tooling remains primary'],
+   ['Databricks','detect extension/CLI/bundles and generate safe bundle commands','official Databricks extension remains primary'],
+   ['Power BI','detect PBIP/TMDL/PBIR and expose focused agentic modules','specialized editors remain external'],
+   ['Grafana','dashboard-as-code paths using gcx / Foundation SDK / IaC','not a dashboard designer'],
+   ['Infrastructure','detect OpenTofu/Terraform, Docker, Kubernetes and SSH','does not replace peer tooling']
+  ],sourceIds:['datapass-readme'],provenance:'source-derived',approval:'approved',visibility:'public'},
+  {id:'galaxy-safety',title:'Control-plane safety contract',entityId:'galaxy-task',type:'note',text:'The repository states that DataPass does not persist cloud credentials, vendor authentication remains vendor-owned, mutating cloud/IaC actions are explicit, and missing tools degrade to actionable Missing/Partial states. Project manifests are schema-validated and exclude secret fields.\n\nThis workspace documents repository behavior; it is not a live environment-health capture.',sourceIds:['datapass-readme'],provenance:'source-derived',approval:'approved',visibility:'public'},
+  {id:'galaxy-flow',title:'Typical operator flow',entityId:'galaxy-task',type:'table',columns:['Step','Action','Evidence'],rows:[
+   [1,'Open Galaxy / choose project','current project manifest and detected tools'],
+   [2,'Review readiness / attention','Ready, Partial or Attention state'],
+   [3,'Open or copy provider-specific action','official extension, CLI, repo or upstream docs'],
+   [4,'Keep mutation explicit','user-triggered command or reviewed scaffold'],
+   [5,'Copy sanitized environment snapshot','handoff/debug JSON without paths, commands or credentials']
+  ],sourceIds:['datapass-readme'],provenance:'source-derived',approval:'approved',visibility:'public'}
  ],workspaces:[
   {id:'controls-screen',title:'Project controls | reconstructed screen',entityId:'reporting',visibility:'public',description:'Screen-like composition inspired by the supplied portfolio. Reusable native cards, not a flattened screenshot.',placements:[{id:'p-kpi',itemId:'capex-kpi',x:0,y:0,w:4,h:2},{id:'p-context',itemId:'report-narrative',x:4,y:0,w:8,h:2},{id:'p-chart',itemId:'capex-chart',x:0,y:2,w:6,h:4},{id:'p-line',itemId:'capex-curve',x:6,y:2,w:6,h:4},{id:'p-gantt',itemId:'schedule-gantt',x:0,y:6,w:7,h:4},{id:'p-table',itemId:'capex-data',x:7,y:6,w:5,h:4}]},
   {id:'quality-screen',title:'SQL quality task | input, code, output',entityId:'quality-task',visibility:'public',description:'A business task may map to several source symbols. This is not a live query editor.',placements:[{id:'q-code',itemId:'quality-sql',x:0,y:0,w:7,h:4},{id:'q-contract',itemId:'quality-contract',x:7,y:0,w:5,h:4},{id:'q-input',itemId:'quality-input',x:0,y:4,w:7,h:3},{id:'q-output',itemId:'quality-output',x:7,y:4,w:5,h:3}]},
   {id:'foil-screen',title:'FOIL | scenario workspace',entityId:'foil-scenarios',visibility:'public',description:'Reconstructed application-style evidence layout with explicitly synthetic fixtures.',placements:[{id:'f-note',itemId:'foil-note',x:0,y:0,w:4,h:4},{id:'f-chart',itemId:'foil-chart',x:4,y:0,w:8,h:4},{id:'f-table',itemId:'foil-data',x:0,y:4,w:12,h:3}]},
   {id:'manifest-screen',title:'DataPass | manifest to architecture',entityId:'manifest-task',visibility:'public',description:'Repository-sourced contract plus a sanitized illustrative instance.',placements:[{id:'m-code',itemId:'manifest-code',x:0,y:0,w:7,h:5},{id:'m-contract',itemId:'manifest-contract',x:7,y:0,w:5,h:5}]},
+  {id:'galaxy-screen',title:'DataPass | Galaxy control-plane screen',entityId:'galaxy-task',visibility:'public',description:'Source-derived view of the implemented control-plane surfaces and safety model at repository revision 5af14e5.',placements:[{id:'g-surfaces',itemId:'galaxy-surfaces',x:0,y:0,w:8,h:5},{id:'g-safety',itemId:'galaxy-safety',x:8,y:0,w:4,h:5},{id:'g-flow',itemId:'galaxy-flow',x:0,y:5,w:12,h:4}]},
   {id:'remix-screen',title:'Portfolio | mixed evidence board',entityId:'portfolio-remix',visibility:'public',description:'The same item IDs are reused across source workspaces and this composition. Placing panels together does not join their datasets.',placements:[{id:'r-code',itemId:'quality-sql',x:0,y:0,w:6,h:4},{id:'r-curve',itemId:'capex-curve',x:6,y:0,w:6,h:4},{id:'r-gantt',itemId:'schedule-gantt',x:0,y:4,w:6,h:4},{id:'r-foil',itemId:'foil-chart',x:6,y:4,w:6,h:4}]}
  ]});
 }
