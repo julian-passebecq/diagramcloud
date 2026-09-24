@@ -14,7 +14,7 @@ test('in-app workspace drills into SQL task and remixes shared items',async({pag
  await nav.getByRole('button',{name:'Portfolio remix',exact:true}).first().click();
  await expect(d.getByTestId('item-capex-curve')).toBeVisible();
  await expect(d.getByTestId('item-quality-sql')).toBeVisible();
- await d.getByLabel('Reusable item').selectOption('manifest-code');await d.getByRole('button',{name:'Add reference',exact:true}).click();await expect(d.getByTestId('item-manifest-code')).toBeVisible();
+ await d.getByLabel('Search reusable items').fill('Portable project');await d.getByLabel('Reusable item').selectOption('manifest-code');await d.getByRole('button',{name:'Add reference',exact:true}).click();await expect(d.getByTestId('item-manifest-code')).toBeVisible();
  await d.getByTestId('item-manifest-code').getByRole('button',{name:'Focus item',exact:true}).click();await expect(d.getByTestId('item-quality-sql')).toHaveCount(0);await d.getByRole('button',{name:'Exit item focus',exact:true}).click();
  await d.getByRole('button',{name:'Two-column layout',exact:true}).click();
  await expect(d.getByTestId('item-quality-sql')).toHaveCSS('grid-column-start','1');
@@ -23,9 +23,10 @@ test('in-app workspace drills into SQL task and remixes shared items',async({pag
  await expect(d.getByTestId('item-capex-curve')).toHaveCSS('grid-column-start','1');
  await d.getByRole('button',{name:'Duplicate as board',exact:true}).click();
  await expect(d.getByRole('heading',{name:/Portfolio \| mixed evidence board \| remix/})).toBeVisible();
+ await d.getByRole('button',{name:'Board settings',exact:true}).click();await d.getByLabel('Board title').fill('Interview evidence board');await d.getByLabel('Board description').fill('Curated reusable evidence for an interview walkthrough.');await d.getByRole('button',{name:'Save board settings',exact:true}).click();await expect(d.getByRole('heading',{name:'Interview evidence board',exact:true})).toBeVisible();
  await d.getByTestId('item-quality-sql').getByRole('button',{name:'Remove placement',exact:true}).click();
  await expect(d.getByTestId('item-quality-sql')).toHaveCount(0);
- await d.getByLabel('Reusable item').selectOption('quality-sql');
+ await d.getByLabel('Search reusable items').fill('SQL validation');await d.getByLabel('Reusable item type').selectOption('code');await d.getByLabel('Reusable item').selectOption('quality-sql');
  await d.getByRole('button',{name:'Add reference',exact:true}).click();
  await expect(d.getByTestId('item-quality-sql')).toBeVisible();
  mkdirSync('test-results',{recursive:true});await page.screenshot({path:'test-results/experience-remix.png',fullPage:true});expect(errors).toEqual([]);
