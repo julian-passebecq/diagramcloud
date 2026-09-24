@@ -94,7 +94,7 @@ Future providers (OneDrive, Dropbox, S3/R2, AI image APIs) should implement the 
 
 ## DataPass repository bridge (Bridge V1, DiagramCloud side)
 
-Contract: DataPass PR #9 at `fde955a`, pinned in `docs/contracts/datapass-diagramcloud-bridge.lock.json`. The two schemas are vendored under `docs/contracts/datapass-bridge-v1/`; `tests/bridge.test.ts` fails if a vendored copy differs from the pinned upstream Git blob.
+Contract: DataPass `main` at `83c41e0` (merged via PR #13; schemas unchanged since the PR #9 draft `fde955a`), pinned in `docs/contracts/datapass-diagramcloud-bridge.lock.json`. The two schemas are vendored under `docs/contracts/datapass-bridge-v1/`; `tests/bridge.test.ts` fails if a vendored copy differs from the pinned upstream Git blob.
 
 - `src/bridge/sidecar.ts` is React-free. It reads and writes `<repo>/.datapass/diagramcloud.json` through a minimal File System Access interface, so unit tests use in-memory folders.
 - Opening: the JSON / AI dialog's **Open project folder…** reads the sidecar as text and places it in the ordinary `parseDocument` → stable-ID change preview → revision check → apply path. A repository file never reaches React state unvalidated. From `.datapass/project.json`, only `project.id` and `project.title` are read, to confirm the folder.

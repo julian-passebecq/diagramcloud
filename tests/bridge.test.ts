@@ -30,7 +30,7 @@ function memoryFolder(name:string,files:Record<string,string>={}):SidecarFolder&
 }
 
 test('vendored bridge schemas are the exact pinned DataPass contract blobs',()=>{
- assert.equal(lock.commit,'fde955ab4617ef0a9c6c82ac6727fad14cf67a81');
+ assert.equal(lock.commit,'83c41e02cde596b2502b9d4dc1b8049c0d5fd974');assert.equal(lock.branch,'main');
  for(const key of ['aiContextSchema','aiPlanSchema'] as const){
   const body=Buffer.from(schemaText(key),'utf8');
   const blob=createHash('sha1').update(`blob ${body.byteLength}\0`).update(body).digest('hex');
