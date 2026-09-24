@@ -181,7 +181,8 @@ Do not hard-code one fixed company hierarchy into the DiagramCloud schema.
 ## Status update (2026-09-24, later)
 
 - The browser-test blocker below is **fixed** (commit `97e0bb9`): card click = Explore architecture only; the sibling "Open task workspace" strip and the Inspector button open the workspace only. PR #6 CI is green.
-- DiagramCloud-side Bridge V1 is implemented: open/review/apply `.datapass/diagramcloud.json`, conflict-guarded save back, create-if-missing, and contract tests pinned to `fde955a`. See `docs/ARCHITECTURE.md` → "DataPass repository bridge" and `docs/ROADMAP.md` → "Bridge V1 pass" for the next steps (DataPass-side actions come next).
+- DiagramCloud-side Bridge V1 is implemented: open/review/apply `.datapass/diagramcloud.json`, conflict-guarded save back, create-if-missing, and contract tests pinned to `fde955a`. See `docs/ARCHITECTURE.md` → "DataPass repository bridge" and `docs/ROADMAP.md` → "Bridge V1 pass" for the next steps.
+- DataPass-side Bridge V1 is implemented in julian-passebecq/datapass-vscode#11 (draft, base `claude0.9`, CI green). End-to-end flow: DataPass "Copy DiagramCloud AI Context" → ChatGPT/Claude → DataPass "Import DiagramCloud AI Plan" (review, approve, journaled write) → DiagramCloud "Reopen repository file" (validate, preview, apply).
 
 ## Immediate blocker (resolved, kept for history)
 

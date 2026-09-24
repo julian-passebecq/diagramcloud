@@ -85,7 +85,7 @@ Done on the DiagramCloud side: explicit Explore vs Open task workspace actions (
 
 Next, in order:
 
-1. DataPass side (datapass-vscode): detect `.datapass/diagramcloud.json`, **Open architecture**, **Copy AI context** (validate against the context schema, use DiagramCloud's `contextBlock` shape), **Import AI plan** with base-revision check and per-operation review.
+1. ~~DataPass side~~ done in julian-passebecq/datapass-vscode#11 (branch `feat/diagramcloud-bridge-v1`, CI green): sidecar detection, Open architecture, Copy AI context (JSON), Import AI plan with base-revision checks, per-operation approval and a journaled write. V1 applies `set-project-metadata` and `link-node-workspace` only; its output bytes equal `serializeSidecar`. After that PR merges, bump `docs/contracts/datapass-diagramcloud-bridge.lock.json` to the merged commit (the contract README gained additive V1 notes; the schemas are unchanged).
 2. Define DiagramCloud payload shapes for the `diagramcloud-document` plan actions (`link-node-workspace`, `add-item`, `add-placement`, …) as a reviewed contract bump, then a shared apply function both products can test.
 3. Persist the folder handle in IndexedDB so the link survives a reload (with a permission re-prompt).
 4. VS Code webview hosting: DataPass posts the sidecar text to an embedded DiagramCloud with an origin-checked message channel.
