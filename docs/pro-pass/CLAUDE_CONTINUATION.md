@@ -95,7 +95,7 @@ Draft contract PR:
 
 Pinned revision:
 
-`7bd433b520676f1dc2d024511f2abbe89fd228a7`
+`fde955ab4617ef0a9c6c82ac6727fad14cf67a81`
 
 Canonical paths at that revision:
 
