@@ -305,3 +305,54 @@ test('model editor: add a table, column and relationship, rename, refuse a dupli
  await expect(star.locator('svg text',{hasText:/^DimArea$/})).toHaveCount(1);
  expect(errors).toEqual([]);
 });
+
+test('multi-select: group move by keys and drag, align, refused overlap, undo, Ctrl-click and Escape',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});
+ await d.locator('.xp-nav').getByRole('button',{name:'Portfolio remix',exact:true}).first().click();
+ await d.getByRole('button',{name:'Edit board',exact:true}).click();
+ const row=(id:string)=>d.getByTestId(`item-${id}`).evaluate(el=>(el as HTMLElement).style.gridRow);
+ const col=(id:string)=>d.getByTestId(`item-${id}`).evaluate(el=>(el as HTMLElement).style.gridColumn);
+ const bar=d.getByRole('toolbar',{name:'Selected panels'});
+
+ await d.getByLabel('Select panel Cumulative cost curve').check();
+ await expect(bar).toContainText('1 selected');
+ await d.getByLabel('Select panel Scenario comparison').check();
+ await expect(bar).toContainText('2 selected');
+
+ // Arrow key on a selected grip moves the whole selection.
+ await d.getByRole('button',{name:'Move panel Scenario comparison',exact:true}).focus();await page.keyboard.press('ArrowDown');
+ expect([await row('capex-curve'),await row('foil-chart')]).toEqual(['2 / span 4','6 / span 4']);
+ await expect(d.getByRole('button',{name:/^↶ Undo: Moved 2 panels/})).toBeVisible();
+
+ // Dragging one selected grip drags both, with a ghost for each.
+ const g=(await d.getByRole('button',{name:'Move panel Cumulative cost curve',exact:true}).boundingBox())!;
+ await page.mouse.move(g.x+g.width/2,g.y+g.height/2);await page.mouse.down();await page.mouse.move(g.x+g.width/2,g.y+g.height/2+4*88,{steps:10});
+ await expect(d.getByTestId('drag-ghost')).toHaveCount(2);
+ await page.mouse.up();
+ expect([await row('capex-curve'),await row('foil-chart')]).toEqual(['6 / span 4','10 / span 4']);
+
+ // Align top works here; align left would stack two panels on each other and is refused.
+ await d.getByLabel('Select panel Cumulative cost curve').uncheck();
+ await d.getByLabel('Select panel SQL validation rule').check();
+ await bar.getByRole('button',{name:'Align top',exact:true}).click();
+ expect(await row('foil-chart')).toBe('1 / span 4');
+ await expect(d.getByRole('status').filter({hasText:'Align top'})).toContainText('Align top: 2 panels.');
+ await bar.getByRole('button',{name:'Align left',exact:true}).click();
+ await expect(d.getByRole('status').filter({hasText:'not changed'})).toContainText('2 panels: not changed.');
+ expect(await col('foil-chart')).toBe('7 / span 6');
+
+ // Undo reverts the alignment as one step.
+ await d.getByRole('button',{name:/^↶ Undo: Align top: 2 panels/}).click();
+ expect(await row('foil-chart')).toBe('10 / span 4');
+
+ // Ctrl-click on a header toggles selection; Escape clears it without closing the dialog.
+ await d.getByTestId('item-schedule-gantt').locator('.xp-card-head h3').click({modifiers:['Control']});
+ await expect(bar).toContainText('3 selected');
+ await d.getByRole('button',{name:'Report view',exact:true}).focus();await page.keyboard.press('Escape');
+ await expect(bar).toHaveCount(0);
+ await expect(d).toBeVisible();
+ expect(errors).toEqual([]);
+});

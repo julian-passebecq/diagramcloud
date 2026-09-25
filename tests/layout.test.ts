@@ -44,3 +44,24 @@ test('every cell the helpers accept also passes pack validation',()=>{
   assert.doesNotThrow(()=>validatePack(q),`${s.id} -> ${JSON.stringify(cell)}`);
  }
 });
+
+test('group moves keep every panel on the grid and are checked against the other panels',async()=>{
+ const {groupShift,groupProblem,aligned}=await import('../src/experience/layout');
+ const p=board(),pick=(ids:string[])=>Object.fromEntries(ids.map(id=>{const s=p.find(x=>x.id===id)!;return [id,{x:s.x,y:s.y,w:s.w,h:s.h}];}));
+ const two=pick(['p-chart','p-line']);
+ assert.deepEqual(groupShift(two,5,0),two,'the right-hand panel already touches the edge, so the group cannot move right');
+ assert.deepEqual(groupShift(two,-3,-9),{'p-chart':{x:0,y:0,w:6,h:4},'p-line':{x:6,y:0,w:6,h:4}},'left is blocked at column 1; up stops at row 1');
+ const down=groupShift(two,0,20);
+ assert.equal(groupProblem(p,down),null,'moving both below the board is free');
+ assert.match(groupProblem(p,groupShift(two,0,1),()=> 'X')!,/would overlap/,'one row down hits the Gantt and table');
+ // Aligning panels from different rows.
+ const kpiAndChart=pick(['p-kpi','p-gantt']);
+ assert.deepEqual(aligned(kpiAndChart,'width'),{'p-kpi':{x:0,y:0,w:7,h:2},'p-gantt':{x:0,y:6,w:7,h:4}});
+ assert.match(groupProblem(p,aligned(kpiAndChart,'width'),()=> 'Y')!,/overlap/,'the widened KPI would hit the narrative panel');
+ const right=aligned(pick(['p-kpi','p-chart']),'right');
+ assert.deepEqual([right['p-kpi'].x+right['p-kpi'].w,right['p-chart'].x+right['p-chart'].w],[6,6]);
+ assert.deepEqual(aligned(pick(['p-chart','p-gantt']),'top'),{'p-chart':{x:0,y:2,w:6,h:4},'p-gantt':{x:0,y:2,w:7,h:4}});
+ assert.deepEqual(aligned(pick(['p-context','p-table']),'bottom')['p-context'].y,8,'bottom edges meet the lowest panel');
+ assert.deepEqual(aligned(pick(['p-kpi','p-gantt']),'height')['p-kpi'].h,4);
+ assert.deepEqual(aligned(pick(['p-context','p-table']),'left')['p-context'].x,4);
+});

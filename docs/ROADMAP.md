@@ -108,4 +108,6 @@ Undo and redo for board edits are done.
 
 The data-model editor is done (see START_HERE, "Data-model editor").
 
-Next candidates: multi-select and align in Edit board; KPI tiles that can count a model's tables/relationships; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+Multi-select, group move and align are done.
+
+Next candidates: KPI tiles that can count a model's tables/relationships; distribute/stack for selections; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
