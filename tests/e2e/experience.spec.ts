@@ -356,3 +356,24 @@ test('multi-select: group move by keys and drag, align, refused overlap, undo, C
  await expect(d).toBeVisible();
  expect(errors).toEqual([]);
 });
+
+test('KPI tiles counted from the model update as the model is edited',async({page})=>{
+ await page.goto('/');
+ await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'}),nav=d.locator('.xp-nav');
+ await nav.getByRole('button',{name:'TotalEnergies',exact:true}).first().click();
+ await nav.getByRole('button',{name:/^BI reporting and data model/}).click();
+ await nav.getByRole('button',{name:/Design the semantic model/}).click();
+ const tile=d.getByTestId('item-sm-kpi-tables');
+ await expect(tile.locator('.xp-kpi-value')).toHaveText('10');
+ await expect(tile).toContainText('3 facts · 7 dimensions');
+ await expect(tile).toContainText('↻ counted from “Star schema”');
+ await d.getByRole('button',{name:'Edit board',exact:true}).click();
+ await d.getByTestId('item-sm-model').getByRole('button',{name:'Edit model',exact:true}).click();
+ const ed=d.getByRole('region',{name:'Edit model Star schema'});
+ await ed.getByLabel('New table name').fill('DimGeography');await ed.getByRole('button',{name:'Add table',exact:true}).click();
+ await expect(tile.locator('.xp-kpi-value')).toHaveText('11');
+ await expect(tile).toContainText('3 facts · 8 dimensions');
+ await ed.getByLabel('Active Fact_Energy.DateKey to DimDate.DateKey').uncheck();
+ await expect(d.getByTestId('item-sm-kpi-rel')).toContainText('9 active · 1 inactive');
+});

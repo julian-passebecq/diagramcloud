@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {KPI_METRICS,metricFits} from './kpi';
 
 const id=z.string().regex(/^[a-z][a-z0-9_.-]{0,119}$/), label=z.string().min(1).max(200);
 const ids=z.array(id).max(1000).default([]);
@@ -13,7 +14,9 @@ export const itemSchema=z.discriminatedUnion('type',[
  z.object({...base,type:z.literal('table'),columns:z.array(label).min(1).max(30),rows:z.array(z.array(scalar).max(30)).max(500),statusColumn:label.optional()}).strict(),
  z.object({...base,type:z.literal('kpi'),value:z.string().max(120),unit:z.string().max(60).default(''),note:z.string().max(1000).default(''),
   // Report tile extras: a displayed comparison, never a computed or measured claim.
-  delta:z.string().max(40).optional(),trend:z.enum(['up','down','flat']).optional(),tone:z.enum(['good','bad','neutral']).optional(),comparison:z.string().max(120).optional()}).strict(),
+  delta:z.string().max(40).optional(),trend:z.enum(['up','down','flat']).optional(),tone:z.enum(['good','bad','neutral']).optional(),comparison:z.string().max(120).optional(),
+  // Count from another item (model or table) instead of showing the typed value; see kpi.ts.
+  derive:z.object({itemId:id,metric:z.enum(KPI_METRICS)}).strict().optional()}).strict(),
  z.object({...base,type:z.literal('chart'),chartType:z.enum(['bar','line','hbar','stacked','donut','scatter']),dataItemId:id,labelColumn:label,valueColumns:z.array(label).min(1).max(6),unit:z.string().max(80).default('')}).strict(),
  z.object({...base,type:z.literal('gantt'),tasks:z.array(z.object({id:id.optional(),label,start:z.string().date(),end:z.string().date(),progress:z.number().min(0).max(100).default(0),group:z.string().max(60).optional(),dependsOn:z.array(id).max(10).optional()}).strict()).min(1).max(80),
   milestones:z.array(z.object({label:z.string().min(1).max(80),date:z.string().date()}).strict()).max(20).default([])}).strict(),
@@ -68,6 +71,7 @@ export function validatePack(input:unknown):ExperiencePack{
   if(i.type==='chart'&&i.chartType==='hbar'&&i.valueColumns.length>2)errors.push(`${i.id}: hbar takes one value column, or two for low/high range bars`);
   if(i.type==='table'&&i.statusColumn&&!i.columns.includes(i.statusColumn))errors.push(`${i.id}: unknown status column ${i.statusColumn}`);
   if(i.type==='gantt'){if(i.tasks.some(t=>t.end<t.start))errors.push(`${i.id}: Gantt end precedes start`);const taskIds=new Set(i.tasks.flatMap(t=>t.id?[t.id]:[]));if(taskIds.size!==i.tasks.filter(t=>t.id).length)errors.push(`${i.id}: duplicate Gantt task id`);for(const t of i.tasks)for(const d of t.dependsOn??[])if(!taskIds.has(d)||d===t.id)errors.push(`${i.id}: invalid dependency ${d}`);}
+  if(i.type==='kpi'&&i.derive){const src=p.items.find(x=>x.id===i.derive!.itemId);if(!src||src.id===i.id)errors.push(`${i.id}: counts from unknown item ${i.derive.itemId}`);else if(!metricFits(src,i.derive.metric))errors.push(`${i.id}: ${src.type} ${src.id} cannot provide ${i.derive.metric}`);}
   if(i.type==='model'){
    const tables=new Map<string,Set<string>>();
    for(const t of i.tables){if(tables.has(t.name))errors.push(`${i.id}: duplicate table ${t.name}`);const cols=new Set<string>();for(const c of t.columns){if(cols.has(c.name))errors.push(`${i.id}: duplicate column ${t.name}.${c.name}`);cols.add(c.name);}tables.set(t.name,cols);}
@@ -94,12 +98,12 @@ export function publicPack(input:ExperiencePack):ExperiencePack{
  const seen=new Set<string>();function walk(id:string){const e=candidates.get(id);if(!e||seen.has(id))return;seen.add(id);e.children.forEach(walk);}walk(p.rootId);
  p.entities=p.entities.filter(e=>seen.has(e.id));
  p.items=p.items.filter(i=>i.visibility==='public'&&i.approval==='approved'&&seen.has(i.entityId)&&i.sourceIds.every(s=>sourceIds.has(s)));
- let allowed=new Set(p.items.map(i=>i.id));p.items=p.items.filter(i=>i.type!=='chart'||allowed.has(i.dataItemId));allowed=new Set(p.items.map(i=>i.id));
+ let allowed=new Set(p.items.map(i=>i.id));p.items=p.items.filter(i=>(i.type!=='chart'||allowed.has(i.dataItemId))&&(i.type!=='kpi'||!i.derive||allowed.has(i.derive.itemId)));allowed=new Set(p.items.map(i=>i.id));
  // A tab set keeps only public children; with fewer than two left it is dropped rather than shown half-empty.
  p.items=p.items.flatMap((i):ExperienceItem[]=>{if(i.type!=='tabs')return [i];const kept=i.itemIds.filter(t=>allowed.has(t));return kept.length>=2?[{...i,itemIds:kept}]:[];});allowed=new Set(p.items.map(i=>i.id));
  p.workspaces=p.workspaces.filter(w=>w.visibility==='public'&&seen.has(w.entityId)).map(w=>({...w,placements:w.placements.filter(s=>allowed.has(s.itemId))}));
  const reachableSpaces=new Set(p.entities.flatMap(e=>e.workspaceIds));p.workspaces=p.workspaces.filter(w=>reachableSpaces.has(w.id));
- const used=new Set(p.workspaces.flatMap(w=>w.placements.map(s=>s.itemId)));p.items.filter(i=>used.has(i.id)).forEach(i=>{if(i.type==='tabs')i.itemIds.forEach(t=>used.add(t));});p.items.filter(i=>used.has(i.id)).forEach(i=>{if(i.type==='chart')used.add(i.dataItemId);});p.items=p.items.filter(i=>used.has(i.id));
+ const used=new Set(p.workspaces.flatMap(w=>w.placements.map(s=>s.itemId)));p.items.filter(i=>used.has(i.id)).forEach(i=>{if(i.type==='tabs')i.itemIds.forEach(t=>used.add(t));});p.items.filter(i=>used.has(i.id)).forEach(i=>{if(i.type==='chart')used.add(i.dataItemId);if(i.type==='kpi'&&i.derive)used.add(i.derive.itemId);});p.items=p.items.filter(i=>used.has(i.id));
  const keptSpaces=new Set(p.workspaces.map(w=>w.id));p.entities=p.entities.map(e=>({...e,children:e.children.filter(c=>seen.has(c)),workspaceIds:e.workspaceIds.filter(w=>keptSpaces.has(w))}));
  p.relations=p.relations.filter(r=>r.visibility==='public'&&seen.has(r.source)&&seen.has(r.target)&&r.sourceIds.every(s=>sourceIds.has(s)));
  const usedSources=new Set([...p.entities.flatMap(e=>e.sourceIds),...p.items.flatMap(i=>i.sourceIds),...p.relations.flatMap(r=>r.sourceIds)]);p.sources=p.sources.filter(s=>usedSources.has(s.id)&&sourceIds.has(s.id));return validatePack(p);
