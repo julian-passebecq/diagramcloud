@@ -126,3 +126,22 @@ Before a whole-document import (JSON / AI dialog) or an Evidence-workspace impor
 Cautions inform; they do not block. Validation and the revision check still decide whether the import can be applied.
 
 **Rendering.** Names and values come from imported JSON and are rendered as React text, never as HTML (`src/ui/ChangeDetail.tsx`).
+
+## Revision-guarded JSON Patch
+
+Small AI edits can be sent as a `diagramcloud.patch` envelope instead of a whole document (`src/core/patch.ts`). Its fields are `target` (project or experience pack), `targetId`, `baseRevision`, `summary`, and RFC 6902 `operations`: add, remove, replace, move, copy and test.
+
+**Stable-ID paths.** A path segment `@<id>` addresses an array item by its stable ID, e.g. `/nodes/@checks/label`, so a patch does not depend on array positions. Plain indexes and `-` still work.
+
+**Guards.** The whole patch is refused when:
+
+- the target or `targetId` does not match the open project or pack
+- `baseRevision` is not its current revision (stale)
+- it changes any `id`, or the document's own identity fields (`/id`, `/revision`, `/schemaVersion`, `/format`)
+- it uses `__proto__` / `constructor` / `prototype` path segments
+- any operation fails, including a `test`
+- the result fails `validateDocument` / `validatePack`, or exceeds the size limit
+
+**Applying.** Operations run on a copy, and a patch applies all-or-nothing. The result keeps the base revision and goes through the same change preview and Apply step as a whole-document import; applying it bumps the revision, so replaying the same patch is refused as stale.
+
+**Schema.** `scripts/generate.ts` writes `public/diagramcloud.patch.schema.json` for AI tools. **New JSON Patch** in both dialogs fills in a template for the open version.

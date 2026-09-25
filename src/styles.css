@@ -11,3 +11,5 @@
 .change-added .change-kind,.change-counts .change-added{color:#1d7a45}.change-removed .change-kind,.change-counts .change-removed{color:#b3263b}.change-changed .change-kind,.change-counts .change-changed{color:#2864a8}
 .change-fields{list-style:none;margin:3px 0 0 68px;padding:0;display:grid;gap:2px}.change-field{display:inline-block;min-width:90px;color:var(--muted);font-family:ui-monospace,monospace;font-size:11px}.change-fields del{background:#b3263b1a;color:inherit;text-decoration:line-through;text-decoration-color:#b3263b88;padding:0 3px;border-radius:3px}.change-fields ins{background:#1d7a451f;color:inherit;text-decoration:none;padding:0 3px;border-radius:3px}.change-more,.change-none{color:var(--muted)}
 @media(max-width:640px){.change-fields{margin-left:0}.change-kind{min-width:0;margin-right:4px}}
+
+.patch-note{margin:6px 0;padding:6px 10px;border-radius:7px;background:var(--blue-soft);font-size:12px}

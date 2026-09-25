@@ -167,3 +167,47 @@ test('workspace import preview shows panel changes and cautions before applying'
  await expect(d.getByRole('note',{name:'Check before applying'})).toContainText('Relabels panel “Renamed by AI” from synthetic to source-derived');
  await expect(d.getByRole('button',{name:'Apply reviewed workspace import',exact:true})).toBeEnabled();
 });
+
+test('JSON Patch: applied through the review, then refused once stale; ID changes refused',async({page})=>{
+ await page.goto('/');
+ await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();
+ await page.getByRole('button',{name:'JSON / AI',exact:true}).click();
+ await page.getByRole('button',{name:'New JSON Patch',exact:true}).click();
+ const editor=page.getByLabel('Project JSON'),patch=JSON.parse(await editor.inputValue());
+ expect([patch.format,patch.target,patch.targetId]).toEqual(['diagramcloud.patch','project','total-project-controls']);
+ patch.summary='Rename the SQL checks after review';
+ patch.operations=[{op:'test',path:'/nodes/@checks/label',value:'SQL quality checks'},{op:'replace',path:'/nodes/@checks/label',value:'Patched SQL checks'}];
+ await editor.fill(JSON.stringify(patch));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
+ await expect(page.locator('.patch-note')).toHaveText(`JSON Patch · 2 operations on revision ${patch.baseRevision} · Rename the SQL checks after review`);
+ await expect(page.getByRole('region',{name:'Proposed changes'})).toContainText('SQL quality checks → Patched SQL checks');
+ await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Explore Patched SQL checks',exact:true})).toBeVisible();
+
+ // The same patch is now stale: the project moved to the next revision.
+ await page.getByRole('button',{name:'JSON / AI',exact:true}).click();
+ await editor.fill(JSON.stringify(patch));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
+ await expect(page.getByRole('alert')).toContainText(`Stale patch: it was written against revision ${patch.baseRevision}, and the open project is at revision ${patch.baseRevision+1}`);
+ await expect(page.getByRole('button',{name:'Apply imported document',exact:true})).toBeDisabled();
+ await editor.fill(JSON.stringify({...patch,baseRevision:patch.baseRevision+1,operations:[{op:'replace',path:'/nodes/@checks/id',value:'checks-renamed'}]}));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
+ await expect(page.getByRole('alert')).toContainText('IDs are stable');
+ await expect(page.getByRole('button',{name:'Apply imported document',exact:true})).toBeDisabled();
+});
+
+test('workspace JSON Patch edits one panel by id and is reviewed before applying',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});
+ await d.getByRole('button',{name:'Workspace JSON / AI',exact:true}).click();
+ await d.getByRole('button',{name:'New JSON Patch',exact:true}).click();
+ const input=d.getByLabel('Experience JSON'),patch=JSON.parse(await input.inputValue());
+ expect(patch.target).toBe('experience');
+ patch.operations[1].value='Patched panel title';
+ await input.fill(JSON.stringify(patch));
+ await d.getByRole('button',{name:'Validate workspace import',exact:true}).click();
+ await expect(d.getByText(/JSON Patch · 2 operations on revision/)).toBeVisible();
+ await expect(d.getByRole('region',{name:'Proposed changes'})).toContainText('Patched panel title');
+ await d.getByRole('button',{name:'Apply reviewed workspace import',exact:true}).click();
+ await expect(d.getByRole('region',{name:'Workspace import review'})).toHaveCount(0);
+});
