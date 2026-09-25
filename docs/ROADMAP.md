@@ -48,7 +48,7 @@ Implemented in `feat/diagramcloud-v1.1-reliability`:
 - **Whole-document AI/JSON review guard.** Same-project imports show stable-ID additions/changes/removals and project-field changes. They may only apply when the imported base revision equals the currently open revision. This is a review guard for whole-document edits, **not yet JSON Patch**.
 - **Shared export geometry.** SVG and editable PowerPoint now share node dimensions and deterministic orthogonal Manhattan connector routing. React Flow canvas geometry is still an independent interactive renderer and remains future convergence work.
 - **Mermaid hardening.** Pipe characters in labels are escaped so authored labels cannot accidentally change Mermaid edge-label syntax.
-- **Regression coverage.** Added save-queue, change-preview, shared-routing, corrupt-row and stale-revision tests. CI validates from a clean runner with `npm install`; the CI artifact includes the resolved `package-lock.json`. Checking that lockfile into the repository is still required before switching branch CI to `npm ci` and dependency caching.
+- **Regression coverage.** Added save-queue, change-preview, shared-routing, corrupt-row and stale-revision tests. `package-lock.json` is checked in and CI installs with `npm ci` using `actions/setup-node` npm caching, so every run validates the same resolved dependency tree.
 
 Save/recovery fault injection is done (2026-09-25): real-IndexedDB browser tests for a two-tab conflict, storage that cannot open, and a quota failure mid-session, with a leave-page guard while work is unsaved. See `tests/e2e/storage.spec.ts`.
 
