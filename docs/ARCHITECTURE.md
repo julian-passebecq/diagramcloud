@@ -145,3 +145,31 @@ Small AI edits can be sent as a `diagramcloud.patch` envelope instead of a whole
 **Applying.** Operations run on a copy, and a patch applies all-or-nothing. The result keeps the base revision and goes through the same change preview and Apply step as a whole-document import; applying it bumps the revision, so replaying the same patch is refused as stale.
 
 **Schema.** `scripts/generate.ts` writes `public/diagramcloud.patch.schema.json` for AI tools. **New JSON Patch** in both dialogs fills in a template for the open version.
+
+## Icon registry
+
+`src/core/icons.ts` is the only place an icon ID gets meaning.
+
+**Original symbols.** The generic symbols are drawn in code by component kind and are DiagramCloud's own MIT artwork.
+
+**Vendor icons.** A vendor icon is third-party artwork under its owner's terms. Each entry records:
+
+- the file under `public/icons`
+- the vendor, and the item it represents
+- the upstream repository, full commit, package name and version
+- the git blob ID of the exact file
+- the controlling terms URL
+- the usage rules: no cropping, flipping, rotating, recolouring or distorting, and never used as a product logo
+
+**Rendering.** The canvas and the Inspector picker read the registry. An unregistered ID draws the generic symbol, never an unknown file. The vendor image carries its attribution as a tooltip.
+
+**Build check.** `scripts/icons.ts` runs first in `npm run build` and fails when:
+
+- a file in `public/icons` is not registered
+- a registered file is missing
+- a file's git blob differs from the recorded one; a recoloured or edited copy always does
+- a vendor entry lacks its source or terms
+
+`.gitattributes` marks `public/icons/**` as `-text`, so line-ending conversion can't change the bytes. The delivery notice `public/third-party-licenses.txt` includes one attribution line per registered icon.
+
+**Exports.** Exports (SVG, PNG, HTML, PPTX) draw generic kind symbols, not vendor artwork. Embedding vendor icons in exports belongs to the shared export scene work.

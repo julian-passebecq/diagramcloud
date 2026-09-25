@@ -21,15 +21,19 @@ File: `public/icons/fabric-lakehouse.svg`.
 
 Source package path: `FabricTools/fabric-icons/node_modules/@fabric-msft/svg-icons/svg/lakehouse_48_item.svg`.
 
-Source blob verified during this pass: `a06e6f9b2beccee5e84138e2f58f0d306a225c2d`.
+Package: `@fabric-msft/svg-icons` 8.2.0. Repository commit: `e206270f367dc440b5bf6bc94f0f6267b922d596` (last change to this file, 2026-05-19).
 
-Source browsing location: https://github.com/FabricTools/fabric-icons/blob/main/node_modules/@fabric-msft/svg-icons/svg/lakehouse_48_item.svg
+Git blob: `a06e893bb2ecafcc6a563a607e7b4c2064b7a7d9`. The shipped file is byte-identical to the upstream file; the build recomputes this blob and fails if the file is changed. (An earlier version of this notice recorded `a06e6f9b…`, which was a transcription error; the upstream and committed blobs are both `a06e893b…`.)
+
+Source: https://github.com/FabricTools/fabric-icons/blob/e206270f367dc440b5bf6bc94f0f6267b922d596/node_modules/@fabric-msft/svg-icons/svg/lakehouse_48_item.svg
+
+The source repository's MIT licence covers that repository's own code, not Microsoft's artwork.
 
 The artwork is Microsoft product iconography, not DiagramCloud artwork and not offered under this repository's MIT license. It is used to identify a Microsoft Fabric Lakehouse in architecture/educational diagrams. The Microsoft usage rules permit specified diagram/training/documentation uses and prohibit cropping, flipping, rotating or distorting the icons or using them as one's own product logo. Preserve the original artwork and label the represented Microsoft item.
 
 Controlling usage terms and official collection: https://learn.microsoft.com/en-us/fabric/fundamentals/icons
 
-Other symbols in `src/ui/Canvas.tsx` are original generic component symbols, not representations claimed to be official vendor logos. The activity animation surrounds the icon; it does not rotate the Microsoft artwork.
+The icon registry in `src/core/icons.ts` is the source of truth for every icon ID: a vendor icon is drawn only if it is registered with its source, version, blob and terms, and `scripts/icons.ts` fails the build for an unregistered or modified file in `public/icons`. Other symbols in `src/ui/Canvas.tsx` are original generic component symbols, not representations claimed to be official vendor logos. The activity animation surrounds the icon; it does not rotate the Microsoft artwork.
 
 ## Fonts and portfolio content
 

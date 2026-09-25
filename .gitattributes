@@ -1,0 +1,2 @@
+# Vendor artwork must stay byte-identical to upstream (the build checks its git blob): never convert line endings.
+public/icons/** -text

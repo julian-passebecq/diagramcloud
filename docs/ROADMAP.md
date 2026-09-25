@@ -130,4 +130,6 @@ Revision-guarded JSON Patch is done: small AI edits as RFC 6902 operations, addr
 
 The visual story composer is done (Edit → Story): add, reorder, edit and preview guided-story steps without JSON.
 
+The icon registry is done (`src/core/icons.ts`): each icon records its origin; vendor icons also record source, commit, package version, git blob and terms, and the build checks them. It holds one vendor icon so far (Fabric Lakehouse). Adding more Fabric/Azure/Databricks artwork is a separate, per-icon decision: each needs its terms checked first.
+
 Next candidates: a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
