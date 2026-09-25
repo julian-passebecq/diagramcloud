@@ -136,6 +136,6 @@ The shared export scene is done: one measured layout for SVG/PNG/HTML/PPTX (see 
 
 Lane separation is done: connections never draw on the same stretch, and connection labels never cover a box or each other.
 
-The icon registry is done (`src/core/icons.ts`): each icon records its origin; vendor icons also record source, commit, package version, git blob and terms, and the build checks them. It holds one vendor icon so far (Fabric Lakehouse). Adding more Fabric/Azure/Databricks artwork is a separate, per-icon decision: each needs its terms checked first.
+The icon registry is done (`src/core/icons.ts`): each icon records its origin; vendor icons also record source, commit, package version, git blob and terms, and the build checks them. It holds two vendor icons so far: Fabric Lakehouse, and Fabric Pipeline on the Fabric sample's "Data Factory pipeline" box (added with Julian's approval). Adding more Fabric/Azure/Databricks artwork is a separate, per-icon decision: each needs its terms checked first.
 
 Next candidates: a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.

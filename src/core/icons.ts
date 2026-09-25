@@ -26,6 +26,14 @@ export const ICON_REGISTRY:IconEntry[]=[
    url:'https://github.com/FabricTools/fabric-icons/blob/e206270f367dc440b5bf6bc94f0f6267b922d596/node_modules/@fabric-msft/svg-icons/svg/lakehouse_48_item.svg'},
   terms:{name:'Microsoft Fabric icons usage terms',url:'https://learn.microsoft.com/en-us/fabric/fundamentals/icons'},
   rules:['Use only to represent the Microsoft Fabric Lakehouse item it depicts, labelled as such.','Do not crop, flip, rotate, recolour or distort the artwork.','Do not use it as a logo for DiagramCloud or any other product.','Not covered by the DiagramCloud MIT licence, nor by the source repository\'s licence.']},
+ {id:'fabric-pipeline',label:'Microsoft Fabric Pipeline',origin:'vendor',alt:'Microsoft Fabric Pipeline icon',
+  file:'icons/fabric-pipeline.svg',vendor:'Microsoft',represents:'a Microsoft Fabric Data Factory pipeline item',
+  source:{repository:'FabricTools/fabric-icons',path:'node_modules/@fabric-msft/svg-icons/svg/pipeline_48_item.svg',
+   commit:'e206270f367dc440b5bf6bc94f0f6267b922d596',blob:'fb8b9c4db4b97a4346f56c6fb7ed1228550419db',
+   packageName:'@fabric-msft/svg-icons',packageVersion:'8.2.0',
+   url:'https://github.com/FabricTools/fabric-icons/blob/e206270f367dc440b5bf6bc94f0f6267b922d596/node_modules/@fabric-msft/svg-icons/svg/pipeline_48_item.svg'},
+  terms:{name:'Microsoft Fabric icons usage terms',url:'https://learn.microsoft.com/en-us/fabric/fundamentals/icons'},
+  rules:['Use only to represent the Microsoft Fabric pipeline item it depicts, labelled as such.','Do not crop, flip, rotate, recolour or distort the artwork.','Do not use it as a logo for DiagramCloud or any other product.','Not covered by the DiagramCloud MIT licence, nor by the source repository\'s licence.']},
 ];
 
 const BY_ID=new Map(ICON_REGISTRY.map(e=>[e.id,e]));
