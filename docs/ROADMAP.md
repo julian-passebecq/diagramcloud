@@ -106,4 +106,6 @@ Drag-to-move and drag-to-resize in Edit board are done.
 
 Undo and redo for board edits are done.
 
-Next candidates: a small in-app editor for model items; multi-select and align in Edit board; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+The data-model editor is done (see START_HERE, "Data-model editor").
+
+Next candidates: multi-select and align in Edit board; KPI tiles that can count a model's tables/relationships; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.

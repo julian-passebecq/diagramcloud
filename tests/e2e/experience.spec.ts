@@ -260,3 +260,48 @@ test('undo and redo board edits with buttons and keyboard; typing in a field is 
  await expect(d.getByTestId('item-foil-chart')).toHaveCount(0);
  expect(errors).toEqual([]);
 });
+
+test('model editor: add a table, column and relationship, rename, refuse a duplicate, undo',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'}),nav=d.locator('.xp-nav');
+ await nav.getByRole('button',{name:'TotalEnergies',exact:true}).first().click();
+ await nav.getByRole('button',{name:/^BI reporting and data model/}).click();
+ await nav.getByRole('button',{name:/Design the semantic model/}).click();
+ await d.getByRole('button',{name:'Edit board',exact:true}).click();
+ await d.getByTestId('item-sm-model').getByRole('button',{name:'Edit model',exact:true}).click();
+ const ed=d.getByRole('region',{name:'Edit model Star schema'}),star=d.getByTestId('item-sm-model');
+ const lines=()=>star.locator('svg path[stroke="#8795a8"]');
+ await expect(lines()).toHaveCount(10);
+
+ await ed.getByLabel('New table name').fill('DimGeography');await ed.getByRole('button',{name:'Add table',exact:true}).click();
+ await expect(star.locator('svg text',{hasText:/^DimGeography$/})).toHaveCount(1);
+ await expect(ed.getByLabel('Column name GeographyKey')).toHaveValue('GeographyKey');
+
+ await ed.getByRole('button',{name:'FactProduction',exact:true}).click();
+ await ed.getByLabel('New column name').fill('GeographyKey');await ed.getByLabel('New column key').selectOption('fk');
+ await ed.getByRole('button',{name:'Add column',exact:true}).click();
+ await ed.getByLabel('Relationship from (many side)').selectOption('FactProduction.GeographyKey');
+ await ed.getByLabel('Relationship to (one side)').selectOption('DimGeography.GeographyKey');
+ await ed.getByRole('button',{name:'Add relationship',exact:true}).click();
+ await expect(lines()).toHaveCount(11);
+
+ // Renaming through the name field rewrites the relationship; a duplicate name is refused and restored.
+ await ed.getByRole('button',{name:'DimGeography',exact:true}).click();
+ const name=ed.getByLabel('Table name',{exact:true});
+ await name.fill('DimArea');await name.press('Enter');
+ await expect(ed.getByText('FactProduction.GeographyKey → DimArea.GeographyKey')).toBeVisible();
+ await ed.getByLabel('Table name',{exact:true}).fill('DimDate');await ed.getByLabel('Table name',{exact:true}).press('Enter');
+ await expect(ed.getByRole('alert')).toContainText('already a table called DimDate');
+ await expect(ed.getByLabel('Table name',{exact:true})).toHaveValue('DimArea');
+
+ // Deleting the table removes its relationship and says so; undo brings both back.
+ await ed.getByRole('button',{name:'Delete table',exact:true}).click();
+ await expect(d.getByRole('button',{name:/^↶ Undo: Removed table DimArea and 1 relationship/})).toBeVisible();
+ await expect(lines()).toHaveCount(10);
+ await d.getByRole('button',{name:/^↶ Undo: Removed table DimArea/}).click();
+ await expect(lines()).toHaveCount(11);
+ await expect(star.locator('svg text',{hasText:/^DimArea$/})).toHaveCount(1);
+ expect(errors).toEqual([]);
+});

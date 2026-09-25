@@ -339,3 +339,18 @@ The geometry lives in `src/experience/layout.ts` (pure, unit-tested; its limits 
 Every edit in Evidence workspaces can be undone and redone: moves, resizes, added or removed panels, layout presets, board settings, new boards, attached images and applied imports. The **↶ Undo** and **↷ Redo** buttons in Edit board name the step ("Undo: Resized 'SQL validation rule'"). Ctrl/Cmd+Z undoes; Ctrl/Cmd+Shift+Z or Ctrl+Y redoes. Shortcuts are ignored while typing in a field, where Ctrl+Z stays text undo.
 
 `src/experience/history.ts` is pure and unit-tested. Labels come from comparing the pack before and after an edit, so new edit types are labelled automatically. History holds 50 steps. Undo and redo restore content but always issue a new, higher revision, so an AI import prepared against an older revision is still refused (tested). History lives while the Evidence workspaces dialog is open. After **Save in current project**, the project-level Undo in Edit mode can revert the whole saved change.
+
+### Data-model editor (2026-09-25)
+
+In **Edit board**, a model panel has an **Edit model** button that opens an editor above the board. The diagram, HTML export and PowerPoint update live.
+
+- **Tables:** add, rename, delete; set the kind. A new table starts with a key column so it can be related at once.
+- **Columns:** add, rename, delete; set the type and the PK/FK key.
+- **Relationships:** add them by picking `Table.Column` on each side; change cardinality; switch active/inactive; delete. A second path between two tables that are already related starts inactive.
+- **Measures:** add (with an optional home table) and delete.
+
+Renaming a table or column rewrites every relationship and measure that refers to it. Deleting one also removes the relationships that used it, and the undo label says how many ("Removed table DimArea and 1 relationship"). Each change is one undo step. Names apply on Enter or when leaving the field; Escape or a refused edit (duplicate name, dot in a table name, unrelated columns…) restores the old value and shows the reason.
+
+The edits are pure functions in `src/experience/modelEdit.ts`; every result is checked against `validatePack` in `tests/modelEdit.test.ts`.
+
+Not included: the KPI tiles on the showcase screen ("10 tables", "10 relationships", "6 measures") are separate authored items, so they do not recount themselves after model edits. Relationships are added from lists rather than by dragging between tables in the diagram.
