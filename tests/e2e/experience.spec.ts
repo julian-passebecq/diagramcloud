@@ -378,6 +378,46 @@ test('KPI tiles counted from the model update as the model is edited',async({pag
  await expect(d.getByTestId('item-sm-kpi-rel')).toContainText('9 active · 1 inactive');
 });
 
+test('count source form: count a new metric, undo, then freeze a tile as typed',async({page})=>{
+ await page.goto('/');
+ await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'}),nav=d.locator('.xp-nav');
+ await nav.getByRole('button',{name:'TotalEnergies',exact:true}).first().click();
+ await nav.getByRole('button',{name:/^BI reporting and data model/}).click();
+ await nav.getByRole('button',{name:/Design the semantic model/}).click();
+ await d.getByRole('button',{name:'Edit board',exact:true}).click();
+ const measures=d.getByTestId('item-sm-kpi-measures');
+ await measures.getByRole('button',{name:'Count source',exact:true}).click();
+ const form=d.getByRole('form',{name:'Count source for Measures'});
+ await expect(form.getByLabel('Count from')).toHaveValue('sm-model');
+ await expect(form.getByRole('button',{name:'Apply count source'})).toBeDisabled();
+ await form.getByLabel('Count',{exact:true}).selectOption('columns');
+ await form.getByLabel('Tile note').fill('{columns} columns in {tables} tables');
+ await expect(form.getByLabel('Tile preview')).toContainText('42 · 42 columns in 10 tables');
+ await form.getByRole('button',{name:'Apply count source'}).click();
+ await expect(measures.locator('.xp-kpi-value')).toHaveText('42');
+ await expect(measures).toContainText('42 columns in 10 tables');
+ await d.getByRole('button',{name:/^↶ Undo: Count source: “Measures”/}).click();
+ await expect(d.getByRole('status').filter({hasText:'Undone'})).toContainText('Undone: Count source: “Measures” counts columns of “Star schema”.');
+ await expect(measures.locator('.xp-kpi-value')).toHaveText('6');
+ await form.getByRole('button',{name:'Close count source'}).click();
+ await expect(form).toHaveCount(0);
+ const tables=d.getByTestId('item-sm-kpi-tables');
+ await tables.getByRole('button',{name:'Count source',exact:true}).click();
+ const f2=d.getByRole('form',{name:'Count source for Tables'});
+ await f2.getByLabel('Count from').selectOption('');
+ await expect(f2.getByLabel('Tile note')).toHaveValue('3 facts · 7 dimensions');
+ await expect(f2.getByLabel('Count',{exact:true})).toBeDisabled();
+ await f2.getByRole('button',{name:'Apply count source'}).click();
+ await expect(tables.locator('.xp-kpi-value')).toHaveText('10');
+ await expect(tables).not.toContainText('counted from');
+ await d.getByTestId('item-sm-model').getByRole('button',{name:'Edit model',exact:true}).click();
+ const ed=d.getByRole('region',{name:'Edit model Star schema'});
+ await ed.getByLabel('New table name').fill('DimGeography');await ed.getByRole('button',{name:'Add table',exact:true}).click();
+ await expect(d.getByTestId('item-sm-model')).toContainText('DimGeography');
+ await expect(tables.locator('.xp-kpi-value'),'a typed tile no longer follows the model').toHaveText('10');
+});
+
 test('stack and distribute selected panels; overlap refused; distribute needs three',async({page})=>{
  await page.goto('/');
  await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();

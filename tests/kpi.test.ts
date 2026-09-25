@@ -4,7 +4,7 @@ import JSZip from 'jszip';
 import PptxGenJS from 'pptxgenjs';
 import {examplePack} from '../src/experience/sample';
 import {publicPack,validatePack,type ExperienceItem,type ExperiencePack} from '../src/experience/model';
-import {countsOf,kpiDisplay} from '../src/experience/kpi';
+import {countableSources,countsOf,kpiDisplay,publicWarning,withSource} from '../src/experience/kpi';
 import {addTable,removeRelationship,setRelationship} from '../src/experience/modelEdit';
 import {itemBody,workspaceHtml} from '../src/experience/render';
 import {buildWorkspaceDeck} from '../src/experience/pptx';
@@ -64,4 +64,38 @@ test('HTML and PowerPoint show the counted value and say where it comes from',as
  const zip=await JSZip.loadAsync(await buildWorkspaceDeck(PptxGenJS,p,['model-screen']).write({outputType:'nodebuffer'}) as Buffer);
  const xml=(await Promise.all(Object.keys(zip.files).filter(n=>/^ppt\/(slides\/slide|notesSlides\/notesSlide)\d+\.xml$/.test(n)).map(n=>zip.file(n)!.async('string')))).join('');
  assert.match(xml,/<a:t>11<\/a:t>/);assert.match(xml,/counted from “Star schema”/);assert.match(xml,/11 · 3 facts · 8 dimensions \(counted from Star schema\)/);
+});
+
+test('the source form points a tile at a model or table, and the result validates and recounts',()=>{
+ const p=examplePack(),k=kpi(p,'sm-kpi-measures');
+ assert(countableSources(p).some(s=>s.item.id==='sm-model'&&s.counts.columns===42));
+ assert(!countableSources(p).some(s=>s.item.type==='kpi'),'only models and tables are offered');
+ const e=withSource(p,k,{itemId:'sm-model',metric:'columns'},'{columns} columns in {tables} tables');
+ assert.equal(e.label,'Count source: “Measures” counts columns of “Star schema”');
+ assert.equal(e.item.value,'42','the stored fallback matches the count');
+ p.items[p.items.indexOf(k)]=e.item;const v=validatePack(p);
+ assert.deepEqual(kpiDisplay(v,kpi(v,'sm-kpi-measures')),{value:'42',note:'42 columns in 10 tables',from:'Star schema'});
+ const rows=withSource(v,kpi(v,'ql-kpi-prod'),{itemId:'ql-loads',metric:'rows'},'');
+ assert.equal(kpiDisplay(v,rows.item).value,'5');assert.equal(rows.item.unit,kpi(v,'ql-kpi-prod').unit,'unit and styling are kept');
+ assert.equal(withSource(v,kpi(v,'sm-kpi-measures'),{itemId:'sm-model',metric:'columns'},'{columns} columns in {tables} tables').label,'','no change, no undo step');
+});
+
+test('going back to a typed value freezes what the tile showed; impossible sources are refused',()=>{
+ const p=examplePack(),k=kpi(p,'sm-kpi-tables');
+ const typed=withSource(p,k,null,k.note);
+ assert.equal(typed.label,'Typed value: “Tables”');assert.equal(typed.item.derive,undefined);
+ assert.deepEqual([typed.item.value,typed.item.note],['10','3 facts · 7 dimensions'],'tokens are filled from the old source');
+ p.items[p.items.indexOf(k)]=typed.item;validatePack(p);
+ assert.throws(()=>withSource(p,k,{itemId:'ql-loads',metric:'tables'},''),/cannot provide tables/);
+ assert.throws(()=>withSource(p,k,{itemId:'ghost',metric:'rows'},''),/Choose a model or table/);
+});
+
+test('the form warns when counting a source that public exports would drop',()=>{
+ const p=examplePack(),k=kpi(p,'sm-kpi-tables');
+ assert.equal(publicWarning(p,k,'sm-model'),null);
+ (p.items.find(i=>i.id==='sm-model') as ModelItem).visibility='private';
+ assert.match(publicWarning(p,k,'sm-model')!,/“Star schema” is private, so this tile will be left out of public exports/);
+ (p.items.find(i=>i.id==='sm-model') as ModelItem).visibility='public';(p.items.find(i=>i.id==='sm-model') as ModelItem).approval='draft';
+ assert.match(publicWarning(p,k,'sm-model')!,/is draft, not approved/);
+ k.visibility='private';assert.equal(publicWarning(p,k,'sm-model'),null,'a private tile is not published anyway');
 });

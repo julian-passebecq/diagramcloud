@@ -114,4 +114,6 @@ Counting KPI tiles are done.
 
 Distribute and stack are done.
 
-Next candidates: a form to set a KPI's counted source; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+The KPI count-source form is done.
+
+Next candidates: diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
