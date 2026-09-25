@@ -438,3 +438,25 @@ Code changes that came with the tests:
 - an `indexedDB.open` that throws no longer leaves a dead cached connection
 
 The tests were checked by disabling the guard and the error reasons: all three then fail.
+
+### AI change preview (2026-09-25)
+
+Paste or load an AI-edited JSON in **JSON / AI**, or in **Evidence workspaces → Workspace JSON / AI**, then click Validate.
+
+**The preview.** Grouped by kind (Components, Views, Evidence, Panels, Screens…), every item shows Added / Changed / Removed, its name and ID, and before → after for each field that changed. For example, `label “SQL quality checks” → “Reviewed SQL checks”`, `tags + ai`, `positions 1 moved`.
+
+**Cautions.** A yellow **Check before applying** box lists edits to confirm:
+
+- **Publishing:** made public, or approved for public export.
+- **Provenance claims:**
+  - synthetic relabelled as source-derived
+  - marked as verified in source
+  - new source-derived content without a source
+- **Changed data:**
+  - a changed KPI figure
+  - changed image rights
+  - removed sources
+  - mass removals
+- **IDs:** an ID replaced instead of a label edited.
+
+Code: `describeChanges` / `describePackChanges` in `src/core/changeDetail.ts` (pure, unit-tested) and `src/ui/ChangeDetail.tsx`. The browser tests also check that HTML in an imported label is shown as text and never runs.
