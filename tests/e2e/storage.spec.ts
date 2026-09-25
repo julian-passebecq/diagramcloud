@@ -87,3 +87,43 @@ test('a save that fails mid-session is explained, guarded, and recovered by the 
  await page.reload();await openTotal(page);
  await expect(page.getByRole('button',{name:'Explore Edited while storage was full',exact:true})).toBeVisible();
 });
+
+test('recovery screen: download a raw row, delete with confirmation, repair a row in the JSON editor',async({page})=>{
+ await page.goto('/');await expect(page.getByRole('tab',{name:'Edit',exact:true})).toBeEnabled();
+ await page.evaluate(async()=>{
+  const doc=await (await fetch('examples/fabric-medallion.json')).json();
+  doc.id='fixable';doc.title='Recovered project';doc.nodes[0].childViewId='missing-view';
+  await new Promise<void>((resolve,reject)=>{const r=indexedDB.open('diagramcloud-v1',1);r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,tx=db.transaction('projects','readwrite'),st=tx.objectStore('projects');
+   st.put({id:'broken-json',json:'{broken',writer:'qa',savedAt:Date.now()});st.put({id:'fixable',json:JSON.stringify(doc),writer:'qa',savedAt:Date.now()});st.put({id:'no-json',writer:'qa',savedAt:1});
+   tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};});
+ });
+ await page.reload();
+ await expect(page.getByText(/3 saved projects could not be read.*Open Recovery/)).toBeVisible();
+ await page.getByRole('button',{name:'Recovery (3)',exact:true}).click();
+ const panel=page.getByRole('region',{name:'Unreadable saved projects'}),row=(id:string)=>panel.locator('li').filter({hasText:id});
+ await expect(row('fixable')).toContainText('unknown reference');
+ await expect(row('no-json').getByRole('button',{name:'Open in JSON editor',exact:true})).toBeDisabled();
+
+ const wait=page.waitForEvent('download');await row('broken-json').getByRole('button',{name:'Download raw copy',exact:true}).click();
+ const raw=JSON.parse(readFileSync(await (await wait).path(),'utf8'));expect(raw).toMatchObject({id:'broken-json',json:'{broken',writer:'qa'});
+ await row('broken-json').getByRole('button',{name:'Delete from this browser…',exact:true}).click();
+ await expect(row('broken-json').getByRole('note')).toContainText('You downloaded a raw copy. Deleting removes the row from this browser for good.');
+ await row('broken-json').getByRole('button',{name:'Delete permanently',exact:true}).click();
+ await expect(row('broken-json')).toHaveCount(0);
+
+ await row('fixable').getByRole('button',{name:'Open in JSON editor',exact:true}).click();
+ await expect(page.locator('.patch-note')).toContainText('Repairing the unreadable saved project “fixable”');
+ const editor=page.getByLabel('Project JSON'),doc=JSON.parse(await editor.inputValue());delete doc.nodes[0].childViewId;
+ await editor.fill(JSON.stringify(doc));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
+ await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Recovered project',exact:true})).toBeVisible();
+ await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Recovery (1)',exact:true})).toBeVisible();
+
+ await page.reload();
+ await expect(page.getByText(/1 saved project could not be read/)).toBeVisible();
+ await expect(page.locator('.project-card').filter({hasText:'Recovered project'})).toBeVisible();
+ await page.getByRole('button',{name:'Recovery (1)',exact:true}).click();
+ await expect(panel.locator('li')).toHaveCount(1);await expect(row('no-json')).toBeVisible();
+});

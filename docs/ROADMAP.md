@@ -56,7 +56,7 @@ Revision-guarded JSON Patch is done (2026-09-25; see below).
 
 Shared measured export scene is done (2026-09-25): SVG, PNG, HTML and PPTX draw one Arial-measured scene with identical line breaks, detour routes around boxes in the way and embedded registered icons. The canvas keeps its own React Flow rendering.
 
-Still open from P0: visual recovery UI for exporting/deleting quarantined corrupt rows.
+The recovery screen for quarantined rows is done (2026-09-25): download raw, repair in the JSON editor, or delete after confirmation. With that, no P0 item from this list is open.
 
 
 ## V1.2 Drive asset pass (2026-09-21)
