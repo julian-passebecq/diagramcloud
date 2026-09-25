@@ -354,3 +354,13 @@ Renaming a table or column rewrites every relationship and measure that refers t
 The edits are pure functions in `src/experience/modelEdit.ts`; every result is checked against `validatePack` in `tests/modelEdit.test.ts`.
 
 Not included: the KPI tiles on the showcase screen ("10 tables", "10 relationships", "6 measures") are separate authored items, so they do not recount themselves after model edits. Relationships are added from lists rather than by dragging between tables in the diagram.
+
+### Multi-select and align (2026-09-25)
+
+In **Edit board**:
+
+- **Selecting:** tick a panel's checkbox, or Ctrl/Shift-click its header, to select it. Esc clears the selection without closing the dialog.
+- **Moving a group:** dragging the grip of a selected panel moves the whole selection, with one ghost per panel. Arrow keys on that grip move the group one cell. The move is limited so the whole group stays on the grid.
+- **Aligning:** with two or more panels selected, the toolbar offers Align left / right / top / bottom (to the outermost selected edge) and Match width / height (to the largest).
+- **Safety and undo:** a group move or alignment that would overlap another panel or leave the grid changes nothing and names the clash ("'SQL validation rule' would overlap 'Scenario comparison'"). Each group action is one undo step ("Moved 2 panels", "Align top: 2 panels").
+- **Code:** `groupShift`, `groupProblem` and `aligned` live in `src/experience/layout.ts` and are unit-tested. Resizing stays single-panel.
