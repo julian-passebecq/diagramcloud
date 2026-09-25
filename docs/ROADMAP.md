@@ -2,7 +2,7 @@
 
 ## Implemented V1 foundation
 
-React + Fluent UI shell; light/dark themes; read-only Explore, Edit, public Portfolio and guided Present modes; gallery; parent-retaining multi-level drilldown; node/edge properties; drag/connect and grid layout; text/code/table/metrics/image evidence rendering; image attachment; whole-document JSON validation/review/import/export; bounded undo/redo; IndexedDB save and other-tab conflict detection; public-content projection; illustrative flow motion; current-view SVG/PNG/Mermaid export; standalone public HTML; native editable PowerPoint export; browser print. Metrics and story steps currently require JSON editing rather than dedicated visual composers.
+React + Fluent UI shell; light/dark themes; read-only Explore, Edit, public Portfolio and guided Present modes; gallery; parent-retaining multi-level drilldown; node/edge properties; drag/connect and grid layout; text/code/table/metrics/image evidence rendering; image attachment; whole-document JSON validation/review/import/export; bounded undo/redo; IndexedDB save and other-tab conflict detection; public-content projection; illustrative flow motion; current-view SVG/PNG/Mermaid export; standalone public HTML; native editable PowerPoint export; browser print. Guided-story steps have a visual composer (Edit → Story); metrics evidence blocks still require JSON editing.
 
 The test suite and CI result, not this list, determine whether a particular revision is ready to use. Read the workflow and artifact from the exact delivered commit.
 
@@ -127,5 +127,7 @@ Save/recovery tests are done, with a leave-page guard and plain-language storage
 The AI change preview is done: item-by-item before → after, with cautions (below).
 
 Revision-guarded JSON Patch is done: small AI edits as RFC 6902 operations, addressed by stable ID and refused when stale.
+
+The visual story composer is done (Edit → Story): add, reorder, edit and preview guided-story steps without JSON.
 
 Next candidates: a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.

@@ -211,3 +211,44 @@ test('workspace JSON Patch edits one panel by id and is reviewed before applying
  await d.getByRole('button',{name:'Apply reviewed workspace import',exact:true}).click();
  await expect(d.getByRole('region',{name:'Workspace import review'})).toHaveCount(0);
 });
+
+test('story composer: edit, reorder, add from the canvas, undo, play, and persist',async({page})=>{
+ await page.goto('/');
+ await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();
+ await expect(page.getByRole('tab',{name:'Edit',exact:true})).toBeEnabled();await page.getByRole('tab',{name:'Edit',exact:true}).click();
+ await page.getByRole('button',{name:'Story',exact:true}).click();
+ const composer=page.getByRole('region',{name:'Story composer'}),steps=composer.locator('.story-list .story-pick b');
+ const count=await steps.count();expect(count).toBeGreaterThan(2);
+ const second=(await steps.nth(1).textContent())!.replace(/^2\. /,'');
+ await steps.nth(1).click();
+ await expect(page.locator('.story-bar h3')).toHaveText(second);
+
+ const form=composer.getByRole('form',{name:'Edit step 2'});
+ await form.getByLabel('Step title').fill('Why the checks matter');
+ await form.getByLabel('Narration').fill('Show one failing row, then the rule that caught it.');
+ await form.getByRole('button',{name:'Save step',exact:true}).click();
+ await expect(steps.nth(1)).toHaveText('2. Why the checks matter');
+ await expect(page.locator('.story-bar p')).toHaveText('Show one failing row, then the rule that caught it.');
+
+ await composer.getByRole('button',{name:'Move step 2 up',exact:true}).click();
+ await expect(steps.nth(0)).toHaveText('1. Why the checks matter');
+
+ // Pick a component on the canvas; the Story tab stays open, and the new step focuses it.
+ await page.getByRole('button',{name:'Explore Power BI reporting',exact:true}).click();
+ await expect(composer).toBeVisible();
+ await composer.getByRole('button',{name:'+ Step from current view',exact:true}).click();
+ await expect(steps).toHaveCount(count+1);
+ await expect(steps.nth(1)).toHaveText('2. Power BI reporting');
+ await expect(composer.getByRole('form',{name:'Edit step 2'}).getByLabel('Focus component')).toHaveValue('powerbi');
+ await page.getByRole('button',{name:'Undo',exact:true}).click();
+ await expect(steps).toHaveCount(count);
+
+ await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();
+ await page.reload();await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();
+ await page.getByRole('tab',{name:'Edit',exact:true}).click();await page.getByRole('button',{name:'Story',exact:true}).click();
+ await expect(steps.nth(0)).toHaveText('1. Why the checks matter');
+ await composer.getByRole('form',{name:'Edit step 1'}).getByRole('button',{name:'Play from here',exact:true}).click();
+ await expect(page.getByRole('tab',{name:'Present',exact:true})).toHaveAttribute('aria-selected','true');
+ await expect(page.locator('.story-bar')).toContainText(`GUIDED STORY · 1 / ${count}`);
+ await expect(page.locator('.story-bar h3')).toHaveText('Why the checks matter');
+});

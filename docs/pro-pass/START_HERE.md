@@ -476,3 +476,22 @@ It is refused, and nothing changes, when:
 - the result is invalid
 
 Code: `src/core/patch.ts` (unit-tested, including RFC 6902 semantics and prototype-key rejection); schema `public/diagramcloud.patch.schema.json`.
+
+### Visual story composer (2026-09-25)
+
+In **Edit** mode the sidebar has a **Story** tab: the guided story Present mode plays, edited without JSON.
+
+**The step list:** every step is numbered with its view and focus component. **↑ / ↓** reorder, and selecting a step previews it on the canvas: its view, focus and highlighted connections, with the narration in the story bar.
+
+**Adding steps:**
+
+- **+ Step from current view** adds a step after the selected one, for the view you are on and the component you clicked. Clicking a component keeps the Story tab open. The title and narration start from that component's own label and role or summary, and its connections are highlighted.
+- **Draft from views** (only when there is no story yet) adds one step per view, in drilldown order, with each view's own title and description.
+
+**The step form:**
+
+- **Fields:** title, view, focus component (only components in that view), highlighted connections (only that view's), and narration with a character count. Changing the view drops the focus and highlights that don't belong to it.
+- **Buttons:** Save step, Revert, Play from here, Duplicate, Delete step. Every change is one undo step.
+- **Notes:** the form says when narration is missing, or when a private view or component means the public portfolio will skip the step. **Play from here** starts Present mode on the matching public step.
+
+Code: `src/core/story.ts` (pure, unit-tested) and `src/ui/StoryComposer.tsx`; `validateDocument` still checks every reference.

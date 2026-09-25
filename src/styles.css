@@ -13,3 +13,11 @@
 @media(max-width:640px){.change-fields{margin-left:0}.change-kind{min-width:0;margin-right:4px}}
 
 .patch-note{margin:6px 0;padding:6px 10px;border-radius:7px;background:var(--blue-soft);font-size:12px}
+
+.story-composer{display:grid;gap:10px;padding:2px 0}.story-actions{display:flex;flex-wrap:wrap;gap:6px}
+.story-list{list-style:none;margin:0;padding:0;display:grid;gap:4px}.story-list li{display:flex;align-items:stretch;gap:4px;border:1px solid var(--border);border-radius:8px;background:var(--panel)}.story-list li.active{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.story-pick{flex:1;min-width:0;text-align:left;border:0;background:none;color:inherit;padding:7px 9px;cursor:pointer;display:grid;gap:1px;font:inherit}.story-pick b{font-size:12.5px;overflow-wrap:anywhere}.story-pick small{color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+.story-move{display:flex;flex-direction:column;border-left:1px solid var(--border)}.story-move button{flex:1;border:0;background:none;color:var(--muted);cursor:pointer;padding:0 8px;font-size:12px}.story-move button:disabled{opacity:.3;cursor:default}.story-move button:not(:disabled):hover{color:var(--blue)}
+.story-form{display:grid;gap:9px;border-top:1px solid var(--border);padding-top:10px}.story-form>label{display:grid;gap:3px;font-size:12px;font-weight:600;color:var(--ink)}.story-form input:not([type=checkbox]),.story-form select,.story-form textarea{font:inherit;font-weight:400;font-size:12.5px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--ink);min-width:0}.story-form textarea{resize:vertical}
+.story-form fieldset{border:1px solid var(--border);border-radius:8px;padding:6px 9px;margin:0;max-height:180px;overflow:auto}.story-form legend{font-size:12px;font-weight:600;padding:0 4px}.story-edge{display:flex;gap:6px;align-items:flex-start;font-size:12px;padding:2px 0;overflow-wrap:anywhere}
+.story-notes{margin:0;padding:6px 10px 6px 24px;border-radius:7px;background:#fff6dc;color:#5a4200;font-size:12px}
