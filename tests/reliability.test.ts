@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createLatestSaveQueue} from '../src/core/saveQueue';
+import {storageErrorMessage} from '../src/core/storage';
 import {previewDocumentChange} from '../src/core/changePreview';
 import {clone} from '../src/core/model';
 import {samples} from '../src/data/samples';
@@ -77,4 +78,28 @@ test('scene bounds account for shared node dimensions',()=>{
  const b=sceneBounds([{x:10,y:20},{x:400,y:300}],0);
  assert.equal(b.width,400+NODE_WIDTH);
  assert.equal(b.height,300+NODE_HEIGHT);
+});
+
+test('unsaved stays true while the newest edit is queued or failed, and clears once a later save succeeds',async()=>{
+ const states:string[]=[];let fail=true;
+ const queue=createLatestSaveQueue<number>(async()=>{if(fail)throw new Error('disk full');},state=>states.push(state.status));
+ assert.equal(queue.unsaved(),false,'nothing edited yet');
+ const first=queue.enqueue(1);assert.equal(queue.unsaved(),true,'saving');
+ await first;assert.equal(queue.unsaved(),true,'a failed save still holds unsaved work');assert.equal(states.at(-1),'failed');
+ fail=false;await queue.enqueue(2);
+ assert.equal(queue.unsaved(),false,'the next snapshot contains every earlier edit, so one success recovers');
+ assert.deepEqual(states,['saving','failed','saving','saved']);
+});
+
+test('an older success does not clear unsaved while a newer edit is still failing',async()=>{
+ const queue=createLatestSaveQueue<number>(async v=>{if(v===2)throw new Error('quota');},()=>{});
+ const a=queue.enqueue(1),b=queue.enqueue(2);
+ await a;await b.catch(()=>{});
+ assert.equal(queue.unsaved(),true);
+});
+
+test('storage errors are explained in plain language',()=>{
+ assert.match(storageErrorMessage({name:'QuotaExceededError',message:'x'}),/storage is full.*Download a backup/);
+ assert.match(storageErrorMessage({name:'SecurityError',message:'x'}),/does not allow local storage/);
+ assert.equal(storageErrorMessage(new Error('Another tab changed this project.')),'Another tab changed this project.');
 });

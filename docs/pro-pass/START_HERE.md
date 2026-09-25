@@ -418,3 +418,23 @@ Boxes can only link to screens that are in the deck, i.e. public and approved. A
 **How slide numbers are known in advance:** screens come after the architecture slides, so the numbers are needed before those slides exist. `planLinks` in `src/export/deck.ts` counts each screen's slides by running `addWorkspaceSlides` into a throwaway deck; the count does not depend on the header text or links. `buildDeck` then checks that the real run lands every screen on the planned slide, and throws if not, so a wrong link cannot ship.
 
 Verified in desktop PowerPoint: the links go to the right slides and the rendered slides were checked visually.
+
+### Save and recovery tests (2026-09-25)
+
+`tests/e2e/storage.spec.ts` injects faults into the browser's real IndexedDB:
+
+- **Two tabs, same project.** Tab A saves first. Tab B's save is refused ("Another tab changed this project"), **Download backup** contains B's edit, and A's saved version survives a reload. After reloading, B sees A's version and can save again.
+- **Storage cannot open** (blocked site data). The alert gives the reason, editing still works, and the backup holds the edit.
+- **Storage fills up mid-session.** The alert says storage is full, and the stored copy is still the previous version. Once space is freed, the next save also stores the edit that failed.
+
+In all three cases, closing or reloading the tab while an edit is unsaved triggers the browser's "Leave site?" prompt.
+
+Code changes that came with the tests:
+
+- `saveQueue.unsaved()`
+- the `beforeunload` guard in `App.tsx`
+- `storageErrorMessage` in `src/core/storage.ts`
+- a `put` that throws now aborts with its real reason
+- an `indexedDB.open` that throws no longer leaves a dead cached connection
+
+The tests were checked by disabling the guard and the error reasons: all three then fail.

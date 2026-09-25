@@ -35,7 +35,9 @@ Selection, zoom, current mode, modal visibility and the expanded navigation path
 
 Each project is stored as one validated JSON record in IndexedDB. The stored row also contains a writer ID and monotonic saved timestamp. A read-and-compare occurs in the same read/write transaction as an update. A different tab with an unexpected generation aborts the write instead of silently overwriting it. This is conflict detection, not collaboration or a CRDT merge.
 
-Save failures remain visible. A failed or corrupted load does not clear the database. The user can export the in-memory authoring document. Site storage is not an external backup; clearing the origin, changing browser profiles or device loss requires a previously exported JSON file. Further quota/recovery/fault-injection testing is explicitly on the roadmap.
+Save failures remain visible. A failed or corrupted load does not clear the database. The user can export the in-memory authoring document (**Download backup** in the save alert). Site storage is not an external backup; clearing the origin, changing browser profiles or device loss requires a previously exported JSON file.
+
+While the newest edit is not stored (saving, failed, or storage unavailable), the page asks before it is closed or reloaded (`saveQueue.unsaved()`). Storage errors keep their real reason: a quota error says storage is full, blocked site data says so, instead of a generic abort. A later successful save stores a full snapshot, so it also recovers every edit whose save failed earlier. `tests/e2e/storage.spec.ts` covers these paths in Chromium's real IndexedDB: a two-tab conflict, storage that cannot open, and a quota failure mid-session (the previously stored document stays intact).
 
 ## Public boundary
 

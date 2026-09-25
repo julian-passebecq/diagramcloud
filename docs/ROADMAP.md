@@ -50,7 +50,9 @@ Implemented in `feat/diagramcloud-v1.1-reliability`:
 - **Mermaid hardening.** Pipe characters in labels are escaped so authored labels cannot accidentally change Mermaid edge-label syntax.
 - **Regression coverage.** Added save-queue, change-preview, shared-routing, corrupt-row and stale-revision tests. CI validates from a clean runner with `npm install`; the CI artifact includes the resolved `package-lock.json`. Checking that lockfile into the repository is still required before switching branch CI to `npm ci` and dependency caching.
 
-Still open from P0: storage quota/fault injection beyond corrupt-row recovery; revision-guarded JSON Patch operations rather than full-document replacement; shared measured text/layout across canvas, SVG and PPTX; visual recovery UI for exporting/deleting quarantined corrupt rows.
+Save/recovery fault injection is done (2026-09-25): real-IndexedDB browser tests for a two-tab conflict, storage that cannot open, and a quota failure mid-session, with a leave-page guard while work is unsaved. See `tests/e2e/storage.spec.ts`.
+
+Still open from P0: revision-guarded JSON Patch operations rather than full-document replacement; shared measured text/layout across canvas, SVG and PPTX; visual recovery UI for exporting/deleting quarantined corrupt rows.
 
 
 ## V1.2 Drive asset pass (2026-09-21)
@@ -117,5 +119,7 @@ Distribute and stack are done.
 The KPI count-source form is done.
 
 Project deck box → task-screen slide links (and links back) are done.
+
+Save/recovery tests are done, with a leave-page guard and plain-language storage errors.
 
 Next candidates: a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
