@@ -43,5 +43,5 @@ test('registry entries are complete, and unknown IDs draw the generic symbol',()
  assert.equal(iconFor('aws-s3').id,'generic');assert.equal(iconFor(undefined).id,'generic');
  for(const d of samples)for(const n of d.nodes)assert(isRegisteredIcon(n.icon),`${d.id}/${n.id} uses unregistered icon ${n.icon}`);
  const fabric=samples.find(d=>d.nodes.some(n=>n.icon==='fabric-lakehouse'))!;
- assert.deepEqual(vendorIconsIn(fabric).map(e=>e.id),['fabric-lakehouse']);
+ assert.deepEqual(vendorIconsIn(fabric).map(e=>e.id),['fabric-pipeline','fabric-lakehouse']);
 });
