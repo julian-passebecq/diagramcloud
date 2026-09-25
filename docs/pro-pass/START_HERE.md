@@ -564,3 +564,23 @@ Nothing is changed until you act.
 - a row with no JSON text cannot be repaired
 
 **Proof the test works:** with `adoptRow` disabled, the repaired save is refused and the test fails.
+
+### Metrics editor (2026-09-25)
+
+Metrics evidence blocks (KPI cards) no longer need JSON. In **Edit**, select a component, then **Add evidence → Metrics (KPI cards)**:
+
+- one row per card: value, label, note; add up to 12, reorder with ↑/↓, remove
+- a live preview of the cards as they will render
+- **Provenance defaults to synthetic.** Any other choice without a linked source shows a warning, so an unsourced number is never presented as a verified result.
+- the project's sources as checkboxes
+
+An attached metrics block opens in the same editor (**Apply metrics**); **Edit as JSON** stays available underneath.
+
+The rules live in `src/core/metrics.ts`, outside React: fields are trimmed, empty rows are dropped, a value without a label is refused ("Metric 2: add a label"), and the result must pass `blockSchema`. The block ID and visibility are kept when editing.
+
+**Tested:** `tests/metrics.test.ts` covers the rules, the round trip, and a private metrics block being removed by `publicDocument`. `tests/e2e/metrics.spec.ts` covers:
+
+- add a block without JSON
+- a refused unlabelled row that changes nothing
+- reorder, then edit through the attached editor
+- undo/redo, and the change surviving a reload
