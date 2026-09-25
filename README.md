@@ -90,7 +90,7 @@ Motion represents an authored explanation: stream/batch/query/control links and 
 
 Original DiagramCloud source is MIT. Dependencies and Microsoft artwork retain their own licenses and usage terms; see [third-party notices](THIRD_PARTY_NOTICES.md). No font files are bundled. Only one official Fabric item icon is currently bundled; other symbols are original generic symbols. This is not yet a complete cloud icon collection.
 
-V1 is a working foundation, not a replacement for every feature of draw.io. It does not yet provide live cloud discovery, SQL/dbt lineage parsing, general draw.io/Visio import, automatic graph layout, real-time collaboration, a visual story composer or a DAX/Python runtime. Those should extend the same core rather than become separate apps.
+V1 is a working foundation, not a replacement for every feature of draw.io. It does not yet provide live cloud discovery, SQL/dbt lineage parsing, general draw.io/Visio import, automatic graph layout, real-time collaboration or a DAX/Python runtime. Those should extend the same core rather than become separate apps.
 
 
 ### V1.1 reliability work
