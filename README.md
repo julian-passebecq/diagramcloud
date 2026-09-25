@@ -11,7 +11,7 @@ Authoritative repository: `julian-passebecq/diagramcloud`. Initial V1 work is on
 Use Node.js 22. From a fresh checkout:
 
 ```sh
-npm install
+npm ci
 npm run check
 npm test
 npm run build

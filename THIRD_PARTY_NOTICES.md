@@ -33,6 +33,20 @@ The artwork is Microsoft product iconography, not DiagramCloud artwork and not o
 
 Controlling usage terms and official collection: https://learn.microsoft.com/en-us/fabric/fundamentals/icons
 
+## Microsoft Fabric Pipeline artwork
+
+File: `public/icons/fabric-pipeline.svg`.
+
+Source package path: `FabricTools/fabric-icons/node_modules/@fabric-msft/svg-icons/svg/pipeline_48_item.svg`.
+
+Package: `@fabric-msft/svg-icons` 8.2.0. Repository commit: `e206270f367dc440b5bf6bc94f0f6267b922d596` (last change to this file, 2026-05-19).
+
+Git blob: `fb8b9c4db4b97a4346f56c6fb7ed1228550419db`. The shipped file is byte-identical to the upstream file, fetched by that blob ID; the build recomputes this blob and fails if the file is changed.
+
+Source: https://github.com/FabricTools/fabric-icons/blob/e206270f367dc440b5bf6bc94f0f6267b922d596/node_modules/@fabric-msft/svg-icons/svg/pipeline_48_item.svg
+
+The source repository's MIT licence covers that repository's own code, not Microsoft's artwork. The same Microsoft usage rules as for the Lakehouse artwork apply: it identifies the Fabric Data Factory pipeline item in the Microsoft Fabric sample ("Data Factory pipeline" box) and is shown unmodified and labelled.
+
 The icon registry in `src/core/icons.ts` is the source of truth for every icon ID: a vendor icon is drawn only if it is registered with its source, version, blob and terms, and `scripts/icons.ts` fails the build for an unregistered or modified file in `public/icons`. Other symbols in `src/ui/Canvas.tsx` are original generic component symbols, not representations claimed to be official vendor logos. The activity animation surrounds the icon; it does not rotate the Microsoft artwork.
 
 ## Fonts and portfolio content

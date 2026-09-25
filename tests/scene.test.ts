@@ -13,7 +13,7 @@ import {ICON_REGISTRY} from '../src/core/icons';
 import {fileIcons,gitBlobId} from '../scripts/icons';
 
 const docs=samples.map(s=>publicDocument(s)),fabric=samples.find(s=>s.id==='fabric-medallion')!,icons=fileIcons();
-const lakehouse=ICON_REGISTRY.find(e=>e.id==='fabric-lakehouse')!;
+const vendorBlobs=['fabric-pipeline','fabric-lakehouse'].map(id=>ICON_REGISTRY.find(e=>e.id===id)!.source!.blob);
 const xmlText=(s:string)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 test('Arial metrics: every printable ASCII character has a width, and known strings measure correctly',()=>{
@@ -62,15 +62,16 @@ test('PowerPoint draws the same lines in Arial with wrapping off',async()=>{
 });
 
 test('vendor icons are embedded byte-identical, square, and credited; without icon bytes the slot stays empty',async()=>{
- const svg=svgDiagram(fabric,fabric.rootViewId,false,icons),m=svg.match(/<image href="data:image\/svg\+xml;base64,([^"]+)" x="[\d.]+" y="[\d.]+" width="([\d.]+)" height="([\d.]+)"/);
- assert(m,'icon embedded');assert.equal(m[2],m[3],'square, not distorted');
- assert.equal(gitBlobId(Buffer.from(m[1],'base64')),lakehouse.source!.blob,'the embedded bytes are the unmodified upstream file');
- assert.match(svg,/Icons: Microsoft Fabric Lakehouse \(Microsoft artwork, Microsoft Fabric icons usage terms\)\. Not covered by the DiagramCloud MIT licence\./);
+ const svg=svgDiagram(fabric,fabric.rootViewId,false,icons),ms=[...svg.matchAll(/<image href="data:image\/svg\+xml;base64,([^"]+)" x="[\d.]+" y="[\d.]+" width="([\d.]+)" height="([\d.]+)"/g)];
+ assert.equal(ms.length,2,'pipeline and lakehouse icons embedded');for(const m of ms)assert.equal(m[2],m[3],'square, not distorted');
+ assert.deepEqual(ms.map(m=>gitBlobId(Buffer.from(m[1],'base64'))),vendorBlobs,'the embedded bytes are the unmodified upstream files');
+ assert.match(svg,/Icons: Microsoft Fabric Pipeline \(Microsoft artwork, Microsoft Fabric icons usage terms\); Microsoft Fabric Lakehouse \(Microsoft artwork, Microsoft Fabric icons usage terms\)\. Not covered by the DiagramCloud MIT licence\./);
  assert.doesNotMatch(svgDiagram(fabric,fabric.rootViewId,false),/<image|Icons:/);
  assert.match(portfolioHtml(fabric,icons),/data:image\/svg\+xml;base64,/);
  const {pptx}=await buildDeck(PptxGenJS,projectPlan(fabric),icons),zip=await JSZip.loadAsync(await pptx.write({outputType:'nodebuffer'}) as Buffer);
  const svgs=await Promise.all(Object.keys(zip.files).filter(f=>/^ppt\/media\/.*\.svg$/.test(f)).map(f=>zip.file(f)!.async('uint8array')));
- assert(svgs.length>0&&svgs.every(b=>gitBlobId(b)===lakehouse.source!.blob),'PowerPoint carries the unmodified file');
+ assert(svgs.length>0&&svgs.every(b=>vendorBlobs.includes(gitBlobId(b))),'PowerPoint carries only unmodified files');
+ assert.deepEqual(new Set(svgs.map(b=>gitBlobId(b))),new Set(vendorBlobs),'both vendor icons reach PowerPoint');
  assert.match(await zip.file('ppt/slides/slide4.xml')!.async('string'),/Not covered by the DiagramCloud MIT licence/);
 });
 

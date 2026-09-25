@@ -500,10 +500,10 @@ Code: `src/core/story.ts` (pure, unit-tested) and `src/ui/StoryComposer.tsx`; `v
 
 `src/core/icons.ts` lists every icon ID; the Inspector's Icon picker is built from it.
 
-**Recorded for the one vendor icon, Microsoft Fabric Lakehouse:**
+**Recorded for the vendor icons, Microsoft Fabric Lakehouse and Microsoft Fabric Pipeline:**
 
-- source: FabricTools/fabric-icons at `e206270`, `@fabric-msft/svg-icons` 8.2.0
-- git blob: `a06e893b…`
+- source: FabricTools/fabric-icons at `e206270`, `@fabric-msft/svg-icons` 8.2.0 (`lakehouse_48_item.svg`, `pipeline_48_item.svg`)
+- git blobs: `a06e893b…` (Lakehouse), `fb8b9c4d…` (Pipeline)
 - terms: Microsoft's Fabric icon usage terms
 - rules: no crop, flip, rotate, recolour or distort; not a product logo
 
@@ -512,7 +512,7 @@ Code: `src/core/story.ts` (pure, unit-tested) and `src/ui/StoryComposer.tsx`; `v
 **Two findings while building it:**
 
 - `THIRD_PARTY_NOTICES.md` recorded the wrong blob (`a06e6f9b…`). Upstream and our copy are both `a06e893b…`, so the notice is now corrected.
-- The Fabric sample's "Data Factory pipeline" box used an icon ID, `fabric-data-factory`, that had no file and always drew the generic symbol. It is now set to `generic` explicitly, so it looks the same. A test fails if a sample uses an unregistered icon.
+- The Fabric sample's "Data Factory pipeline" box used an icon ID, `fabric-data-factory`, that had no file and always drew the generic symbol. It is now set to `generic` explicitly, so it looks the same. A test fails if a sample uses an unregistered icon. (Later, with Julian's approval, the box got the registered `fabric-pipeline` icon: the upstream Pipeline item file, fetched by its git blob.)
 
 **Adding a vendor icon:** copy the unmodified upstream file into `public/icons`, then add an entry with the repository, full commit, package version, git blob and terms. The build verifies the blob.
 
@@ -524,7 +524,7 @@ All exports now draw one measured scene (`src/export/scene.ts`): SVG, PNG, the H
 
 - **Text** is measured with Arial's character widths (`src/export/measure.ts`) and drawn in Arial.
 - **PowerPoint** has wrapping turned off and exact line spacing, so it keeps the scene's line breaks. The baseline placement was calibrated in desktop PowerPoint.
-- **Icons:** a registered vendor icon, today the Fabric Lakehouse, is embedded byte-for-byte in SVG, HTML and PowerPoint, with a credit line.
+- **Icons:** a registered vendor icon, today the Fabric Lakehouse and Fabric Pipeline, is embedded byte-for-byte in SVG, HTML and PowerPoint, with a credit line.
 
 **Visible fixes that came with it** (both were there before, in every export):
 
@@ -564,3 +564,23 @@ Nothing is changed until you act.
 - a row with no JSON text cannot be repaired
 
 **Proof the test works:** with `adoptRow` disabled, the repaired save is refused and the test fails.
+
+### Metrics editor (2026-09-25)
+
+Metrics evidence blocks (KPI cards) no longer need JSON. In **Edit**, select a component, then **Add evidence → Metrics (KPI cards)**:
+
+- one row per card: value, label, note; add up to 12, reorder with ↑/↓, remove
+- a live preview of the cards as they will render
+- **Provenance defaults to synthetic.** Any other choice without a linked source shows a warning, so an unsourced number is never presented as a verified result.
+- the project's sources as checkboxes
+
+An attached metrics block opens in the same editor (**Apply metrics**); **Edit as JSON** stays available underneath.
+
+The rules live in `src/core/metrics.ts`, outside React: fields are trimmed, empty rows are dropped, a value without a label is refused ("Metric 2: add a label"), and the result must pass `blockSchema`. The block ID and visibility are kept when editing.
+
+**Tested:** `tests/metrics.test.ts` covers the rules, the round trip, and a private metrics block being removed by `publicDocument`. `tests/e2e/metrics.spec.ts` covers:
+
+- add a block without JSON
+- a refused unlabelled row that changes nothing
+- reorder, then edit through the attached editor
+- undo/redo, and the change surviving a reload
