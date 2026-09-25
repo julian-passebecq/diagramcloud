@@ -2,6 +2,7 @@ import {createHash} from 'node:crypto';
 import {existsSync,readFileSync,readdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {ICON_REGISTRY} from '../src/core/icons';
+import {iconDataFrom,iconDataUri,type IconData} from '../src/export/iconData';
 
 /** Git's blob ID for file bytes: sha1("blob <size>\0" + bytes). Equal to the upstream blob only for an unmodified copy. */
 export function gitBlobId(bytes:Uint8Array):string{
@@ -29,4 +30,9 @@ export function checkIcons(publicDir='public'):void{
  const problems=iconProblems(publicDir);
  if(problems.length)throw new Error(`Icon registry check failed:\n- ${problems.join('\n- ')}`);
  console.log(`Icon registry: ${ICON_REGISTRY.length} entries; every shipped icon matches its recorded source.`);
+}
+
+/** Icon bytes for exports built outside the browser (build, tests), read from public/ after the registry check. */
+export function fileIcons(publicDir='public'):IconData{
+ return iconDataFrom(new Map(ICON_REGISTRY.flatMap(e=>e.file&&existsSync(join(publicDir,e.file))?[[e.id,iconDataUri(e.file,readFileSync(join(publicDir,e.file)))] as [string,string]]:[])));
 }
