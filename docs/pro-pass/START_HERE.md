@@ -364,3 +364,17 @@ In **Edit board**:
 - **Aligning:** with two or more panels selected, the toolbar offers Align left / right / top / bottom (to the outermost selected edge) and Match width / height (to the largest).
 - **Safety and undo:** a group move or alignment that would overlap another panel or leave the grid changes nothing and names the clash ("'SQL validation rule' would overlap 'Scenario comparison'"). Each group action is one undo step ("Moved 2 panels", "Align top: 2 panels").
 - **Code:** `groupShift`, `groupProblem` and `aligned` live in `src/experience/layout.ts` and are unit-tested. Resizing stays single-panel.
+
+### KPI tiles that count (2026-09-25)
+
+A `kpi` item can carry `derive: {itemId, metric}` to show a live count instead of its typed `value`:
+
+- **Model metrics:** `tables`, `facts`, `dimensions`, `relationships`, `active`, `inactive`, `measures`, `columns`.
+- **Table metric:** `rows`.
+- **Notes:** the note may use the same counts as `{tokens}`, e.g. `"{facts} facts · {dimensions} dimensions"`. Unknown tokens stay visible.
+- **Honesty:** a counted tile says "↻ counted from '<source title>'" in the app, the HTML export and PowerPoint (slide and notes). All three use `kpiDisplay` in `src/experience/kpi.ts`.
+- **Validation:** a tile that counts from an unknown item, from itself, or from the wrong kind of item is rejected.
+- **Privacy:** a tile counting a private or draft item is removed from public output, since a count can leak what redaction removed. A public tile keeps its public source in the pack even when the source isn't placed.
+- **Showcase:** the three tiles on "Design the semantic model" now count from the star schema, so they follow edits made in the model editor.
+
+Set `derive` through Workspace JSON / AI; there is no form for it yet.

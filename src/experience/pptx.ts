@@ -2,6 +2,7 @@ import type PptxGenJS from 'pptxgenjs';
 import {publicPack,type ExperienceItem,type ExperiencePack,type ExperienceWorkspace} from './model';
 import {MODEL_KIND_COLOR,PLAIN_NUMBER_COLUMN,PROVENANCE_NOTE,clip,fmt,statusClass} from './render';
 import {MODEL_HEADER,MODEL_ROW,modelLayout,type ModelItem} from './semantic';
+import {kpiDisplay} from './kpi';
 
 /**
  * Report screens as native, editable PowerPoint: the same rail + 12-column grid as the in-app Report view.
@@ -167,11 +168,12 @@ function body(pptx:Pptx,s:Slide,p:ExperiencePack,i:ExperienceItem,b:Box,appendix
   case 'table':{const size=b.w<3.5?7:8,rowH=size*1.9/72,maxRows=Math.max(1,Math.floor(b.h/rowH)-1);
    const weights=i.columns.map((c,k)=>Math.min(34,Math.max(5,c.length,...i.rows.slice(0,maxRows).map(r=>String(r[k]??'').length)))),total=weights.reduce((a,v)=>a+v,0);
    s.addTable(tableRows(i,maxRows),{x:b.x,y:b.y,w:b.w,colW:weights.map(v=>b.w*v/total),fontSize:size,fontFace:FONT,rowH,margin:[1,4,1,4],border:{type:'solid',color:'E8EDF3',pt:.5},fill:{color:'FFFFFF'},autoPage:false,valign:'middle'});return;}
-  case 'kpi':{const tone=i.tone??(i.trend==='up'?'good':i.trend==='down'?'bad':'neutral'),valueSize=Math.min(28,Math.max(14,(b.w*72)/((i.value.length+i.unit.length*.55)*.62)));
-   s.addText([{text:i.value,options:{fontSize:valueSize,bold:true,color:INK}},{text:i.unit?`  ${i.unit}`:'',options:{fontSize:Math.max(9,valueSize*.42),color:MUTED}}],{x:b.x,y:b.y,w:b.w,h:Math.min(.55,b.h*.55),fontFace:FONT,margin:0,valign:'middle'});
+  case 'kpi':{const tone=i.tone??(i.trend==='up'?'good':i.trend==='down'?'bad':'neutral'),k=kpiDisplay(p,i),valueSize=Math.min(28,Math.max(14,(b.w*72)/((k.value.length+i.unit.length*.55)*.62)));
+   s.addText([{text:k.value,options:{fontSize:valueSize,bold:true,color:INK}},{text:i.unit?`  ${i.unit}`:'',options:{fontSize:Math.max(9,valueSize*.42),color:MUTED}}],{x:b.x,y:b.y,w:b.w,h:Math.min(.55,b.h*.55),fontFace:FONT,margin:0,valign:'middle'});
    const lines:PptxGenJS.TextProps[]=[];
-   if(i.delta||i.trend)lines.push({text:`${i.trend?{up:'▲',down:'▼',flat:'▬'}[i.trend]+' ':''}${i.delta??''}`,options:{bold:true,color:TONE[tone]}},{text:i.comparison?`  ${i.comparison}`:'',options:{color:MUTED,breakLine:!!i.note}});
-   if(i.note)lines.push({text:clip(i.note,120),options:{color:MUTED}});
+   if(i.delta||i.trend)lines.push({text:`${i.trend?{up:'▲',down:'▼',flat:'▬'}[i.trend]+' ':''}${i.delta??''}`,options:{bold:true,color:TONE[tone]}},{text:i.comparison?`  ${i.comparison}`:'',options:{color:MUTED,breakLine:!!(k.note||k.from)}});
+   if(k.note)lines.push({text:clip(k.note,120),options:{color:MUTED,breakLine:!!k.from}});
+   if(k.from)lines.push({text:`↻ counted from “${clip(k.from,60)}”`,options:{color:MUTED,italic:true}});
    if(lines.length)s.addText(lines,{x:b.x,y:b.y+Math.min(.55,b.h*.55),w:b.w,h:b.h-Math.min(.55,b.h*.55),fontSize:8,fontFace:FONT,margin:0,valign:'top'});return;}
   case 'chart':chart(pptx,s,p,i,b);return;
   case 'model':model(pptx,s,i,b);return;
@@ -204,6 +206,7 @@ function noteText(p:ExperiencePack,i:ExperienceItem):string{
  if(i.type==='code')return `${head}\n${i.code}`;
  if(i.type==='table')return `${head}\n${[i.columns,...i.rows].map(r=>r.map(c=>c??'—').join(' | ')).join('\n')}`;
  if(i.type==='note')return `${head}\n${i.text}`;
+ if(i.type==='kpi'){const k=kpiDisplay(p,i);return `${head}\n${[k.value,i.unit].filter(Boolean).join(' ')}${k.note?` · ${k.note}`:''}${k.from?` (counted from ${k.from})`:''}`;}
  if(i.type==='model')return `${head}\nTables:\n${i.tables.map(t=>`- ${t.name} (${t.kind}): ${t.columns.map(c=>c.name+(c.key?` [${c.key}]`:'')).join(', ')}`).join('\n')}\nRelationships:\n${i.relationships.map(r=>`- ${r.from} -> ${r.to} (${r.cardinality}${r.active?'':', inactive'})`).join('\n')}${i.measures.length?`\nMeasures: ${i.measures.map(m=>m.name).join(', ')}`:''}`;
  if(i.type==='tabs')return `${head}\n${i.itemIds.map(id=>p.items.find(x=>x.id===id)).filter((x):x is ExperienceItem=>!!x&&x.type!=='tabs').map(c=>`--- Tab: ${noteText(p,c)}`).join('\n\n')}`;
  if(i.type==='chart'){const t=p.items.find(x=>x.id===i.dataItemId);return `${head}\nData: ${t?.title??i.dataItemId}${i.unit?` · ${i.unit}`:''}`;}

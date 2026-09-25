@@ -110,4 +110,6 @@ The data-model editor is done (see START_HERE, "Data-model editor").
 
 Multi-select, group move and align are done.
 
-Next candidates: KPI tiles that can count a model's tables/relationships; distribute/stack for selections; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+Counting KPI tiles are done.
+
+Next candidates: distribute/stack for selections; a form to set a KPI's counted source; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
