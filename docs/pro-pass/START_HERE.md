@@ -315,7 +315,7 @@ Limits: text sizes are estimated (there is no font measurement in the browser), 
 - Built by `src/export/deck.ts` on top of `addArchitectureSlides` (src/export/pptx.ts) and `addWorkspaceSlides` (src/experience/pptx.ts). Everything passes through `publicDocument` / `publicPack`. The limit is 180 slides; above it, the export asks for a scope deck instead.
 - Tests resolve every hyperlink in the saved file to its target slide. Downloaded decks were opened in desktop PowerPoint, which confirmed the link targets.
 
-Not included in the project deck: node evidence blocks (they remain in the architecture-only PowerPoint), and links from a diagram box straight to its task-screen slide.
+Not included in the project deck: node evidence blocks (they remain in the architecture-only PowerPoint).
 
 ### Semantic model item (2026-09-25)
 
@@ -403,3 +403,18 @@ A preview shows the tile as it will look, and **Apply count source** is one undo
 - **Public warning:** if the source is private, draft or cites a private source, the form warns that a public tile counting it will be left out of public exports.
 
 Code: `withSource`, `countableSources` and `publicWarning` in `src/experience/kpi.ts` (pure, unit-tested), and `src/experience/KpiSourceEditor.tsx`.
+
+### Project deck: box → screen links (2026-09-25)
+
+In the project deck, a diagram box whose component has a task screen (`experienceWorkspaceId`) now links to that screen's first slide:
+
+- **The box:** it gets a blue border and a small **SCREEN ›** link at its top right.
+- **The box title:** it still opens the deeper view; when the box has no deeper view, the title opens the screen too.
+- **The way back:** every slide of a linked screen (all parts and tab slides) has a **← Architecture: <view>** link in its header, to the first view that shows the box.
+- **Speaker notes:** the view slide's notes list "Task screen: <title> (slide N)".
+
+Boxes can only link to screens that are in the deck, i.e. public and approved. A private screen gets no link and no SCREEN label. The architecture-only PowerPoint and scope decks are unchanged.
+
+**How slide numbers are known in advance:** screens come after the architecture slides, so the numbers are needed before those slides exist. `planLinks` in `src/export/deck.ts` counts each screen's slides by running `addWorkspaceSlides` into a throwaway deck; the count does not depend on the header text or links. `buildDeck` then checks that the real run lands every screen on the planned slide, and throws if not, so a wrong link cannot ship.
+
+Verified in desktop PowerPoint: the links go to the right slides and the rendered slides were checked visually.

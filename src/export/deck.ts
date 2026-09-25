@@ -2,9 +2,9 @@ import type PptxGenJS from 'pptxgenjs';
 import type {Project} from '../core/model';
 import {publicDocument} from '../core/operations';
 import {publicPack,type ExperienceItem,type ExperiencePack} from '../experience/model';
-import {addWorkspaceSlides,workspaceGroups,type DeckGroup} from '../experience/pptx';
+import {addWorkspaceSlides,workspaceGroups,type BackLink,type DeckGroup} from '../experience/pptx';
 import {PROVENANCE_NOTE,clip} from '../experience/render';
-import {addArchitectureSlides} from './pptx';
+import {addArchitectureSlides,type ScreenLink} from './pptx';
 
 /**
  * One deck for a whole project (or one scope): cover, linked contents, architecture views, one section per
@@ -20,6 +20,22 @@ const NAVY='0F2748',INK='13294A',BODY='34465E',MUTED='5B6F88',ACCENT='3FB4E8',BG
 export type DeckSource={title:string;detail:string;page?:number;revision?:string};
 export type DeckPlan={title:string;subtitle:string;author:string;architecture?:Project;pack?:ExperiencePack;groups:DeckGroup[];sources:DeckSource[]};
 export type DeckSection={label:string;slide:number;detail:string};
+/** Box → screen links (by workspace id) and the screen → architecture view link back. */
+export type DeckLinks={screens:Map<string,ScreenLink>;back:Map<string,BackLink>};
+
+/**
+ * Screen slide numbers before any slide exists: architecture boxes link forward to screens. Counting runs
+ * addWorkspaceSlides into a throwaway deck; buildDeck checks the real run lands on the same numbers.
+ */
+export function planLinks(PptxCtor:typeof PptxGenJS,plan:DeckPlan):DeckLinks{
+ const views=plan.architecture?.views??[],screens=new Map<string,ScreenLink>(),back=new Map<string,BackLink>();
+ if(!plan.pack)return {screens,back};
+ let at=2+(views.length?1+views.length:0);
+ for(const g of plan.groups){at++;const counts=addWorkspaceSlides(new PptxCtor(),plan.pack,g.screens.map(x=>x.workspaceId),()=>[]);g.screens.forEach((x,k)=>{screens.set(x.workspaceId,{slide:at+1,title:x.title});at+=counts[k];});}
+ // The back link goes to the first view (in deck order) that has a box for the screen.
+ views.forEach((v,k)=>{for(const n of plan.architecture!.nodes){const id=n.experienceWorkspaceId;if(id&&v.nodeIds.includes(n.id)&&screens.has(id)&&!back.has(id))back.set(id,{slide:4+k,label:`Architecture: ${v.title}`});}});
+ return {screens,back};
+}
 
 /** Whole project: public architecture views plus every public screen reachable from its experience root. */
 export function projectPlan(input:Project):DeckPlan{
@@ -93,26 +109,27 @@ function sourcesSlides(pptx:Pptx,plan:DeckPlan,number:string){
 }
 
 /** Builds the deck and returns it with the section map (also used by tests). */
-export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan):Promise<{pptx:Pptx;sections:DeckSection[];slides:number}>{
+export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan):Promise<{pptx:Pptx;sections:DeckSection[];slides:number;links:DeckLinks}>{
  const pptx=new PptxCtor();
  pptx.layout='LAYOUT_WIDE';pptx.title=plan.title;pptx.subject=plan.subtitle;pptx.author=plan.author||'DiagramCloud';pptx.company='DiagramCloud';
  const views=plan.architecture?.views.length??0,screens=plan.groups.reduce((n,g)=>n+g.screens.length,0);
  if(!views&&!screens)throw new Error('Nothing public to export yet: no architecture view or approved public screen.');
+ const links=planLinks(PptxCtor,plan);
  cover(pptx,plan,views,screens);
  const contents=pptx.addSlide();contents.background={color:BG};
  let slide=2,num=0;const sections:DeckSection[]=[],pad=(n:number)=>String(n).padStart(2,'0');
  if(plan.architecture&&views){
   num++;const divider=sectionFrame(pptx,pad(num),'Architecture',`${views} connected view${views===1?'':'s'}, from the overview down to tasks. A box with a deeper view links to it.`);slide++;
   sections.push({label:'Architecture',slide,detail:`${views} view${views===1?'':'s'}`});
-  const first=slide+1;await addArchitectureSlides(pptx,plan.architecture,{cover:false,evidence:false,sources:false,firstViewSlide:first});slide+=views;
+  const first=slide+1;await addArchitectureSlides(pptx,plan.architecture,{cover:false,evidence:false,sources:false,firstViewSlide:first,screens:links.screens});slide+=views;
   linkedRows(pptx,divider,plan.architecture.views.slice(0,9).map((v,k)=>({label:v.title,detail:v.description,slide:first+k})),5.2,1.1,7.5);
   if(views>9)divider.addText(`… and ${views-9} more views`,{x:5.2,y:6.8,w:7,h:.3,fontSize:10,color:MUTED,fontFace:FONT,margin:0});
  }
  if(plan.pack)for(const g of plan.groups){
   num++;const divider=sectionFrame(pptx,pad(num),g.label,g.summary);slide++;
   sections.push({label:g.label,slide,detail:`${g.screens.length} screen${g.screens.length===1?'':'s'}`});
-  const counts=addWorkspaceSlides(pptx,plan.pack,g.screens.map(x=>x.workspaceId),id=>g.screens.find(x=>x.workspaceId===id)!.trail);
-  let at=slide+1;const rows=g.screens.map((x,k)=>{const r={label:x.title,detail:x.trail.slice(1).join(' › '),slide:at};at+=counts[k];return r;});
+  const counts=addWorkspaceSlides(pptx,plan.pack,g.screens.map(x=>x.workspaceId),id=>g.screens.find(x=>x.workspaceId===id)!.trail,id=>links.back.get(id));
+  let at=slide+1;const rows=g.screens.map((x,k)=>{if(links.screens.get(x.workspaceId)?.slide!==at)throw new Error(`Slide numbers drifted for screen ${x.workspaceId}`);const r={label:x.title,detail:x.trail.slice(1).join(' › '),slide:at};at+=counts[k];return r;});
   slide=at-1;linkedRows(pptx,divider,rows,5.2,1.1,7.5);
  }
  num++;sections.push({label:'Sources and provenance',slide:slide+1,detail:`${plan.sources.length} source${plan.sources.length===1?'':'s'}`});
@@ -122,7 +139,7 @@ export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan):Promise
  linkedRows(pptx,contents,sections.map((x,k)=>({label:`${pad(k+1)}   ${x.label}`,detail:x.detail,slide:x.slide})),.6,1.7,12.1);
  contents.addNotes(sections.map(x=>`${x.label}: slide ${x.slide}`).join('\n'));
  if(slide>MAX_DECK_SLIDES)throw new Error(`This deck would have ${slide} slides (limit ${MAX_DECK_SLIDES}). Export one scope from Evidence workspaces instead.`);
- return {pptx,sections,slides:slide};
+ return {pptx,sections,slides:slide,links};
 }
 
 export async function downloadDeck(plan:DeckPlan,fileName:string):Promise<number>{
