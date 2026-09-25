@@ -378,3 +378,12 @@ A `kpi` item can carry `derive: {itemId, metric}` to show a live count instead o
 - **Showcase:** the three tiles on "Design the semantic model" now count from the star schema, so they follow edits made in the model editor.
 
 Set `derive` through Workspace JSON / AI; there is no form for it yet.
+
+### Distribute and stack (2026-09-25)
+
+The selection toolbar in Edit board adds:
+
+- **Distribute horizontally / vertically** (3+ panels): the first and last panel stay where they are and the gaps between neighbours become equal. When the cells don't divide evenly, the extra cells go to the leading gaps.
+- **Stack vertically / horizontally** (2+ panels): panels go edge to edge in their current order, starting at the selection's top-left and aligned on its left or top edge.
+
+Sizes never change. As with align, the result is checked as a whole: overlaps or cells outside the grid (e.g. three 6-wide panels side by side) change nothing and give the reason. Each action is one undo step. Code: `arranged` in `src/experience/layout.ts`.

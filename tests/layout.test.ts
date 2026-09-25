@@ -65,3 +65,21 @@ test('group moves keep every panel on the grid and are checked against the other
  assert.deepEqual(aligned(pick(['p-kpi','p-gantt']),'height')['p-kpi'].h,4);
  assert.deepEqual(aligned(pick(['p-context','p-table']),'left')['p-context'].x,4);
 });
+
+test('distribute keeps the end panels and evens out the gaps; stack places panels edge to edge',async()=>{
+ const {arranged,groupProblem}=await import('../src/experience/layout');
+ const row={a:{x:0,y:0,w:2,h:1},b:{x:3,y:0,w:2,h:1},c:{x:10,y:0,w:2,h:1}};
+ assert.deepEqual(arranged(row,'distribute-x'),{a:{x:0,y:0,w:2,h:1},b:{x:5,y:0,w:2,h:1},c:{x:10,y:0,w:2,h:1}});
+ const uneven={a:{x:0,y:0,w:2,h:1},b:{x:2,y:0,w:2,h:1},c:{x:9,y:0,w:2,h:1}};
+ assert.deepEqual(arranged(uneven,'distribute-x').b,{x:5,y:0,w:2,h:1},'5 free cells over 2 gaps: the extra cell goes to the first gap');
+ const col={a:{x:0,y:0,w:4,h:2},b:{x:4,y:3,w:4,h:1},c:{x:8,y:9,w:4,h:3}};
+ assert.deepEqual(arranged(col,'distribute-y'),{a:{x:0,y:0,w:4,h:2},b:{x:4,y:5,w:4,h:1},c:{x:8,y:9,w:4,h:3}});
+ assert.deepEqual(arranged({p:{x:4,y:5,w:3,h:2},q:{x:0,y:1,w:4,h:3}},'stack-y'),{q:{x:0,y:1,w:4,h:3},p:{x:0,y:4,w:3,h:2}},'top-down order kept, aligned on the left edge');
+ assert.deepEqual(arranged({p:{x:6,y:4,w:6,h:4},q:{x:0,y:0,w:6,h:4}},'stack-x'),{q:{x:0,y:0,w:6,h:4},p:{x:6,y:0,w:6,h:4}});
+ const wide=arranged({a:{x:0,y:0,w:6,h:2},b:{x:0,y:3,w:6,h:2},c:{x:0,y:6,w:6,h:2}},'stack-x');
+ assert.match(groupProblem([],wide)!,/outside the 12-column grid/,'three 6-wide panels do not fit side by side');
+ for(const m of ['distribute-x','distribute-y','stack-y','stack-x'] as const){
+  const out=arranged(col,m);
+  assert(Object.keys(col).every(k=>out[k].w===col[k as keyof typeof col].w&&out[k].h===col[k as keyof typeof col].h),`${m} never resizes`);
+ }
+});

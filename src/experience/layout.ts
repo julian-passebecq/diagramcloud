@@ -60,6 +60,35 @@ export function aligned(orig:CellMap,mode:AlignMode):CellMap{
  return Object.fromEntries(Object.entries(orig).map(([id,c])=>[id,f[mode](c)]));
 }
 
+export type ArrangeMode='distribute-x'|'distribute-y'|'stack-y'|'stack-x';
+export const ARRANGE_LABEL:Record<ArrangeMode,string>={'distribute-x':'Distribute horizontally','distribute-y':'Distribute vertically','stack-y':'Stack vertically','stack-x':'Stack horizontally'};
+/** Distribute needs a panel on each end plus at least one between them; stacking needs two. */
+export const ARRANGE_MIN:Record<ArrangeMode,number>={'distribute-x':3,'distribute-y':3,'stack-y':2,'stack-x':2};
+
+/**
+ * Distribute: keep the first and last panel (by position) in place and make the gaps between neighbours equal;
+ * when cells do not divide evenly the extra cells go to the leading gaps. If the panels are wider than the span
+ * they sit edge to edge from the first panel (the overlap check then decides). Stack: place panels edge to edge
+ * in their current order, starting at the top-left of the selection. Sizes never change.
+ */
+export function arranged(orig:CellMap,mode:ArrangeMode):CellMap{
+ const entries=Object.entries(orig);if(entries.length<2)return orig;
+ const horizontal=mode==='distribute-x'||mode==='stack-x';
+ const pos=(c:Cell)=>horizontal?c.x:c.y,size=(c:Cell)=>horizontal?c.w:c.h,cross=(c:Cell)=>horizontal?c.y:c.x;
+ const sorted=[...entries].sort((a,b)=>pos(a[1])-pos(b[1])||cross(a[1])-cross(b[1])||a[0].localeCompare(b[0]));
+ const place=(c:Cell,at:number,alignTo?:number):Cell=>horizontal?{...c,x:at,...(alignTo===undefined?{}:{y:alignTo})}:{...c,y:at,...(alignTo===undefined?{}:{x:alignTo})};
+ const out:CellMap={};
+ if(mode.startsWith('stack')){
+  const start=Math.min(...entries.map(([,c])=>pos(c))),edge=Math.min(...entries.map(([,c])=>cross(c)));let at=start;
+  for(const [id,c] of sorted){out[id]=place(c,at,edge);at+=size(c);}
+  return out;
+ }
+ const first=sorted[0][1],last=sorted.at(-1)![1],span=pos(last)+size(last)-pos(first),free=span-sorted.reduce((n,[,c])=>n+size(c),0),gaps=sorted.length-1;
+ const base=Math.max(0,Math.floor(free/gaps)),extra=Math.max(0,free-base*gaps);let at=pos(first);
+ sorted.forEach(([id,c],k)=>{out[id]=place(c,at);at+=size(c)+base+(k<extra?1:0);});
+ return out;
+}
+
 export function describeCell(c:Cell):string{return `column ${c.x+1}, row ${c.y+1}, ${c.w} wide × ${c.h} tall`;}
 
 const KEYS:Record<string,[number,number]>={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};

@@ -112,4 +112,6 @@ Multi-select, group move and align are done.
 
 Counting KPI tiles are done.
 
-Next candidates: distribute/stack for selections; a form to set a KPI's counted source; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+Distribute and stack are done.
+
+Next candidates: a form to set a KPI's counted source; diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
