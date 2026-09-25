@@ -377,7 +377,7 @@ A `kpi` item can carry `derive: {itemId, metric}` to show a live count instead o
 - **Privacy:** a tile counting a private or draft item is removed from public output, since a count can leak what redaction removed. A public tile keeps its public source in the pack even when the source isn't placed.
 - **Showcase:** the three tiles on "Design the semantic model" now count from the star schema, so they follow edits made in the model editor.
 
-Set `derive` through Workspace JSON / AI; there is no form for it yet.
+Set `derive` with the Count source form (below) or through Workspace JSON / AI.
 
 ### Distribute and stack (2026-09-25)
 
@@ -387,3 +387,19 @@ The selection toolbar in Edit board adds:
 - **Stack vertically / horizontally** (2+ panels): panels go edge to edge in their current order, starting at the selection's top-left and aligned on its left or top edge.
 
 Sizes never change. As with align, the result is checked as a whole: overlaps or cells outside the grid (e.g. three 6-wide panels side by side) change nothing and give the reason. Each action is one undo step. Code: `arranged` in `src/experience/layout.ts`.
+
+### KPI count-source form (2026-09-25)
+
+In Edit board, each KPI panel has a **Count source** button. The form sets:
+
+- **Counts from:** any model or table in the pack, or "Nothing: typed value".
+- **Count:** only the metrics the chosen source provides, each shown with its current number.
+- **Note:** the tokens available for the source are listed with their values.
+
+A preview shows the tile as it will look, and **Apply count source** is one undo step; it stays disabled until something changes.
+
+- **Stored value:** applying refreshes the tile's stored `value` to the count, so the fallback used if the source is later removed is current.
+- **Back to typed:** switching back to a typed value keeps the current count, and fills the note's tokens from the old source, so the tile looks the same until someone edits it.
+- **Public warning:** if the source is private, draft or cites a private source, the form warns that a public tile counting it will be left out of public exports.
+
+Code: `withSource`, `countableSources` and `publicWarning` in `src/experience/kpi.ts` (pure, unit-tested), and `src/experience/KpiSourceEditor.tsx`.

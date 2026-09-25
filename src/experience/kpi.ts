@@ -32,3 +32,38 @@ export function kpiDisplay(p:ExperiencePack,i:Kpi):KpiDisplay{
  const note=i.note.replace(/\{(\w+)\}/g,(whole,key:string)=>{const v=counts[key as KpiMetric];return v===undefined?whole:String(v);});
  return {value:n.toLocaleString('en-US'),note,from:source.title};
 }
+
+export const METRIC_LABEL:Record<KpiMetric,string>={tables:'Tables',facts:'Fact tables',dimensions:'Dimension tables',relationships:'Relationships',active:'Active relationships',inactive:'Inactive relationships',measures:'Measures',columns:'Columns',rows:'Rows'};
+
+/** Items a tile can count from, with the counts each one offers. */
+export function countableSources(p:ExperiencePack):{item:ExperienceItem;counts:Partial<Record<KpiMetric,number>>}[]{
+ return p.items.flatMap(item=>{const counts=countsOf(item);return counts?[{item,counts}]:[];});
+}
+
+export type KpiSource={itemId:string;metric:KpiMetric}|null;
+/**
+ * Point a tile at a source (or back to a typed value). The stored value is refreshed to what the tile shows, so the
+ * fallback used when the source is later removed is current. Going back to typed freezes the counted value and fills
+ * the note's {tokens} from the old source, so the tile looks the same until someone edits it. Empty label = no change.
+ */
+export function withSource(p:ExperiencePack,i:Kpi,source:KpiSource,note:string):{item:Kpi;label:string}{
+ const same=(source?.itemId??'')===(i.derive?.itemId??'')&&(source?.metric??'')===(i.derive?.metric??'')&&note===i.note;
+ if(same)return {item:i,label:''};
+ if(!source){
+  const shown=kpiDisplay(p,{...i,note}),{derive:_,...rest}=i;
+  return {item:{...rest,value:shown.value,note:shown.note},label:`Typed value: “${i.title}”`};
+ }
+ const src=p.items.find(x=>x.id===source.itemId);
+ if(!src||src.id===i.id)throw new Error('Choose a model or table to count from.');
+ const n=countsOf(src)?.[source.metric];
+ if(n===undefined)throw new Error(`“${src.title}” cannot provide ${METRIC_LABEL[source.metric].toLowerCase()}.`);
+ return {item:{...i,derive:{...source},value:n.toLocaleString('en-US'),note},label:`Count source: “${i.title}” counts ${METRIC_LABEL[source.metric].toLowerCase()} of “${src.title}”`};
+}
+
+/** Why a tile counting this source would be left out of public exports, or null. Mirrors publicPack's item rule. */
+export function publicWarning(p:ExperiencePack,i:Kpi,sourceId:string):string|null{
+ const src=p.items.find(x=>x.id===sourceId);if(!src||i.visibility!=='public')return null;
+ const privateSource=src.sourceIds.find(s=>p.sources.find(x=>x.id===s)?.visibility!=='public');
+ const why=src.visibility!=='public'?'is private':src.approval!=='approved'?`is ${src.approval}, not approved`:privateSource?'cites a private source':null;
+ return why?`“${src.title}” ${why}, so this tile will be left out of public exports (a count can reveal what was redacted).`:null;
+}
