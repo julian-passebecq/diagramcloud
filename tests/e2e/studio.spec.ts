@@ -132,3 +132,38 @@ test('Google Drive asset vault is optional and disabled until configured',async(
  await expect(page.getByRole('button',{name:'Choose image from Drive',exact:true})).toBeDisabled();
  await expect(page.getByText(/PNG, PDF and PPTX files can also be archived in Drive/)).toBeVisible();
 });
+
+test('AI change preview lists each change by name, flags risky edits, and renders imported text as text',async({page})=>{
+ await page.goto('/');
+ await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();
+ await page.getByRole('button',{name:'JSON / AI',exact:true}).click();
+ await page.getByRole('button',{name:'Load current JSON',exact:true}).click();
+ const editor=page.getByLabel('Project JSON'),doc=JSON.parse(await editor.inputValue());
+ doc.nodes.find((n:{id:string})=>n.id==='checks').label='Reviewed SQL checks';
+ doc.nodes.find((n:{id:string})=>n.id==='excel').summary='<img src=x onerror="window.HACKED=1">';
+ const block=doc.blocks.find((b:{provenance:string})=>b.provenance==='synthetic');block.provenance='source-derived';
+ await editor.fill(JSON.stringify(doc));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
+ const changes=page.getByRole('region',{name:'Proposed changes'});
+ await expect(changes.locator('.change-item').filter({hasText:'checks'})).toContainText('SQL quality checks → Reviewed SQL checks');
+ await expect(changes.locator('.change-item').filter({hasText:'checks'}).locator('ins')).toHaveText('“Reviewed SQL checks”');
+ await expect(changes.locator('.change-item').filter({hasText:'excel'}).locator('ins')).toContainText('<img src=x onerror=');
+ expect(await page.evaluate(()=>(window as unknown as {HACKED?:number}).HACKED)).toBeUndefined();
+ await expect(page.getByRole('note',{name:'Check before applying'})).toContainText(`Relabels evidence block “${block.title}” from synthetic to source-derived`);
+ await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Explore Reviewed SQL checks',exact:true})).toBeVisible();
+});
+
+test('workspace import preview shows panel changes and cautions before applying',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});
+ await d.getByRole('button',{name:'Workspace JSON / AI',exact:true}).click();
+ const input=d.getByLabel('Experience JSON'),p=JSON.parse(await input.inputValue());
+ const item=p.items.find((i:{provenance:string})=>i.provenance==='synthetic');item.provenance='source-derived';item.title='Renamed by AI';
+ await input.fill(JSON.stringify(p));
+ await d.getByRole('button',{name:'Validate workspace import',exact:true}).click();
+ const changes=d.getByRole('region',{name:'Proposed changes'});
+ await expect(changes.locator('.change-group').filter({hasText:'Panels'})).toContainText('Renamed by AI');
+ await expect(d.getByRole('note',{name:'Check before applying'})).toContainText('Relabels panel “Renamed by AI” from synthetic to source-derived');
+ await expect(d.getByRole('button',{name:'Apply reviewed workspace import',exact:true})).toBeEnabled();
+});

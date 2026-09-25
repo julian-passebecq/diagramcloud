@@ -122,4 +122,6 @@ Project deck box → task-screen slide links (and links back) are done.
 
 Save/recovery tests are done, with a leave-page guard and plain-language storage errors.
 
+The AI change preview is done: item-by-item before → after, with cautions (below). Revision-guarded JSON Patch is still open.
+
 Next candidates: a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.

@@ -106,3 +106,23 @@ Contract: DataPass `main` at `83c41e0` (merged via PR #13; schemas unchanged sin
 - `contextBlock()` is the `diagramCloud` member DiagramCloud guarantees for a `datapass.ai-context` V1 envelope and is tested against the pinned schema.
 
 Limits: folder access needs a Chromium browser (Edge/Chrome); elsewhere use Import JSON and **Download diagramcloud.json**. The folder link is kept in memory only and must be reopened after a page reload. DiagramCloud does not apply `datapass.ai-plan` operations; that stays with DataPass per the contract.
+
+## AI change preview
+
+Before a whole-document import (JSON / AI dialog) or an Evidence-workspace import is applied, `src/core/changeDetail.ts` compares the proposal with the open version by stable ID. The preview lists every added, removed or changed item by name, with before → after for each changed field. Moved positions, placement lists and replaced images are summarised rather than dumped.
+
+**Cautions.** Edits that the contributor rules say a human must confirm are listed first as cautions:
+
+- making something public, or approving it for public export
+- relabelling synthetic data as source-derived
+- marking something as verified in source
+- new source-derived content that cites no source
+- a changed KPI figure
+- changed image rights
+- dropped sources
+- mass removals
+- an item removed and re-added under a new ID with the same name, which means a stable ID was replaced instead of its label edited
+
+Cautions inform; they do not block. Validation and the revision check still decide whether the import can be applied.
+
+**Rendering.** Names and values come from imported JSON and are rendered as React text, never as HTML (`src/ui/ChangeDetail.tsx`).
