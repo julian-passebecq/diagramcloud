@@ -8,6 +8,8 @@ Use `src/core/model.ts` as the canonical contract and the generated `public/diag
 
 Add a child view by creating its node/edge memberships and positions, then assigning childViewId to a parent node. No recursive drilldown. Attach code, tables and explanations as evidence blocks; code is not executed. Synthetic data must stay labelled. Add useful input/output examples and explain the contribution, constraint or decision, rather than duplicating a vendor product description.
 
+Observations (`src/core/realization.ts`) only enter a document through a reviewed `diagramcloud.patch`; never author one directly into the document or mark it reviewed or shareable on the author's behalf — those are the human author's decisions, made in Edit mode. Never promote a synthetic evidence block to back an observation; `validateDocument` already refuses this, but do not work around it. Keep the three meanings distinct in anything you write or generate: Planned/designed (a node's status), Observed/verified (a dated external claim), and Presented (reviewed and selected for the story or portfolio).
+
 ## Code
 
 Keep the domain independent of React Flow. UI coordinates must not become the sole model. Public exports must call publicDocument; do not ship hidden private data in HTML comments, SVG metadata, slides, notes or bundled JSON. Authoring JSON is the explicit full backup path. Escape XML/HTML and script serialization separately. No eval or raw HTML from imported JSON.

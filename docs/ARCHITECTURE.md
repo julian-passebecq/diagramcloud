@@ -152,6 +152,30 @@ Small AI edits can be sent as a `diagramcloud.patch` envelope instead of a whole
 
 **Schema.** `scripts/generate.ts` writes `public/diagramcloud.patch.schema.json` for AI tools. **New JSON Patch** in both dialogs fills in a template for the open version.
 
+## Realization overlay
+
+Every node's `status` is a Planned/designed illustration. `src/core/realization.ts` adds a second, external
+layer: **observations** — dated facts about one component, owned by another Datapass Galaxy app, that enter
+only through a reviewed `diagramcloud.patch` (`observationPatch()`) and stay private/unreviewed until an
+author reviews them in Edit mode. The full pipeline is model → validation → UI → export:
+
+- **Model** (`src/core/model.ts`): `observationSchema` on `documentSchema.observations`, plus a `portfolio`
+  block holding portfolio-index settings (`projectRef`, `openUri`, `lastReviewedAt`, `indexVisibility`).
+- **Validation** (`validateDocument`): refuses credential-like values and `.env` text in an observation
+  (`src/core/secrets.ts`), synthetic evidence backing an observation, and `shareable` set without
+  `reviewedAt` + public visibility; also checks a story step only cites a reviewed observation about a
+  component in its own view.
+- **UI**: `src/ui/Realization.tsx` (the Realization section and its review controls in Edit mode, the story
+  evidence list), a `node-realization` chip and `status-dot` tooltip on the canvas card
+  (`src/ui/Canvas.tsx`), and **New observation patch** in the JSON / AI dialog (`src/App.tsx`).
+- **Export**: `publicDocument` keeps only reviewed+public observations; `src/export/portfolioIndex.ts`
+  further narrows to shareable ones for the `diagramcloud.portfolio-index/1` file; the standalone HTML
+  export (`src/export/html.ts`) lists a component's presented observations under "Observed by other apps."
+
+Full field list, the four claim values, the patch shape, the review lifecycle, refusal rules, the
+portfolio-index envelope, the deep-link format (`src/core/links.ts`) and the Galaxy integration roles are in
+[docs/contracts/realization-overlay.md](contracts/realization-overlay.md).
+
 ## Icon registry
 
 `src/core/icons.ts` is the only place an icon ID gets meaning.
