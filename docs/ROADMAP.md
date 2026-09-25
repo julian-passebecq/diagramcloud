@@ -52,7 +52,9 @@ Implemented in `feat/diagramcloud-v1.1-reliability`:
 
 Save/recovery fault injection is done (2026-09-25): real-IndexedDB browser tests for a two-tab conflict, storage that cannot open, and a quota failure mid-session, with a leave-page guard while work is unsaved. See `tests/e2e/storage.spec.ts`.
 
-Still open from P0: revision-guarded JSON Patch operations rather than full-document replacement; shared measured text/layout across canvas, SVG and PPTX; visual recovery UI for exporting/deleting quarantined corrupt rows.
+Revision-guarded JSON Patch is done (2026-09-25; see below).
+
+Still open from P0: shared measured text/layout across canvas, SVG and PPTX; visual recovery UI for exporting/deleting quarantined corrupt rows.
 
 
 ## V1.2 Drive asset pass (2026-09-21)
@@ -122,6 +124,8 @@ Project deck box → task-screen slide links (and links back) are done.
 
 Save/recovery tests are done, with a leave-page guard and plain-language storage errors.
 
-The AI change preview is done: item-by-item before → after, with cautions (below). Revision-guarded JSON Patch is still open.
+The AI change preview is done: item-by-item before → after, with cautions (below).
+
+Revision-guarded JSON Patch is done: small AI edits as RFC 6902 operations, addressed by stable ID and refused when stale.
 
 Next candidates: a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.

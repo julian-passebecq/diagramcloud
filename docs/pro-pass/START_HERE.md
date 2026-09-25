@@ -460,3 +460,19 @@ Paste or load an AI-edited JSON in **JSON / AI**, or in **Evidence workspaces �
 - **IDs:** an ID replaced instead of a label edited.
 
 Code: `describeChanges` / `describePackChanges` in `src/core/changeDetail.ts` (pure, unit-tested) and `src/ui/ChangeDetail.tsx`. The browser tests also check that HTML in an imported label is shown as text and never runs.
+
+### Revision-guarded JSON Patch (2026-09-25)
+
+For small AI edits, click **New JSON Patch** in **JSON / AI**, or in **Evidence workspaces → Workspace JSON / AI**. It fills in a patch for the open project or pack: the right `targetId`, the current `baseRevision`, and an example `test` + `replace`. Give that to the AI along with the current JSON, and ask it to fill in `operations`, addressing items as `/nodes/@<id>/…` or `/items/@<id>/…`.
+
+When you validate, the patch is applied to a copy. You then see "JSON Patch · N operations on revision R" and the usual change preview and cautions before **Apply**.
+
+It is refused, and nothing changes, when:
+
+- it is stale (the project moved on)
+- it is for another project or pack
+- it changes an ID, or the document's own identity fields
+- a `test` fails
+- the result is invalid
+
+Code: `src/core/patch.ts` (unit-tested, including RFC 6902 semantics and prototype-key rejection); schema `public/diagramcloud.patch.schema.json`.
