@@ -495,3 +495,23 @@ In **Edit** mode the sidebar has a **Story** tab: the guided story Present mode 
 - **Notes:** the form says when narration is missing, or when a private view or component means the public portfolio will skip the step. **Play from here** starts Present mode on the matching public step.
 
 Code: `src/core/story.ts` (pure, unit-tested) and `src/ui/StoryComposer.tsx`; `validateDocument` still checks every reference.
+
+### Icon registry (2026-09-25)
+
+`src/core/icons.ts` lists every icon ID; the Inspector's Icon picker is built from it.
+
+**Recorded for the one vendor icon, Microsoft Fabric Lakehouse:**
+
+- source: FabricTools/fabric-icons at `e206270`, `@fabric-msft/svg-icons` 8.2.0
+- git blob: `a06e893b…`
+- terms: Microsoft's Fabric icon usage terms
+- rules: no crop, flip, rotate, recolour or distort; not a product logo
+
+**The build fails** (`scripts/icons.ts`) if a file in `public/icons` isn't registered, or no longer matches its recorded blob.
+
+**Two findings while building it:**
+
+- `THIRD_PARTY_NOTICES.md` recorded the wrong blob (`a06e6f9b…`). Upstream and our copy are both `a06e893b…`, so the notice is now corrected.
+- The Fabric sample's "Data Factory pipeline" box used an icon ID, `fabric-data-factory`, that had no file and always drew the generic symbol. It is now set to `generic` explicitly, so it looks the same. A test fails if a sample uses an unregistered icon.
+
+**Adding a vendor icon:** copy the unmodified upstream file into `public/icons`, then add an entry with the repository, full commit, package version, git blob and terms. The build verifies the blob.
