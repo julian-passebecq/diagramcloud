@@ -139,3 +139,27 @@ Lane separation is done: connections never draw on the same stretch, and connect
 The icon registry is done (`src/core/icons.ts`): each icon records its origin; vendor icons also record source, commit, package version, git blob and terms, and the build checks them. It holds two vendor icons so far: Fabric Lakehouse, and Fabric Pipeline on the Fabric sample's "Data Factory pipeline" box (added with Julian's approval). Adding more Fabric/Azure/Databricks artwork is a separate, per-icon decision: each needs its terms checked first.
 
 Next candidates: a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+
+## Realization overlay pass (2026-09-25)
+
+Done: the observation contract (`src/core/model.ts`, `src/core/realization.ts`) with four claims
+(observed/verified/partial/not-observed), a revision-guarded `diagramcloud.patch` producer
+(`observationPatch()`) and **New observation patch** in the JSON / AI dialog; the private → reviewed →
+public → shareable lifecycle with review controls in Edit mode (`src/ui/Realization.tsx`); refusal of
+credential-like values, `.env`-looking text, credential links and synthetic-evidence backing
+(`src/core/secrets.ts`); the `diagramcloud.portfolio-index/1` export (`src/export/portfolioIndex.ts`),
+validated against a verbatim port of Mongoku's own projection consumer
+(`tests/contracts/mongokuProjection.ts`, pinned to Mongoku-datapass commit `8e83981`); the
+`?project=&view=&node=` deep-link format and **Copy deep link** (`src/core/links.ts`); a canvas realization
+chip and status-dot tooltip, a Realization section, story citations of reviewed observations, and a
+standalone-HTML "Observed by other apps" list. Details in
+[docs/contracts/realization-overlay.md](contracts/realization-overlay.md).
+
+Remaining limits:
+
+- PPTX, the project deck, SVG, PNG and Mermaid exports do not show observations yet — only the interactive
+  canvas, the Realization section, the story bar and the standalone HTML export do.
+- No live sync: an observation is a one-time reviewed patch, not a subscription to the source app.
+- No automatic observation fetching; DiagramCloud never polls or connects to another app to pull facts.
+- DiagramCloud is not a runtime, a password/secret store, a MongoDB client, or a task authority: it refuses
+  credential-shaped content, has no Mongo driver, and never applies a `datapass.ai-plan` itself.

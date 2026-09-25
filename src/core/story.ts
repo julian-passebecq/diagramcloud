@@ -34,8 +34,9 @@ export function draftStory(doc:Project):StoryStep[]{
 /** Keep a step valid after its view changes: drop the focus and highlights that are not in the new view. */
 export function retarget(doc:Project,step:StoryStep,viewId:string):StoryStep{
  const view=doc.views.find(v=>v.id===viewId);if(!view)throw new Error(`Unknown view ${viewId}`);
- const {nodeId,...rest}=step,keep=nodeId&&view.nodeIds.includes(nodeId);
- return {...rest,viewId,...(keep?{nodeId}:{}),highlightEdgeIds:step.highlightEdgeIds.filter(id=>view.edgeIds.includes(id))};
+ const {nodeId,observationIds,...rest}=step,keep=nodeId&&view.nodeIds.includes(nodeId);
+ const cited=observationIds?.filter(id=>{const o=doc.observations.find(o=>o.id===id);return !!o&&view.nodeIds.includes(o.nodeId);});
+ return {...rest,viewId,...(keep?{nodeId}:{}),highlightEdgeIds:step.highlightEdgeIds.filter(id=>view.edgeIds.includes(id)),...(cited?.length?{observationIds:cited}:{})};
 }
 
 export function moveStep(story:StoryStep[],from:number,to:number):StoryStep[]{
@@ -46,6 +47,11 @@ export function insertStep(story:StoryStep[],at:number,step:StoryStep):StoryStep
 export function removeStep(story:StoryStep[],at:number):StoryStep[]{return story.filter((_,k)=>k!==at);}
 export function replaceStep(story:StoryStep[],at:number,step:StoryStep):StoryStep[]{return story.map((s,k)=>k===at?step:s);}
 
+/** Reviewed observations a step may cite: about a component in its view. Citing one never changes its claim or authority. */
+export function citableObservations(doc:Project,viewId:string){
+ const view=doc.views.find(v=>v.id===viewId);return doc.observations.filter(o=>!!o.reviewedAt&&!!view?.nodeIds.includes(o.nodeId));
+}
+
 /** What an author should know about a step: missing text, or content the public portfolio will leave out. */
 export function stepNotes(doc:Project,step:StoryStep):string[]{
  const notes:string[]=[],view=doc.views.find(v=>v.id===step.viewId),node=step.nodeId?doc.nodes.find(n=>n.id===step.nodeId):undefined;
@@ -53,5 +59,6 @@ export function stepNotes(doc:Project,step:StoryStep):string[]{
  if(!step.narration.trim())notes.push('No narration yet: Present mode will show only the title.');
  if(view?.visibility==='private')notes.push('The view is private, so the public portfolio skips this step.');
  else if(node?.visibility==='private')notes.push('The focus component is private, so the public portfolio skips this step.');
+ for(const id of step.observationIds??[]){const o=doc.observations.find(o=>o.id===id);if(o&&o.visibility!=='public')notes.push(`Cited observation “${o.summary.slice(0,60)}” is private, so the public story leaves it out.`);}
  return notes;
 }

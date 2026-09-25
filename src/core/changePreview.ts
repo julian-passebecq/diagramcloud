@@ -1,6 +1,6 @@
 import type {Project} from './model';
 
-export const ENTITY_GROUPS=['nodes','edges','views','blocks','assets','sources'] as const;
+export const ENTITY_GROUPS=['nodes','edges','views','blocks','assets','sources','observations'] as const;
 export type EntityGroup=typeof ENTITY_GROUPS[number];
 export type EntityDelta={added:string[];removed:string[];changed:string[]};
 export type DocumentChangePreview={
@@ -12,7 +12,7 @@ export type DocumentChangePreview={
  totalChanges:number;
 };
 
-const metadataKeys=['title','summary','author','category','tags','rootViewId','provenance','privateNotes','experience'] as const;
+const metadataKeys=['title','summary','author','category','tags','rootViewId','provenance','privateNotes','portfolio','experience'] as const;
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 function byId<T extends {id:string}>(current:T[],incoming:T[]):EntityDelta{
  const before=new Map(current.map(item=>[item.id,item])),after=new Map(incoming.map(item=>[item.id,item]));

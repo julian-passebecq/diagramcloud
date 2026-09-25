@@ -60,8 +60,20 @@ The supplied PDFs contain illustrative financial scenarios with different figure
 | PowerPoint | Native editable shapes, text and tables; view slides, evidence, source notes; child-view hyperlinks | Static; layout is a semantic reconstruction, not a screenshot |
 | Mermaid | Basic flowchart of the current view | No general Mermaid import or lossless evidence/hierarchy round trip |
 | Print / PDF | Browser print of currently expanded public views and selected evidence | Not an all-project pagination engine |
+| Portfolio index | `diagramcloud.portfolio-index/1`: revision, counts and shareable realization cards, for Mongoku's read-only view | Only reviewed, public, author-marked-shareable observations; max 25 items; ≤64 KiB; DiagramCloud only exports it, storing it in DATAPASSCONTROL is a separate operator step |
 
 **SVG metadata contains the entire public project, not just the visible diagram.** Arbitrary SVG can be attached as an image, but cannot automatically become an editable graph. Uploaded SVG is sanitized and rasterized; PNG/JPEG/WebP uploads are decoded and re-encoded. Code snippets are displayed, never executed.
+
+## Realization overlay
+
+A node's status is a Planned/designed illustration. Other Datapass Galaxy apps can add dated **observations**
+about a component (observed / verified / partial / not-observed) through a reviewed JSON Patch; each one
+stays private and unreviewed until an author reviews it in Edit mode. Only reviewed, public observations reach
+the public portfolio, a story or the standalone HTML export; the portfolio index additionally requires the author
+to mark a card shareable. Credential-like
+values, `.env`-looking text and synthetic evidence backing a claim are refused. See
+[docs/contracts/realization-overlay.md](docs/contracts/realization-overlay.md) for the field-level contract,
+the patch format, the review lifecycle and the deep-link format used to open a component directly.
 
 ## Root architecture
 
