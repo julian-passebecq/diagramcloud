@@ -10,7 +10,7 @@ The test suite and CI result, not this list, determine whether a particular revi
 
 | Priority | Work | Acceptance condition |
 |---|---|---|
-| P0 | Shared measured export scene and orthogonal routing | Canvas, SVG and PPTX use consistent node bounds; long labels and upward/backward links do not cross unrelated cards |
+| P0 | Shared measured export scene and orthogonal routing | Canvas, SVG and PPTX use consistent node bounds; long labels and upward/backward links do not cross unrelated cards. Done for exports (2026-09-25): no sample route crosses a box; the canvas still routes on its own |
 | P0 | Autosave queue, quota and recovery fault injection | No premature 'saved' status; interrupted writes preserve the prior document; same-origin multi-tab conflicts are tested in real IndexedDB |
 | P0 | AI change preview and revision-guarded JSON Patch | Show added/changed/deleted entities before apply; reject a stale base revision; keep stable IDs |
 | P1 | Curated official icon registry | Versioned provider/product/source/rights/checksum manifest; larger Fabric/Azure/Databricks collections with verified terms; no logo distortion |
@@ -26,7 +26,7 @@ The test suite and CI result, not this list, determine whether a particular revi
 
 ## Not implemented or not proven as a general guarantee
 
-No full draw.io/Visio import; no arbitrary SVG-to-graph conversion; no full Mermaid round trip; no live cloud discovery; no Python/SQL/DAX execution; no actual streaming telemetry; no scientific Foil'O solver; no measured engine pricing/performance; no full official cloud icon pack; no collaborative merge; no complete arbitrary-layout PPTX fidelity guarantee; no automatic confidentiality approval; no all-project PDF pagination engine; no deployed public site in this pass.
+No full draw.io/Visio import; no arbitrary SVG-to-graph conversion; no full Mermaid round trip; no live cloud discovery; no Python/SQL/DAX execution; no actual streaming telemetry; no scientific Foil'O solver; no measured engine pricing/performance; no full official cloud icon pack; no collaborative merge; no complete arbitrary-layout PPTX fidelity guarantee; no graph auto-layout and no general obstacle router (export routes use fixed candidates plus a channel-grid fallback); no automatic confidentiality approval; no all-project PDF pagination engine; no deployed public site in this pass.
 
 ## Sample scope
 
@@ -54,7 +54,7 @@ Save/recovery fault injection is done (2026-09-25): real-IndexedDB browser tests
 
 Revision-guarded JSON Patch is done (2026-09-25; see below).
 
-Shared measured export scene is done (2026-09-25): SVG, PNG, HTML and PPTX draw one Arial-measured scene with identical line breaks, detour routes around boxes in the way and embedded registered icons. The canvas keeps its own React Flow rendering.
+Shared measured export scene is done (2026-09-25): SVG, PNG, HTML and PPTX draw one Arial-measured scene with identical line breaks, detour routes around boxes in the way and embedded registered icons. The canvas keeps its own React Flow rendering. Since the channel fallback (2026-09-25) no sample route passes through a box; this is a unit-tested property of the samples, not a guarantee for every layout.
 
 The recovery screen for quarantined rows is done (2026-09-25): download raw, repair in the JSON editor, or delete after confirmation. With that, no P0 item from this list is open.
 

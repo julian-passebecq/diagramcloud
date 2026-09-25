@@ -528,7 +528,7 @@ All exports now draw one measured scene (`src/export/scene.ts`): SVG, PNG, the H
 
 **Visible fixes that came with it** (both were there before, in every export):
 
-- **Connections behind boxes:** a connection that ran behind another box now detours through the gap between rows or columns, or along a lane above or below. Box crossings across the samples went from 136 to 2.
+- **Connections behind boxes:** a connection that ran behind another box now detours through the gap between rows or columns, or along a lane above or below. Box crossings across the samples went from 136 to 2 (and to 0 with the channel fallback below).
 - **Hidden labels:** connection labels hidden under boxes, or cut at box edges, now sit on a visible stretch of the line, wrap to fit the gap, and have a background halo.
 
 **Checked:**
@@ -546,6 +546,20 @@ Two follow-ups to the shared export scene, in SVG, PNG, HTML and PowerPoint:
   - A label beside a vertical line tries both sides and narrower wraps, and can slide along its line into open space.
 
 Checked in unit tests over every sample view, and by rendering the dense FOIL Databricks DAB detail and the constellation overview in desktop PowerPoint.
+
+### No route through a box (2026-09-25)
+
+One connection still ran behind boxes: in the FOIL Databricks DAB detail, **optional experiment** (Lakeflow Job → MLflow) dropped through AI/BI dashboards and the Neon export box. Both boxes are on the middle row of a 3×3 grid, with dbt Gold marts between them, so every existing detour hit a box.
+
+- **Channel fallback:** when every detour crosses a box, the router now searches the free channels between rows and columns (`channelRoute` in `src/export/scene.ts`). It takes the shortest route with the fewest bends. That route now runs through the gap under the middle row. Routes that already avoided boxes are unchanged.
+- **Labels off lines:** the new route crossed two labels of other connections, so they looked like its labels. A label now first looks for a spot that covers no line, its own included. Across the samples, labels on another connection's line went from 32 of 189 to 3, and labels on their own line from 3 to 0.
+
+**Checked:**
+
+- Unit tests: no route in any sample view passes through a box other than its two ends, routes stay orthogonal, attached and lane-separated, and a synthetic 3×3 grid gets the channel route.
+- Rendered in desktop PowerPoint: the FOIL DAB detail and the constellation overview.
+
+Still not an auto-layout engine or general router: see "Known limits" in `docs/ARCHITECTURE.md`.
 
 ### Recovery screen (2026-09-25)
 

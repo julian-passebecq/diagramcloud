@@ -84,7 +84,7 @@ export function buildScene(d:Project,view:ProjectView):Scene{
  const routes=separateLanes(shown.map(e=>{const s=positionFor(view,e.source),t=positionFor(view,e.target);
   return simplifyRoute(routeAround(s,t,boxes.filter(b=>!(b.x===s.x&&b.y===s.y)&&!(b.x===t.x&&b.y===t.y)),boxes));}));
  const placed:Box[]=[];
- const edges=shown.map((e,k):SceneEdge=>({id:e.id,points:routes[k],dashed:e.kind==='control',...(e.label?{label:clearOf(edgeLabel(e.label,routes[k],boxes),placed,boxes)}:{})}));
+ const edges=shown.map((e,k):SceneEdge=>({id:e.id,points:routes[k],dashed:e.kind==='control',...(e.label?{label:clearOf(edgeLabel(e.label,routes[k],boxes),placed,boxes,routes)}:{})}));
  const vendorIcons=[...new Set(nodes.flatMap(n=>n.icon?[n.icon.entry]:[]))];
  // Detours may leave the node area; the bounds grow to keep every route and label on the page.
  const base=sceneBounds(view.nodeIds.map(id=>positionFor(view,id))),extra=edges.flatMap(e=>[...e.points,...(e.label?[{x:e.label.x,y:e.label.y-e.label.size}]:[])]);
@@ -144,7 +144,46 @@ export function routeAround(source:ScenePoint,target:ScenePoint,obstacles:Box[],
  const minY=Math.min(...all.map(b=>b.y)),maxY=Math.max(...all.map(b=>b.y+b.h)),between=(y:number)=>y>minY&&y<maxY;
  const under=[{x:sx,y:source.y+H},{x:sx,y:bottom},{x:tx,y:bottom},{x:tx,y:target.y+H}],over=[{x:sx,y:source.y},{x:sx,y:top},{x:tx,y:top},{x:tx,y:target.y}];
  candidates.push(...(between(bottom)||!between(top)?[under,over]:[over,under]));
- return candidates.map((r,k)=>({r,k,n:crossings(r,obstacles)})).sort((p,q)=>p.n-q.n||p.k-q.k)[0].r;
+ const best=candidates.map((r,k)=>({r,k,n:crossings(r,obstacles)})).sort((p,q)=>p.n-q.n||p.k-q.k)[0];
+ return best.n?channelRoute(source,target,all)??best.r:best.r;
+}
+
+const BEND=100;
+/**
+ * Fallback for when every route above still crosses a box: the shortest route, counting each bend as BEND px, over
+ * a grid of channel lines (half-way between neighbouring box edges, box centres, and a lane just outside all boxes).
+ * It leaves the middle of a side of the source and enters the middle of a side of the target, and no segment passes
+ * through any box, its own two ends included. Undefined when no such route exists.
+ */
+export function channelRoute(source:ScenePoint,target:ScenePoint,all:Box[]):ScenePoint[]|undefined{
+ const W=NODE_WIDTH,H=NODE_HEIGHT,c=ROUTE_CLEARANCE/2,s={...source,w:W,h:H},t={...target,w:W,h:H},boxes=[...all,s,t];
+ const lines=(edges:number[],ends:number[])=>{const e=[...new Set(edges)].sort((p,q)=>p-q);
+  return [...new Set([e[0]-c,...e.slice(1).map((v,i)=>(e[i]+v)/2),e.at(-1)!+c,...ends])].sort((p,q)=>p-q);};
+ const xs=lines(boxes.flatMap(b=>[b.x,b.x+b.w]),[s.x+W/2,t.x+W/2]),ys=lines(boxes.flatMap(b=>[b.y,b.y+b.h]),[s.y+H/2,t.y+H/2]);
+ const DIRS=[[1,0],[0,1],[-1,0],[0,-1]],free=(a:ScenePoint,z:ScenePoint)=>!boxes.some(b=>crosses(a,z,b));
+ const beyond=(v:number[],from:number,step:number)=>{if(!step)return v.indexOf(from);for(let k=step>0?0:v.length-1;k>=0&&k<v.length;k+=step)if(step*(v[k]-from)>0)return k;return -1;};
+ // Side midpoints, bottom first, with the outward direction d (an index in DIRS); each joins the grid at the first line beyond its side.
+ const sides=(b:Box)=>[[b.x+b.w/2,b.y+b.h,1],[b.x+b.w,b.y+b.h/2,0],[b.x+b.w/2,b.y,3],[b.x,b.y+b.h/2,2]].flatMap(([x,y,d])=>{
+  const i=beyond(xs,x,DIRS[d][0]),j=beyond(ys,y,DIRS[d][1]),side={x,y};
+  return i<0||j<0||!free(side,{x:xs[i],y:ys[j]})?[]:[{side,d,i,j,len:Math.abs(xs[i]-x)+Math.abs(ys[j]-y)}];});
+ // Dijkstra over (grid point, heading) states; a heading change costs BEND and reversing is not allowed.
+ const key=(i:number,j:number,d:number)=>(i*ys.length+j)*4+d,cost=new Map<number,number>(),prev=new Map<number,number>(),start=new Map<number,ScenePoint>();
+ const queue:[number,number][]=[],push=(k:number,c:number)=>{if(cost.has(k)&&cost.get(k)!<=c)return false;cost.set(k,c);queue.push([c,k]);return true;};
+ for(const g of sides(s)){const k=key(g.i,g.j,g.d);if(push(k,g.len))start.set(k,g.side);}
+ const goals=sides(t);let end:{k:number;total:number;side:ScenePoint}|undefined;
+ while(queue.length){
+  let m=0;for(let q=1;q<queue.length;q++)if(queue[q][0]<queue[m][0])m=q;
+  const [here,k]=queue.splice(m,1)[0];if(here>cost.get(k)!)continue;if(end&&here>=end.total)break;
+  const d=k%4,j=Math.floor(k/4)%ys.length,i=Math.floor(k/4/ys.length);
+  for(const g of goals)if(g.i===i&&g.j===j){const total=here+g.len+(d===(g.d+2)%4?0:BEND);if(!end||total<end.total)end={k,total,side:g.side};}
+  DIRS.forEach(([dx,dy],nd)=>{const ni=i+dx,nj=j+dy;if(nd===(d+2)%4||ni<0||nj<0||ni>=xs.length||nj>=ys.length)return;
+   const a={x:xs[i],y:ys[j]},z={x:xs[ni],y:ys[nj]};if(!free(a,z))return;
+   const nk=key(ni,nj,nd);if(push(nk,here+Math.abs(z.x-a.x)+Math.abs(z.y-a.y)+(nd===d?0:BEND))){prev.set(nk,k);start.delete(nk);}});
+ }
+ if(!end)return undefined;
+ const path:ScenePoint[]=[end.side];let k=end.k;
+ for(;;){path.unshift({x:xs[Math.floor(k/4/ys.length)],y:ys[Math.floor(k/4)%ys.length]});const p=prev.get(k);if(p===undefined)break;k=p;}
+ return simplifyRoute([start.get(k)!,...path]);
 }
 
 /** Drop repeated points and merge straight runs, so a route alternates horizontal and vertical segments. */
@@ -190,15 +229,17 @@ export function labelBox(t:SceneText):Box{
 const overlaps=(a:Box,b:Box)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
 /**
  * Place a label clear of labels already placed and of every box (labels are drawn on top, so they must not cover
- * box text): try its side(s) at positions one line apart, alternately after and before the original. If nothing is
- * fully clear, accept a spot clear of other labels with its anchor outside boxes; otherwise keep the original.
+ * box text): try its side(s) at positions one line apart, alternately after and before the original. A spot that
+ * also covers no line, its own included, comes first, so a label is not read as belonging to the line under it. If
+ * nothing is fully clear, accept a spot clear of other labels with its anchor outside boxes; otherwise keep the original.
  */
-function clearOf(t:SceneText,placed:Box[],boxes:Box[]):SceneText{
+function clearOf(t:SceneText,placed:Box[],boxes:Box[],lines:ScenePoint[][]=[]):SceneText{
  const {alts,...base}=t,sides=[base,...(alts??[])];
  // Positions one line apart, nearest first: within ±3 lines, or along the whole line for a label beside a vertical one.
  const ks=[0,...Array.from({length:40},(_,i)=>i%2?-(i+1)/2:i/2+1)];
  const tries=sides.flatMap(side=>ks.map(k=>({...side,y:side.y+k*side.lineHeight})).filter((c,i)=>side.span?c.y>=side.span[0]&&c.y<=side.span[1]:i<7));
  const free=(c:SceneText)=>!placed.some(b=>overlaps(labelBox(c),b));
- const out=tries.find(c=>free(c)&&!boxes.some(b=>overlaps(labelBox(c),b)))??tries.find(c=>free(c)&&!boxes.some(b=>inside({x:c.x,y:c.y},b)))??base;
+ const clear=(c:SceneText)=>free(c)&&!boxes.some(b=>overlaps(labelBox(c),b)),offLines=(c:SceneText)=>{const b=labelBox(c);return !lines.some(r=>r.slice(1).some((z,i)=>crosses(r[i],z,b)));};
+ const out=tries.find(c=>clear(c)&&offLines(c))??tries.find(c=>clear(c))??tries.find(c=>free(c)&&!boxes.some(b=>inside({x:c.x,y:c.y},b)))??base;
  placed.push(labelBox(out));return out;
 }

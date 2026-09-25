@@ -5,7 +5,7 @@ import PptxGenJS from 'pptxgenjs';
 import {samples} from '../src/data/samples';
 import {publicDocument} from '../src/core/operations';
 import {measureLines,textWidth} from '../src/export/measure';
-import {LANE_GAP,buildScene,crosses,labelBox,routeAround,separateLanes,simplifyRoute,type SceneText} from '../src/export/scene';
+import {LANE_GAP,buildScene,channelRoute,crosses,labelBox,routeAround,separateLanes,simplifyRoute,type SceneText} from '../src/export/scene';
 import {svgDiagram} from '../src/export/diagram';
 import {portfolioHtml} from '../src/export/html';
 import {buildDeck,projectPlan} from '../src/export/deck';
@@ -85,7 +85,33 @@ test('routes detour around a box in the way instead of passing behind it',()=>{
  for(const d of docs)for(const v of d.views){const scene=buildScene(d,v);for(const e of scene.edges){edges++;const edge=d.edges.find(x=>x.id===e.id)!;
   const others=scene.nodes.filter(n=>n.id!==edge.source&&n.id!==edge.target);crossing+=e.points.slice(1).reduce((k,z,i)=>k+others.filter(b=>crosses(e.points[i],z,b)).length,0);
   assert(e.points.every(q=>q.x>=scene.bounds.x&&q.y>=scene.bounds.y&&q.x<=scene.bounds.x+scene.bounds.width&&q.y<=scene.bounds.y+scene.bounds.height),`${d.id}/${e.id} route leaves the page`);}}
- assert(crossing<=2,`${crossing} box crossings across ${edges} sample connections (was 136 before detours)`);
+ assert(edges>0&&crossing===0,`${crossing} box crossings across ${edges} sample connections (was 136 before detours)`);
+});
+
+test('when every candidate crosses a box, the route takes a free channel and stays orthogonal and attached',()=>{
+ // A 3×3 grid, joining the two outer boxes of the middle row: straight, row-gap, column-gap and outer-lane candidates all cross a box.
+ const grid=[0,180,360].flatMap(y=>[0,300,600].map(x=>({x,y,w:220,h:100}))),source=grid[3],target=grid[5];
+ const obstacles=grid.filter(b=>b!==source&&b!==target),r=routeAround(source,target,obstacles,grid);
+ assert.deepEqual(r,[{x:110,y:280},{x:110,y:320},{x:710,y:320},{x:710,y:280}],'a U through the gap between the lower two rows');
+ assert(!grid.some(b=>r.slice(1).some((z,i)=>crosses(r[i],z,b))),'no box crossed, its own two ends included');
+ assert.equal(channelRoute({x:0,y:0},{x:600,y:0},[{x:-100,y:-100,w:1000,h:400}]),undefined,'no route when every channel is covered');
+});
+
+test('no sample route passes through a box other than its own two ends',()=>{
+ const found:string[]=[];
+ for(const d of docs)for(const v of d.views){const scene=buildScene(d,v);
+  for(const e of scene.edges){const edge=d.edges.find(x=>x.id===e.id)!;
+   for(const b of scene.nodes)if(b.id!==edge.source&&b.id!==edge.target&&e.points.slice(1).some((z,i)=>crosses(e.points[i],z,b)))found.push(`${d.id}/${v.id}/${e.id} crosses ${b.id}`);}}
+ assert.deepEqual(found,[]);
+});
+
+test('connection labels prefer spots off every line, their own included',()=>{
+ let on=0,own=0,total=0;
+ for(const d of docs)for(const v of d.views){const edges=buildScene(d,v).edges;
+  for(const e of edges)if(e.label){total++;const b=labelBox(e.label),covers=(o:typeof e)=>o.points.slice(1).some((z,i)=>crosses(o.points[i],z,b));
+   if(covers(e))own++;if(edges.some(o=>o!==e&&covers(o)))on++;}}
+ assert(total>0&&on<=3,`${on} of ${total} labels sit on another connection's line (32 before this preference)`);
+ assert.equal(own,0,'no label covers its own line (3 did before)');
 });
 
 test('connections that share a stretch get separate lanes; routes stay orthogonal and attached to their boxes',()=>{
