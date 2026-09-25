@@ -2,7 +2,7 @@
 
 ## Implemented V1 foundation
 
-React + Fluent UI shell; light/dark themes; read-only Explore, Edit, public Portfolio and guided Present modes; gallery; parent-retaining multi-level drilldown; node/edge properties; drag/connect and grid layout; text/code/table/metrics/image evidence rendering; image attachment; whole-document JSON validation/review/import/export; bounded undo/redo; IndexedDB save and other-tab conflict detection; public-content projection; illustrative flow motion; current-view SVG/PNG/Mermaid export; standalone public HTML; native editable PowerPoint export; browser print. Guided-story steps have a visual composer (Edit → Story); metrics evidence blocks still require JSON editing.
+React + Fluent UI shell; light/dark themes; read-only Explore, Edit, public Portfolio and guided Present modes; gallery; parent-retaining multi-level drilldown; node/edge properties; drag/connect and grid layout; text/code/table/metrics/image evidence rendering; image attachment; whole-document JSON validation/review/import/export; bounded undo/redo; IndexedDB save and other-tab conflict detection; public-content projection; illustrative flow motion; current-view SVG/PNG/Mermaid export; standalone public HTML; native editable PowerPoint export; browser print. Guided-story steps have a visual composer (Edit → Story); metrics evidence blocks have a visual editor (Edit → Add evidence → Metrics); tables still use JSON.
 
 The test suite and CI result, not this list, determine whether a particular revision is ready to use. Read the workflow and artifact from the exact delivered commit.
 
@@ -15,7 +15,7 @@ The test suite and CI result, not this list, determine whether a particular revi
 | P0 | AI change preview and revision-guarded JSON Patch | Show added/changed/deleted entities before apply; reject a stale base revision; keep stable IDs |
 | P1 | Curated official icon registry | Versioned provider/product/source/rights/checksum manifest; larger Fabric/Azure/Databricks collections with verified terms; no logo distortion |
 | P1 | Visual story composer | Reorder steps, select target view/node/edges, write narration and preview an interview sequence without editing raw JSON |
-| P1 | Better evidence authoring | Visual table editor, code language selector improvements, metrics form, image captions/rights controls and block ordering |
+| P1 | Better evidence authoring | Visual table editor, code language selector improvements, image captions/rights controls and block ordering (metrics form done) |
 | P1 | Explain a transformation | Side-by-side input/output rows, column mappings, quality rules, join/grain explanations; remain display-only unless a separate sandbox is deliberately added |
 | P1 | Portfolio composition | Executive/technical/interview layouts, contribution/outcome/constraint blocks, focused share links, selected-view PDF deck planning |
 | P1 | All CV projects after source verification | Retrieve or receive current CV; source-confirm Eukleia, Danone, Savencia and remaining projects; no invented outcomes or date claims |
