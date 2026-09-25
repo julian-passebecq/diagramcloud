@@ -5,7 +5,7 @@ import PptxGenJS from 'pptxgenjs';
 import {samples} from '../src/data/samples';
 import {publicDocument} from '../src/core/operations';
 import {measureLines,textWidth} from '../src/export/measure';
-import {buildScene,crosses,routeAround,type SceneText} from '../src/export/scene';
+import {LANE_GAP,buildScene,crosses,labelBox,routeAround,separateLanes,simplifyRoute,type SceneText} from '../src/export/scene';
 import {svgDiagram} from '../src/export/diagram';
 import {portfolioHtml} from '../src/export/html';
 import {buildDeck,projectPlan} from '../src/export/deck';
@@ -85,4 +85,25 @@ test('routes detour around a box in the way instead of passing behind it',()=>{
   const others=scene.nodes.filter(n=>n.id!==edge.source&&n.id!==edge.target);crossing+=e.points.slice(1).reduce((k,z,i)=>k+others.filter(b=>crosses(e.points[i],z,b)).length,0);
   assert(e.points.every(q=>q.x>=scene.bounds.x&&q.y>=scene.bounds.y&&q.x<=scene.bounds.x+scene.bounds.width&&q.y<=scene.bounds.y+scene.bounds.height),`${d.id}/${e.id} route leaves the page`);}}
  assert(crossing<=2,`${crossing} box crossings across ${edges} sample connections (was 136 before detours)`);
+});
+
+test('connections that share a stretch get separate lanes; routes stay orthogonal and attached to their boxes',()=>{
+ assert.deepEqual(simplifyRoute([{x:0,y:0},{x:5,y:0},{x:5,y:0},{x:9,y:0},{x:9,y:4}]),[{x:0,y:0},{x:9,y:0},{x:9,y:4}]);
+ const [a,b]=separateLanes([[{x:0,y:50},{x:100,y:50}],[{x:40,y:50},{x:160,y:50}]]);
+ assert.deepEqual([a[0].y,b[0].y],[50-LANE_GAP/2,50+LANE_GAP/2],'two lanes centred on the shared line');
+ assert.deepEqual(separateLanes([[{x:0,y:50},{x:100,y:50}],[{x:100,y:50},{x:200,y:50}]])[1][0].y,50,'end-to-end is not sharing');
+ type P={x:number;y:number};let shared=0;
+ for(const d of docs)for(const v of d.views){const scene=buildScene(d,v);
+  const segs=scene.edges.flatMap(e=>e.points.slice(1).map((z,i)=>({e:e.id,a:e.points[i],z})));
+  for(let i=0;i<segs.length;i++)for(let j=i+1;j<segs.length;j++){const p=segs[i],q=segs[j];if(p.e===q.e)continue;
+   const ov=(a1:number,a2:number,b1:number,b2:number)=>Math.min(Math.max(a1,a2),Math.max(b1,b2))-Math.max(Math.min(a1,a2),Math.min(b1,b2))>4,h=(g:{a:P;z:P})=>g.a.y===g.z.y;
+   if(h(p)&&h(q)&&p.a.y===q.a.y&&ov(p.a.x,p.z.x,q.a.x,q.z.x))shared++;if(!h(p)&&!h(q)&&p.a.x===q.a.x&&ov(p.a.y,p.z.y,q.a.y,q.z.y))shared++;}
+  for(const e of scene.edges){const ed=d.edges.find(x=>x.id===e.id)!,src=scene.nodes.find(n=>n.id===ed.source)!,tgt=scene.nodes.find(n=>n.id===ed.target)!;
+   assert(e.points.slice(1).every((z,i)=>z.x===e.points[i].x||z.y===e.points[i].y),`${d.id}/${e.id} orthogonal`);
+   const onSide=(q:P,b:typeof src)=>((q.x===b.x||q.x===b.x+b.w)&&q.y>=b.y&&q.y<=b.y+b.h)||((q.y===b.y||q.y===b.y+b.h)&&q.x>=b.x&&q.x<=b.x+b.w);
+   assert(onSide(e.points[0],src)&&onSide(e.points.at(-1)!,tgt),`${d.id}/${e.id} attached`);}}
+ assert.equal(shared,0,'no two connections draw on the same stretch (42 pairs before lane separation)');
+ for(const d of docs)for(const v of d.views){const L=buildScene(d,v).edges.flatMap(e=>e.label?[labelBox(e.label)]:[]);
+  for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){const a=L[i],b=L[j];assert(!(a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y),`${d.id}/${v.id}: two connection labels overlap`);}
+  const nodes=buildScene(d,v).nodes;for(const a of L)assert(!nodes.some(b=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y),`${d.id}/${v.id}: a connection label covers a box`);}
 });

@@ -57,8 +57,6 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
    const route=e.points.map(q=>({x:X(q.x),y:Y(q.y)}));
    for(let i=1;i<route.length;i++){const a=route[i-1],z=route[i];if(Math.abs(a.x-z.x)+Math.abs(a.y-z.y)<.0001)continue;slide.addShape(shape.line,{x:Math.min(a.x,z.x),y:Math.min(a.y,z.y),w:Math.max(.001,Math.abs(z.x-a.x)),h:Math.max(.001,Math.abs(z.y-a.y)),flipH:a.x>z.x,flipV:a.y>z.y,line:{color:'8FA2BA',width:1.5,beginArrowType:'none',endArrowType:i===route.length-1?'triangle':'none',dashType:e.dashed?'dash':'solid'}});}
   }
-  // Labels after all lines, on a background-coloured box as tight as the text, so crossing lines do not run through them.
-  for(const e of scene.edges)if(e.label){const tight=Math.max(...e.label.lines.map(l=>textWidth(l,e.label!.size)))+6;put({...e.label,width:tight},{fill:{color:'F5F7FB'}});}
   const embedded:IconEntry[]=[];
   for(const n of scene.nodes){
    const screen=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined,x=X(n.x),y=Y(n.y),w=n.w*scale,h=n.h*scale;
@@ -73,6 +71,8 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
    put(n.summary);put(n.footer);
    if(screen)slide.addText([{text:'SCREEN ›',options:{hyperlink:screenLink}}],{x:X(n.x+n.w-NODE_PAD-60),y:Y(n.footer.y)-.905*pt(10)/72,w:60*scale,h:pt(12.5)/72+.02,fontFace:SCENE_FONT,fontSize:pt(10),bold:true,color:'1F6FB2',align:'right',valign:'top',margin:0,wrap:false});
   }
+  // Connection labels last, on a background-coloured box as tight as the text: never hidden under a box or a line.
+  for(const e of scene.edges)if(e.label){const tight=Math.max(...e.label.lines.map(l=>textWidth(l,e.label!.size)))+6;put({...e.label,width:tight},{fill:{color:'F5F7FB'}});}
   const credit=iconCredit(embedded);
   if(credit)slide.addText(credit,{x:.6,y:6.92,w:12.1,h:.18,fontSize:8,color:'6F8197',margin:0});
   slide.addNotes(notes([v.title,v.description,...(credit?[credit]:[]),...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>{const sc=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined;return `${n.label}\n${n.summary}\n${n.role}${sc?`\nTask screen: ${sc.title} (slide ${sc.slide})`:''}`;}),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));

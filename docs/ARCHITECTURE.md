@@ -197,7 +197,9 @@ Small AI edits can be sent as a `diagramcloud.patch` envelope instead of a whole
 
 Across the sample projects this took box crossings from 136 to 2; the remaining pair is in one dense detail view.
 
-**Labels.** Connection labels sit on the longest visible straight run, limited to its free length, and wrap up to 3 lines above it. They are drawn after all lines, on a background halo. The scene's bounds grow to include every route and label.
+**Lanes.** Routes are simplified (no repeated or collinear points). Then connections that share a straight stretch get their own lanes (`separateLanes`), `LANE_GAP` = 8px apart and centred on the shared line. A moved segment takes both of its end points along, so routes stay orthogonal and their ends only slide along the box side. Across the samples, overlapping pairs went from 42 to 0.
+
+**Labels.** Connection labels sit on the longest visible straight run, limited to its free length, and wrap up to 3 lines above it. A label beside a vertical line tries the right side, then the left, then narrower wraps, and may slide along its line. The first spot that covers no box and no other label wins. Labels are drawn last, after the boxes, on a background halo. Across the samples, no label covers a box or another label. The scene's bounds grow to include every route and label.
 
 **Icons.** A registered vendor icon is embedded as a data URI of its exact file: the build and tests read `public/`, and the app fetches from its own origin (`src/export/iconData.ts`). It keeps a square slot, is never cropped or recoloured, and comes with a credit line (in the SVG footer, on the slide and in the slide notes). Tests check that the bytes inside the SVG and inside the PPTX media have the registry's git blob.
 
@@ -205,6 +207,6 @@ In PowerPoint the icon is an SVG with a PNG fallback. In the browser pptxgenjs d
 
 **Known limits:**
 
-- connections can share a lane between rows, and labels then sit on other lines (readable thanks to the halo)
-- there is no general obstacle router or auto-layout
+- there is no general obstacle router or auto-layout; one dense sample view still has a route crossing a box
+- lanes are separated per straight stretch; crossings between different connections are allowed
 - the canvas is not drawn from the scene
