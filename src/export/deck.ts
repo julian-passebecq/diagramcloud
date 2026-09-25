@@ -5,6 +5,7 @@ import {publicPack,type ExperienceItem,type ExperiencePack} from '../experience/
 import {addWorkspaceSlides,workspaceGroups,type BackLink,type DeckGroup} from '../experience/pptx';
 import {PROVENANCE_NOTE,clip} from '../experience/render';
 import {addArchitectureSlides,type ScreenLink} from './pptx';
+import {noIcons,type IconData} from './iconData';
 
 /**
  * One deck for a whole project (or one scope): cover, linked contents, architecture views, one section per
@@ -109,7 +110,7 @@ function sourcesSlides(pptx:Pptx,plan:DeckPlan,number:string){
 }
 
 /** Builds the deck and returns it with the section map (also used by tests). */
-export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan):Promise<{pptx:Pptx;sections:DeckSection[];slides:number;links:DeckLinks}>{
+export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan,icons:IconData=noIcons):Promise<{pptx:Pptx;sections:DeckSection[];slides:number;links:DeckLinks}>{
  const pptx=new PptxCtor();
  pptx.layout='LAYOUT_WIDE';pptx.title=plan.title;pptx.subject=plan.subtitle;pptx.author=plan.author||'DiagramCloud';pptx.company='DiagramCloud';
  const views=plan.architecture?.views.length??0,screens=plan.groups.reduce((n,g)=>n+g.screens.length,0);
@@ -121,7 +122,7 @@ export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan):Promise
  if(plan.architecture&&views){
   num++;const divider=sectionFrame(pptx,pad(num),'Architecture',`${views} connected view${views===1?'':'s'}, from the overview down to tasks. A box with a deeper view links to it.`);slide++;
   sections.push({label:'Architecture',slide,detail:`${views} view${views===1?'':'s'}`});
-  const first=slide+1;await addArchitectureSlides(pptx,plan.architecture,{cover:false,evidence:false,sources:false,firstViewSlide:first,screens:links.screens});slide+=views;
+  const first=slide+1;await addArchitectureSlides(pptx,plan.architecture,{cover:false,evidence:false,sources:false,firstViewSlide:first,screens:links.screens,icons});slide+=views;
   linkedRows(pptx,divider,plan.architecture.views.slice(0,9).map((v,k)=>({label:v.title,detail:v.description,slide:first+k})),5.2,1.1,7.5);
   if(views>9)divider.addText(`… and ${views-9} more views`,{x:5.2,y:6.8,w:7,h:.3,fontSize:10,color:MUTED,fontFace:FONT,margin:0});
  }
@@ -142,7 +143,7 @@ export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan):Promise
  return {pptx,sections,slides:slide,links};
 }
 
-export async function downloadDeck(plan:DeckPlan,fileName:string):Promise<number>{
+export async function downloadDeck(plan:DeckPlan,fileName:string,icons:IconData=noIcons):Promise<number>{
  const {default:PptxGenJS}=await import('pptxgenjs');
- const {pptx,slides}=await buildDeck(PptxGenJS,plan);await pptx.writeFile({fileName});return slides;
+ const {pptx,slides}=await buildDeck(PptxGenJS,plan,icons);await pptx.writeFile({fileName});return slides;
 }

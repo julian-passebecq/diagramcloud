@@ -1,30 +1,35 @@
-import {publicDocument,positionFor} from '../core/operations';
+import {publicDocument} from '../core/operations';
 import type {Project,EvidenceBlock} from '../core/model';
-import {bounds} from './diagram';
+import {iconCredit} from './diagram';
 import {wrapLines,caption} from './text';
-import {NODE_HEIGHT,NODE_WIDTH,orthogonalRoute,routeLabel} from './scene';
+import {NODE_PAD,SCENE_FONT,buildScene,type SceneText} from './scene';
+import {textWidth} from './measure';
+import {noIcons,type IconData} from './iconData';
+import type {IconEntry} from '../core/icons';
+/** Largest scale (inches per layout pixel): small views are not blown up past a readable size. */
+const MAX_SCALE=.0165;
 function textOf(b:EvidenceBlock):string{return b.type==='text'?b.text:b.type==='code'?b.code:b.type==='metrics'?b.items.map(i=>`${i.label}: ${i.value}\n${i.note}`).join('\n\n'):'';}
 
 type Pptx=InstanceType<typeof import('pptxgenjs').default>;
 /** `screens` maps an experience workspace id to its first slide in the same deck; boxes linked to one get a SCREEN link. */
 export type ScreenLink={slide:number;title:string};
-export type ArchitectureParts={cover:boolean;evidence:boolean;sources:boolean;firstViewSlide:number;screens?:Map<string,ScreenLink>};
+export type ArchitectureParts={cover:boolean;evidence:boolean;sources:boolean;firstViewSlide:number;screens?:Map<string,ScreenLink>;icons?:IconData};
 
 /** Native editable objects, not screenshots. Exported code is display-only. */
-export async function exportPptx(input:Project):Promise<void>{
+export async function exportPptx(input:Project,icons:IconData=noIcons):Promise<void>{
  const d=publicDocument(input),attached=new Set(d.nodes.flatMap(n=>n.blockIds)),blocks=d.blocks.filter(b=>attached.has(b.id));
  const estimate=2+d.views.length+blocks.reduce((sum,b)=>sum+(b.type==='table'?Math.max(1,Math.ceil(b.rows.length/12)):b.type==='image'?1:Math.max(1,Math.ceil(wrapLines(textOf(b),95,b.type==='code').length/(b.type==='code'?23:18)))),0);
  if(estimate>180)throw new Error('This project would create more than 180 slides. Export a smaller public project or use HTML.');
  const {default:PptxGenJS}=await import('pptxgenjs');const pptx=new PptxGenJS();
  pptx.layout='LAYOUT_WIDE';pptx.author=d.author||'DiagramCloud';pptx.subject=d.summary;pptx.title=d.title;pptx.company='DiagramCloud';pptx.theme={headFontFace:'Aptos Display',bodyFontFace:'Aptos'};
- await addArchitectureSlides(pptx,d,{cover:true,evidence:true,sources:true,firstViewSlide:2});
+ await addArchitectureSlides(pptx,d,{cover:true,evidence:true,sources:true,firstViewSlide:2,icons});
  await pptx.writeFile({fileName:`${d.id}.pptx`});
 }
 
 /** Architecture slides into an existing deck. `d` must already be publicDocument output; view links assume views are consecutive from firstViewSlide. */
 export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:ArchitectureParts):Promise<void>{
  const attached=new Set(d.nodes.flatMap(n=>n.blockIds)),blocks=parts.evidence?d.blocks.filter(b=>attached.has(b.id)):[];
- const width=40/3,shape=pptx.ShapeType;
+ const width=40/3,shape=pptx.ShapeType,icons=parts.icons??noIcons;
  const sourceNotes='[Sources]\n'+d.sources.map(s=>`${s.title}\n${s.location}${s.url?'\n'+s.url:''}`).join('\n\n')+'\n[/Sources]';
  const notes=(parts:string[])=>[d.provenance,sourceNotes,...parts].join('\n\n');
  function base(title:string,subtitle:string){
@@ -42,24 +47,35 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
  cover.addText(caption(d.tags.join('  /  '),145,2),{x:.6,y:6.25,w:11.8,h:.45,fontSize:12,color:'536780',margin:0});}
  const slideNumbers=new Map(d.views.map((v,i)=>[v.id,i+parts.firstViewSlide]));
  for(const v of d.views){
-  const slide=base(v.title,v.description),b=bounds(v),scale=Math.min((width-1.2)/b.width,4.6/b.height),left=(width-b.width*scale)/2,top=2.2;
-  const pos=(id:string)=>{const p=positionFor(v,id);return{x:left+(p.x-b.x)*scale,y:top+(p.y-b.y)*scale};};
-  for(const e of d.edges.filter(e=>v.edgeIds.includes(e.id))){
-   const route=orthogonalRoute(positionFor(v,e.source),positionFor(v,e.target)).map(point=>({x:left+(point.x-b.x)*scale,y:top+(point.y-b.y)*scale}));
-   for(let i=1;i<route.length;i++){const a=route[i-1],z=route[i];if(Math.abs(a.x-z.x)+Math.abs(a.y-z.y)<.0001)continue;slide.addShape(shape.line,{x:Math.min(a.x,z.x),y:Math.min(a.y,z.y),w:Math.max(.001,Math.abs(z.x-a.x)),h:Math.max(.001,Math.abs(z.y-a.y)),flipH:a.x>z.x,flipV:a.y>z.y,line:{color:'8FA2BA',width:1.5,beginArrowType:'none',endArrowType:i===route.length-1?'triangle':'none',dashType:e.kind==='control'?'dash':'solid'}});}
-   const label=routeLabel(route);slide.addText(caption(e.label,32,1),{x:label.x-.65,y:label.y-.2,w:1.3,h:.18,fontSize:8,color:'536780',align:'center',margin:0});
+  const slide=base(v.title,v.description),scene=buildScene(d,v),b=scene.bounds,scale=Math.min((width-1.2)/b.width,4.6/b.height,MAX_SCALE),left=(width-b.width*scale)/2,top=2.2;
+  const X=(x:number)=>left+(x-b.x)*scale,Y=(y:number)=>top+(y-b.y)*scale,pt=(px:number)=>px*scale*72;
+  /** One text box per measured block, in Arial with exact line spacing and wrapping off, so PowerPoint keeps the scene's line breaks. */
+  const put=(t:SceneText,extra:Record<string,unknown>={})=>{if(!t.lines.length)return;
+   const size=pt(t.size),lead=pt(t.lineHeight),topPt=pt(t.y-b.y)-.905*size-Math.max(0,lead-1.15*size)/2,w=(t.width+4)*scale;
+   slide.addText(t.lines.join('\n'),{x:t.anchor==='middle'?X(t.x)-w/2:X(t.x),y:top+topPt/72,w,h:lead*t.lines.length/72+.02,fontFace:SCENE_FONT,fontSize:size,lineSpacing:lead,bold:t.bold,color:t.color,align:t.anchor==='middle'?'center':'left',valign:'top',margin:0,wrap:false,...extra});};
+  for(const e of scene.edges){
+   const route=e.points.map(q=>({x:X(q.x),y:Y(q.y)}));
+   for(let i=1;i<route.length;i++){const a=route[i-1],z=route[i];if(Math.abs(a.x-z.x)+Math.abs(a.y-z.y)<.0001)continue;slide.addShape(shape.line,{x:Math.min(a.x,z.x),y:Math.min(a.y,z.y),w:Math.max(.001,Math.abs(z.x-a.x)),h:Math.max(.001,Math.abs(z.y-a.y)),flipH:a.x>z.x,flipV:a.y>z.y,line:{color:'8FA2BA',width:1.5,beginArrowType:'none',endArrowType:i===route.length-1?'triangle':'none',dashType:e.dashed?'dash':'solid'}});}
   }
-  for(const n of d.nodes.filter(n=>v.nodeIds.includes(n.id))){
-   const p=pos(n.id),w=NODE_WIDTH*scale,h=NODE_HEIGHT*scale,screen=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined,chipW=screen?Math.min(.9,w*.42):0;
-   slide.addShape(shape.roundRect,{x:p.x,y:p.y,w,h,rectRadius:.12,line:{color:screen?'7FB3DF':'CAD5E4',width:1},fill:{color:'FFFFFF'}});
-   slide.addText(caption(n.provider.toUpperCase(),screen?18:30,1),{x:p.x+.12,y:p.y+.08,w:Math.max(.01,w-.24-chipW),h:h*.17,fontSize:Math.min(9,scale*1150),color:'58718F',margin:0});
-   // The box title opens the deeper view; without one it opens the task screen. The SCREEN link always opens the screen.
+  // Labels after all lines, on a background-coloured box as tight as the text, so crossing lines do not run through them.
+  for(const e of scene.edges)if(e.label){const tight=Math.max(...e.label.lines.map(l=>textWidth(l,e.label!.size)))+6;put({...e.label,width:tight},{fill:{color:'F5F7FB'}});}
+  const embedded:IconEntry[]=[];
+  for(const n of scene.nodes){
+   const screen=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined,x=X(n.x),y=Y(n.y),w=n.w*scale,h=n.h*scale;
+   slide.addShape(shape.roundRect,{x,y,w,h,rectRadius:12*scale,line:{color:screen?'7FB3DF':'CBD5E1',width:1},fill:{color:'FFFFFF'}});
+   slide.addShape(shape.roundRect,{x,y:Y(n.y+12),w:4*scale,h:28*scale,rectRadius:2*scale,line:{color:'2563EB',width:0},fill:{color:'2563EB'}});
+   const data=n.icon?icons(n.icon.entry):undefined;
+   if(n.icon&&data){slide.addImage({data,x:X(n.icon.x),y:Y(n.icon.y),w:n.icon.size*scale,h:n.icon.size*scale,altText:`${n.icon.entry.label} (${n.icon.entry.vendor} artwork)`});if(!embedded.includes(n.icon.entry))embedded.push(n.icon.entry);}
+   put(n.provider);
+   // The box title opens the deeper view; without one it opens the task screen. The SCREEN link, on the footer row, always opens the screen.
    const screenLink=screen?{slide:screen.slide,tooltip:`Task screen: ${caption(screen.title,80,1)}`}:undefined;
-   if(screen)slide.addText([{text:'SCREEN ›',options:{hyperlink:screenLink}}],{x:p.x+w-.12-chipW,y:p.y+.08,w:chipW,h:h*.17,fontSize:Math.min(8,scale*1050),bold:true,color:'1F6FB2',align:'right',margin:0});
-   slide.addText(caption(n.label,25,2),{x:p.x+.12,y:p.y+h*.3,w:Math.max(.01,w-.24),h:h*.3,fontSize:Math.min(14,scale*1650),bold:true,color:'172C48',margin:0,hyperlink:n.childViewId?{slide:slideNumbers.get(n.childViewId)}:screenLink});
-   slide.addText(caption(n.summary,36,2),{x:p.x+.12,y:p.y+h*.66,w:Math.max(.01,w-.24),h:h*.28,fontSize:Math.min(9,scale*1100),color:'536780',margin:0});
+   put(n.label,{hyperlink:n.childViewId?{slide:slideNumbers.get(n.childViewId)}:screenLink});
+   put(n.summary);put(n.footer);
+   if(screen)slide.addText([{text:'SCREEN ›',options:{hyperlink:screenLink}}],{x:X(n.x+n.w-NODE_PAD-60),y:Y(n.footer.y)-.905*pt(10)/72,w:60*scale,h:pt(12.5)/72+.02,fontFace:SCENE_FONT,fontSize:pt(10),bold:true,color:'1F6FB2',align:'right',valign:'top',margin:0,wrap:false});
   }
-  slide.addNotes(notes([v.title,v.description,...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>{const sc=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined;return `${n.label}\n${n.summary}\n${n.role}${sc?`\nTask screen: ${sc.title} (slide ${sc.slide})`:''}`;}),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));
+  const credit=iconCredit(embedded);
+  if(credit)slide.addText(credit,{x:.6,y:6.92,w:12.1,h:.18,fontSize:8,color:'6F8197',margin:0});
+  slide.addNotes(notes([v.title,v.description,...(credit?[credit]:[]),...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>{const sc=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined;return `${n.label}\n${n.summary}\n${n.role}${sc?`\nTask screen: ${sc.title} (slide ${sc.slide})`:''}`;}),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));
  }
  for(const b of blocks){
   const subtitle=d.nodes.filter(n=>n.blockIds.includes(b.id)).map(n=>n.label).join(' / ')+` | ${b.provenance}`;

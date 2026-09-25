@@ -54,7 +54,9 @@ Save/recovery fault injection is done (2026-09-25): real-IndexedDB browser tests
 
 Revision-guarded JSON Patch is done (2026-09-25; see below).
 
-Still open from P0: shared measured text/layout across canvas, SVG and PPTX; visual recovery UI for exporting/deleting quarantined corrupt rows.
+Shared measured export scene is done (2026-09-25): SVG, PNG, HTML and PPTX draw one Arial-measured scene with identical line breaks, detour routes around boxes in the way and embedded registered icons. The canvas keeps its own React Flow rendering.
+
+Still open from P0: visual recovery UI for exporting/deleting quarantined corrupt rows.
 
 
 ## V1.2 Drive asset pass (2026-09-21)
@@ -129,6 +131,8 @@ The AI change preview is done: item-by-item before → after, with cautions (bel
 Revision-guarded JSON Patch is done: small AI edits as RFC 6902 operations, addressed by stable ID and refused when stale.
 
 The visual story composer is done (Edit → Story): add, reorder, edit and preview guided-story steps without JSON.
+
+The shared export scene is done: one measured layout for SVG/PNG/HTML/PPTX (see ARCHITECTURE.md, "Shared export scene").
 
 The icon registry is done (`src/core/icons.ts`): each icon records its origin; vendor icons also record source, commit, package version, git blob and terms, and the build checks them. It holds one vendor icon so far (Fabric Lakehouse). Adding more Fabric/Azure/Databricks artwork is a separate, per-icon decision: each needs its terms checked first.
 

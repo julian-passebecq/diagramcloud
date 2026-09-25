@@ -515,3 +515,23 @@ Code: `src/core/story.ts` (pure, unit-tested) and `src/ui/StoryComposer.tsx`; `v
 - The Fabric sample's "Data Factory pipeline" box used an icon ID, `fabric-data-factory`, that had no file and always drew the generic symbol. It is now set to `generic` explicitly, so it looks the same. A test fails if a sample uses an unregistered icon.
 
 **Adding a vendor icon:** copy the unmodified upstream file into `public/icons`, then add an entry with the repository, full commit, package version, git blob and terms. The build verifies the blob.
+
+### Shared export scene (2026-09-25)
+
+All exports now draw one measured scene (`src/export/scene.ts`): SVG, PNG, the HTML portfolio, the architecture PowerPoint and the project deck. So a box label breaks at the same word in each.
+
+**How it works:**
+
+- **Text** is measured with Arial's character widths (`src/export/measure.ts`) and drawn in Arial.
+- **PowerPoint** has wrapping turned off and exact line spacing, so it keeps the scene's line breaks. The baseline placement was calibrated in desktop PowerPoint.
+- **Icons:** a registered vendor icon, today the Fabric Lakehouse, is embedded byte-for-byte in SVG, HTML and PowerPoint, with a credit line.
+
+**Visible fixes that came with it** (both were there before, in every export):
+
+- **Connections behind boxes:** a connection that ran behind another box now detours through the gap between rows or columns, or along a lane above or below. Box crossings across the samples went from 136 to 2.
+- **Hidden labels:** connection labels hidden under boxes, or cut at box edges, now sit on a visible stretch of the line, wrap to fit the gap, and have a background halo.
+
+**Checked:**
+
+- Unit tests: text fits its box in every sample view; SVG and PowerPoint contain exactly the same lines; the embedded icon bytes match the registry's git blob; routes stay orthogonal and on the page.
+- Rendered with Chromium (SVG) and desktop PowerPoint (slides) for the Fabric, TotalEnergies and constellation overviews, and compared side by side.

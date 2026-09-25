@@ -6,17 +6,18 @@ import {publicDocument} from '../src/core/operations';
 import {portfolioHtml} from '../src/export/html';
 import {svgDiagram} from '../src/export/diagram';
 import {generateNotices} from './notices';
-import {checkIcons} from './icons';
+import {checkIcons,fileIcons} from './icons';
 import {patchSchema} from '../src/core/patch';
 import {packSchema} from '../src/experience/model';
 import {examplePack} from '../src/experience/sample';
 import {workspaceHtml} from '../src/experience/render';
 checkIcons();
+const icons=fileIcons();
 mkdirSync('public/examples',{recursive:true});
 const schema=zodToJsonSchema(documentSchema,{name:'DiagramCloudDocument',target:'jsonSchema7'});
 writeFileSync('public/diagramcloud.schema.json',JSON.stringify({...schema,$id:'https://diagramcloud.local/schema/v1',description:'Structural schema. Imports must ALSO pass validateDocument for relational references, view membership and drilldown-cycle checks.'},null,2)+'\n');
 writeFileSync('public/diagramcloud.patch.schema.json',JSON.stringify({...zodToJsonSchema(patchSchema,{name:'DiagramCloudPatch',target:'jsonSchema7'}),$id:'https://diagramcloud.local/schema/patch/v1',description:'RFC 6902 JSON Patch envelope. Path segments may be @<id> to address an array item by stable ID. The patch is refused if targetId or baseRevision do not match the open project or pack, if it changes any id, or if the result fails validateDocument / validatePack.'},null,2)+'\n');
-for(const sample of samples){const d=publicDocument(validateDocument(sample));writeFileSync(`public/examples/${d.id}.json`,JSON.stringify(d,null,2)+'\n');writeFileSync(`public/examples/${d.id}.html`,portfolioHtml(d));writeFileSync(`public/examples/${d.id}.svg`,svgDiagram(d));}
+for(const sample of samples){const d=publicDocument(validateDocument(sample));writeFileSync(`public/examples/${d.id}.json`,JSON.stringify(d,null,2)+'\n');writeFileSync(`public/examples/${d.id}.html`,portfolioHtml(d,icons));writeFileSync(`public/examples/${d.id}.svg`,svgDiagram(d,d.rootViewId,true,icons));}
 generateNotices();
 console.log(`Generated JSON Schema and ${samples.length} standalone example sets.`);
 

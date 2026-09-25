@@ -74,7 +74,7 @@ The persistence status shown in the shell is now driven by a latest-snapshot sav
 
 Whole-document JSON/AI editing remains explicit and human-applied. `src/core/changePreview.ts` computes a stable-ID diff across nodes, edges, views, evidence blocks, assets and sources plus top-level metadata/story changes. Same-project input must carry the exact current revision before Apply is enabled. This prevents a stale AI/editor snapshot from silently overwriting newer edits. It is optimistic revision guarding, not semantic merge and not a JSON Patch implementation.
 
-`src/export/scene.ts` is the first shared presentation scene primitive. SVG and PowerPoint use the same node dimensions and orthogonal connector route. This deliberately stops short of claiming pixel identity with the React Flow canvas: interactive routing, measured text, provider icons and export layout still need a larger shared scene model before arbitrary-view fidelity can be guaranteed.
+`src/export/scene.ts` builds one measured scene per view, and every export draws it: SVG, PNG (from the SVG), the HTML portfolio (inline SVG) and PowerPoint. See "Shared export scene" below. The React Flow canvas is not drawn from the scene: it keeps its own interactive routing and CSS text, so the canvas and exports share node positions and box size but not pixel identity.
 
 
 ## V1.2 optional cloud asset connector
@@ -172,4 +172,39 @@ Small AI edits can be sent as a `diagramcloud.patch` envelope instead of a whole
 
 `.gitattributes` marks `public/icons/**` as `-text`, so line-ending conversion can't change the bytes. The delivery notice `public/third-party-licenses.txt` includes one attribution line per registered icon.
 
-**Exports.** Exports (SVG, PNG, HTML, PPTX) draw generic kind symbols, not vendor artwork. Embedding vendor icons in exports belongs to the shared export scene work.
+**Exports.** Exports embed a registered vendor icon from its unmodified file (see "Shared export scene").
+
+## Shared export scene
+
+`buildScene(document, view)` in `src/export/scene.ts` returns everything an export needs to draw one view: node boxes, their measured text blocks, a square icon slot, connection routes and label positions.
+
+**Measured text.** `src/export/measure.ts` measures text with Arial's advance widths (1/1000 em; metric-compatible with Helvetica and Liberation Sans). It needs no DOM and no font files. Lines break at spaces, then after `/` or `-`, then by characters; overflow ends with an ellipsis that still fits. Per box:
+
+- provider: 1 line
+- label (bold): up to 2 lines
+- summary: 2 lines, or 1 when the label takes 2
+- footer: 1 line
+
+**SVG.** Draws each line as its own `tspan`, in Arial.
+
+**PowerPoint.** Draws each block as one text box with the scene's line breaks, in Arial, with exact line spacing and wrapping off, so PowerPoint cannot re-wrap it. Scale is capped at 0.0165 in/px. Boxes are placed from a measured baseline model: first baseline = 0.905 em + half the extra leading. That model was calibrated by rendering in desktop PowerPoint.
+
+**Routes.** The shared orthogonal route is kept unless it would pass behind another box, which would make it look connected to that box. In that case the route with the fewest crossings wins, from:
+
+- through the gap between rows (vertical first)
+- through the gap between columns (horizontal first)
+- a lane just below or above the boxes in the way
+
+Across the sample projects this took box crossings from 136 to 2; the remaining pair is in one dense detail view.
+
+**Labels.** Connection labels sit on the longest visible straight run, limited to its free length, and wrap up to 3 lines above it. They are drawn after all lines, on a background halo. The scene's bounds grow to include every route and label.
+
+**Icons.** A registered vendor icon is embedded as a data URI of its exact file: the build and tests read `public/`, and the app fetches from its own origin (`src/export/iconData.ts`). It keeps a square slot, is never cropped or recoloured, and comes with a credit line (in the SVG footer, on the slide and in the slide notes). Tests check that the bytes inside the SVG and inside the PPTX media have the registry's git blob.
+
+In PowerPoint the icon is an SVG with a PNG fallback. In the browser pptxgenjs draws that fallback as a real PNG; decks built in Node (build/tests) carry the SVG only.
+
+**Known limits:**
+
+- connections can share a lane between rows, and labels then sit on other lines (readable thanks to the halo)
+- there is no general obstacle router or auto-layout
+- the canvas is not drawn from the scene
