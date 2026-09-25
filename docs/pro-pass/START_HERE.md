@@ -535,3 +535,14 @@ All exports now draw one measured scene (`src/export/scene.ts`): SVG, PNG, the H
 
 - Unit tests: text fits its box in every sample view; SVG and PowerPoint contain exactly the same lines; the embedded icon bytes match the registry's git blob; routes stay orthogonal and on the page.
 - Rendered with Chromium (SVG) and desktop PowerPoint (slides) for the Fabric, TotalEnergies and constellation overviews, and compared side by side.
+
+### Lanes and label placement (2026-09-25)
+
+Two follow-ups to the shared export scene, in SVG, PNG, HTML and PowerPoint:
+
+- **Separate lanes:** connections that shared a straight stretch used to draw as one line; 42 such pairs across the samples. Now each gets its own lane, 8px apart, and routes stay orthogonal and attached to their boxes.
+- **Label placement:**
+  - Labels are drawn last, on a halo, and never cover a box or another label.
+  - A label beside a vertical line tries both sides and narrower wraps, and can slide along its line into open space.
+
+Checked in unit tests over every sample view, and by rendering the dense FOIL Databricks DAB detail and the constellation overview in desktop PowerPoint.

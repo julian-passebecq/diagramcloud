@@ -1,7 +1,7 @@
 import type {Project,ProjectView} from '../core/model';
 import {positionFor} from '../core/operations';
 import {iconFor,type IconEntry} from '../core/icons';
-import {measureLines} from './measure';
+import {measureLines,textWidth} from './measure';
 export type ScenePoint={x:number;y:number};
 export type SceneBounds={x:number;y:number;width:number;height:number};
 export const NODE_WIDTH=220;
@@ -48,7 +48,11 @@ export function routeIsOrthogonal(points:ScenePoint[]):boolean{return points.sli
  * layout pixels; PowerPoint scales them to inches. Text is measured with Arial metrics (see measure.ts).
  */
 
-export type SceneText={lines:string[];x:number;y:number;size:number;lineHeight:number;bold:boolean;color:string;width:number;anchor:'start'|'middle';truncated:boolean};
+export type SceneText={lines:string[];x:number;y:number;size:number;lineHeight:number;bold:boolean;color:string;width:number;anchor:'start'|'middle';truncated:boolean;
+ /** Other placements for the same label (other side of a vertical line, narrower wraps); layout only, not drawn. */
+ alts?:SceneText[];
+ /** For a label beside a vertical line: the y range its anchor may slide along; layout only. */
+ span?:[number,number]};
 export type SceneIcon={entry:IconEntry;x:number;y:number;size:number};
 export type SceneNode={id:string;x:number;y:number;w:number;h:number;provider:SceneText;label:SceneText;summary:SceneText;footer:SceneText;icon?:SceneIcon;childViewId?:string;experienceWorkspaceId?:string};
 export type SceneEdge={id:string;points:ScenePoint[];dashed:boolean;label?:SceneText};
@@ -76,11 +80,11 @@ export function buildScene(d:Project,view:ProjectView):Scene{
   return {id:n.id,x,y,w,h,provider,label,summary,footer,icon,...(n.childViewId?{childViewId:n.childViewId}:{}),...(n.experienceWorkspaceId?{experienceWorkspaceId:n.experienceWorkspaceId}:{})};
  });
  const boxes=nodes.map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
- const edges=d.edges.filter(e=>view.edgeIds.includes(e.id)).map((e):SceneEdge=>{
-  const s=positionFor(view,e.source),t=positionFor(view,e.target);
-  const points=routeAround(s,t,boxes.filter(b=>!(b.x===s.x&&b.y===s.y)&&!(b.x===t.x&&b.y===t.y)),boxes);
-  return {id:e.id,points,dashed:e.kind==='control',...(e.label?{label:edgeLabel(e.label,points,boxes)}:{})};
- });
+ const shown=d.edges.filter(e=>view.edgeIds.includes(e.id));
+ const routes=separateLanes(shown.map(e=>{const s=positionFor(view,e.source),t=positionFor(view,e.target);
+  return simplifyRoute(routeAround(s,t,boxes.filter(b=>!(b.x===s.x&&b.y===s.y)&&!(b.x===t.x&&b.y===t.y)),boxes));}));
+ const placed:Box[]=[];
+ const edges=shown.map((e,k):SceneEdge=>({id:e.id,points:routes[k],dashed:e.kind==='control',...(e.label?{label:clearOf(edgeLabel(e.label,routes[k],boxes),placed,boxes)}:{})}));
  const vendorIcons=[...new Set(nodes.flatMap(n=>n.icon?[n.icon.entry]:[]))];
  // Detours may leave the node area; the bounds grow to keep every route and label on the page.
  const base=sceneBounds(view.nodeIds.map(id=>positionFor(view,id))),extra=edges.flatMap(e=>[...e.points,...(e.label?[{x:e.label.x,y:e.label.y-e.label.size}]:[])]);
@@ -106,7 +110,12 @@ export function edgeLabel(value:string,points:ScenePoint[],boxes:Box[]):SceneTex
   const width=Math.max(24,Math.min(EDGE_LABEL_WIDTH,pick.len-8)),t=text(value,pick.mid.x,0,width,10,12.5,EDGE,3,false,'middle');
   return {...t,y:pick.mid.y-6-(t.lines.length-1)*t.lineHeight};
  }
- return text(value,pick.mid.x+6,pick.mid.y+3,EDGE_LABEL_WIDTH,10,12.5,EDGE,2);
+ // Beside a vertical line: right side on one or two lines first, then the left side, then narrower wraps of up to
+ // three lines on either side for tight gaps. clearOf takes the first that covers no box and no other label.
+ const span:[number,number]=[Math.min(pick.a.y,pick.z.y)+12,Math.max(pick.a.y,pick.z.y)-4];
+ const beside=(width:number,lines:number)=>{const r={...text(value,pick.mid.x+6,pick.mid.y+3,width,10,12.5,EDGE,lines),span},w=labelBox(r).w;return [r,{...r,x:pick.mid.x-6-w+2}];};
+ const [first,...alts]=[...beside(EDGE_LABEL_WIDTH,2),...beside(56,3)];
+ return {...first,alts};
 }
 
 /** True when an axis-aligned segment passes through the inside of a box (touching its edge does not count). */
@@ -136,4 +145,60 @@ export function routeAround(source:ScenePoint,target:ScenePoint,obstacles:Box[],
  const under=[{x:sx,y:source.y+H},{x:sx,y:bottom},{x:tx,y:bottom},{x:tx,y:target.y+H}],over=[{x:sx,y:source.y},{x:sx,y:top},{x:tx,y:top},{x:tx,y:target.y}];
  candidates.push(...(between(bottom)||!between(top)?[under,over]:[over,under]));
  return candidates.map((r,k)=>({r,k,n:crossings(r,obstacles)})).sort((p,q)=>p.n-q.n||p.k-q.k)[0].r;
+}
+
+/** Drop repeated points and merge straight runs, so a route alternates horizontal and vertical segments. */
+export function simplifyRoute(points:ScenePoint[]):ScenePoint[]{
+ const out:ScenePoint[]=[];
+ for(const q of points){const last=out.at(-1);if(last&&last.x===q.x&&last.y===q.y)continue;
+  const prev=out.at(-2);if(prev&&last&&((prev.x===last.x&&last.x===q.x)||(prev.y===last.y&&last.y===q.y)))out[out.length-1]={...q};else out.push({...q});}
+ return out;
+}
+
+export const LANE_GAP=8;
+/**
+ * Connections that share a straight stretch get their own lanes, LANE_GAP apart and centred on the shared line, so
+ * two connections never draw as one. Moving a segment moves its two end points together: routes stay orthogonal,
+ * and an end on a box side only slides along that side. Horizontal stretches first, then vertical ones.
+ */
+export function separateLanes(input:ScenePoint[][]):ScenePoint[][]{
+ const routes=input.map(r=>r.map(q=>({...q})));
+ for(const horizontal of [true,false]){
+  type Seg={r:number;i:number;at:number;lo:number;hi:number};
+  const segs:Seg[]=[];
+  routes.forEach((pts,r)=>pts.slice(1).forEach((z,i)=>{const a=pts[i];if(horizontal?a.y===z.y&&a.x!==z.x:a.x===z.x&&a.y!==z.y)segs.push({r,i,at:horizontal?a.y:a.x,lo:Math.min(horizontal?a.x:a.y,horizontal?z.x:z.y),hi:Math.max(horizontal?a.x:a.y,horizontal?z.x:z.y)});}));
+  const byLine=new Map<number,Seg[]>();for(const g of segs)byLine.set(g.at,[...(byLine.get(g.at)??[]),g]);
+  for(const line of byLine.values()){
+   // Clusters of overlapping stretches from different routes on one line.
+   line.sort((p,q)=>p.lo-q.lo);let cluster:Seg[]=[],reach=-Infinity;
+   const flush=()=>{const rs=[...new Set(cluster.map(g=>g.r))].sort((p,q)=>p-q);
+    if(rs.length>1)for(const g of cluster){const offset=(rs.indexOf(g.r)-(rs.length-1)/2)*LANE_GAP,pts=routes[g.r];
+     for(const k of [g.i,g.i+1]){if(horizontal)pts[k].y=g.at+offset;else pts[k].x=g.at+offset;}}
+    cluster=[];reach=-Infinity;};
+   for(const g of line){if(cluster.length&&g.lo>=reach-4)flush();cluster.push(g);reach=Math.max(reach,g.hi);}
+   flush();
+  }
+ }
+ return routes;
+}
+
+/** The rectangle a label's text covers. */
+export function labelBox(t:SceneText):Box{
+ const w=Math.max(0,...t.lines.map(l=>textWidth(l,t.size,t.bold)))+4,top=t.y-t.size,h=t.size+(t.lines.length-1)*t.lineHeight+4;
+ return {x:t.anchor==='middle'?t.x-w/2:t.x-2,y:top,w,h};
+}
+const overlaps=(a:Box,b:Box)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+/**
+ * Place a label clear of labels already placed and of every box (labels are drawn on top, so they must not cover
+ * box text): try its side(s) at positions one line apart, alternately after and before the original. If nothing is
+ * fully clear, accept a spot clear of other labels with its anchor outside boxes; otherwise keep the original.
+ */
+function clearOf(t:SceneText,placed:Box[],boxes:Box[]):SceneText{
+ const {alts,...base}=t,sides=[base,...(alts??[])];
+ // Positions one line apart, nearest first: within ±3 lines, or along the whole line for a label beside a vertical one.
+ const ks=[0,...Array.from({length:40},(_,i)=>i%2?-(i+1)/2:i/2+1)];
+ const tries=sides.flatMap(side=>ks.map(k=>({...side,y:side.y+k*side.lineHeight})).filter((c,i)=>side.span?c.y>=side.span[0]&&c.y<=side.span[1]:i<7));
+ const free=(c:SceneText)=>!placed.some(b=>overlaps(labelBox(c),b));
+ const out=tries.find(c=>free(c)&&!boxes.some(b=>overlaps(labelBox(c),b)))??tries.find(c=>free(c)&&!boxes.some(b=>inside({x:c.x,y:c.y},b)))??base;
+ placed.push(labelBox(out));return out;
 }
