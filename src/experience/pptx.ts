@@ -57,7 +57,8 @@ export function rowBands(placements:Placement[]):[number,number][]{
  return bands;
 }
 
-function frame(pptx:Pptx,w:ExperienceWorkspace,trail:string[],sources:string[],part:string){
+export type BackLink={slide:number;label:string};
+function frame(pptx:Pptx,w:ExperienceWorkspace,trail:string[],sources:string[],part:string,back?:BackLink){
  const s=pptx.addSlide();s.background={color:'EEF2F7'};
  s.addShape(pptx.ShapeType.rect,{x:0,y:0,w:RAIL,h:7.5,fill:{color:NAVY},line:{color:NAVY}});
  const runs:PptxGenJS.TextProps[]=[];
@@ -67,7 +68,9 @@ function frame(pptx:Pptx,w:ExperienceWorkspace,trail:string[],sources:string[],p
  for(const c of w.context)section(c.heading,c.lines);
  if(sources.length)section('Sources',sources);
  s.addText(runs,{x:.22,y:.3,w:RAIL-.4,h:6.9,valign:'top',fontFace:FONT,margin:0});
- s.addText(clip(trail.join('  ›  ').toUpperCase(),110)+part,{x:MAIN_X,y:.22,w:MAIN_W,h:.22,fontSize:8,color:MUTED,charSpacing:1,fontFace:FONT,margin:0});
+ const backW=back?4.4:0;
+ s.addText(clip(trail.join('  ›  ').toUpperCase(),back?80:110)+part,{x:MAIN_X,y:.22,w:MAIN_W-backW,h:.22,fontSize:8,color:MUTED,charSpacing:1,fontFace:FONT,margin:0});
+ if(back)s.addText([{text:`← ${clip(back.label,60)}`,options:{hyperlink:{slide:back.slide,tooltip:'Back to the architecture view'}}}],{x:MAIN_X+MAIN_W-backW,y:.2,w:backW,h:.24,fontSize:8.5,bold:true,color:'1F6FB2',align:'right',fontFace:FONT,margin:0});
  s.addText(clip(w.title,90),{x:MAIN_X,y:.46,w:MAIN_W,h:.5,fontSize:w.title.length>60?18:22,bold:true,color:INK,fontFace:FONT,margin:0});
  s.addText(clip(w.description,210),{x:MAIN_X,y:.98,w:MAIN_W,h:.4,fontSize:10,color:MUTED,fontFace:FONT,margin:0,valign:'top'});
  return s;
@@ -221,11 +224,14 @@ export function buildWorkspaceDeck(PptxCtor:typeof PptxGenJS,input:ExperiencePac
  return pptx;
 }
 
-/** Report-screen slides into an existing deck. `p` must already be publicPack output. Returns slides added per workspace, in order. */
-export function addWorkspaceSlides(pptx:Pptx,p:ExperiencePack,workspaceIds:string[],trailFor:(workspaceId:string)=>string[]):number[]{
+/**
+ * Report-screen slides into an existing deck. `p` must already be publicPack output. Returns slides added per workspace, in order.
+ * The count never depends on trail or back link, so a throwaway run can predict slide numbers. `backFor` adds a return link.
+ */
+export function addWorkspaceSlides(pptx:Pptx,p:ExperiencePack,workspaceIds:string[],trailFor:(workspaceId:string)=>string[],backFor:(workspaceId:string)=>BackLink|undefined=()=>undefined):number[]{
  const counts:number[]=[];
  for(const id of workspaceIds){
-  const trail=trailFor(id);
+  const trail=trailFor(id),back=backFor(id);
   const w=p.workspaces.find(x=>x.id===id);if(!w)throw new Error(`Workspace ${id} is not approved for public export`);
   const placed=w.placements.filter(s=>p.items.some(i=>i.id===s.itemId));
   const items=placed.map(s=>p.items.find(i=>i.id===s.itemId)!),srcIds=new Set(items.flatMap(i=>[...i.sourceIds,...(i.type==='tabs'?i.itemIds.flatMap(t=>p.items.find(x=>x.id===t)?.sourceIds??[]):[])]));
@@ -235,7 +241,7 @@ export function addWorkspaceSlides(pptx:Pptx,p:ExperiencePack,workspaceIds:strin
   const bands=rowBands(placed),appendix:ExperienceItem[]=[];let added=0;
   const colW=(MAIN_W-11*GAP)/12;
   bands.forEach(([from,to],k)=>{
-   added++;const s=frame(pptx,w,trail,sourceLines,bands.length>1?`   ·   PART ${k+1} OF ${bands.length}`:''),rows=to-from,rowH=Math.min(MAX_ROW_H,(BOARD_H-(rows-1)*GAP)/rows);
+   added++;const s=frame(pptx,w,trail,sourceLines,bands.length>1?`   ·   PART ${k+1} OF ${bands.length}`:'',back),rows=to-from,rowH=Math.min(MAX_ROW_H,(BOARD_H-(rows-1)*GAP)/rows);
    const inBand=placed.filter(pl=>pl.y>=from&&pl.y+pl.h<=to);
    for(const pl of inBand){const i=p.items.find(x=>x.id===pl.itemId)!;
     const b={x:MAIN_X+pl.x*(colW+GAP),y:BOARD_Y+(pl.y-from)*(rowH+GAP),w:pl.w*colW+(pl.w-1)*GAP,h:pl.h*rowH+(pl.h-1)*GAP};
@@ -244,7 +250,7 @@ export function addWorkspaceSlides(pptx:Pptx,p:ExperiencePack,workspaceIds:strin
    s.addNotes(`${w.title}${bands.length>1?` (part ${k+1} of ${bands.length})`:''}\n\n${inBand.map(pl=>noteText(p,p.items.find(x=>x.id===pl.itemId)!)).join('\n\n')}\n\n${notesBase}`);
   });
   for(const [k,i] of appendix.entries()){
-   added++;const s=frame(pptx,w,trail,sourceLines,`   ·   TAB ${k+2}`);
+   added++;const s=frame(pptx,w,trail,sourceLines,`   ·   TAB ${k+2}`,back);
    body(pptx,s,p,i,panel(pptx,s,i,{x:MAIN_X,y:BOARD_Y,w:MAIN_W,h:BOARD_H}),[]);
    s.addText(clip(footer,260),{x:MAIN_X,y:7.02,w:MAIN_W,h:.3,fontSize:7,color:MUTED,fontFace:FONT,margin:0,valign:'top'});
    s.addNotes(`${noteText(p,i)}\n\n${notesBase}`);

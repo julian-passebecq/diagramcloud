@@ -6,7 +6,9 @@ import {NODE_HEIGHT,NODE_WIDTH,orthogonalRoute,routeLabel} from './scene';
 function textOf(b:EvidenceBlock):string{return b.type==='text'?b.text:b.type==='code'?b.code:b.type==='metrics'?b.items.map(i=>`${i.label}: ${i.value}\n${i.note}`).join('\n\n'):'';}
 
 type Pptx=InstanceType<typeof import('pptxgenjs').default>;
-export type ArchitectureParts={cover:boolean;evidence:boolean;sources:boolean;firstViewSlide:number};
+/** `screens` maps an experience workspace id to its first slide in the same deck; boxes linked to one get a SCREEN link. */
+export type ScreenLink={slide:number;title:string};
+export type ArchitectureParts={cover:boolean;evidence:boolean;sources:boolean;firstViewSlide:number;screens?:Map<string,ScreenLink>};
 
 /** Native editable objects, not screenshots. Exported code is display-only. */
 export async function exportPptx(input:Project):Promise<void>{
@@ -48,12 +50,16 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
    const label=routeLabel(route);slide.addText(caption(e.label,32,1),{x:label.x-.65,y:label.y-.2,w:1.3,h:.18,fontSize:8,color:'536780',align:'center',margin:0});
   }
   for(const n of d.nodes.filter(n=>v.nodeIds.includes(n.id))){
-   const p=pos(n.id),w=NODE_WIDTH*scale,h=NODE_HEIGHT*scale;slide.addShape(shape.roundRect,{x:p.x,y:p.y,w,h,rectRadius:.12,line:{color:'CAD5E4',width:1},fill:{color:'FFFFFF'}});
-   slide.addText(caption(n.provider.toUpperCase(),30,1),{x:p.x+.12,y:p.y+.08,w:Math.max(.01,w-.24),h:h*.17,fontSize:Math.min(9,scale*1150),color:'58718F',margin:0});
-   slide.addText(caption(n.label,25,2),{x:p.x+.12,y:p.y+h*.3,w:Math.max(.01,w-.24),h:h*.3,fontSize:Math.min(14,scale*1650),bold:true,color:'172C48',margin:0,hyperlink:n.childViewId?{slide:slideNumbers.get(n.childViewId)}:undefined});
+   const p=pos(n.id),w=NODE_WIDTH*scale,h=NODE_HEIGHT*scale,screen=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined,chipW=screen?Math.min(.9,w*.42):0;
+   slide.addShape(shape.roundRect,{x:p.x,y:p.y,w,h,rectRadius:.12,line:{color:screen?'7FB3DF':'CAD5E4',width:1},fill:{color:'FFFFFF'}});
+   slide.addText(caption(n.provider.toUpperCase(),screen?18:30,1),{x:p.x+.12,y:p.y+.08,w:Math.max(.01,w-.24-chipW),h:h*.17,fontSize:Math.min(9,scale*1150),color:'58718F',margin:0});
+   // The box title opens the deeper view; without one it opens the task screen. The SCREEN link always opens the screen.
+   const screenLink=screen?{slide:screen.slide,tooltip:`Task screen: ${caption(screen.title,80,1)}`}:undefined;
+   if(screen)slide.addText([{text:'SCREEN ›',options:{hyperlink:screenLink}}],{x:p.x+w-.12-chipW,y:p.y+.08,w:chipW,h:h*.17,fontSize:Math.min(8,scale*1050),bold:true,color:'1F6FB2',align:'right',margin:0});
+   slide.addText(caption(n.label,25,2),{x:p.x+.12,y:p.y+h*.3,w:Math.max(.01,w-.24),h:h*.3,fontSize:Math.min(14,scale*1650),bold:true,color:'172C48',margin:0,hyperlink:n.childViewId?{slide:slideNumbers.get(n.childViewId)}:screenLink});
    slide.addText(caption(n.summary,36,2),{x:p.x+.12,y:p.y+h*.66,w:Math.max(.01,w-.24),h:h*.28,fontSize:Math.min(9,scale*1100),color:'536780',margin:0});
   }
-  slide.addNotes(notes([v.title,v.description,...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>`${n.label}\n${n.summary}\n${n.role}`),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));
+  slide.addNotes(notes([v.title,v.description,...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>{const sc=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined;return `${n.label}\n${n.summary}\n${n.role}${sc?`\nTask screen: ${sc.title} (slide ${sc.slide})`:''}`;}),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));
  }
  for(const b of blocks){
   const subtitle=d.nodes.filter(n=>n.blockIds.includes(b.id)).map(n=>n.label).join(' / ')+` | ${b.provenance}`;

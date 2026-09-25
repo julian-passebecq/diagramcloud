@@ -116,4 +116,6 @@ Distribute and stack are done.
 
 The KPI count-source form is done.
 
-Next candidates: diagram box → task-screen slide links inside the project deck; a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
+Project deck box → task-screen slide links (and links back) are done.
+
+Next candidates: a map/geo item for the site-assessment slide (p.16) if a licensed basemap is chosen.
