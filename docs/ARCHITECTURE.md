@@ -201,11 +201,13 @@ Small AI edits can be sent as a `diagramcloud.patch` envelope instead of a whole
 - through the gap between columns (horizontal first)
 - a lane just below or above the boxes in the way
 
-Across the sample projects this took box crossings from 136 to 2; the remaining pair is in one dense detail view.
+If every one of those still crosses a box, `channelRoute` searches a small grid of channel lines: half-way between neighbouring box edges, the two box centres, and a lane just outside all boxes. It takes the shortest route, counting each bend as 100px. The route leaves the middle of a side of the source, enters the middle of a side of the target, and no segment passes through any box, its own two ends included. This only runs when every candidate crosses a box, so other routes keep their shape. If no channel is free, the candidate with the fewest crossings is kept.
+
+Across the sample projects this took box crossings from 136 to 0. The last one was in the FOIL Databricks DAB detail: two boxes on the middle row of a 3×3 grid, with a box between them. Now it runs through the gap between the lower two rows.
 
 **Lanes.** Routes are simplified (no repeated or collinear points). Then connections that share a straight stretch get their own lanes (`separateLanes`), `LANE_GAP` = 8px apart and centred on the shared line. A moved segment takes both of its end points along, so routes stay orthogonal and their ends only slide along the box side. Across the samples, overlapping pairs went from 42 to 0.
 
-**Labels.** Connection labels sit on the longest visible straight run, limited to its free length, and wrap up to 3 lines above it. A label beside a vertical line tries the right side, then the left, then narrower wraps, and may slide along its line. The first spot that covers no box and no other label wins. Labels are drawn last, after the boxes, on a background halo. Across the samples, no label covers a box or another label. The scene's bounds grow to include every route and label.
+**Labels.** Connection labels sit on the longest visible straight run, limited to its free length, and wrap up to 3 lines above it. A label beside a vertical line tries the right side, then the left, then narrower wraps, and may slide along its line. The first spot that covers no box, no other label and no line (its own included) wins. If there is none, the first spot that covers no box and no other label wins. Across the samples, labels on another connection's line went from 32 of 189 to 3, and labels on their own line from 3 to 0. Labels are drawn last, after the boxes, on a background halo. Across the samples, no label covers a box or another label. The scene's bounds grow to include every route and label.
 
 **Icons.** A registered vendor icon is embedded as a data URI of its exact file: the build and tests read `public/`, and the app fetches from its own origin (`src/export/iconData.ts`). It keeps a square slot, is never cropped or recoloured, and comes with a credit line (in the SVG footer, on the slide and in the slide notes). Tests check that the bytes inside the SVG and inside the PPTX media have the registry's git blob.
 
@@ -213,6 +215,6 @@ In PowerPoint the icon is an SVG with a PNG fallback. In the browser pptxgenjs d
 
 **Known limits:**
 
-- there is no general obstacle router or auto-layout; one dense sample view still has a route crossing a box
+- there is no auto-layout, and the channel search is a fallback, not a general obstacle router: it does not minimise crossings between connections or balance lanes across a whole view, and it gives up (keeping the fewest-crossings candidate) when boxes leave no free channel
 - lanes are separated per straight stretch; crossings between different connections are allowed
 - the canvas is not drawn from the scene
