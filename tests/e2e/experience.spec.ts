@@ -377,3 +377,30 @@ test('KPI tiles counted from the model update as the model is edited',async({pag
  await ed.getByLabel('Active Fact_Energy.DateKey to DimDate.DateKey').uncheck();
  await expect(d.getByTestId('item-sm-kpi-rel')).toContainText('9 active · 1 inactive');
 });
+
+test('stack and distribute selected panels; overlap refused; distribute needs three',async({page})=>{
+ await page.goto('/');
+ await page.getByRole('button',{name:'Evidence workspaces',exact:true}).click();
+ const d=page.getByRole('dialog',{name:'Evidence workspace pilot'});
+ await d.locator('.xp-nav').getByRole('button',{name:'Portfolio remix',exact:true}).first().click();
+ await d.getByRole('button',{name:'Edit board',exact:true}).click();
+ const at=(id:string)=>d.getByTestId(`item-${id}`).evaluate(el=>[(el as HTMLElement).style.gridColumn,(el as HTMLElement).style.gridRow]);
+ const bar=d.getByRole('toolbar',{name:'Selected panels'});
+ await d.getByLabel('Select panel SQL validation rule').check();
+ await d.getByLabel('Select panel Delivery schedule').check();
+ await expect(bar.getByRole('button',{name:'Distribute vertically',exact:true})).toBeDisabled();
+
+ // Two panels side by side would land on the cost curve: refused, nothing moves.
+ await bar.getByRole('button',{name:'Stack horizontally',exact:true}).click();
+ await expect(d.getByRole('status').filter({hasText:'not changed'})).toContainText('would overlap');
+ expect(await at('schedule-gantt')).toEqual(['1 / span 6','5 / span 4']);
+
+ // Stack three panels vertically in their current order (SQL, curve, Gantt), on the left edge.
+ await d.getByLabel('Select panel Cumulative cost curve').check();
+ await expect(bar.getByRole('button',{name:'Distribute vertically',exact:true})).toBeEnabled();
+ await bar.getByRole('button',{name:'Stack vertically',exact:true}).click();
+ expect([await at('quality-sql'),await at('capex-curve'),await at('schedule-gantt')]).toEqual([['1 / span 6','1 / span 4'],['1 / span 6','5 / span 4'],['1 / span 6','9 / span 4']]);
+ await expect(d.getByRole('status').filter({hasText:'Stack vertically'})).toContainText('Stack vertically: 3 panels.');
+ await d.getByRole('button',{name:/^↶ Undo: Stack vertically: 3 panels/}).click();
+ expect(await at('capex-curve')).toEqual(['7 / span 6','1 / span 4']);
+});
