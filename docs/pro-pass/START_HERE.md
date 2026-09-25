@@ -546,3 +546,21 @@ Two follow-ups to the shared export scene, in SVG, PNG, HTML and PowerPoint:
   - A label beside a vertical line tries both sides and narrower wraps, and can slide along its line into open space.
 
 Checked in unit tests over every sample view, and by rendering the dense FOIL Databricks DAB detail and the constellation overview in desktop PowerPoint.
+
+### Recovery screen (2026-09-25)
+
+If saved projects in the browser can't be read, the header shows **Recovery (N)**. Each unreadable row shows its ID, save time, size and the reason it failed, with three actions:
+
+- **Download raw copy:** the row exactly as stored.
+- **Open in JSON editor:** fix the JSON, then Validate and Apply; the repaired project replaces the broken row. Shown only when the row holds JSON text.
+- **Delete from this browser…:** then **Delete permanently**. It tells you whether you downloaded a raw copy first.
+
+Nothing is changed until you act.
+
+**Tested** in `tests/e2e/storage.spec.ts` against real IndexedDB:
+
+- download a raw row, then delete it
+- repair a project with a dangling reference, apply it, and see it load after a reload
+- a row with no JSON text cannot be repaired
+
+**Proof the test works:** with `adoptRow` disabled, the repaired save is refused and the test fails.

@@ -72,6 +72,12 @@ The persistence status shown in the shell is now driven by a latest-snapshot sav
 
 `loadWorkspace` validates stored rows independently. A corrupt row, invalid row envelope, or key/document-ID mismatch becomes a workspace warning while valid projects remain available. The raw invalid row is deliberately not deleted or rewritten automatically, preserving a future recovery path. IndexedDB `blocked` and `versionchange` events clear the cached connection state.
 
+**Recovery screen.** When rows fail to load, the header shows **Recovery (N)** (`src/ui/Recovery.tsx`). Each row lists its ID, save time, size and the reason it failed, and nothing changes until the user acts:
+
+- **Download raw copy:** the row exactly as stored (`readRawRow`).
+- **Open in JSON editor:** only when the row holds JSON text. It goes through the normal validate → preview → apply path. `adoptRow` first records the row's stored generation, so the repaired save replaces that row instead of being refused by the other-tab guard. A later write from another tab is still detected. The row leaves the list only after its replacement has actually been saved.
+- **Delete from this browser…:** needs a second click, **Delete permanently**, and says whether a raw copy was downloaded (`deleteRow`).
+
 Whole-document JSON/AI editing remains explicit and human-applied. `src/core/changePreview.ts` computes a stable-ID diff across nodes, edges, views, evidence blocks, assets and sources plus top-level metadata/story changes. Same-project input must carry the exact current revision before Apply is enabled. This prevents a stale AI/editor snapshot from silently overwriting newer edits. It is optimistic revision guarding, not semantic merge and not a JSON Patch implementation.
 
 `src/export/scene.ts` builds one measured scene per view, and every export draws it: SVG, PNG (from the SVG), the HTML portfolio (inline SVG) and PowerPoint. See "Shared export scene" below. The React Flow canvas is not drawn from the scene: it keeps its own interactive routing and CSS text, so the canvas and exports share node positions and box size but not pixel identity.

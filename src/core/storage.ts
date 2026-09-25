@@ -2,7 +2,8 @@ import {errorMessage,parseDocument,type Project} from './model';
 const TAB_ID=crypto.randomUUID();let connection:Promise<IDBDatabase>|undefined;const known=new Map<string,number>();
 
 type Row={id:string;json:string;writer:string;savedAt:number};
-export type WorkspaceWarning={id:string;message:string};
+/** A stored row that could not be loaded. It stays untouched in IndexedDB until the user recovers or deletes it. */
+export type WorkspaceWarning={id:string;message:string;savedAt?:number;bytes:number;hasJsonText:boolean};
 export type WorkspaceLoad={projects:Project[];warnings:WorkspaceWarning[]};
 
 /** Plain-language reason for a storage failure; quota errors say what to do. */
@@ -40,7 +41,8 @@ export async function loadWorkspace():Promise<WorkspaceLoad>{
      const project=parseDocument(row.json);
      if(project.id!==rowId)throw new Error(`Stored key ${rowId} does not match document ID ${project.id}`);
      known.set(project.id,row.savedAt);projects.push(project);
-    }catch(error){warnings.push({id:rowId,message:errorMessage(error)});}
+    }catch(error){let bytes=0;try{bytes=typeof row.json==='string'?row.json.length:JSON.stringify(raw)?.length??0;}catch{/* unserializable envelope */}
+     warnings.push({id:rowId,message:errorMessage(error),...(typeof row.savedAt==='number'&&Number.isFinite(row.savedAt)?{savedAt:row.savedAt}:{}),bytes,hasJsonText:typeof row.json==='string'});}
    }
    resolve({projects,warnings});
   };
@@ -60,4 +62,25 @@ export async function saveProject(doc:Project):Promise<void>{
   tx.oncomplete=()=>{known.set(doc.id,timestamp);resolve();};
   tx.onabort=tx.onerror=()=>reject(problem??(tx.error?new Error(storageErrorMessage(tx.error)):new Error('Local save failed. Export a JSON backup.')));
  });
+}
+
+/** The stored row exactly as it is, for a raw backup of a row that could not be loaded. */
+export async function readRawRow(id:string):Promise<unknown>{
+ const db=await open();
+ return new Promise((resolve,reject)=>{const r=db.transaction('projects','readonly').objectStore('projects').get(id);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error??new Error('Could not read the stored row'));});
+}
+/** Permanently remove one stored row. The recovery screen only offers this after an explicit confirmation. */
+export async function deleteRow(id:string):Promise<void>{
+ const db=await open();
+ return new Promise((resolve,reject)=>{const tx=db.transaction('projects','readwrite');tx.objectStore('projects').delete(id);tx.oncomplete=()=>{known.delete(id);resolve();};tx.onabort=tx.onerror=()=>reject(tx.error?new Error(storageErrorMessage(tx.error)):new Error('Could not delete the stored row'));});
+}
+/**
+ * Let a repaired document replace its quarantined row. That row was never loaded, so its generation is unknown and
+ * the other-tab guard would refuse the save; adopting records the generation seen now. Another tab writing the row
+ * after this point is still detected.
+ */
+export async function adoptRow(id:string):Promise<void>{
+ const row=await readRawRow(id) as {savedAt?:unknown}|undefined;
+ // Record the value as stored, even a broken one: saveProject compares it with the row it finds.
+ if(row)known.set(id,row.savedAt as number);
 }
