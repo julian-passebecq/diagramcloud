@@ -44,7 +44,7 @@ const galaxySchemas=[
 for(const [file,zodSchema,name] of galaxySchemas){
  writeFileSync(`public/galaxy/${file}`,JSON.stringify(zodToJsonSchema(zodSchema,{name,target:'jsonSchema7'}),null,2)+'\n');
 }
-const generatedAt=process.env.SOURCE_DATE_EPOCH?new Date(Number(process.env.SOURCE_DATE_EPOCH)*1000):new Date(0);
+const generatedAt=process.env.SOURCE_DATE_EPOCH?new Date(Number(process.env.SOURCE_DATE_EPOCH)*1000):new Date();
 writeFileSync('public/galaxy/version-handshake.json',JSON.stringify(versionHandshake({
  productVersion:'0.1.0',
  generatedAt,
