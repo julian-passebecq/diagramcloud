@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {readFileSync} from 'node:fs';
 import {samples} from '../src/data/samples';
 import {applyDocumentPatch} from '../src/core/patch';
 import {
@@ -131,4 +133,32 @@ test('self claims and unmapped entities are not silently imported',()=>{
  const staged=stagePublicationSnapshot(total,external);
  assert.equal(staged.patch,null);
  assert.equal(staged.unresolved[0].reason,'no_diagramcloud_node_mapping');
+});
+
+
+test('the exact pinned DataPass producer fixture validates and stages through DiagramCloud review',()=>{
+ const fixturePath='tests/contracts/datapass-publication-snapshot.json';
+ const lock=JSON.parse(readFileSync('tests/contracts/datapass-galaxy-v1g.lock.json','utf8'));
+ const bytes=readFileSync(fixturePath);
+ const blob=createHash('sha1').update(`blob ${bytes.byteLength}\0`).update(bytes).digest('hex');
+ assert.equal(blob,lock.producer.fixtureBlob,'vendored fixture changed without bumping the DataPass contract lock');
+ assert.equal(lock.producer.commit,'3f0a68848cd27804c5e343cbce7e9a607c3ef205');
+ const snapshot=validatePublicationSnapshot(JSON.parse(bytes.toString('utf8')));
+ assert.equal(snapshot.producer.app_id,'datapass-vscode');
+ assert.equal(snapshot.producer.source_revision,'1c8dc4ac796687cb7ede4d8acaf4d2717bc0446c');
+ assert.equal(snapshot.realization_claims.length,1);
+ const staged=stagePublicationSnapshot(total,snapshot);
+ assert.equal(staged.unresolved.length,0);
+ assert.equal(staged.candidates.length,1);
+ assert(staged.patch);
+ const applied=applyDocumentPatch(total,staged.patch!).result;
+ const obs=applied.observations.find(o=>o.id===staged.candidates[0].observation_id)!;
+ assert.equal(obs.nodeId,'checks');
+ assert.equal(obs.sourceApp,'datapass-vscode');
+ assert.equal(obs.claim,'observed');
+ assert.equal(obs.sourceRevision,'1c8dc4ac796687cb7ede4d8acaf4d2717bc0446c');
+ assert.equal(obs.visibility,'private');
+ assert.equal(obs.reviewedAt,undefined);
+ assert.equal(obs.shareable,false);
+ assert.match(obs.caveat,/not a runtime or production deployment verification/);
 });
