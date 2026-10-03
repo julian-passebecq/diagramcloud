@@ -21,10 +21,10 @@ test('Galaxy entity IDs are deterministic and preserve local IDs separately',()=
  assert.equal(entity.display_name,'SQL quality checks');
 });
 
-test('DiagramCloud publishes a G0 handshake with the complete accepted V1G contract set',()=>{
+test('DiagramCloud publishes a V1G handshake with the complete qualified contract set',()=>{
  const hs=versionHandshake({productVersion:'0.1.0',generatedAt:new Date('2026-10-03T01:00:00Z'),sourceRevision:'4829223'});
  assert.equal(hs.app_id,'diagramcloud');
- assert.equal(hs.galaxy_level,'G0','supporting V1G contracts does not self-promote qualification');
+ assert.equal(hs.galaxy_level,'V1G');
  assert.equal(hs.standalone,true);
  assert.deepEqual(hs.contracts.map(c=>c.contract_id),[...GALAXY_V1G_CONTRACTS]);
  assert.deepEqual(hs.deep_link_routes,[DIAGRAMCLOUD_DEEP_LINK_ROUTE.route_id]);
