@@ -50,7 +50,7 @@ DiagramCloud publishes a static-compatible handshake containing:
 - registered deep-link routes;
 - graceful-degradation statements.
 
-The implementation deliberately reports `G0` until cross-app V1G qualification is actually completed. Implementing the schemas does not self-promote the application to `V1G`.
+The qualified candidate reports `V1G`. This promotion is evidence-bound: the exact DataPass producer fixture is Git-blob pinned and accepted by DiagramCloud's consumer tests, the shared deep-link route is registered and resolved by DataPass VS Code, and the candidate must keep passing CI. A schema-only implementation would remain `G0`.
 
 ## Deep link
 
@@ -134,6 +134,6 @@ Required checks before Galaxy maturity can change from G0 to V1G:
 2. Generated JSON Schemas/manifests validate.
 3. PublicationSnapshot fixtures round-trip between at least two applications.
 4. DataPass or another producer supplies a reviewed external claim that stages into DiagramCloud without bypassing review.
-5. Hub/Galaxy resolves the registered deep link.
+5. Galaxy registers the route and at least one launcher resolves it; currently DataPass VS Code resolves `diagramcloud.project-view-node/1` and the Hub remains registry/documentation.
 6. Missing companions leave standalone DiagramCloud unaffected.
 7. Exact evidence for the qualification is recorded in Galaxy as a verification receipt/audit.
