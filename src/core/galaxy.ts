@@ -116,8 +116,8 @@ export type VersionHandshake=z.infer<typeof versionHandshakeSchema>;
 export function versionHandshake({productVersion,generatedAt=new Date(),sourceRevision}:{productVersion:string;generatedAt?:Date;sourceRevision?:string}):VersionHandshake{
  return versionHandshakeSchema.parse({
   schema_version:1,app_id:'diagramcloud',product_version:productVersion,
-  // This branch is V1G-qualified by the pinned DataPass producer fixture, registered deep-link resolver and CI evidence.
-  galaxy_level:'V1G',standalone:true,
+  // Contract support is implemented locally, but no external Galaxy companion is required or qualified.
+  galaxy_level:'G0',standalone:true,
   contracts:[
    {contract_id:'galaxy.entity/1',role:'both',required:true},
    {contract_id:'galaxy.evidence-ref/1',role:'both',required:true},
