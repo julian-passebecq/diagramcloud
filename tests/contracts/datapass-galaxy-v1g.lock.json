@@ -1,0 +1,19 @@
+{
+  "contract": "galaxy.publication-snapshot/1",
+  "producer": {
+    "repository": "julian-passebecq/datapass-vscode",
+    "branch": "feat/diagramcloud-galaxy-v1g",
+    "commit": "3f0a68848cd27804c5e343cbce7e9a607c3ef205",
+    "producerPath": "src/core/diagramcloud/galaxyPublication.ts",
+    "producerBlob": "97d3307c9715535bcccc3fd72260a065199862dd",
+    "fixturePath": "tests/fixtures/diagramcloud/datapass-publication-snapshot.json",
+    "fixtureBlob": "9e2058b89a3e53ae6acd81ec428ab554d0af7a35"
+  },
+  "consumer": {
+    "repository": "julian-passebecq/diagramcloud",
+    "branch": "feat/diagramcloud-galaxy-v1g",
+    "validator": "src/core/galaxy.ts",
+    "test": "tests/galaxy.test.ts"
+  },
+  "rule": "The vendored fixture must stay byte-equivalent to the pinned DataPass blob until this lock is deliberately bumped after producer review."
+}
