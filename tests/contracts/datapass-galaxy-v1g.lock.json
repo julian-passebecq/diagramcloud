@@ -3,11 +3,11 @@
   "producer": {
     "repository": "julian-passebecq/datapass-vscode",
     "branch": "feat/diagramcloud-galaxy-v1g",
-    "commit": "3f0a68848cd27804c5e343cbce7e9a607c3ef205",
+    "commit": "cd64d4655e4a0cb8ec21390661632bdf1ed1160a",
     "producerPath": "src/core/diagramcloud/galaxyPublication.ts",
-    "producerBlob": "97d3307c9715535bcccc3fd72260a065199862dd",
+    "producerBlob": "1123024d8224a46a1bb3f6f0a37249d682a60cbd",
     "fixturePath": "tests/fixtures/diagramcloud/datapass-publication-snapshot.json",
-    "fixtureBlob": "9e2058b89a3e53ae6acd81ec428ab554d0af7a35"
+    "fixtureBlob": "bf3c0041285037982be382afab1579bad57f6082"
   },
   "consumer": {
     "repository": "julian-passebecq/diagramcloud",
