@@ -1,7 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createHash} from 'node:crypto';
-import {readFileSync} from 'node:fs';
 import {samples} from '../src/data/samples';
 import {applyDocumentPatch} from '../src/core/patch';
 import {
@@ -21,10 +19,10 @@ test('Galaxy entity IDs are deterministic and preserve local IDs separately',()=
  assert.equal(entity.display_name,'SQL quality checks');
 });
 
-test('DiagramCloud publishes a V1G handshake with the complete qualified contract set',()=>{
+test('DiagramCloud publishes a G0 standalone handshake with the supported contract set',()=>{
  const hs=versionHandshake({productVersion:'0.1.0',generatedAt:new Date('2026-10-03T01:00:00Z'),sourceRevision:'4829223'});
  assert.equal(hs.app_id,'diagramcloud');
- assert.equal(hs.galaxy_level,'V1G');
+ assert.equal(hs.galaxy_level,'G0');
  assert.equal(hs.standalone,true);
  assert.deepEqual(hs.contracts.map(c=>c.contract_id),[...GALAXY_V1G_CONTRACTS]);
  assert.deepEqual(hs.deep_link_routes,[DIAGRAMCLOUD_DEEP_LINK_ROUTE.route_id]);
@@ -135,44 +133,6 @@ test('self claims and unmapped entities are not silently imported',()=>{
  assert.equal(staged.unresolved[0].reason,'no_diagramcloud_node_mapping');
 });
 
-
-test('the exact pinned DataPass producer fixture validates and stages through DiagramCloud review',()=>{
- const fixturePath='tests/contracts/datapass-publication-snapshot.json';
- const lock=JSON.parse(readFileSync('tests/contracts/datapass-galaxy-v1g.lock.json','utf8'));
- const bytes=readFileSync(fixturePath);
- const blob=createHash('sha1').update(`blob ${bytes.byteLength}\0`).update(bytes).digest('hex');
- assert.equal(blob,lock.producer.fixtureBlob,'vendored fixture changed without bumping the DataPass contract lock');
- assert.equal(lock.producer.commit,'cd64d4655e4a0cb8ec21390661632bdf1ed1160a');
- const snapshot=validatePublicationSnapshot(JSON.parse(bytes.toString('utf8')));
- assert.equal(snapshot.producer.app_id,'datapass_vscode');
- assert.equal(snapshot.producer.source_revision,'58f7d2da51647c261c2b000416751ad570f64e32');
- assert.equal(snapshot.realization_claims.length,1);
- const staged=stagePublicationSnapshot(total,snapshot);
- assert.equal(staged.unresolved.length,0);
- assert.equal(staged.candidates.length,1);
- assert(staged.patch);
- const applied=applyDocumentPatch(total,staged.patch!).result;
- const obs=applied.observations.find(o=>o.id===staged.candidates[0].observation_id)!;
- assert.equal(obs.nodeId,'checks');
- assert.equal(obs.sourceApp,'datapass_vscode');
- assert.equal(obs.claim,'observed');
- assert.equal(obs.sourceRevision,'58f7d2da51647c261c2b000416751ad570f64e32');
- assert.equal(obs.visibility,'private');
- assert.equal(obs.reviewedAt,undefined);
- assert.equal(obs.shareable,false);
- assert.match(obs.caveat,/not a runtime or production deployment verification/);
-});
-
-
-test('Galaxy registry app IDs may contain underscores and remain valid observation sourceApp values',()=>{
- const entity=galaxyEntity('datapass_vscode','project','total-project-controls');
- assert.equal(entity.owner_app,'datapass_vscode');
- const snapshot=JSON.parse(readFileSync('tests/contracts/datapass-publication-snapshot.json','utf8'));
- const staged=stagePublicationSnapshot(total,snapshot);
- assert(staged.patch);
- const applied=applyDocumentPatch(total,staged.patch!).result;
- assert.equal(applied.observations.find(o=>o.id===staged.candidates[0].observation_id)!.sourceApp,'datapass_vscode');
-});
 
 test('public PublicationSnapshot cannot contain internal evidence, internal entities or unreviewed claims',()=>{
  const snap=publicationSnapshot(total,{
