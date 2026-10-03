@@ -1,16 +1,18 @@
-# DiagramCloud ↔ DataPass Galaxy V1G contracts
+# DiagramCloud Galaxy contract support
 
-Date: 2026-10-03. Implementation branch: `feat/diagramcloud-galaxy-v1g`.
+Date: 2026-10-03.
 
 ## Boundary
 
-DiagramCloud remains the local-first architecture / work / evidence / publication authority for its own `Project` document. Galaxy adds portable identity, evidence references, navigation and reviewed publication exchange. It does **not** replace `src/core/model.ts`, React Flow, IndexedDB, the author review workflow or DiagramCloud exports.
+DiagramCloud remains the standalone, local-first authority for its own `Project` document, architecture model, evidence review and publication workflow.
 
-V1G requires no server, MongoDB runtime client, polling loop or shared execution engine. Every Galaxy companion is optional; an incompatible or absent companion disables only that integration.
+The Galaxy adapters in `src/core/galaxy.ts` are **local contract support only**. They do not require, modify or qualify DataPass VS Code, DataPass Hub, MongoDB runtime services or any other companion application.
 
-## Contract set
+DiagramCloud currently reports `G0` in its version handshake. Contract support alone does not promote Galaxy maturity.
 
-DiagramCloud implements the accepted minimal V1G set:
+## Supported contract shapes
+
+DiagramCloud can validate or emit these generic shapes:
 
 - `galaxy.entity/1`
 - `galaxy.evidence-ref/1`
@@ -18,122 +20,70 @@ DiagramCloud implements the accepted minimal V1G set:
 - `galaxy.publication-snapshot/1`
 - `galaxy.deep-link/1`
 
-The canonical TypeScript validators/adapters are in `src/core/galaxy.ts`. Build-time JSON Schema and manifests are generated under `public/galaxy/`.
+Build-time JSON Schema and manifests are generated under `public/galaxy/`.
 
 ## Identity
 
-A Galaxy entity carries a globally stable `entity_id` **and** the owning application's `local_id`. DiagramCloud keeps its existing stable Project/View/Node IDs unchanged.
+A Galaxy entity carries a globally stable `entity_id` plus the owning application's `local_id`. DiagramCloud keeps its own stable Project/View/Node IDs unchanged.
 
-Recommended generated ID:
-
-```text
-galaxy:<owner_app>:<entity_type>:<percent-encoded-local-id>
-```
-
-Consumers treat the complete `entity_id` as opaque. Labels, paths and positions are never identity. `owner_app` uses the canonical Galaxy registry `app_id` (for example `datapass_vscode`); repository slugs such as `datapass-vscode` are separate locators and are never substituted for the registry ID.
+Labels, paths, display names and canvas positions are never identity.
 
 ## Evidence
 
-`galaxy.evidence-ref/1` points to external evidence such as Git commits, CI runs, runtime receipts, files or documents. It records source system, locator, capture time, visibility, synthetic status and review/qualification state.
+`galaxy.evidence-ref/1` is a portable provenance reference. It does not make external evidence authoritative inside DiagramCloud.
 
-An EvidenceRef is a pointer/provenance object, not a claim that DiagramCloud independently verified the source. Foreign EvidenceRefs are not silently converted into DiagramCloud evidence blocks.
-
-## Version handshake
-
-DiagramCloud publishes a static-compatible handshake containing:
-
-- product version;
-- current Galaxy maturity;
-- standalone flag;
-- produced/consumed contract versions;
-- available/partial capabilities;
-- registered deep-link routes;
-- graceful-degradation statements.
-
-The qualified candidate reports `V1G`. This promotion is evidence-bound: the exact DataPass producer fixture is Git-blob pinned and accepted by DiagramCloud's consumer tests, the shared deep-link route is registered and resolved by DataPass VS Code, and the candidate must keep passing CI. A schema-only implementation would remain `G0`.
-
-## Deep link
-
-Route ID:
-
-```text
-diagramcloud.project-view-node/1
-```
-
-Relative route:
-
-```text
-?project={project}&view={view?}&node={node?}
-```
-
-The deployment base URL belongs to Galaxy/Hub configuration, not this semantic contract. Existing `src/core/links.ts` remains the application implementation.
+Foreign evidence is never silently converted into a local DiagramCloud evidence block.
 
 ## PublicationSnapshot
 
-`galaxy.publication-snapshot/1` is an immutable, reviewed and visibility-scoped projection.
+`galaxy.publication-snapshot/1` is treated as a reviewed projection, never as a replacement for the DiagramCloud Project document.
 
-It contains:
+DiagramCloud producer flow:
 
-- producer and exact source revision when available;
-- stable subject entity;
-- reviewed publication metadata;
-- public/internal entity projections;
-- typed relationships;
-- EvidenceRefs;
-- realization claims;
-- optional non-authoritative presentation hints;
-- exact contract versions.
+```text
+Project
+  ↓ publicDocument()
+reviewed projection
+  ↓
+PublicationSnapshot
+```
 
-### DiagramCloud as producer
-
-`publicationSnapshot()` first uses `publicDocument()`. Private/unreachable authoring content is therefore excluded before the Galaxy projection is built.
-
-A public snapshot requires `human_confirmed: true`. It may contain only `public` entities and EvidenceRefs, and public realization claims must already be reviewed/qualified. Synthetic EvidenceRefs may be published as explicitly synthetic context, but they cannot back a `verified` realization claim.
-
-### DiagramCloud as consumer
-
-`stagePublicationSnapshot()` validates the snapshot and converts only safely mapped **external realization claims** into the existing `diagramcloud.patch` review path.
-
-Flow:
+DiagramCloud consumer flow:
 
 ```text
 PublicationSnapshot
-      ↓ validate
-entity mapping to existing DiagramCloud Node
-      ↓
+  ↓ validate
+stable entity mapping
+  ↓
 staged diagramcloud.patch
-      ↓ normal change preview / base-revision guard
-private, unreviewed Observation
-      ↓
+  ↓
+private + unreviewed observation
+  ↓
 human DiagramCloud review
-      ↓
-optional public / shareable presentation
 ```
 
-The import never directly overwrites a Project and never sets `reviewedAt`, public visibility or `shareable` on the author's behalf.
+The consumer never sets `reviewedAt`, public visibility or `shareable` on the author's behalf.
 
-Claims produced by DiagramCloud itself are not re-imported. Unmapped foreign entities remain unresolved instead of being guessed by name.
+Public snapshots require explicit human confirmation and may only contain public entities/evidence plus reviewed or qualified claims. Synthetic evidence cannot back a `verified` claim.
 
-## Relationship to existing contracts
+## Deep links
 
-This V1G layer deliberately reuses rather than replaces:
+DiagramCloud defines the semantic route:
 
-- `diagramcloud.patch` for guarded changes;
-- the realization observation lifecycle;
-- `diagramcloud.portfolio-index/1` for Mongoku's bounded read-only portfolio projection;
-- the DataPass sidecar bridge;
-- the project/view/node deep-link behavior.
+```text
+diagramcloud.project-view-node/1
+?project={project}&view={view?}&node={node?}
+```
 
-`PublicationSnapshot` is the richer semantic exchange contract; `portfolio-index/1` remains the small curated portfolio projection.
+This route belongs to DiagramCloud's own contract surface. No external launcher or Hub integration is assumed.
 
-## Qualification
+## Current maturity
 
-Required checks before Galaxy maturity can change from G0 to V1G:
+Current handshake:
 
-1. TypeScript and unit tests on exact revision.
-2. Generated JSON Schemas/manifests validate.
-3. PublicationSnapshot fixtures round-trip between at least two applications.
-4. DataPass or another producer supplies a reviewed external claim that stages into DiagramCloud without bypassing review.
-5. Galaxy registers the route and at least one launcher resolves it; currently DataPass VS Code resolves `diagramcloud.project-view-node/1` and the Hub remains registry/documentation.
-6. Missing companions leave standalone DiagramCloud unaffected.
-7. Exact evidence for the qualification is recorded in Galaxy as a verification receipt/audit.
+```text
+galaxy_level = G0
+standalone = true
+```
+
+A future V1G promotion would require an explicitly approved external interoperability project and fresh qualification evidence. It must not require modifying DataPass unless that is separately requested.
