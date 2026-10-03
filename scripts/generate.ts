@@ -11,15 +11,49 @@ import {patchSchema} from '../src/core/patch';
 import {packSchema} from '../src/experience/model';
 import {examplePack} from '../src/experience/sample';
 import {workspaceHtml} from '../src/experience/render';
+import {
+ DIAGRAMCLOUD_DEEP_LINK_ROUTE,
+ evidenceRefSchema,
+ galaxyEntitySchema,
+ publicationSnapshotSchema,
+ versionHandshake,
+ versionHandshakeSchema
+} from '../src/core/galaxy';
+
 checkIcons();
 const icons=fileIcons();
+
 mkdirSync('public/examples',{recursive:true});
 const schema=zodToJsonSchema(documentSchema,{name:'DiagramCloudDocument',target:'jsonSchema7'});
 writeFileSync('public/diagramcloud.schema.json',JSON.stringify({...schema,$id:'https://diagramcloud.local/schema/v1',description:'Structural schema. Imports must ALSO pass validateDocument for relational references, view membership and drilldown-cycle checks.'},null,2)+'\n');
 writeFileSync('public/diagramcloud.patch.schema.json',JSON.stringify({...zodToJsonSchema(patchSchema,{name:'DiagramCloudPatch',target:'jsonSchema7'}),$id:'https://diagramcloud.local/schema/patch/v1',description:'RFC 6902 JSON Patch envelope. Path segments may be @<id> to address an array item by stable ID. The patch is refused if targetId or baseRevision do not match the open project or pack, if it changes any id, or if the result fails validateDocument / validatePack.'},null,2)+'\n');
-for(const sample of samples){const d=publicDocument(validateDocument(sample));writeFileSync(`public/examples/${d.id}.json`,JSON.stringify(d,null,2)+'\n');writeFileSync(`public/examples/${d.id}.html`,portfolioHtml(d,icons));writeFileSync(`public/examples/${d.id}.svg`,svgDiagram(d,d.rootViewId,true,icons));}
+for(const sample of samples){
+ const d=publicDocument(validateDocument(sample));
+ writeFileSync(`public/examples/${d.id}.json`,JSON.stringify(d,null,2)+'\n');
+ writeFileSync(`public/examples/${d.id}.html`,portfolioHtml(d,icons));
+ writeFileSync(`public/examples/${d.id}.svg`,svgDiagram(d,d.rootViewId,true,icons));
+}
+
+mkdirSync('public/galaxy',{recursive:true});
+const galaxySchemas=[
+ ['entity.schema.json',galaxyEntitySchema,'GalaxyEntity'],
+ ['evidence-ref.schema.json',evidenceRefSchema,'GalaxyEvidenceRef'],
+ ['version-handshake.schema.json',versionHandshakeSchema,'GalaxyVersionHandshake'],
+ ['publication-snapshot.schema.json',publicationSnapshotSchema,'GalaxyPublicationSnapshot']
+] as const;
+for(const [file,zodSchema,name] of galaxySchemas){
+ writeFileSync(`public/galaxy/${file}`,JSON.stringify(zodToJsonSchema(zodSchema,{name,target:'jsonSchema7'}),null,2)+'\n');
+}
+const generatedAt=process.env.SOURCE_DATE_EPOCH?new Date(Number(process.env.SOURCE_DATE_EPOCH)*1000):new Date(0);
+writeFileSync('public/galaxy/version-handshake.json',JSON.stringify(versionHandshake({
+ productVersion:'0.1.0',
+ generatedAt,
+ ...(process.env.GITHUB_SHA?{sourceRevision:process.env.GITHUB_SHA}:{})
+}),null,2)+'\n');
+writeFileSync('public/galaxy/deep-link-route.json',JSON.stringify(DIAGRAMCLOUD_DEEP_LINK_ROUTE,null,2)+'\n');
+
 generateNotices();
-console.log(`Generated JSON Schema and ${samples.length} standalone example sets.`);
+console.log(`Generated JSON Schema, Galaxy V1G contracts and ${samples.length} standalone example sets.`);
 
 mkdirSync('public/experience',{recursive:true});
 writeFileSync('public/experience/schema.json',JSON.stringify(zodToJsonSchema(packSchema,{name:'DiagramCloudExperience',target:'jsonSchema7'}),null,2));
