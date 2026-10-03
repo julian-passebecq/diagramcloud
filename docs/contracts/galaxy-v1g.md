@@ -30,7 +30,7 @@ Recommended generated ID:
 galaxy:<owner_app>:<entity_type>:<percent-encoded-local-id>
 ```
 
-Consumers treat the complete `entity_id` as opaque. Labels, paths and positions are never identity.
+Consumers treat the complete `entity_id` as opaque. Labels, paths and positions are never identity. `owner_app` uses the canonical Galaxy registry `app_id` (for example `datapass_vscode`); repository slugs such as `datapass-vscode` are separate locators and are never substituted for the registry ID.
 
 ## Evidence
 
@@ -88,7 +88,7 @@ It contains:
 
 `publicationSnapshot()` first uses `publicDocument()`. Private/unreachable authoring content is therefore excluded before the Galaxy projection is built.
 
-A public snapshot requires `human_confirmed: true`.
+A public snapshot requires `human_confirmed: true`. It may contain only `public` entities and EvidenceRefs, and public realization claims must already be reviewed/qualified. Synthetic EvidenceRefs may be published as explicitly synthetic context, but they cannot back a `verified` realization claim.
 
 ### DiagramCloud as consumer
 
