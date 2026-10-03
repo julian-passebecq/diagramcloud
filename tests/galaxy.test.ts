@@ -142,10 +142,10 @@ test('the exact pinned DataPass producer fixture validates and stages through Di
  const bytes=readFileSync(fixturePath);
  const blob=createHash('sha1').update(`blob ${bytes.byteLength}\0`).update(bytes).digest('hex');
  assert.equal(blob,lock.producer.fixtureBlob,'vendored fixture changed without bumping the DataPass contract lock');
- assert.equal(lock.producer.commit,'3f0a68848cd27804c5e343cbce7e9a607c3ef205');
+ assert.equal(lock.producer.commit,'cd64d4655e4a0cb8ec21390661632bdf1ed1160a');
  const snapshot=validatePublicationSnapshot(JSON.parse(bytes.toString('utf8')));
- assert.equal(snapshot.producer.app_id,'datapass-vscode');
- assert.equal(snapshot.producer.source_revision,'1c8dc4ac796687cb7ede4d8acaf4d2717bc0446c');
+ assert.equal(snapshot.producer.app_id,'datapass_vscode');
+ assert.equal(snapshot.producer.source_revision,'58f7d2da51647c261c2b000416751ad570f64e32');
  assert.equal(snapshot.realization_claims.length,1);
  const staged=stagePublicationSnapshot(total,snapshot);
  assert.equal(staged.unresolved.length,0);
@@ -154,11 +154,65 @@ test('the exact pinned DataPass producer fixture validates and stages through Di
  const applied=applyDocumentPatch(total,staged.patch!).result;
  const obs=applied.observations.find(o=>o.id===staged.candidates[0].observation_id)!;
  assert.equal(obs.nodeId,'checks');
- assert.equal(obs.sourceApp,'datapass-vscode');
+ assert.equal(obs.sourceApp,'datapass_vscode');
  assert.equal(obs.claim,'observed');
- assert.equal(obs.sourceRevision,'1c8dc4ac796687cb7ede4d8acaf4d2717bc0446c');
+ assert.equal(obs.sourceRevision,'58f7d2da51647c261c2b000416751ad570f64e32');
  assert.equal(obs.visibility,'private');
  assert.equal(obs.reviewedAt,undefined);
  assert.equal(obs.shareable,false);
  assert.match(obs.caveat,/not a runtime or production deployment verification/);
+});
+
+
+test('Galaxy registry app IDs may contain underscores and remain valid observation sourceApp values',()=>{
+ const entity=galaxyEntity('datapass_vscode','project','total-project-controls');
+ assert.equal(entity.owner_app,'datapass_vscode');
+ const snapshot=JSON.parse(readFileSync('tests/contracts/datapass-publication-snapshot.json','utf8'));
+ const staged=stagePublicationSnapshot(total,snapshot);
+ assert(staged.patch);
+ const applied=applyDocumentPatch(total,staged.patch!).result;
+ assert.equal(applied.observations.find(o=>o.id===staged.candidates[0].observation_id)!.sourceApp,'datapass_vscode');
+});
+
+test('public PublicationSnapshot cannot contain internal evidence, internal entities or unreviewed claims',()=>{
+ const snap=publicationSnapshot(total,{
+  productVersion:'0.1.0',reviewedAt:'2026-10-03T01:05:00Z',humanConfirmed:true,intendedVisibility:'public',
+  generatedAt:new Date('2026-10-03T01:06:00Z')
+ });
+ const internalEvidence=structuredClone(snap);
+ internalEvidence.evidence_refs[0]&&=({...internalEvidence.evidence_refs[0],visibility:'internal'});
+ if(internalEvidence.evidence_refs.length)assert.throws(()=>validatePublicationSnapshot(internalEvidence),/cannot include non-public evidence/);
+
+ const internalEntity=structuredClone(snap);
+ internalEntity.entities[0].visibility='internal';
+ assert.throws(()=>validatePublicationSnapshot(internalEntity),/cannot include non-public entity/);
+
+ const withClaim=structuredClone(snap);
+ withClaim.realization_claims=[{
+  claim_id:'public-unreviewed',
+  subject_entity_id:withClaim.entities.find(e=>e.entity_type==='node')!.entity_id,
+  state:'observed',
+  observed_at:'2026-10-03T01:00:00Z',
+  producer_app:'verify',
+  authority:'Verify',
+  summary:'Observed state.',
+  evidence_ref_ids:[],
+  review_state:'unreviewed'
+ }];
+ assert.throws(()=>validatePublicationSnapshot(withClaim),/cannot include unreviewed claim/);
+});
+
+test('verified realization claims cannot be backed by synthetic EvidenceRefs',()=>{
+ const projectEntity=galaxyEntity('diagramcloud','project',total.id,{revision:String(total.revision),displayName:total.title});
+ const nodeEntity=galaxyEntity('diagramcloud','node','checks',{revision:String(total.revision),displayName:'SQL quality checks'});
+ assert.throws(()=>validatePublicationSnapshot({
+  schema_version:1,snapshot_id:'synthetic-verified',producer:{app_id:'verify',source_revision:'run-1'},subject:projectEntity,
+  created_at:'2026-10-03T01:00:00Z',
+  review:{state:'reviewed',reviewed_at:'2026-10-03T01:01:00Z',human_confirmed:true,intended_visibility:'internal'},
+  entities:[{...projectEntity,label:total.title,visibility:'internal'},{...nodeEntity,label:'SQL quality checks',visibility:'internal'}],
+  relationships:[],
+  evidence_refs:[{schema_version:1,evidence_id:'galaxy:verify:evidence:synthetic',kind:'test_run',source_system:'ci',locator:{run_id:'1'},captured_at:'2026-10-03T00:59:00Z',visibility:'internal',synthetic:true,review_state:'reviewed',producer_app:'verify'}],
+  realization_claims:[{claim_id:'verified-synthetic',subject_entity_id:nodeEntity.entity_id,state:'verified',observed_at:'2026-10-03T00:59:00Z',producer_app:'verify',authority:'Verify',summary:'Verified claim.',evidence_ref_ids:['galaxy:verify:evidence:synthetic'],review_state:'reviewed'}],
+  contract_versions:[...GALAXY_V1G_CONTRACTS]
+ }),/synthetic evidence .* cannot back a verified claim/);
 });
