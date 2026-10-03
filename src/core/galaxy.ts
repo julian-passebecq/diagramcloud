@@ -14,7 +14,7 @@ export const GALAXY_V1G_CONTRACTS=[
 ] as const;
 export const MAX_PUBLICATION_SNAPSHOT_BYTES=2*1024*1024;
 
-const appId=z.string().regex(/^[a-z][a-z0-9-]{0,39}$/,'Use a lowercase Galaxy app ID');
+const appId=z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/,'Use a lowercase Galaxy registry app ID');
 const entityType=z.string().regex(/^[a-z][a-z0-9_.-]{0,63}$/,'Use a stable lowercase entity type');
 const entityId=z.string().min(1).max(500);
 const localId=z.string().min(1).max(200);
@@ -214,12 +214,19 @@ export function validatePublicationSnapshot(raw:unknown):PublicationSnapshot{
  if(bytes>MAX_PUBLICATION_SNAPSHOT_BYTES)throw new Error(`PublicationSnapshot exceeds ${MAX_PUBLICATION_SNAPSHOT_BYTES} bytes`);
  const secrets=secretFindings(raw);if(secrets.length)throw new Error(`PublicationSnapshot refused: ${secrets.slice(0,10).join('; ')}`);
  const snap=publicationSnapshotSchema.parse(raw),errors:string[]=[];
- if(snap.review.intended_visibility==='public'&&!snap.review.human_confirmed)errors.push('Public PublicationSnapshot requires explicit human confirmation');
+ if(snap.review.intended_visibility==='public'){
+  if(!snap.review.human_confirmed)errors.push('Public PublicationSnapshot requires explicit human confirmation');
+  for(const e of snap.entities)if(e.visibility!=='public')errors.push(`Public PublicationSnapshot cannot include non-public entity ${e.entity_id}`);
+  for(const e of snap.evidence_refs)if(e.visibility!=='public')errors.push(`Public PublicationSnapshot cannot include non-public evidence ${e.evidence_id}`);
+  for(const c of snap.realization_claims)if(c.review_state==='unreviewed')errors.push(`Public PublicationSnapshot cannot include unreviewed claim ${c.claim_id}`);
+ }
+ for(const required of ['galaxy.entity/1','galaxy.evidence-ref/1','galaxy.publication-snapshot/1'])
+  if(!snap.contract_versions.includes(required))errors.push(`PublicationSnapshot missing required contract version ${required}`);
  const entities=snap.entities.map(e=>({id:e.entity_id}));duplicateIds(entities,'entity',errors);
  const evidence=snap.evidence_refs.map(e=>({id:e.evidence_id}));duplicateIds(evidence,'evidence',errors);
  const relationships=snap.relationships.filter(r=>r.relationship_id).map(r=>({id:r.relationship_id!}));duplicateIds(relationships,'relationship',errors);
  const claims=snap.realization_claims.map(c=>({id:c.claim_id}));duplicateIds(claims,'claim',errors);
- const entityIds=new Set(snap.entities.map(e=>e.entity_id)),evidenceIds=new Set(snap.evidence_refs.map(e=>e.evidence_id));
+ const entityIds=new Set(snap.entities.map(e=>e.entity_id)),evidenceIds=new Set(snap.evidence_refs.map(e=>e.evidence_id)),evidenceById=new Map(snap.evidence_refs.map(e=>[e.evidence_id,e] as const));
  if(!entityIds.has(snap.subject.entity_id))errors.push('Snapshot subject must also appear in entities');
  for(const r of snap.relationships){
   if(!entityIds.has(r.from_entity_id))errors.push(`${r.type}: unknown from_entity_id ${r.from_entity_id}`);
@@ -228,7 +235,10 @@ export function validatePublicationSnapshot(raw:unknown):PublicationSnapshot{
  }
  for(const c of snap.realization_claims){
   if(!entityIds.has(c.subject_entity_id))errors.push(`${c.claim_id}: unknown subject_entity_id ${c.subject_entity_id}`);
-  for(const id of c.evidence_ref_ids)if(!evidenceIds.has(id))errors.push(`${c.claim_id}: unknown evidence_ref_id ${id}`);
+  for(const id of c.evidence_ref_ids){
+   if(!evidenceIds.has(id))errors.push(`${c.claim_id}: unknown evidence_ref_id ${id}`);
+   else if(c.state==='verified'&&evidenceById.get(id)?.synthetic)errors.push(`${c.claim_id}: synthetic evidence ${id} cannot back a verified claim`);
+  }
  }
  if(errors.length)throw new Error(errors.slice(0,20).join('\n'));
  return snap;
