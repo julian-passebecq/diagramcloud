@@ -1,5 +1,7 @@
 # DiagramCloud: project experience architecture
 
+> **Historical working note.** Kept for context; it describes an earlier pass and may name branches, limits or plans that no longer apply. The current state is in [README.md]({r}README.md) and [docs/RELEASE.md]({r}docs/RELEASE.md).
+
 Date: 2026-09-24
 Status: product contract and bounded implementation pilot, not a completed release.
 Base: the existing V1.4 architecture-content branch. Preserve the existing React/Fluent shell and React Flow canvas.

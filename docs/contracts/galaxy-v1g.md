@@ -1,6 +1,6 @@
 # DiagramCloud Galaxy contract support
 
-Date: 2026-10-03.
+Date: 2026-10-03, updated 2026-10-05 for 1.0.0 (verification receipt, snapshot import in the UI).
 
 ## Boundary
 
@@ -19,6 +19,7 @@ DiagramCloud can validate or emit these generic shapes:
 - `galaxy.version-handshake/1`
 - `galaxy.publication-snapshot/1`
 - `galaxy.deep-link/1`
+- `galaxy.verification-receipt/1` (produce only, optional; see below)
 
 Build-time JSON Schema and manifests are generated under `public/galaxy/`.
 
@@ -62,9 +63,27 @@ private + unreviewed observation
 human DiagramCloud review
 ```
 
+In the app, paste a snapshot into **JSON / AI → Validate JSON**: `isPublicationSnapshot` recognises it, `stagePublicationSnapshot` maps its claims to DiagramCloud nodes through owned entity IDs or `galaxy:diagramcloud:node:<id>` aliases, and the result is shown as an ordinary revision-guarded patch with a note naming the producing app and every unresolved claim (self claims, `designed`, unmapped subjects, already imported). Applying it adds private, unreviewed observations; nothing else changes.
+
 The consumer never sets `reviewedAt`, public visibility or `shareable` on the author's behalf.
 
 Public snapshots require explicit human confirmation and may only contain public entities/evidence plus reviewed or qualified claims. Synthetic evidence cannot back a `verified` claim.
+
+## Verification receipt
+
+`galaxy.verification-receipt/1` (`verificationReceipt`, `validateVerificationReceipt` in `src/core/galaxy.ts`) describes one release candidate: receipt ID, the `diagramcloud` app identity as a `galaxy.entity/1` subject (`entity_type: release`), the exact 40-character commit, product version, document schema version, Galaxy maturity, the checks, evidence refs, timestamp, status and caveats.
+
+The verification level is **derived** from the checks, never passed in, and never inferred upward:
+
+| Level | Needs passed checks |
+|---|---|
+| IMPLEMENTED | typecheck |
+| BUILD_VERIFIED | + unit, build |
+| PACKAGE_VERIFIED | + package (sha256 manifest of the static `dist/` bundle) |
+| E2E_VERIFIED | + e2e (Chromium) |
+| MANUAL_QUALIFIED | + manual-visual, citing a hashed human review record (`MANUAL_REVIEW=<file>`) |
+
+The validator refuses `GALAXY_QUALIFIED` (that needs a cross-app qualification outside DiagramCloud), any Galaxy level other than `G0`, a dirty working tree, synthetic evidence, a failed check under status `passed`, and unknown evidence references. `npm run qualify` runs every check locally and writes `release/verification-receipt.json`; CI records the same receipt from its step outcomes and uploads it with the `diagramcloud-ci` artifact.
 
 ## Deep links
 
@@ -79,11 +98,13 @@ This route belongs to DiagramCloud's own contract surface. No external launcher 
 
 ## Current maturity
 
-Current handshake:
+Current handshake (product version 1.0.0):
 
 ```text
 galaxy_level = G0
 standalone = true
 ```
+
+Product version, release qualification level (receipt) and Galaxy maturity are three separate dimensions.
 
 A future V1G promotion would require an explicitly approved external interoperability project and fresh qualification evidence. It must not require modifying DataPass unless that is separately requested.

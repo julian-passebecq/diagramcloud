@@ -1,12 +1,12 @@
 # Vercel deployment
 
-DiagramCloud V1.3 is a static Vite + React application. No server, database, or Vercel Function is required.
+DiagramCloud is a static Vite + React application. No server, database, or Vercel Function is required.
 
 ## One-time project creation
 
-Import this branch into Vercel:
+Import the repository into Vercel with `main` as the production branch:
 
-`https://github.com/julian-passebecq/diagramcloud/tree/feat/diagramcloud-v1.3-architecture-lab`
+`https://github.com/julian-passebecq/diagramcloud`
 
 The repository contains `vercel.json`, so Vercel should use:
 
@@ -38,19 +38,15 @@ Preview deployments use different hostnames. If Drive must work on previews, exp
 
 ## Deployment verification
 
-After deployment verify:
+The release check is in [RELEASE.md](RELEASE.md) ("Static deployment check"). After a deployment, for the exact commit:
 
-1. The Datapass architecture map loads.
-2. Drill down: Foil data platform -> BigQuery historical analytics -> foil.telemetry_history -> Historical SQL task.
+1. The gallery loads; TotalEnergies drills SQL quality checks → Required fields with the parent view kept.
+2. `?project=total-project-controls&view=validation&node=mandatory` opens with its parent context.
 3. Explore/Edit/Portfolio/Present modes open.
-4. PNG, SVG, HTML and PPTX export actions initialize successfully.
-5. Browser refresh at the root loads normally.
+4. PNG, SVG, HTML and PPTX exports download.
+5. `galaxy/version-handshake.json` reports the expected `product_version` and `galaxy_level: G0`.
 6. If Google variables are configured, Project files -> Connect Google Drive is enabled.
 
 ## Git workflow
 
-The current deployment-ready branch is:
-
-`feat/diagramcloud-v1.3-architecture-lab`
-
-PR #4 targets the V1.2 Drive branch. Once V1.3 is promoted to the repository production branch, Vercel Git integration can deploy every future production push automatically and create previews for feature branches.
+`main` is the production branch: every push to `main` deploys to production, and pull requests get preview deployments. Feature branches are merged into `main` through pull requests after CI passes (see [RELEASE.md](RELEASE.md)).

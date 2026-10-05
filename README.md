@@ -1,142 +1,126 @@
 # DiagramCloud
 
-**Architecture -> the work behind it -> the evidence.**
+**Architecture → the work behind it → the evidence.**
 
-A local-first React + Microsoft Fluent UI project studio. Select a component to keep the parent architecture visible and open its child diagram underneath. Continue into a task, function, table or code example. Use the same document for an interview walkthrough, a public portfolio and presentation exports.
+DiagramCloud is a local-first, static web studio for explaining a project: select a component and its child architecture opens underneath while the parent stays visible, continue into a task workspace, and read the evidence (code, tables, metrics, images, sources) behind it. The same document produces a public portfolio, a guided walkthrough and native exports. It is the DataPass/Galaxy product for architecture explanation, realization evidence and publication.
 
-Authoritative repository: `julian-passebecq/diagramcloud`. Initial V1 work is on `feat/diagramcloud-v1`, not the initialization-only `main` branch.
+## Current state (read this first)
+
+| | |
+|---|---|
+| Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
+| Product version | **1.0.0** (`package.json`; shown in the header) |
+| Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
+| Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
+| Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
+| Browser target | Chrome / Chromium (the only browser the test suite qualifies) |
+| Hosting | Any static host; production is the Vercel project connected to `main` ([docs/VERCEL.md](docs/VERCEL.md)) |
+
+**What it is:** React + TypeScript + Fluent UI + React Flow, Vite build, IndexedDB storage, no server, no account, no database. Optional integrations (Google Drive asset vault, DataPass repository folder bridge) stay optional.
+
+**What it is not:** a cloud runtime, an IDE, a notebook kernel, a SQL/Python/DAX/Spark engine, a Git or task authority, a MongoDB UI, live infrastructure monitoring, or a replacement for DataPass VS Code, Studio or Galaxy. Code and rows are displayed, never executed.
+
+## The grammar
+
+DiagramCloud uses one vocabulary in its model, Inspector, badges, exports and contracts, aligned with DataPass/Galaxy:
+
+| Question | DiagramCloud answer |
+|---|---|
+| What is it? | **Project → Architecture / View → Component** (stable lowercase IDs; renaming never changes identity) |
+| What was designed? | A component's design status: illustrative intent, never a deployment claim |
+| What was actually seen? | An **Observation** from another app: observed / verified / partial / not observed, dated, at a source revision |
+| How do we know? | **Evidence** blocks and **Sources**, each labelled source-derived, synthetic, reference or author |
+| How strong is the claim? | The observation's claim and its owner; for releases, the **verification receipt** level |
+| Who owns the fact? | The producing app and authority named on the observation; DiagramCloud only presents it |
+| Can it be shared? | Author review + public visibility (**Presented**) + an explicit shareable flag for the portfolio index |
+| Where is the work? | **Task / Workspace** screens linked from a component |
+| How is it published? | Story, HTML, SVG, PNG, PPTX, project deck, portfolio index |
+
+Synthetic evidence stays synthetic: it can never back an observation (`validateDocument` refuses it), and a Galaxy snapshot cannot back a `verified` claim with it.
+
+The Inspector shows every selected component in the same order: **Identity, Meaning, Realization, Evidence, Work, Publication**.
 
 ## Start locally
 
-Use Node.js 22. From a fresh checkout:
+Use Node.js 22.
 
 ```sh
 npm ci
-npm run check
-npm test
-npm run build
 npm run dev
 ```
 
-Open the local URL printed by Vite, normally `http://localhost:5173`. The generated `dist/` can be served by any static HTTP host. Do not double-click `dist/index.html`: the editor uses ES modules and a normal browser origin. In contrast, the exported `*.html` portfolios are self-contained files that can be opened directly, offline.
+Open the URL Vite prints (normally `http://localhost:5173`). `npm run build` writes a static `dist/` that any HTTP host can serve; do not open `dist/index.html` from disk (ES modules need an origin). Exported `*.html` portfolios, by contrast, are self-contained and work offline from a file.
 
-The CI source artifact includes the resolved `package-lock.json`; use `npm ci` when working from that artifact. Browser tests:
-
-```sh
-npx playwright install chromium
-npm run test:e2e
-```
-
-A static Cloudflare Workers assets configuration is included in `wrangler.jsonc`. It does not deploy anything by itself. No cloud account, database, Python runtime, API key or paid diagram service is required to use V1 locally.
+Qualification commands are in [docs/RELEASE.md](docs/RELEASE.md).
 
 ## First walkthrough
 
-Open **TotalEnergies**. Click **SQL quality checks**, then **Required fields**, then **Validation query**. The architecture stays above, a validation workflow opens below, and the third level exposes synthetic input rows, a SQL function and expected exceptions. Evidence appears below the diagrams; the left Inspector explains the selected component.
+Open **TotalEnergies**. Click **SQL quality checks**, then **Required fields**. The architecture stays above, the validation workflow opens below, and the evidence appears underneath; the Inspector on the left explains the selected component. **Open task workspace** opens the linked task screen.
 
-Explore is read-only. Edit enables dragging, handle-to-handle connections, node and edge properties, new components, child diagrams, evidence creation, image attachment and undo/redo. Portfolio removes private/unreachable content from the displayed model. Present adds a guided narrative. Light is the default; a dark theme and reduced-motion behavior are included.
+Modes: **Explore** is read-only. **Edit** adds dragging, connections, properties, new components and child diagrams, visual evidence editors, sources, story composition, observation review and undo/redo. **Portfolio** shows only the public projection. **Present** adds the guided story. Light and dark themes and reduced motion are supported.
+
+## Authoring without raw JSON
+
+Ordinary authoring is visual: project metadata and sources; components (identity, meaning, design status, cited sources, visibility); connections; child views; workspace links; explanations, code, images, metrics and **tables** (columns, rows, reorder, paste from a spreadsheet); block order; the **transformation explainer** (input rows → logic → output rows, column mapping, grain/keys/quality rules; explanatory only); story steps; observation review, visibility and sharing.
+
+JSON / AI remains the path for whole-document edits, RFC 6902 patches addressed by stable ID (`@id` segments, refused when the base revision is stale), observation patches and Galaxy publication snapshots. Every import is validated, previewed item by item and applied only after review.
 
 ## Included examples
 
 | Project | Scope | Provenance |
 |---|---|---|
-| Datapass architecture map | Overall platform → Foil macro → BigQuery/GCP/DuckLake/Databricks sub-architectures → static task/table examples | Author-created current-state planning model |
-| TotalEnergies | Cost/schedule flow, SQL checks, sample model and reporting | Reconstructed from two supplied PDFs; synthetic code and rows |
-| Foil'O Ecologie | Physical hydrofoil, Databricks workflow, governance, scenario assumptions | Reconstructed from the PDFs; not a verified scientific solver |
-| Microsoft Fabric | Medallion architecture, ingestion and Silver transformation | Independently authored reference with official documentation links |
-| Databricks | Medallion architecture, contracts and deduplication | Independently authored reference with official documentation links |
+| Data Projects \| constellation / DataPass architecture map | Platform, Foil macro architecture, provider sub-architectures, task/table examples | Author-created current-state planning model |
+| TotalEnergies | Cost/schedule flow, SQL checks, data model, reporting screens | Reconstructed from two supplied PDFs; synthetic code and rows |
+| Foil'O Ecologie | Hydrofoil, Databricks workflow, governance, scenario screens | Reconstructed from the PDFs; not a verified scientific solver |
+| Microsoft Fabric | Medallion architecture, ingestion, Silver transformation | Independently authored reference with official documentation links |
+| Databricks | Medallion architecture, contracts, deduplication | Independently authored reference with official documentation links |
 | Blank project | One component to start editing | Author-created |
 
-The supplied PDFs contain illustrative financial scenarios with different figures. These are not silently combined or presented as employer achievements. The remote CV PDF was not successfully retrieved during this pass; the gallery does not claim to cover every job in the full CV. The original PDFs and any confidential employer files are not stored in this repository.
+Illustrative financial scenarios are not combined or presented as employer achievements. The original PDFs and any confidential employer files are not stored in this repository.
 
 ## Exports and fidelity
 
 | Format | Included | Deliberate limits |
 |---|---|---|
-| Authoring JSON | Full validated source document, including private and unattached content | A backup, not a safe public artifact |
-| Public JSON | Reachable public graph, evidence, assets and sources | Public text still requires human confidentiality review |
-| Interactive HTML | All public views, click drilldown, evidence, guided story, no network dependency | Read-only; static diagrams rather than live execution |
-| SVG | Current public view; embedded full public document metadata supports re-import | Semantic export, not pixel-identical to the editor; generic artwork |
-| PNG | Current view, up to 4096-pixel longest edge | Raster and static; no drilldown or metadata |
-| PowerPoint | Native editable shapes, text and tables; view slides, evidence, source notes; child-view hyperlinks | Static; layout is a semantic reconstruction, not a screenshot |
-| Mermaid | Basic flowchart of the current view | No general Mermaid import or lossless evidence/hierarchy round trip |
-| Print / PDF | Browser print of currently expanded public views and selected evidence | Not an all-project pagination engine |
-| Portfolio index | `diagramcloud.portfolio-index/1`: revision, counts and shareable realization cards, for Mongoku's read-only view | Only reviewed, public, author-marked-shareable observations; max 25 items; ≤64 KiB; DiagramCloud only exports it, storing it in DATAPASSCONTROL is a separate operator step |
+| Authoring JSON | Full validated document, including private and unattached content | A backup, not a safe public artifact |
+| Public JSON | Reachable public graph, evidence, assets, sources, presented observations | Public text still needs human confidentiality review |
+| Interactive HTML | All public views, drilldown, evidence, realization badges and lists, guided story; no network | Read-only; static diagrams |
+| SVG | Current public view with realization badges; embedded public document metadata supports re-import | Semantic export, not pixel-identical to the editor |
+| PNG | Current view with badges, up to a 4096-pixel longest edge | Raster, no metadata |
+| PowerPoint | Native editable shapes, text, tables; realization badges, notes and appendix; source notes; drilldown hyperlinks | Static; a semantic reconstruction, not a screenshot |
+| Project deck | Cover, linked contents, architecture, every public task screen, realization section, sources | Max 180 slides |
+| Scope deck | One scope's report screens (Evidence workspaces) | Task screens only |
+| Mermaid | Flowchart of the current view, realization as classes and comments | Lossy: no evidence, hierarchy or caveats |
+| Print / PDF | Browser print of the expanded public views and selected evidence | Not an all-project pagination engine |
+| Portfolio index | `diagramcloud.portfolio-index/1` for Mongoku's read-only view | Only reviewed, public, shareable observations; ≤ 25 items, ≤ 64 KiB |
 
-**SVG metadata contains the entire public project, not just the visible diagram.** Arbitrary SVG can be attached as an image, but cannot automatically become an editable graph. Uploaded SVG is sanitized and rasterized; PNG/JPEG/WebP uploads are decoded and re-encoded. Code snippets are displayed, never executed.
+All exports are built from `publicDocument`: private objects are removed, not hidden. Uploaded SVG is sanitized and rasterized; PNG/JPEG/WebP uploads are re-encoded. Details: [realization contract](docs/contracts/realization-overlay.md), [architecture](docs/ARCHITECTURE.md).
 
-## Realization overlay
+## Galaxy contracts
 
-A node's status is a Planned/designed illustration. Other Datapass Galaxy apps can add dated **observations**
-about a component (observed / verified / partial / not-observed) through a reviewed JSON Patch; each one
-stays private and unreviewed until an author reviews it in Edit mode. Only reviewed, public observations reach
-the public portfolio, a story or the standalone HTML export; the portfolio index additionally requires the author
-to mark a card shareable. Credential-like
-values, `.env`-looking text and synthetic evidence backing a claim are refused. See
-[docs/contracts/realization-overlay.md](docs/contracts/realization-overlay.md) for the field-level contract,
-the patch format, the review lifecycle and the deep-link format used to open a component directly.
-
-## Root architecture
-
-`src/core/model.ts` is the source-of-truth contract. The UI and exporters are adapters; React Flow serialization is not the document format.
-
-```text
-AI / JSON import -> schema + reference validation -> canonical Project
-                                                   |             |
-                                            IndexedDB         public filter
-                                                   |             |
-                                          React + Fluent     HTML / SVG / PNG
-                                           React Flow        PPTX / Mermaid
-```
-
-Read [architecture](docs/ARCHITECTURE.md), [research and license matrix](docs/RESEARCH.md), [roadmap](docs/ROADMAP.md), and [AI editing instructions](AGENTS.md). The build generates `public/diagramcloud.schema.json` plus JSON/HTML/SVG examples. JSON Schema checks structure; `validateDocument` additionally checks references, memberships and drilldown cycles.
+Local contract support (no companion app required): `galaxy.entity/1`, `galaxy.evidence-ref/1`, `galaxy.version-handshake/1`, `galaxy.publication-snapshot/1` (produce and consume through review), `galaxy.deep-link/1` (`diagramcloud.project-view-node/1`, `?project=&view=&node=`, parent drilldown kept, visible failure for unresolved targets) and `galaxy.verification-receipt/1` (release evidence). Galaxy owner app ID: `diagramcloud`. See [docs/contracts/galaxy-v1g.md](docs/contracts/galaxy-v1g.md).
 
 ## Storage and safety
 
-Projects are saved in this browser's IndexedDB. Clearing site data or using a different browser/profile does not preserve the workspace. Export Authoring JSON backups. Save failures and conflicting edits from another tab are surfaced; there is no server synchronization or collaborative merge. Undo history is bounded and in-memory.
+Projects live in this browser's IndexedDB. Saves are queued so only the newest edit can report "Saved locally"; save failures, quota errors, corrupt rows (quarantined, with a recovery screen) and edits from another tab are surfaced; unsaved work triggers a leave-page guard. There is no server synchronization or collaborative merge. Export Authoring JSON backups.
 
-Private objects are removed from public outputs, not merely hidden with CSS. This is not secret scanning or an access-control system: a sensitive fact marked public remains public. Never publish credentials, customer records, private screenshots or employer data without authorization.
+Credential-like values and `.env`-looking text are refused where content crosses an app boundary (observations, snapshots, receipts, the portfolio index). This is not secret scanning, DLP or access control: a sensitive fact marked public remains public. Human publication review remains required.
 
-Motion represents an authored explanation: stream/batch/query/control links and slow/medium/fast visual cues. It is not measured throughput, Spark execution or a performance comparison. Activity rings move around symbols; Microsoft product artwork itself is not rotated.
+## Current limitations
 
-## License and scope
+These are the genuine post-V1 boundaries (full list and candidates in [docs/ROADMAP.md](docs/ROADMAP.md)):
 
-Original DiagramCloud source is MIT. Dependencies and Microsoft artwork retain their own licenses and usage terms; see [third-party notices](THIRD_PARTY_NOTICES.md). No font files are bundled. Only one official Fabric item icon is currently bundled; other symbols are original generic symbols. This is not yet a complete cloud icon collection.
+- Chrome/Chromium only is qualified; other browsers are untested.
+- No full draw.io/Visio import, no arbitrary SVG → editable graph, no lossless Mermaid round trip.
+- The layout button is a grid, not a graph auto-layout engine; export routing avoids boxes on the shipped samples (unit-tested), not on every possible layout. The interactive canvas routes edges on its own.
+- No live cloud discovery, no execution of SQL/DAX/Python/Spark, no real-time collaboration or server sync.
+- Observations are one-time reviewed imports, not subscriptions; DiagramCloud never polls another app.
+- The DataPass folder bridge needs the folder to be chosen again after a reload (the handle is not persisted).
+- Vendor artwork: eight Microsoft Fabric item icons; Azure and Databricks use generic symbols.
+- PPTX fidelity is a semantic reconstruction, not a pixel copy of arbitrary layouts.
 
-V1 is a working foundation, not a replacement for every feature of draw.io. It does not yet provide live cloud discovery, SQL/dbt lineage parsing, general draw.io/Visio import, automatic graph layout, real-time collaboration or a DAX/Python runtime. Those should extend the same core rather than become separate apps.
+## License and documents
 
+Original source is MIT. Dependencies and Microsoft artwork keep their own terms: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). No font files are bundled.
 
-### V1.1 reliability work
-
-The current reliability branch adds latest-snapshot autosave status, rapid-edit history hardening, corrupt-row isolation, same-project JSON/AI revision guards with stable-ID change previews, shared SVG/PPTX orthogonal routing, Mermaid label escaping, and regression tests. These are incremental V1 improvements; schema version remains `1` and the renderer-independent JSON contract is unchanged.
-
-
-### V1.2 optional Google Drive asset vault
-
-The `feat/diagramcloud-v1.2-drive-assets` pass adds a user-triggered Google Drive image connector without changing the local-first ownership model. Images imported from Drive are normalized and cached in the project; editable PPTX and standalone HTML exports use that cached copy and therefore remain independent of Drive authentication. Drive uses the narrow `drive.file` scope, and authoring-only Drive identifiers are removed from public documents.
-
-See [docs/GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md) for Google Cloud setup, Picker configuration, security boundaries and the AI-image workflow.
-
-
-### V1.3 architecture lab
-
-The `feat/diagramcloud-v1.3-architecture-lab` branch turns DiagramCloud into the working architecture map for the current Datapass/Foil environment. The default sample drills from the overall project map into the Foil multi-cloud macro architecture, then into provider responsibilities such as BigQuery historical analytics, and finally into static table rows, SQL tasks and expected outputs. The app remains explanatory: it does not execute BigQuery, Oracle, Fabric, Databricks or Airflow.
-
-Google Drive is widened from image-only backup into a user-triggered project file archive for PNG/JPEG/WebP/PDF/PPTX. Binary exports remain outside the DiagramCloud JSON document; image evidence still uses the bounded sanitized local cache. The architecture sample models Cloud Storage as the optional object layer and BigQuery as searchable metadata/historical analytics rather than a binary file store or duplicate medallion lakehouse.
-
-
-## Deploy on Vercel
-
-V1.3 includes a root `vercel.json` for the Vite application:
-
-- install: `npm ci`
-- build: `npm run build`
-- output: `dist`
-- framework: Vite
-
-Use Vercel's Git import / Deploy Button with the V1.3 branch:
-
-`https://github.com/julian-passebecq/diagramcloud/tree/feat/diagramcloud-v1.3-architecture-lab`
-
-The application itself requires no server or database. Google Drive support is optional. To enable Drive on the deployed site, configure `VITE_GOOGLE_CLIENT_ID`, `VITE_GOOGLE_PICKER_API_KEY`, and `VITE_GOOGLE_APP_ID` in Vercel and add the final Vercel origin to the Google OAuth Authorized JavaScript origins / Picker website restrictions.
-
-See `docs/VERCEL.md`.
+Read next: [AGENTS.md](AGENTS.md) (rules for AI and human contributors), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/RELEASE.md](docs/RELEASE.md), [docs/ROADMAP.md](docs/ROADMAP.md), [docs/RESEARCH.md](docs/RESEARCH.md), [docs/GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Documents under `docs/pro-pass/` and `docs/ARTIFACT_PLATFORM.md` are historical working notes.

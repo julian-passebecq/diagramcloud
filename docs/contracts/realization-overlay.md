@@ -245,6 +245,23 @@ Mongoku-datapass commit `8e83981` (2026-09-25), `src/lib/datapass/projection.ts`
 DiagramCloud code: the portfolio index must pass Mongoku's own rules, not only DiagramCloud's mirror of
 them. Update the port when Mongoku's contract changes.
 
+## Realization in exports (1.0)
+
+Every public export is built from `publicDocument`, so only **Presented** observations (reviewed and public)
+can appear; private or unreviewed observations reach none of them. Representation varies by format:
+
+| Export | What survives |
+|---|---|
+| SVG / PNG | A claim badge (Observed, Verified, Partial, Not observed) on the component's footer row, drawn by the shared scene (`buildScene`); the SVG badge carries the full provenance as its `<title>`; a footnote explains that unbadged components are planned / designed only |
+| Standalone HTML | The same badged diagrams, plus the per-component "Observed by other apps" list and story citations |
+| Project PPTX | A native, editable badge on each view slide; owner, authority, revision, date and caveat in the slide notes; a **Realization** appendix table before the sources |
+| Project deck | Badged architecture slides; a **Realization** section before Sources (no linked slide moves) |
+| Scope deck | Not applicable: scope decks contain task screens only, not architecture components |
+| Mermaid | Intentionally lossy: a `classDef`/`class` per claim and one `%%` comment per observation (claim, source app, revision, date). Evidence, caveats, hierarchy and authority detail stay in JSON |
+| Portfolio index | Only observations the author also marked shareable (see above) |
+
+Badges never use green: a verified claim is the source app's statement, not a DiagramCloud validation.
+
 ## Deep-link format
 
 `?project=<id>&view=<id>&node=<id>` (`src/core/links.ts`). Only stable IDs travel (`^[a-z][a-z0-9_.-]{0,79}$`);

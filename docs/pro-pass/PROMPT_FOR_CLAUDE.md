@@ -1,5 +1,7 @@
 # Prompt for Claude — continue DiagramCloud Pro and DataPass bridge
 
+> **Historical working note.** Kept for context; it describes an earlier pass and may name branches, limits or plans that no longer apply. The current state is in [README.md]({r}README.md) and [docs/RELEASE.md]({r}docs/RELEASE.md).
+
 You are taking over an existing implementation. Do **not** restart or redesign it from scratch.
 
 ## Repositories
