@@ -21,13 +21,20 @@ jobs:
       - name: Install
         run: npm ci --no-fund --no-audit
       - name: Typecheck
+        id: typecheck
         run: npm run check
       - name: Unit tests
+        id: unit
         run: npm test
       - name: Build
+        id: build
         run: npm run build
       - name: Browser tests
+        id: e2e
         run: npx playwright install --with-deps chromium && npm run test:e2e
+      - name: Verification receipt
+        if: always()
+        run: npx tsx scripts/qualify.ts record typecheck=${{ steps.typecheck.outcome }} unit=${{ steps.unit.outcome }} build=${{ steps.build.outcome }} e2e=${{ steps.e2e.outcome }}
       - name: Package source and build
         if: always()
         run: |

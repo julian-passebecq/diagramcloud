@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {samples} from '../src/data/samples';
 import {applyDocumentPatch} from '../src/core/patch';
 import {
- DIAGRAMCLOUD_DEEP_LINK_ROUTE,GALAXY_V1G_CONTRACTS,
+ DIAGRAMCLOUD_DEEP_LINK_ROUTE,DIAGRAMCLOUD_GALAXY_CONTRACTS,GALAXY_V1G_CONTRACTS,
  entityIdFor,galaxyEntity,publicationSnapshot,stagePublicationSnapshot,
  validatePublicationSnapshot,versionHandshake
 } from '../src/core/galaxy';
@@ -24,7 +24,8 @@ test('DiagramCloud publishes a G0 standalone handshake with the supported contra
  assert.equal(hs.app_id,'diagramcloud');
  assert.equal(hs.galaxy_level,'G0');
  assert.equal(hs.standalone,true);
- assert.deepEqual(hs.contracts.map(c=>c.contract_id),[...GALAXY_V1G_CONTRACTS]);
+ assert.deepEqual(hs.contracts.map(c=>c.contract_id),[...DIAGRAMCLOUD_GALAXY_CONTRACTS]);
+ assert.equal(hs.contracts.find(c=>c.contract_id==='galaxy.verification-receipt/1')?.required,false);
  assert.deepEqual(hs.deep_link_routes,[DIAGRAMCLOUD_DEEP_LINK_ROUTE.route_id]);
  assert(hs.degradation?.some(x=>/fully usable/.test(x)));
 });
