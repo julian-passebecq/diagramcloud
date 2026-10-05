@@ -4,7 +4,19 @@ import type {Project} from '../core/model';
 /** Gallery buckets: the author's portfolio, the cloud architecture reference gallery, and the user's own or imported projects. */
 export type GalleryFilter='all'|'portfolio'|'cloud'|'mine';
 export const GALLERY_FILTERS:{id:GalleryFilter;label:string}[]=[{id:'all',label:'All'},{id:'portfolio',label:'Portfolio'},{id:'cloud',label:'Cloud architectures'},{id:'mine',label:'Your projects'}];
-export function galleryBucket(p:Project):Exclude<GalleryFilter,'all'>{return p.category==='Portfolio'?'portfolio':p.category==='Reference'?'cloud':'mine';}
+/** The DataPass planning maps are reference-category documents about the author's own work, so they sit with the portfolio. */
+export function galleryBucket(p:Project):Exclude<GalleryFilter,'all'>{
+ if(p.category==='Portfolio'||p.category==='Reference'&&p.tags.some(t=>t==='Portfolio'||t==='Datapass'))return 'portfolio';
+ return p.category==='Reference'?'cloud':'mine';
+}
+/** The small caption above a gallery card's title. */
+export function galleryCaption(p:Project):string{
+ if(p.tags.includes('Imported'))return `Imported · ${p.tags[1]??'diagram'}`;
+ const bucket=galleryBucket(p);
+ if(bucket==='portfolio')return p.category==='Portfolio'?'Portfolio':'Portfolio map';
+ if(bucket==='cloud')return `Cloud architecture${p.tags[0]&&p.tags[0]!==p.title?` · ${p.tags[0]}`:''}`;
+ return p.category;
+}
 
 const MARKS:Record<string,string>={'Microsoft Fabric':'F',Databricks:'D',AWS:'A',Azure:'Az','Google Cloud':'G',Kubernetes:'K8',Imported:'↧'};
 /** The small letter mark on a gallery card, from the project's first technology tag. */
