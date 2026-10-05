@@ -15,6 +15,22 @@ export type IconEntry={
  terms?:{name:string;url:string};rules?:string[];
 };
 
+/*
+ * Curated, not exhaustive: Microsoft Fabric items used by the samples and the DataPass ecosystem. Azure and
+ * Databricks concepts use the original generic symbols: Azure artwork ships as a separate download with its own
+ * terms, and Databricks publishes no icon usage terms, so neither is bundled. Adding one is a per-icon decision
+ * with its terms checked first.
+ */
+/** A Microsoft Fabric item icon from the same pinned FabricTools/fabric-icons commit and terms as the entries above. */
+function fabricIcon(id:string,upstream:string,label:string,represents:string,blob:string):IconEntry{
+ const path=`node_modules/@fabric-msft/svg-icons/svg/${upstream}_48_item.svg`;
+ return {id,label,origin:'vendor',alt:`${label} icon`,file:`icons/${id}.svg`,vendor:'Microsoft',represents,
+  source:{repository:'FabricTools/fabric-icons',path,commit:'e206270f367dc440b5bf6bc94f0f6267b922d596',blob,packageName:'@fabric-msft/svg-icons',packageVersion:'8.2.0',
+   url:`https://github.com/FabricTools/fabric-icons/blob/e206270f367dc440b5bf6bc94f0f6267b922d596/${path}`},
+  terms:{name:'Microsoft Fabric icons usage terms',url:'https://learn.microsoft.com/en-us/fabric/fundamentals/icons'},
+  rules:[`Use only to represent ${represents}, labelled as such.`,'Do not crop, flip, rotate, recolour or distort the artwork.','Do not use it as a logo for DiagramCloud or any other product.','Not covered by the DiagramCloud MIT licence, nor by the source repository\'s licence.']};
+}
+
 export const ICON_REGISTRY:IconEntry[]=[
  {id:'generic',label:'Generic component symbol',origin:'original',alt:'',
   rules:['Original DiagramCloud line symbols chosen by component kind. Not a vendor logo.']},
@@ -34,6 +50,12 @@ export const ICON_REGISTRY:IconEntry[]=[
    url:'https://github.com/FabricTools/fabric-icons/blob/e206270f367dc440b5bf6bc94f0f6267b922d596/node_modules/@fabric-msft/svg-icons/svg/pipeline_48_item.svg'},
   terms:{name:'Microsoft Fabric icons usage terms',url:'https://learn.microsoft.com/en-us/fabric/fundamentals/icons'},
   rules:['Use only to represent the Microsoft Fabric pipeline item it depicts, labelled as such.','Do not crop, flip, rotate, recolour or distort the artwork.','Do not use it as a logo for DiagramCloud or any other product.','Not covered by the DiagramCloud MIT licence, nor by the source repository\'s licence.']},
+ fabricIcon('fabric-data-warehouse','data_warehouse','Microsoft Fabric Warehouse','a Microsoft Fabric Warehouse item','624222e8fad1dfb1285aab130884645895d22aad'),
+ fabricIcon('fabric-notebook','notebook','Microsoft Fabric Notebook','a Microsoft Fabric Notebook item','f329876b4e02ccabd1b2cdc01d26102f008c47c0'),
+ fabricIcon('fabric-semantic-model','semantic_model','Microsoft Fabric Semantic model','a Microsoft Fabric / Power BI semantic model item','8fe5fc93fe7d6f536629b5e5ba0d5f314a7bc516'),
+ fabricIcon('fabric-sql-database','sql_database','Microsoft Fabric SQL database','a Microsoft Fabric SQL database item','04e1ead5f1239138b4c19dcb89423597012afb3a'),
+ fabricIcon('fabric-eventstream','eventstream','Microsoft Fabric Eventstream','a Microsoft Fabric Real-Time Intelligence Eventstream item','bfe104a0ec081b3c3f7db5bbab56959d18632905'),
+ fabricIcon('fabric-kql-database','kql_database','Microsoft Fabric KQL database','a Microsoft Fabric Real-Time Intelligence KQL database item (inside an Eventhouse)','894da8130df7afc8f5fa977be04721ae1945a3cd'),
 ];
 
 const BY_ID=new Map(ICON_REGISTRY.map(e=>[e.id,e]));
