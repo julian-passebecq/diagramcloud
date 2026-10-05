@@ -44,3 +44,28 @@ export function observationPatch(doc:Pick<Project,'id'|'revision'>,input:Observa
   summary:`Add a ${input.sourceApp} observation for ${input.nodeId} (${input.claim}, revision ${input.sourceRevision})`,
   operations:[{op:'test',path:`/nodes/@${input.nodeId}/id`,value:input.nodeId},{op:'add',path:'/observations/-',value}]};
 }
+
+/**
+ * Export grammar for realization. Exports show only Presented observations (reviewed and public): a badge on the
+ * component, the full provenance in notes or an appendix. Colours never use green, because a verified claim is
+ * the source app's statement, not a DiagramCloud validation.
+ */
+export const CLAIM_BADGE:Record<Observation['claim'],{text:string;fill:string;stroke:string;ink:string}>={
+ observed:{text:'Observed',fill:'E8F0FE',stroke:'2563EB',ink:'1D4ED8'},
+ verified:{text:'Verified',fill:'E0E7FF',stroke:'3730A3',ink:'312E81'},
+ partial:{text:'Partial',fill:'FEF3C7',stroke:'B45309',ink:'92400E'},
+ 'not-observed':{text:'Not observed',fill:'F1F5F9',stroke:'64748B',ink:'475569'}
+};
+export const REALIZATION_EXPORT_NOTE='Badges show reviewed, public observations owned by other apps; unbadged components are planned / designed only. Design status is illustrative.';
+/** The newest Presented observation about a component, if any. */
+export function presentedObservation(doc:Pick<Project,'observations'>,nodeId:string):Observation|undefined{
+ return observationsFor(doc,nodeId).find(isPresented);
+}
+/** Every Presented observation, newest first: what an appendix or notes may cite. */
+export function presentedObservations(doc:Pick<Project,'observations'>):Observation[]{
+ return doc.observations.filter(isPresented).sort((a,b)=>Date.parse(b.observedAt)-Date.parse(a.observedAt));
+}
+/** One plain-text line with the claim, its owner, the revision and the date. */
+export function observationLine(o:Observation,component:string):string{
+ return `${component}: ${CLAIM_LABEL[o.claim]} by ${o.sourceApp} (authority: ${o.authority}) at revision ${o.sourceRevision}, observed ${day(o.observedAt)}. ${o.summary}${o.caveat?` Caveat: ${o.caveat}`:''}`;
+}

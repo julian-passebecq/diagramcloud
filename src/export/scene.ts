@@ -1,6 +1,7 @@
-import type {Project,ProjectView} from '../core/model';
+import type {Observation,Project,ProjectView} from '../core/model';
 import {positionFor} from '../core/operations';
 import {iconFor,type IconEntry} from '../core/icons';
+import {CLAIM_BADGE,presentedObservation,realizationOf} from '../core/realization';
 import {measureLines,textWidth} from './measure';
 export type ScenePoint={x:number;y:number};
 export type SceneBounds={x:number;y:number;width:number;height:number};
@@ -54,12 +55,14 @@ export type SceneText={lines:string[];x:number;y:number;size:number;lineHeight:n
  /** For a label beside a vertical line: the y range its anchor may slide along; layout only. */
  span?:[number,number]};
 export type SceneIcon={entry:IconEntry;x:number;y:number;size:number};
-export type SceneNode={id:string;x:number;y:number;w:number;h:number;provider:SceneText;label:SceneText;summary:SceneText;footer:SceneText;icon?:SceneIcon;childViewId?:string;experienceWorkspaceId?:string};
+/** A reviewed, public observation drawn on the footer row: claim badge plus the full provenance as a tooltip/note. */
+export type SceneBadge={claim:Observation['claim'];x:number;y:number;w:number;h:number;fill:string;stroke:string;text:SceneText;title:string};
+export type SceneNode={id:string;x:number;y:number;w:number;h:number;provider:SceneText;label:SceneText;summary:SceneText;footer:SceneText;icon?:SceneIcon;realization?:SceneBadge;childViewId?:string;experienceWorkspaceId?:string};
 export type SceneEdge={id:string;points:ScenePoint[];dashed:boolean;label?:SceneText};
 export type Scene={bounds:SceneBounds;nodes:SceneNode[];edges:SceneEdge[];vendorIcons:IconEntry[]};
 
 export const SCENE_FONT='Arial';
-export const NODE_PAD=16,ICON_SIZE=22,EDGE_LABEL_WIDTH=150;
+export const NODE_PAD=16,ICON_SIZE=22,EDGE_LABEL_WIDTH=150,BADGE_SIZE=9;
 const INK='16263d',MUTED='52647a',LINK='2563eb',EDGE='45556d';
 
 function text(value:string,x:number,y:number,width:number,size:number,lineHeight:number,color:string,maxLines:number,bold=false,anchor:'start'|'middle'='start'):SceneText{
@@ -76,8 +79,12 @@ export function buildScene(d:Project,view:ProjectView):Scene{
   const label=text(n.label,x+NODE_PAD,y+44,inner,14,17,INK,2,true);
   const summaryTop=label.y+label.lineHeight*(label.lines.length-1)+16;
   const summary=text(n.summary,x+NODE_PAD,summaryTop,inner,10,12.5,MUTED,label.lines.length>1?1:2);
-  const footer=text(n.childViewId?'Open subdiagram':n.blockIds.length?`${n.blockIds.length} evidence block${n.blockIds.length===1?'':'s'}`:'Component',x+NODE_PAD,y+h-11,inner,10,12.5,LINK,1);
-  return {id:n.id,x,y,w,h,provider,label,summary,footer,icon,...(n.childViewId?{childViewId:n.childViewId}:{}),...(n.experienceWorkspaceId?{experienceWorkspaceId:n.experienceWorkspaceId}:{})};
+  // Only a Presented observation (reviewed and public) gets a badge, so a private or unreviewed claim never shows.
+  const obs=presentedObservation(d,n.id),style=obs?CLAIM_BADGE[obs.claim]:undefined,bw=style?Math.ceil(textWidth(style.text,BADGE_SIZE,true))+10:0;
+  const realization=obs&&style?{claim:obs.claim,x:x+w-NODE_PAD-bw,y:y+h-11-BADGE_SIZE-1,w:bw,h:BADGE_SIZE+5,fill:style.fill,stroke:style.stroke,
+   text:text(style.text,x+w-NODE_PAD-bw+5,y+h-11,bw,BADGE_SIZE,BADGE_SIZE+2,style.ink,1,true),title:realizationOf({observations:[obs]},n.id).title}:undefined;
+  const footer=text(n.childViewId?'Open subdiagram':n.blockIds.length?`${n.blockIds.length} evidence block${n.blockIds.length===1?'':'s'}`:'Component',x+NODE_PAD,y+h-11,inner-(bw?bw+6:0),10,12.5,LINK,1);
+  return {id:n.id,x,y,w,h,provider,label,summary,footer,icon,...(realization?{realization}:{}),...(n.childViewId?{childViewId:n.childViewId}:{}),...(n.experienceWorkspaceId?{experienceWorkspaceId:n.experienceWorkspaceId}:{})};
  });
  const boxes=nodes.map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
  const shown=d.edges.filter(e=>view.edgeIds.includes(e.id));

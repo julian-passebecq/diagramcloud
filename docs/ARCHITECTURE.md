@@ -1,4 +1,6 @@
-# Architecture decision record - V1
+# Architecture decision record
+
+Current for DiagramCloud 1.0.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -242,3 +244,15 @@ In PowerPoint the icon is an SVG with a PNG fallback. In the browser pptxgenjs d
 - there is no auto-layout, and the channel search is a fallback, not a general obstacle router: it does not minimise crossings between connections or balance lanes across a whole view, and it gives up (keeping the fewest-crossings candidate) when boxes leave no free channel
 - lanes are separated per straight stretch; crossings between different connections are allowed
 - the canvas is not drawn from the scene
+
+## 1.0 additions
+
+**Realization in exports.** The export scene carries an optional realization badge per node (`SceneNode.realization`), only for Presented observations (reviewed and public; `presentedObservation` in `src/core/realization.ts`). SVG, PNG, PPTX, the project deck, HTML and Mermaid draw it from that one decision, so no export can show an unreviewed or private claim. Colours come from `CLAIM_BADGE` (blue/indigo/amber/slate, never green). Details: [realization contract](contracts/realization-overlay.md#realization-in-exports-10).
+
+**Tables and transformations without JSON.** `src/core/table.ts` owns table drafts (cell parsing, row/column operations, TSV/CSV paste, limits of 20 columns and 500 rows) and refuses blank or duplicate column names. Evidence blocks can carry an optional `transform` step (`input`, `logic`, `output`, `mapping`, `rules`); `src/core/transform.ts` groups them into the transformation explainer. It is explanatory only: nothing is executed, and template input/output rows are labelled synthetic. Both are additive optional fields: the document schema stays 1.
+
+**Inspector grammar.** `src/ui/Inspector.tsx` presents every component in a fixed order (Identity, Meaning, Realization, Evidence, Work, Publication), and the edit form uses the same groups. Visual editors (`src/ui/BlockEditor.tsx`, `src/ui/SourcesEditor.tsx`) cover tables, text/code/images, metrics and project sources; "Edit as JSON" stays as a per-block fallback.
+
+**Verification receipt.** `galaxy.verification-receipt/1` (`src/core/galaxy.ts`) records a release's qualification: the exact git commit, a clean tree, the checks run and the level they support (IMPLEMENTED → BUILD_VERIFIED → PACKAGE_VERIFIED → E2E_VERIFIED → MANUAL_QUALIFIED). The level is derived from the checks and never inferred upward; `GALAXY_QUALIFIED` and any Galaxy level other than G0 are refused. `scripts/qualify.ts` writes it locally (`npm run qualify`) or from CI step outcomes. See [RELEASE.md](RELEASE.md).
+
+**Version.** `package.json` is the single product version: Vite injects it as `__APP_VERSION__` (header, footer, About) and the generator writes it into the Galaxy handshake.

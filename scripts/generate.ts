@@ -1,4 +1,4 @@
-import {mkdirSync,writeFileSync} from 'node:fs';
+import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
 import {zodToJsonSchema} from 'zod-to-json-schema';
 import {documentSchema,validateDocument} from '../src/core/model';
 import {samples} from '../src/data/samples';
@@ -16,9 +16,12 @@ import {
  evidenceRefSchema,
  galaxyEntitySchema,
  publicationSnapshotSchema,
+ verificationReceiptSchema,
  versionHandshake,
  versionHandshakeSchema
 } from '../src/core/galaxy';
+
+const productVersion=(JSON.parse(readFileSync('package.json','utf8')) as {version:string}).version;
 
 checkIcons();
 const icons=fileIcons();
@@ -39,14 +42,15 @@ const galaxySchemas=[
  ['entity.schema.json',galaxyEntitySchema,'GalaxyEntity'],
  ['evidence-ref.schema.json',evidenceRefSchema,'GalaxyEvidenceRef'],
  ['version-handshake.schema.json',versionHandshakeSchema,'GalaxyVersionHandshake'],
- ['publication-snapshot.schema.json',publicationSnapshotSchema,'GalaxyPublicationSnapshot']
+ ['publication-snapshot.schema.json',publicationSnapshotSchema,'GalaxyPublicationSnapshot'],
+ ['verification-receipt.schema.json',verificationReceiptSchema,'GalaxyVerificationReceipt']
 ] as const;
 for(const [file,zodSchema,name] of galaxySchemas){
  writeFileSync(`public/galaxy/${file}`,JSON.stringify(zodToJsonSchema(zodSchema,{name,target:'jsonSchema7'}),null,2)+'\n');
 }
 const generatedAt=process.env.SOURCE_DATE_EPOCH?new Date(Number(process.env.SOURCE_DATE_EPOCH)*1000):new Date();
 writeFileSync('public/galaxy/version-handshake.json',JSON.stringify(versionHandshake({
- productVersion:'0.1.0',
+ productVersion,
  generatedAt,
  ...(process.env.GITHUB_SHA?{sourceRevision:process.env.GITHUB_SHA}:{})
 }),null,2)+'\n');

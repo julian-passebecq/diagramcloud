@@ -47,6 +47,21 @@ Source: https://github.com/FabricTools/fabric-icons/blob/e206270f367dc440b5bf6bc
 
 The source repository's MIT licence covers that repository's own code, not Microsoft's artwork. The same Microsoft usage rules as for the Lakehouse artwork apply: it identifies the Fabric Data Factory pipeline item in the Microsoft Fabric sample ("Data Factory pipeline" box) and is shown unmodified and labelled.
 
+## Further Microsoft Fabric item artwork (1.0)
+
+Same source repository, package (`@fabric-msft/svg-icons` 8.2.0), commit `e206270f367dc440b5bf6bc94f0f6267b922d596` and Microsoft usage terms (https://learn.microsoft.com/en-us/fabric/fundamentals/icons) as the Lakehouse and Pipeline artwork above. Each file is byte-identical to upstream; the build recomputes the git blob. The Lakehouse artwork is also used for the Fabric sample's Silver layer, following Microsoft's lakehouse-per-layer medallion guidance.
+
+| File | Upstream file | Represents | Git blob | Used for |
+|---|---|---|---|---|
+| `public/icons/fabric-data-warehouse.svg` | `data_warehouse_48_item.svg` | Microsoft Fabric Warehouse item | `624222e8fad1dfb1285aab130884645895d22aad` | Available to authors; not used by a sample. |
+| `public/icons/fabric-notebook.svg` | `notebook_48_item.svg` | Microsoft Fabric Notebook item | `f329876b4e02ccabd1b2cdc01d26102f008c47c0` | Available to authors; not used by a sample. |
+| `public/icons/fabric-semantic-model.svg` | `semantic_model_48_item.svg` | Microsoft Fabric Semantic model item | `8fe5fc93fe7d6f536629b5e5ba0d5f314a7bc516` | Microsoft Fabric sample, "Semantic model + Power BI" box. |
+| `public/icons/fabric-sql-database.svg` | `sql_database_48_item.svg` | Microsoft Fabric SQL database item | `04e1ead5f1239138b4c19dcb89423597012afb3a` | Available to authors; not used by a sample. |
+| `public/icons/fabric-eventstream.svg` | `eventstream_48_item.svg` | Microsoft Fabric Eventstream item | `bfe104a0ec081b3c3f7db5bbab56959d18632905` | DataPass architecture sample, "Eventstream ingestion" box. |
+| `public/icons/fabric-kql-database.svg` | `kql_database_48_item.svg` | Microsoft Fabric KQL database item | `894da8130df7afc8f5fa977be04721ae1945a3cd` | DataPass architecture sample, "Eventhouse / KQL" box. |
+
+Azure and Databricks artwork is not bundled: Azure icons are a separate download with their own terms and Databricks publishes no icon usage terms, so those concepts use original generic symbols.
+
 The icon registry in `src/core/icons.ts` is the source of truth for every icon ID: a vendor icon is drawn only if it is registered with its source, version, blob and terms, and `scripts/icons.ts` fails the build for an unregistered or modified file in `public/icons`. Other symbols in `src/ui/Canvas.tsx` are original generic component symbols, not representations claimed to be official vendor logos. The activity animation surrounds the icon; it does not rotate the Microsoft artwork.
 
 ## Fonts and portfolio content

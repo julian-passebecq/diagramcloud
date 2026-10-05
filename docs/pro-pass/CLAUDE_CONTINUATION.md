@@ -1,5 +1,7 @@
 # Claude continuation — DiagramCloud Pro + DataPass bridge
 
+> **Historical working note.** Kept for context; it describes an earlier pass and may name branches, limits or plans that no longer apply. The current state is in [README.md]({r}README.md) and [docs/RELEASE.md]({r}docs/RELEASE.md).
+
 Date: 2026-09-24  
 Primary repo: `julian-passebecq/diagramcloud`  
 Working branch: `feat/diagramcloud-experience-pro-pass`  

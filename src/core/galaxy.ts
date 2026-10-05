@@ -123,7 +123,8 @@ export function versionHandshake({productVersion,generatedAt=new Date(),sourceRe
    {contract_id:'galaxy.evidence-ref/1',role:'both',required:true},
    {contract_id:'galaxy.version-handshake/1',role:'produce',required:true},
    {contract_id:'galaxy.publication-snapshot/1',role:'both',required:true},
-   {contract_id:'galaxy.deep-link/1',role:'produce',required:true}
+   {contract_id:'galaxy.deep-link/1',role:'produce',required:true},
+   {contract_id:'galaxy.verification-receipt/1',role:'produce',required:false}
   ],
   capabilities:[
    {capability_id:'graph',status:'available'},
@@ -347,4 +348,105 @@ export function stagePublicationSnapshot(doc:Project,raw:unknown):StagedPublicat
  const summary=`Stage ${inputs.length} reviewed Galaxy realization claim${inputs.length===1?'':'s'} from ${snapshot.producer.app_id}`.slice(0,500);
  const patch:Patch={format:PATCH_FORMAT,version:1,target:'project',targetId:doc.id,baseRevision:doc.revision,summary,operations};
  return {snapshot,patch,candidates,unresolved};
+}
+
+/** Contracts DiagramCloud speaks: the V1G set plus the release verification receipt it produces. */
+export const DIAGRAMCLOUD_GALAXY_CONTRACTS=[...GALAXY_V1G_CONTRACTS,'galaxy.verification-receipt/1'] as const;
+
+/** Galaxy qualification taxonomy, weakest first. A level is never inferred from a lower one. */
+export const QUALIFICATION_LEVELS=['DECLARED','IMPLEMENTED','BUILD_VERIFIED','PACKAGE_VERIFIED','E2E_VERIFIED','MANUAL_QUALIFIED','GALAXY_QUALIFIED'] as const;
+export type QualificationLevel=typeof QUALIFICATION_LEVELS[number];
+/**
+ * Checks each level needs, cumulatively. GALAXY_QUALIFIED is deliberately absent: it needs a cross-app
+ * qualification that happens outside DiagramCloud, so a DiagramCloud receipt can never claim it.
+ */
+export const RECEIPT_LEVEL_CHECKS:Partial<Record<QualificationLevel,readonly string[]>>={
+ IMPLEMENTED:['typecheck'],
+ BUILD_VERIFIED:['typecheck','unit','build'],
+ PACKAGE_VERIFIED:['typecheck','unit','build','package'],
+ E2E_VERIFIED:['typecheck','unit','build','package','e2e'],
+ MANUAL_QUALIFIED:['typecheck','unit','build','package','e2e','manual-visual']
+};
+export const receiptCheckSchema=z.object({
+ check_id:z.string().regex(/^[a-z][a-z0-9_-]{0,63}$/),
+ status:z.enum(['passed','failed','skipped','not_run']),
+ command:z.string().min(1).max(300).optional(),
+ summary:z.string().max(500).optional(),
+ duration_ms:z.number().int().nonnegative().optional(),
+ evidence_ref_ids:z.array(entityId).max(20).default([])
+}).strict();
+export type ReceiptCheck=z.input<typeof receiptCheckSchema>;
+export const verificationReceiptSchema=z.object({
+ schema_version:z.literal(1),
+ receipt_id:z.string().min(1).max(300),
+ subject:galaxyEntitySchema,
+ app_id:appId,
+ product_version:z.string().min(1).max(80),
+ document_schema_version:z.number().int().positive(),
+ galaxy_level:z.enum(['G0','V1G','V2G','V3G']),
+ revision:z.object({
+  vcs:z.literal('git'),
+  repository:z.string().min(1).max(200),
+  commit:z.string().regex(/^[0-9a-f]{40}$/,'Record the full 40-character commit SHA'),
+  branch:z.string().max(200).optional(),
+  dirty:z.boolean()
+ }).strict(),
+ verification_level:z.enum(QUALIFICATION_LEVELS),
+ status:z.enum(['passed','failed']),
+ checks:z.array(receiptCheckSchema).min(1).max(40),
+ evidence_refs:z.array(evidenceRefSchema).max(40).default([]),
+ created_at:instant,
+ caveats:z.array(z.string().min(1).max(500)).max(20).default([])
+}).strict();
+export type VerificationReceipt=z.infer<typeof verificationReceiptSchema>;
+
+const passed=(checks:ReceiptCheck[],id:string)=>checks.some(c=>c.check_id===id&&c.status==='passed');
+/** Highest level whose every required check passed, walking up from the weakest; DECLARED when even typecheck did not pass. */
+export function receiptLevel(checks:ReceiptCheck[]):QualificationLevel{
+ let level:QualificationLevel='DECLARED';
+ for(const l of QUALIFICATION_LEVELS){const need=RECEIPT_LEVEL_CHECKS[l];if(!need)continue;if(need.every(id=>passed(checks,id)))level=l;else break;}
+ return level;
+}
+
+/**
+ * Validates one release receipt: an exact committed revision, a level backed by its checks, real (non-synthetic)
+ * evidence, and neither GALAXY_QUALIFIED nor a Galaxy maturity promotion produced by DiagramCloud on its own.
+ */
+export function validateVerificationReceipt(raw:unknown):VerificationReceipt{
+ const secrets=secretFindings(raw);if(secrets.length)throw new Error(`VerificationReceipt refused: ${secrets.slice(0,10).join('; ')}`);
+ const r=verificationReceiptSchema.parse(raw),errors:string[]=[];
+ if(r.revision.dirty)errors.push('A receipt describes one exact committed revision; the working tree had uncommitted changes');
+ if(r.subject.owner_app!==r.app_id)errors.push(`Receipt subject is owned by ${r.subject.owner_app}, not ${r.app_id}`);
+ if(r.verification_level==='GALAXY_QUALIFIED'&&r.app_id==='diagramcloud')errors.push('GALAXY_QUALIFIED needs a cross-app qualification outside DiagramCloud; a DiagramCloud receipt cannot claim it');
+ if(r.app_id==='diagramcloud'&&r.galaxy_level!=='G0')errors.push(`DiagramCloud reports Galaxy maturity G0 until a cross-app qualification promotes it, not ${r.galaxy_level}`);
+ for(const id of RECEIPT_LEVEL_CHECKS[r.verification_level]??[])if(!passed(r.checks,id))errors.push(`${r.verification_level} needs a passed ${id} check`);
+ const derived=receiptLevel(r.checks);
+ if(QUALIFICATION_LEVELS.indexOf(r.verification_level)>QUALIFICATION_LEVELS.indexOf(derived))errors.push(`Checks support ${derived}, not ${r.verification_level}`);
+ if(r.status==='passed'&&r.checks.some(c=>c.status==='failed'))errors.push('A receipt with a failed check cannot have status passed');
+ if(r.verification_level==='MANUAL_QUALIFIED'&&!r.checks.find(c=>c.check_id==='manual-visual')?.evidence_ref_ids.length)errors.push('MANUAL_QUALIFIED needs the manual-visual check to cite its human review evidence');
+ const ids=new Set<string>();
+ for(const e of r.evidence_refs){if(ids.has(e.evidence_id))errors.push(`Duplicate evidence ID: ${e.evidence_id}`);ids.add(e.evidence_id);if(e.synthetic)errors.push(`${e.evidence_id}: synthetic evidence cannot support a verification receipt`);}
+ const seen=new Set<string>();
+ for(const c of r.checks){if(seen.has(c.check_id))errors.push(`Duplicate check: ${c.check_id}`);seen.add(c.check_id);for(const id of c.evidence_ref_ids)if(!ids.has(id))errors.push(`${c.check_id}: unknown evidence_ref_id ${id}`);}
+ if(errors.length)throw new Error(errors.slice(0,20).join('\n'));
+ return r;
+}
+
+/** Builds the receipt for one revision. The level is derived from the checks, never passed in. */
+export function verificationReceipt(input:{productVersion:string;documentSchemaVersion:number;repository:string;commit:string;branch?:string;dirty:boolean;checks:ReceiptCheck[];evidenceRefs?:EvidenceRef[];createdAt?:Date;caveats?:string[]}):VerificationReceipt{
+ const createdAt=input.createdAt??new Date();
+ const subject=galaxyEntity('diagramcloud','release',`${input.productVersion}@${input.commit}`,{revision:input.commit,displayName:`DiagramCloud ${input.productVersion}`,metadata:{product_version:input.productVersion}});
+ return validateVerificationReceipt({
+  schema_version:1,receipt_id:`diagramcloud:${input.productVersion}:${input.commit.slice(0,12)}:${createdAt.getTime()}`,subject,app_id:'diagramcloud',
+  product_version:input.productVersion,document_schema_version:input.documentSchemaVersion,galaxy_level:'G0',
+  revision:{vcs:'git',repository:input.repository,commit:input.commit,...(input.branch?{branch:input.branch}:{}),dirty:input.dirty},
+  verification_level:receiptLevel(input.checks),status:input.checks.some(c=>c.status==='failed')?'failed':'passed',
+  checks:input.checks,evidence_refs:input.evidenceRefs??[],created_at:createdAt.toISOString(),
+  caveats:['No cross-app qualification is part of this receipt, so it never claims GALAXY_QUALIFIED.','Galaxy maturity stays G0: product version, qualification level and Galaxy maturity are separate dimensions.',...(input.caveats??[])]
+ });
+}
+
+/** True for anything shaped like a Galaxy publication snapshot, so the import dialog stages it instead of reading it as a document. */
+export function isPublicationSnapshot(value:unknown):boolean{
+ return !!value&&typeof value==='object'&&typeof (value as {snapshot_id?:unknown}).snapshot_id==='string'&&Array.isArray((value as {contract_versions?:unknown}).contract_versions);
 }

@@ -78,9 +78,9 @@ test('public portfolio omits private payload and escapes user content',async({pa
 });
 test('reduced motion and Fabric icon loading',async({browser})=>{
  const context=await browser.newContext({reducedMotion:'reduce',viewport:{width:1440,height:1000}});const page=await context.newPage();await page.goto('http://127.0.0.1:4173');await expect(page.getByRole('button',{name:'Enable motion',exact:true})).toBeVisible();
- await page.locator('.project-card').filter({hasText:'Microsoft Fabric'}).click();await expect(page.getByRole('heading',{name:'Microsoft Fabric',exact:true})).toBeVisible();await expect(page.locator('.official-icon')).toHaveCount(2);
+ await page.locator('.project-card').filter({hasText:'Microsoft Fabric'}).click();await expect(page.getByRole('heading',{name:'Microsoft Fabric',exact:true})).toBeVisible();await expect(page.locator('.official-icon')).toHaveCount(4);
  await expect.poll(()=>page.locator('.official-icon').evaluateAll((imgs:HTMLImageElement[])=>imgs.every(img=>img.complete&&img.naturalWidth>0))).toBe(true);
- for(const item of ['Lakehouse','Pipeline'])await expect(page.locator(`.official-icon[title="Microsoft Fabric ${item} · Microsoft artwork, used under the Microsoft Fabric icons usage terms"]`)).toBeVisible();await page.screenshot({path:'test-results/showcase-fabric.png',fullPage:true});await context.close();
+ for(const [item,n] of [['Lakehouse',2],['Pipeline',1],['Semantic model',1]] as const){const icon=page.locator(`.official-icon[title="Microsoft Fabric ${item} · Microsoft artwork, used under the Microsoft Fabric icons usage terms"]`);await expect(icon).toHaveCount(n);await expect(icon.first()).toBeVisible();}await page.screenshot({path:'test-results/showcase-fabric.png',fullPage:true});await context.close();
 });
 test('mobile layout does not overflow viewport',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.getByRole('heading',{name:'Data Projects | constellation',exact:true})).toBeVisible();const dimensions=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.width+2);await page.screenshot({path:'test-results/showcase-mobile.png',fullPage:true});

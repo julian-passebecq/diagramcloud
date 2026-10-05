@@ -1,41 +1,47 @@
-# Roadmap and honest completion boundaries
+# Roadmap
 
-## Implemented V1 foundation
+Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
-React + Fluent UI shell; light/dark themes; read-only Explore, Edit, public Portfolio and guided Present modes; gallery; parent-retaining multi-level drilldown; node/edge properties; drag/connect and grid layout; text/code/table/metrics/image evidence rendering; image attachment; whole-document JSON validation/review/import/export; bounded undo/redo; IndexedDB save and other-tab conflict detection; public-content projection; illustrative flow motion; current-view SVG/PNG/Mermaid export; standalone public HTML; native editable PowerPoint export; browser print. Guided-story steps have a visual composer (Edit → Story); metrics evidence blocks have a visual editor (Edit → Add evidence → Metrics); tables still use JSON.
+## Shipped in 1.0.0
 
-The test suite and CI result, not this list, determine whether a particular revision is ready to use. Read the workflow and artifact from the exact delivered commit.
+- **Core:** canonical `Project` JSON (schema 1) with stable IDs, parent-retaining multi-level drilldown, task workspaces with reusable evidence items, sources and provenance labels, guided stories with a visual composer, public/private projection.
+- **Authoring without raw JSON:** components, connections, child views, workspace links, project metadata and sources, text/code/image/metrics/**table** editors, block ordering, **transformation explainer** (input → logic → output, mapping, grain/keys/quality rules), board editing (multi-select, align, distribute, stack), data-model and KPI source editors, undo/redo.
+- **Realization:** designed / observed / presented kept apart; observations enter only through a reviewed, revision-guarded patch or a staged Galaxy publication snapshot; review, visibility and sharing are author decisions; reviewed public observations survive HTML, SVG, PNG, PPTX, the project deck, Mermaid (lossy) and the portfolio index.
+- **Galaxy grammar:** `galaxy.entity/1`, `galaxy.evidence-ref/1`, `galaxy.version-handshake/1`, `galaxy.publication-snapshot/1` (produce, and consume through review in the UI), `galaxy.deep-link/1`, `galaxy.verification-receipt/1`; Galaxy maturity G0.
+- **Inspector grammar:** Identity, Meaning, Realization, Evidence, Work, Publication for every component.
+- **Exports:** authoring/public JSON, standalone HTML, SVG, PNG, native editable PPTX, project and scope decks, Mermaid, browser print/PDF, portfolio index; one measured export scene with orthogonal, box-avoiding routes on the shipped samples.
+- **Reliability:** latest-snapshot save queue, corrupt-row quarantine and recovery screen, multi-tab conflict detection, quota/open failure messages, leave-page guard, stale whole-document and patch imports refused.
+- **Visuals:** icon registry with source, commit, package version, git blob and terms; eight Microsoft Fabric item icons; generic original symbols elsewhere.
+- **Integrations (optional):** Google Drive asset vault (`drive.file`), DataPass repository folder bridge (`.datapass/diagramcloud.json`, review before apply, revision/hash conflict guard, download fallback).
 
-## Next pass: improve the same root
+## Post-V1 candidates
 
-| Priority | Work | Acceptance condition |
-|---|---|---|
-| P0 | Shared measured export scene and orthogonal routing | Canvas, SVG and PPTX use consistent node bounds; long labels and upward/backward links do not cross unrelated cards. Done for exports (2026-09-25): no sample route crosses a box; the canvas still routes on its own |
-| P0 | Autosave queue, quota and recovery fault injection | No premature 'saved' status; interrupted writes preserve the prior document; same-origin multi-tab conflicts are tested in real IndexedDB |
-| P0 | AI change preview and revision-guarded JSON Patch | Show added/changed/deleted entities before apply; reject a stale base revision; keep stable IDs |
-| P1 | Curated official icon registry | Versioned provider/product/source/rights/checksum manifest; larger Fabric/Azure/Databricks collections with verified terms; no logo distortion |
-| P1 | Visual story composer | Reorder steps, select target view/node/edges, write narration and preview an interview sequence without editing raw JSON |
-| P1 | Better evidence authoring | Visual table editor, code language selector improvements, image captions/rights controls and block ordering (metrics form done) |
-| P1 | Explain a transformation | Side-by-side input/output rows, column mappings, quality rules, join/grain explanations; remain display-only unless a separate sandbox is deliberately added |
-| P1 | Portfolio composition | Executive/technical/interview layouts, contribution/outcome/constraint blocks, focused share links, selected-view PDF deck planning |
-| P1 | All CV projects after source verification | Retrieve or receive current CV; source-confirm Eukleia, Danone, Savencia and remaining projects; no invented outcomes or date claims |
-| P2 | Interchange adapters | Narrow documented draw.io/Mermaid/D2/LikeC4 import scopes with explicit loss reports and round-trip fixtures |
-| P2 | Read-only metadata adapters | dbt manifest, SQL DDL, Databricks Jobs, Fabric metadata, semantic-model tables; mark observed versus authored relationships |
-| P2 | Layout options | Evaluate ELK/D2/TALA licensing and deployment boundaries; preserve user overrides and avoid moving the canvas unexpectedly |
-| Later | Collaboration, cloud sync and execution | Only after local artifact/recovery contracts are stable. Keep optional services separate from the viewer |
+| Candidate | Why it is not in 1.0 |
+|---|---|
+| Persist the DataPass folder handle in IndexedDB with a permission re-prompt | Convenience; reopening the folder or JSON import already works |
+| Azure and Databricks vendor artwork | Needs per-icon terms review (Azure ships a separate download; Databricks publishes no icon terms) |
+| Firefox / Safari qualification | 1.0 qualifies Chromium only |
+| Canvas routing shared with the export scene | The interactive canvas still routes edges with React Flow |
+| Narrow interchange adapters (draw.io, Mermaid, D2, LikeC4) with loss reports | Explicit V1 non-goal |
+| Read-only metadata adapters (dbt manifest, SQL DDL, Databricks Jobs, Fabric items) | Explicit V1 non-goal; would mark observed vs authored relationships |
+| Graph auto-layout (ELK or similar) preserving user overrides | Licensing and UX evaluation pending |
+| Portfolio composition layouts (executive / technical / interview) | Current deck and story cover the release |
+| Map/geo item for site-assessment screens | Needs a licensed basemap |
+| VS Code webview hosting of DiagramCloud | DataPass-side work; out of scope for this repository |
 
-## Not implemented or not proven as a general guarantee
+## Not implemented, by design (V1 non-goals)
 
-No full draw.io/Visio import; no arbitrary SVG-to-graph conversion; no full Mermaid round trip; no live cloud discovery; no Python/SQL/DAX execution; no actual streaming telemetry; no scientific Foil'O solver; no measured engine pricing/performance; no full official cloud icon pack; no collaborative merge; no complete arbitrary-layout PPTX fidelity guarantee; no graph auto-layout and no general obstacle router (export routes use fixed candidates plus a channel-grid fallback); no automatic confidentiality approval; no all-project PDF pagination engine; no deployed public site in this pass.
+No full draw.io/Visio import; no arbitrary SVG → editable graph; no lossless Mermaid round trip; no universal graph auto-layout; no live Azure/Fabric/Databricks discovery or infrastructure control; no SQL/DAX/Python/Spark execution; no real-time collaboration or server sync; no complete arbitrary-layout PPTX fidelity; no exhaustive cloud icon pack; no GIS engine; no Electron/desktop distribution; no automatic confidentiality approval.
 
 ## Sample scope
 
-The two supplied PDFs are a starting portfolio source, not immutable production documentation. Source-derived narratives are distinguished from synthetic rows, snippets and illustrative financial scenarios. Do not replace this distinction with a generic 'demo' footer while presenting numerical results as real achievements. A read-only exported portfolio should carry provenance next to the evidence that needs it.
+The supplied PDFs are a starting portfolio source, not immutable production documentation. Source-derived narratives stay distinct from synthetic rows, snippets and illustrative financial scenarios. Do not present numerical illustrations as real achievements. Further CV projects need source confirmation first.
 
-## Suggested implementation sequence
+---
 
-Finish browser/export visual QA and storage failure tests first. Then build the shared scene/icon registry. Add the visual narrative composer and richer evidence editing. Only then add import/metadata adapters. This keeps the product small enough to understand while making it genuinely more useful than a static cloud drawing.
+# History (pass logs, kept for context)
 
+The sections below record earlier passes as they were written. Branch names refer to branches that have since been merged into `main`; limitations listed there may since have been solved (see "Shipped in 1.0.0" above).
 
 ## V1.1 reliability pass (2026-09-21)
 
@@ -157,8 +163,8 @@ standalone-HTML "Observed by other apps" list. Details in
 
 Remaining limits:
 
-- PPTX, the project deck, SVG, PNG and Mermaid exports do not show observations yet — only the interactive
-  canvas, the Realization section, the story bar and the standalone HTML export do.
+- ~~PPTX, the project deck, SVG, PNG and Mermaid exports do not show observations yet.~~ Solved in 1.0.0: see
+  "Realization in exports" in the realization contract.
 - No live sync: an observation is a one-time reviewed patch, not a subscription to the source app.
 - No automatic observation fetching; DiagramCloud never polls or connects to another app to pull facts.
 - DiagramCloud is not a runtime, a password/secret store, a MongoDB client, or a task authority: it refuses

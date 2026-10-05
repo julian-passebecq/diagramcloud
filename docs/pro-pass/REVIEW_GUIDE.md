@@ -1,5 +1,7 @@
 # Review guide: PR #6 (DiagramCloud) and PR #11 (DataPass)
 
+> **Historical working note.** Kept for context; it describes an earlier pass and may name branches, limits or plans that no longer apply. The current state is in [README.md]({r}README.md) and [docs/RELEASE.md]({r}docs/RELEASE.md).
+
 Date: 2026-09-25. Expected time: about 30 minutes to click through, plus whatever time you want to spend reading code.
 
 This guide is for deciding whether to merge. It lists what to open, what you should see, and what only you can judge. Automated checks already cover correctness in depth (see "What is already verified"). Your review matters most where a machine can't judge: whether the screens represent your work honestly, and whether the product feels right.

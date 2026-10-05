@@ -1,5 +1,7 @@
 # Artifact Studio and publishing architecture
 
+> **Historical working note.** Kept for context; it describes an earlier pass and may name branches, limits or plans that no longer apply. The current state is in [README.md]({r}README.md) and [docs/RELEASE.md]({r}docs/RELEASE.md).
+
 Status: architecture target for DiagramCloud / Datapass project artifacts.
 
 ## Decision
