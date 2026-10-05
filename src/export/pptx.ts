@@ -6,6 +6,7 @@ import {NODE_PAD,SCENE_FONT,buildScene,type SceneText} from './scene';
 import {textWidth} from './measure';
 import {noIcons,type IconData} from './iconData';
 import type {IconEntry} from '../core/icons';
+import {CLAIM_LABEL,REALIZATION_EXPORT_NOTE,day,observationLine,presentedObservations} from '../core/realization';
 /** Largest scale (inches per layout pixel): small views are not blown up past a readable size. */
 const MAX_SCALE=.0165;
 function textOf(b:EvidenceBlock):string{return b.type==='text'?b.text:b.type==='code'?b.code:b.type==='metrics'?b.items.map(i=>`${i.label}: ${i.value}\n${i.note}`).join('\n\n'):'';}
@@ -13,7 +14,7 @@ function textOf(b:EvidenceBlock):string{return b.type==='text'?b.text:b.type==='
 type Pptx=InstanceType<typeof import('pptxgenjs').default>;
 /** `screens` maps an experience workspace id to its first slide in the same deck; boxes linked to one get a SCREEN link. */
 export type ScreenLink={slide:number;title:string};
-export type ArchitectureParts={cover:boolean;evidence:boolean;sources:boolean;firstViewSlide:number;screens?:Map<string,ScreenLink>;icons?:IconData};
+export type ArchitectureParts={cover:boolean;evidence:boolean;sources:boolean;realization?:boolean;firstViewSlide:number;screens?:Map<string,ScreenLink>;icons?:IconData};
 
 /** Native editable objects, not screenshots. Exported code is display-only. */
 export async function exportPptx(input:Project,icons:IconData=noIcons):Promise<void>{
@@ -22,7 +23,7 @@ export async function exportPptx(input:Project,icons:IconData=noIcons):Promise<v
  if(estimate>180)throw new Error('This project would create more than 180 slides. Export a smaller public project or use HTML.');
  const {default:PptxGenJS}=await import('pptxgenjs');const pptx=new PptxGenJS();
  pptx.layout='LAYOUT_WIDE';pptx.author=d.author||'DiagramCloud';pptx.subject=d.summary;pptx.title=d.title;pptx.company='DiagramCloud';pptx.theme={headFontFace:'Aptos Display',bodyFontFace:'Aptos'};
- await addArchitectureSlides(pptx,d,{cover:true,evidence:true,sources:true,firstViewSlide:2,icons});
+ await addArchitectureSlides(pptx,d,{cover:true,evidence:true,sources:true,realization:true,firstViewSlide:2,icons});
  await pptx.writeFile({fileName:`${d.id}.pptx`});
 }
 
@@ -69,13 +70,15 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
    const screenLink=screen?{slide:screen.slide,tooltip:`Task screen: ${caption(screen.title,80,1)}`}:undefined;
    put(n.label,{hyperlink:n.childViewId?{slide:slideNumbers.get(n.childViewId)}:screenLink});
    put(n.summary);put(n.footer);
+   if(n.realization){const r=n.realization;slide.addShape(shape.roundRect,{x:X(r.x),y:Y(r.y),w:r.w*scale,h:r.h*scale,rectRadius:4*scale,line:{color:r.stroke,width:.75},fill:{color:r.fill}});put(r.text);}
    if(screen)slide.addText([{text:'SCREEN ›',options:{hyperlink:screenLink}}],{x:X(n.x+n.w-NODE_PAD-60),y:Y(n.footer.y)-.905*pt(10)/72,w:60*scale,h:pt(12.5)/72+.02,fontFace:SCENE_FONT,fontSize:pt(10),bold:true,color:'1F6FB2',align:'right',valign:'top',margin:0,wrap:false});
   }
   // Connection labels last, on a background-coloured box as tight as the text: never hidden under a box or a line.
   for(const e of scene.edges)if(e.label){const tight=Math.max(...e.label.lines.map(l=>textWidth(l,e.label!.size)))+6;put({...e.label,width:tight},{fill:{color:'F5F7FB'}});}
-  const credit=iconCredit(embedded);
+  const credit=iconCredit(embedded),badges=scene.nodes.filter(n=>n.realization);
   if(credit)slide.addText(credit,{x:.6,y:6.92,w:12.1,h:.18,fontSize:8,color:'6F8197',margin:0});
-  slide.addNotes(notes([v.title,v.description,...(credit?[credit]:[]),...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>{const sc=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined;return `${n.label}\n${n.summary}\n${n.role}${sc?`\nTask screen: ${sc.title} (slide ${sc.slide})`:''}`;}),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));
+  if(badges.length)slide.addText(REALIZATION_EXPORT_NOTE,{x:.6,y:credit?6.72:6.92,w:12.1,h:.18,fontSize:8,color:'6F8197',margin:0});
+  slide.addNotes(notes([v.title,v.description,...(credit?[credit]:[]),...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>{const sc=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined;const obs=presentedObservations(d).filter(o=>o.nodeId===n.id);return `${n.label}\n${n.summary}\n${n.role}${sc?`\nTask screen: ${sc.title} (slide ${sc.slide})`:''}${obs.length?`\n[Realization]\n${obs.map(o=>observationLine(o,n.label)).join('\n')}`:''}`;}),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));
  }
  for(const b of blocks){
   const subtitle=d.nodes.filter(n=>n.blockIds.includes(b.id)).map(n=>n.label).join(' / ')+` | ${b.provenance}`;
@@ -88,5 +91,23 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
   const full=textOf(b),lines=wrapLines(full,95,b.type==='code'),size=b.type==='code'?23:18;
   for(let start=0;start<Math.max(1,lines.length);start+=size){const slide=base(b.title+(start?' (continued)':''),subtitle);slide.addText(lines.slice(start,start+size).join('\n'),{x:.8,y:2.35,w:11.7,h:4.35,fontSize:b.type==='code'?12:16,fontFace:b.type==='code'?'Consolas':'Aptos',color:'243B58',valign:'top',margin:0,paraSpaceAfter:0});slide.addNotes(notes([b.title,subtitle,'Original evidence content:',full]));}
  }
+ if(parts.realization)addRealizationSlides(pptx,d,base);
  if(parts.sources&&d.sources.length){const lines=wrapLines(d.sources.map(s=>`${s.title}\n${s.location}${s.url?'\n'+s.url:''}`).join('\n\n'),135);for(let start=0;start<lines.length;start+=23){const slide=base('Sources and provenance','Source-derived descriptions and synthetic teaching material are distinct.');slide.addText(lines.slice(start,start+23).join('\n'),{x:.7,y:2.25,w:11.9,h:4.5,fontSize:12,color:'536780',valign:'top',margin:0});}}
+}
+
+/** Rows of the realization appendix: one per Presented observation, with its owner, revision and date. */
+export function realizationRows(d:Project):string[][]{
+ const label=(id:string)=>d.nodes.find(n=>n.id===id)?.label??id;
+ return presentedObservations(d).map(o=>[label(o.nodeId),CLAIM_LABEL[o.claim],`${o.sourceApp} · ${o.authority}`,o.sourceRevision,day(o.observedAt),o.summary+(o.caveat?` Caveat: ${o.caveat}`:'')]);
+}
+/** Realization appendix: what other apps observed, reviewed and made public. Nothing when no observation is Presented. */
+export function addRealizationSlides(pptx:Pptx,d:Project,frame:(title:string,subtitle:string)=>ReturnType<Pptx['addSlide']>):number{
+ const rows=realizationRows(d),per=10;
+ for(let start=0;start<rows.length;start+=per){
+  const slide=frame(`Realization${start?` (continued ${start+1})`:''}`,'Reviewed, public observations owned by other apps. Design status elsewhere in this deck is illustrative.');
+  slide.addTable([['Component','Claim','Source · authority','Revision','Observed','Statement'].map(text=>({text,options:{bold:true}})),...rows.slice(start,start+per).map(r=>r.map((c,i)=>({text:caption(c,i===5?160:60,3)})))],
+   {x:.6,y:2.2,w:12.1,colW:[2.1,1.1,2.2,1.6,1.1,4],border:{type:'solid',color:'DCE3ED',pt:.5},fontSize:9,color:'243B58',fill:{color:'FFFFFF'},margin:3,rowH:.3,autoPage:false});
+  slide.addNotes(rows.slice(start,start+per).map(r=>r.join(' | ')).join('\n'));
+ }
+ return Math.ceil(rows.length/per);
 }

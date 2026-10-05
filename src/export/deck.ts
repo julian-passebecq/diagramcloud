@@ -4,7 +4,7 @@ import {publicDocument} from '../core/operations';
 import {publicPack,type ExperienceItem,type ExperiencePack} from '../experience/model';
 import {addWorkspaceSlides,workspaceGroups,type BackLink,type DeckGroup} from '../experience/pptx';
 import {PROVENANCE_NOTE,clip} from '../experience/render';
-import {addArchitectureSlides,type ScreenLink} from './pptx';
+import {addArchitectureSlides,realizationRows,type ScreenLink} from './pptx';
 import {noIcons,type IconData} from './iconData';
 
 /**
@@ -109,6 +109,20 @@ function sourcesSlides(pptx:Pptx,plan:DeckPlan,number:string){
  return pages;
 }
 
+function realizationSlides(pptx:Pptx,rows:string[][],number:string){
+ const per=10,pages=Math.ceil(rows.length/per);
+ for(let k=0;k<pages;k++){
+  const s=pptx.addSlide();s.background={color:BG};
+  s.addText(`${number}  REALIZATION${pages>1?`  ·  ${k+1} OF ${pages}`:''}`,{x:.6,y:.35,w:12,h:.3,fontSize:10,bold:true,color:MUTED,charSpacing:2,fontFace:FONT,margin:0});
+  s.addText('What other apps observed',{x:.6,y:.7,w:12,h:.6,fontSize:26,bold:true,color:INK,fontFace:FONT,margin:0});
+  s.addTable([['Component','Claim','Source · authority','Revision','Observed','Statement'].map(text=>({text,options:{bold:true}})),...rows.slice(k*per,(k+1)*per).map(r=>r.map((c,i)=>({text:clip(c,i===5?160:60)})))],
+   {x:.6,y:1.5,w:12.1,colW:[2.1,1.1,2.2,1.6,1.1,4],fontSize:9,fontFace:FONT,color:BODY,rowH:.3,margin:[2,5,2,5],border:{type:'solid',color:'E1E7EF',pt:.5},fill:{color:'FFFFFF'},autoPage:false,valign:'middle'});
+  s.addText('Only reviewed, public observations appear. Each fact belongs to the app that observed it, at the stated revision and date; designed components without an observation are planned, not deployed.',{x:.6,y:6.75,w:12.1,h:.4,fontSize:8.5,color:MUTED,fontFace:FONT,margin:0,valign:'top'});
+  s.addNotes(rows.slice(k*per,(k+1)*per).map(r=>r.join(' | ')).join('\n'));
+ }
+ return pages;
+}
+
 /** Builds the deck and returns it with the section map (also used by tests). */
 export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan,icons:IconData=noIcons):Promise<{pptx:Pptx;sections:DeckSection[];slides:number;links:DeckLinks}>{
  const pptx=new PptxCtor();
@@ -133,6 +147,8 @@ export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan,icons:Ic
   let at=slide+1;const rows=g.screens.map((x,k)=>{if(links.screens.get(x.workspaceId)?.slide!==at)throw new Error(`Slide numbers drifted for screen ${x.workspaceId}`);const r={label:x.title,detail:x.trail.slice(1).join(' › '),slide:at};at+=counts[k];return r;});
   slide=at-1;linkedRows(pptx,divider,rows,5.2,1.1,7.5);
  }
+ const observed=plan.architecture?realizationRows(plan.architecture):[];
+ if(observed.length){num++;sections.push({label:'Realization',slide:slide+1,detail:`${observed.length} reviewed observation${observed.length===1?'':'s'} from other apps`});slide+=realizationSlides(pptx,observed,pad(num));}
  num++;sections.push({label:'Sources and provenance',slide:slide+1,detail:`${plan.sources.length} source${plan.sources.length===1?'':'s'}`});
  slide+=sourcesSlides(pptx,plan,pad(num));
  contents.addText('CONTENTS',{x:.6,y:.45,w:12,h:.3,fontSize:10,bold:true,color:MUTED,charSpacing:2,fontFace:FONT,margin:0});
