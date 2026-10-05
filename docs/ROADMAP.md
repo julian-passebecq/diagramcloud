@@ -2,6 +2,11 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.1.0
+
+- **Interchange import:** draw.io / diagrams.net (`.drawio`, `.xml`, compressed pages, editable `.drawio.svg` / `.drawio.png`, multi-page, containers and frames, C4 placeholders, AWS/Azure/GCP stencil names, unsnapped connectors, junction dots) and Mermaid (`flowchart`/`graph`, `architecture-beta`), each with a kept / not-imported report, into a new reviewed project. Checked against 19 public draw.io examples from jgraph/drawio-diagrams (AWS, Azure, IBM, C4, network, data-flow) during development.
+- **Cloud architecture gallery:** AWS serverless, Azure web app with private data, Google Cloud streaming, Kubernetes microservices and an event-driven outbox reference, each with a drilldown, cited official guidance, synthetic-labelled code and rows and a two-step story; gallery filters (Portfolio, Cloud architectures, Your projects) and a "What's new" card.
+
 ## Shipped in 1.0.0
 
 - **Core:** canonical `Project` JSON (schema 1) with stable IDs, parent-retaining multi-level drilldown, task workspaces with reusable evidence items, sources and provenance labels, guided stories with a visual composer, public/private projection.
@@ -22,7 +27,7 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 | Azure and Databricks vendor artwork | Needs per-icon terms review (Azure ships a separate download; Databricks publishes no icon terms) |
 | Firefox / Safari qualification | 1.0 qualifies Chromium only |
 | Canvas routing shared with the export scene | The interactive canvas still routes edges with React Flow |
-| Narrow interchange adapters (draw.io, Mermaid, D2, LikeC4) with loss reports | Explicit V1 non-goal |
+| More interchange adapters (D2, LikeC4, Structurizr, Visio) and export to draw.io | draw.io and Mermaid import shipped in 1.1; the others are not started |
 | Read-only metadata adapters (dbt manifest, SQL DDL, Databricks Jobs, Fabric items) | Explicit V1 non-goal; would mark observed vs authored relationships |
 | Graph auto-layout (ELK or similar) preserving user overrides | Licensing and UX evaluation pending |
 | Portfolio composition layouts (executive / technical / interview) | Current deck and story cover the release |
@@ -31,7 +36,7 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 
 ## Not implemented, by design (V1 non-goals)
 
-No full draw.io/Visio import; no arbitrary SVG → editable graph; no lossless Mermaid round trip; no universal graph auto-layout; no live Azure/Fabric/Databricks discovery or infrastructure control; no SQL/DAX/Python/Spark execution; no real-time collaboration or server sync; no complete arbitrary-layout PPTX fidelity; no exhaustive cloud icon pack; no GIS engine; no Electron/desktop distribution; no automatic confidentiality approval.
+No Visio import; no lossless draw.io or Mermaid round trip (imports are adapters with a loss report); no arbitrary SVG → editable graph; no universal graph auto-layout; no live Azure/Fabric/Databricks discovery or infrastructure control; no SQL/DAX/Python/Spark execution; no real-time collaboration or server sync; no complete arbitrary-layout PPTX fidelity; no exhaustive cloud icon pack; no GIS engine; no Electron/desktop distribution; no automatic confidentiality approval.
 
 ## Sample scope
 

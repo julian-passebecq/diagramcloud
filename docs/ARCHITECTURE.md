@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.0.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.1.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -256,3 +256,16 @@ In PowerPoint the icon is an SVG with a PNG fallback. In the browser pptxgenjs d
 **Verification receipt.** `galaxy.verification-receipt/1` (`src/core/galaxy.ts`) records a release's qualification: the exact git commit, a clean tree, the checks run and the level they support (IMPLEMENTED → BUILD_VERIFIED → PACKAGE_VERIFIED → E2E_VERIFIED → MANUAL_QUALIFIED). The level is derived from the checks and never inferred upward; `GALAXY_QUALIFIED` and any Galaxy level other than G0 are refused. `scripts/qualify.ts` writes it locally (`npm run qualify`) or from CI step outcomes. See [RELEASE.md](RELEASE.md).
 
 **Version.** `package.json` is the single product version: Vite injects it as `__APP_VERSION__` (header, footer, About) and the generator writes it into the Galaxy handshake.
+
+## 1.1 additions: interchange import
+
+`src/core/interchange/` converts other diagram formats into the canonical document; it never touches the open project.
+
+- `graph.ts`: the interchange graph (pages of boxes, connections and groups), label clean-up, provider and component-type inference from labels and shapes, and `documentFromGraph`, which builds one validated project: stable IDs (Mermaid node IDs; slugged labels for draw.io), group membership as tags, a root view of page cards when there is more than one page, positions (the source arrangement rescaled to the card size, or a layered layout when the source has none), and the import report. Imported projects get a new `import-…` ID, so applying one can never replace an existing project.
+- `xml.ts`: a small non-validating XML reader (no DTD or external entities), the same in the browser and in Node tests.
+- `drawio.ts`: pages (plain or compressed with raw deflate through `DecompressionStream`), editable SVG/PNG containers, cells and object wrappers, absolute positions through containers, frames detected geometrically, invisible groups, junction dots, placeholder labels, unsnapped connector ends. Vendor stencils keep only a provider name; no vendor artwork is drawn (see the icon registry).
+- `mermaid.ts`: `flowchart`/`graph` and `architecture-beta`; other types are refused.
+
+The report lists every kind of loss with a count. Tests cover a hand-written multi-page AWS file, compressed/SVG/PNG containers, malformed input, every Mermaid link form, round trips of our own Mermaid export for every sample, and refusals.
+
+**Gallery.** `src/data/cloudGallery.ts` adds five independently authored references through the shared builders in `src/data/builders.ts`; `src/ui/Gallery.tsx` holds the gallery filters, card marks and the dismissible "What's new" card (browser storage only for the dismissal).

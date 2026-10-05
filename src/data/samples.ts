@@ -1,11 +1,8 @@
-import {documentSchema,nodeSchema,edgeSchema,viewSchema,blockSchema,validateDocument,type Project,type ProjectNode,type ProjectEdge,type EvidenceBlock} from '../core/model';
+import {validateDocument,type Project} from '../core/model';
+import {block,node,note,project,view} from './builders';
+import {cloudGallery} from './cloudGallery';
 import {examplePack} from '../experience/sample';
 
-function project(id:string,title:string,summary:string,category:Project['category'],tags:string[]):Project{return documentSchema.parse({schemaVersion:1,id,title,summary,category,tags,rootViewId:'overview',author:category==='Portfolio'?'Julian Passebecq':'DiagramCloud reference library',provenance:category==='Portfolio'?'Reconstructed from the user-provided portfolio PDFs. Tables, code and visual flow speeds in this app are synthetic teaching examples, not verified employer data or measured performance.':'Independently authored educational example. Not an official or vendor-approved architecture.',nodes:[],edges:[],views:[{id:'overview',title:'Architecture overview'}]});}
-function node(d:Project,id:string,label:string,kind:ProjectNode['kind'],options:Partial<ProjectNode>={}){d.nodes.push(nodeSchema.parse({id,label,kind,...options}));return id;}
-function view(d:Project,id:string,title:string,description:string,names:string[],links:[string,string,string,ProjectEdge['kind']?][],columns=3){const edgeIds=links.map(([source,target,label,kind],i)=>{const eid=`${id}-e${i}`;d.edges.push(edgeSchema.parse({id:eid,source,target,label,kind:kind??'batch',speed:kind==='stream'?'fast':kind==='control'?'slow':'medium'}));return eid;});const v=viewSchema.parse({id,title,description,nodeIds:names,edgeIds,positions:Object.fromEntries(names.map((id,i)=>[id,{x:(i%columns)*300,y:Math.floor(i/columns)*180}]))});const old=d.views.findIndex(v=>v.id===id);if(old<0)d.views.push(v);else d.views[old]=v;}
-function block(d:Project,nodeId:string,value:unknown){const b=blockSchema.parse(value);d.blocks.push(b);d.nodes.find(n=>n.id===nodeId)!.blockIds.push(b.id);}
-function note(d:Project,nodeId:string,id:string,title:string,text:string,provenance:EvidenceBlock['provenance']='synthetic',sourceIds:string[]=[]){block(d,nodeId,{id,title,type:'text',text,provenance,sourceIds});}
 function experience(rootId:string,id:string,title:string){const p=examplePack();p.rootId=rootId;p.id=id;p.title=title;return p;}
 const portfolioSources=[{id:'pdf-six',title:'Total_Foilo_Portfolio_6_pages (2).pdf',location:'User-supplied six-page portfolio; illustrative/synthetic labels retained.',visibility:'public' as const},{id:'pdf-eighteen',title:'Julian_Passebecq_Portfolio_TotalEnergies_First_NoGlossary (2).pdf',location:'User-supplied 18-page portfolio; TotalEnergies first, then Foil\u2019O.',visibility:'public' as const}];
 
@@ -690,4 +687,4 @@ platform.story=[
 
 const blank=project('blank-project','Start from a blank project','Build a small architecture, attach evidence, then add one drilldown at a time.','Blank',['Your project']);
 node(blank,'first-node','Your first component','process',{summary:'Switch to Edit to change this component.'});view(blank,'overview','Architecture overview','A diagram is the entry point; the evidence explains the work.',['first-node'],[]);
-export const samples:Project[]=[validateDocument(constellation),validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),validateDocument(blank)];
+export const samples:Project[]=[validateDocument(constellation),validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),...cloudGallery(),validateDocument(blank)];
