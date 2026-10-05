@@ -70,7 +70,7 @@ test('gallery: cloud architecture filter, a reference drilldown with the parent 
  await page.getByRole('button',{name:/^Cloud architectures/}).click();
  const cards=page.locator('.project-card');
  for(const title of ['AWS serverless web application','Azure web app with private data','Google Cloud streaming analytics','Microservices on Kubernetes','Event-driven orders with an outbox','Microsoft Fabric','Databricks'])await expect(cards.filter({hasText:title}).first()).toBeVisible();
- await expect(cards.filter({hasText:'TotalEnergies'})).toHaveCount(0);
+ await expect(cards.filter({hasText:'TotalEnergies'})).toHaveCount(0);await expect(cards.filter({hasText:'Data Projects'})).toHaveCount(0);await expect(page.getByRole('button',{name:/^Cloud architectures 7/})).toBeVisible();
  await news.getByRole('button',{name:"Dismiss what's new"}).click();await expect(news).toHaveCount(0);
  await page.reload();await expect(page.getByRole('region',{name:"What's new"})).toHaveCount(0);
  await cards.filter({hasText:'AWS serverless web application'}).click();

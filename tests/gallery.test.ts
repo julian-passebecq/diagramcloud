@@ -4,7 +4,7 @@ import {cloudGallery} from '../src/data/cloudGallery';
 import {samples} from '../src/data/samples';
 import {validateDocument} from '../src/core/model';
 import {publicDocument} from '../src/core/operations';
-import {galleryBucket,projectMark} from '../src/ui/Gallery';
+import {galleryBucket,galleryCaption,projectMark} from '../src/ui/Gallery';
 import {svgDiagram} from '../src/export/diagram';
 
 const gallery=cloudGallery();
@@ -36,4 +36,8 @@ test('gallery buckets and marks',()=>{
  assert.equal(galleryBucket(samples.find(s=>s.id==='fabric-medallion')!),'cloud');
  assert.equal(galleryBucket(samples.find(s=>s.id==='blank-project')!),'mine');
  assert.deepEqual(gallery.map(projectMark),['A','Az','G','K8','E']);
+ // The DataPass planning maps are the author's own work: portfolio, never presented as vendor cloud references.
+ for(const id of ['project-constellation','datapass-platform']){const s=samples.find(s=>s.id===id)!;assert.equal(galleryBucket(s),'portfolio',id);assert.equal(galleryCaption(s),'Portfolio map');}
+ assert.deepEqual(samples.filter(s=>galleryBucket(s)==='cloud').map(s=>s.id),['fabric-medallion','databricks-reference',...gallery.map(p=>p.id)]);
+ assert.equal(galleryCaption(gallery[0]),'Cloud architecture · AWS');
 });
