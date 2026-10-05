@@ -6,6 +6,7 @@ import {NODE_PAD,SCENE_FONT,buildScene,type SceneText} from './scene';
 import {textWidth} from './measure';
 import {noIcons,type IconData} from './iconData';
 import type {IconEntry} from '../core/icons';
+import {TRANSFORM_LABEL} from '../core/transform';
 import {CLAIM_LABEL,REALIZATION_EXPORT_NOTE,day,observationLine,presentedObservations} from '../core/realization';
 /** Largest scale (inches per layout pixel): small views are not blown up past a readable size. */
 const MAX_SCALE=.0165;
@@ -81,7 +82,7 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
   slide.addNotes(notes([v.title,v.description,...(credit?[credit]:[]),...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>{const sc=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined;const obs=presentedObservations(d).filter(o=>o.nodeId===n.id);return `${n.label}\n${n.summary}\n${n.role}${sc?`\nTask screen: ${sc.title} (slide ${sc.slide})`:''}${obs.length?`\n[Realization]\n${obs.map(o=>observationLine(o,n.label)).join('\n')}`:''}`;}),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));
  }
  for(const b of blocks){
-  const subtitle=d.nodes.filter(n=>n.blockIds.includes(b.id)).map(n=>n.label).join(' / ')+` | ${b.provenance}`;
+  const subtitle=d.nodes.filter(n=>n.blockIds.includes(b.id)).map(n=>n.label).join(' / ')+` | ${b.provenance}`+(b.transform?` | ${TRANSFORM_LABEL[b.transform]} (explanatory, not executed)`:'');
   if(b.type==='image'){
    const asset=d.assets.find(a=>a.id===b.assetId);if(asset){const image=new Image();await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(new Error('Cannot decode an evidence image'));image.src=asset.data;});const ratio=image.width/image.height,maxW=11.9,maxH=3.8,w=Math.min(maxW,maxH*ratio),h=w/ratio,slide=base(b.title,subtitle);slide.addImage({data:asset.data,x:(width-w)/2,y:2.25+(maxH-h)/2,w,h});slide.addText(caption(b.caption+'\n'+asset.rights,145,4),{x:.7,y:6.2,w:11.9,h:.65,fontSize:10,color:'536780',margin:0});}continue;
   }
