@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.0.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.1.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,4 +44,5 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
-| 1.0.0 | head of the release PR (`feat/diagramcloud-v1-finalization`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | Chromium only; human visual review recorded separately when performed |
+| 1.1.0 | head of the interchange and gallery PR (`feat/diagram-import-and-gallery`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | draw.io and Mermaid import, cloud gallery; Chromium only |
+| 1.0.0 | `4a2e5be` (tag `v1.0.0`), qualified at `7943f5b` | 37369437999 | E2E_VERIFIED | Vercel production from `main` | first V1 release |

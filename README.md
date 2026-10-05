@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.0.0** (`package.json`; shown in the header) |
+| Product version | **1.1.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -65,6 +65,17 @@ Ordinary authoring is visual: project metadata and sources; components (identity
 
 JSON / AI remains the path for whole-document edits, RFC 6902 patches addressed by stable ID (`@id` segments, refused when the base revision is stale), observation patches and Galaxy publication snapshots. Every import is validated, previewed item by item and applied only after review.
 
+## Import draw.io and Mermaid
+
+**Import draw.io / Mermaid** in the gallery (or the file button in JSON / AI) turns an existing diagram into a new DiagramCloud project. You can also paste Mermaid or draw.io XML into the JSON box.
+
+| Source | Read | Kept | Not imported (listed in the report) |
+|---|---|---|---|
+| draw.io / diagrams.net | `.drawio`, `.xml` (plain or compressed pages), editable `.drawio.svg` and `.drawio.png` | every page (more than one page gives a root view of page cards that drill into each page), boxes, labels (HTML stripped, `%placeholders%` and C4 fields resolved), connectors and their labels, containers and drawn frames as group tags, the arrangement (rescaled for DiagramCloud cards), unlabelled AWS/Azure/GCP stencils named after their shape, provider names | colours, fonts, styles, waypoints, vendor artwork (generic symbols are drawn), free text, decorative shapes; connectors with a loose end; unsnapped connector ends are attached to the box under them and counted |
+| Mermaid | `flowchart`/`graph` and `architecture-beta` (`.mmd`, `.mermaid`, or the first ```` ```mermaid ```` block of a `.md`) | node IDs as stable component IDs, labels, shapes as component types, links and labels (every link form, chains, `&` lists, edge IDs, `@{ shape }` data), subgraphs/groups as tags, the title, LR/TB direction with a layered layout | `classDef`, `class`, `style`, `linkStyle`, `click`, Markdown formatting; other diagram types (sequence, class, ER, Gantt…) are refused with a message |
+
+Every import shows a report of what was kept and what was not, then becomes a **new** project (the open one never changes) after the usual validation and review. Component types and providers are inferred from labels and shapes: check them in the Inspector. Imported diagrams are public by default like any authored project; review before publishing.
+
 ## Included examples
 
 | Project | Scope | Provenance |
@@ -74,6 +85,13 @@ JSON / AI remains the path for whole-document edits, RFC 6902 patches addressed 
 | Foil'O Ecologie | Hydrofoil, Databricks workflow, governance, scenario screens | Reconstructed from the PDFs; not a verified scientific solver |
 | Microsoft Fabric | Medallion architecture, ingestion, Silver transformation | Independently authored reference with official documentation links |
 | Databricks | Medallion architecture, contracts, deduplication | Independently authored reference with official documentation links |
+
+The gallery filters to **Portfolio**, **Cloud architectures** (every reference above) and **Your projects** (blank, imported and your own).
+| AWS serverless web application | CDN, API, functions, table; request path with idempotency | Independently authored reference citing AWS documentation |
+| Azure web app with private data | Front Door, App Service, Key Vault, private SQL; private networking path | Independently authored reference citing the Azure Architecture Center |
+| Google Cloud streaming analytics | Pub/Sub, Dataflow, BigQuery, dead-letter; windowing detail | Independently authored reference citing Google Cloud documentation |
+| Microservices on Kubernetes | Ingress, services, config, autoscaling detail | Independently authored reference citing Kubernetes documentation |
+| Event-driven orders with an outbox | Outbox relay, broker, idempotent consumers, dead-letter queue | Independently authored, cloud-agnostic pattern reference |
 | Blank project | One component to start editing | Author-created |
 
 Illustrative financial scenarios are not combined or presented as employer achievements. The original PDFs and any confidential employer files are not stored in this repository.
@@ -111,7 +129,7 @@ Credential-like values and `.env`-looking text are refused where content crosses
 These are the genuine post-V1 boundaries (full list and candidates in [docs/ROADMAP.md](docs/ROADMAP.md)):
 
 - Chrome/Chromium only is qualified; other browsers are untested.
-- No full draw.io/Visio import, no arbitrary SVG → editable graph, no lossless Mermaid round trip.
+- draw.io and Mermaid import are adapters with a loss report, not round trips: no Visio import, no export back to draw.io, no arbitrary SVG → editable graph, no lossless Mermaid round trip, and only Mermaid flowchart / architecture-beta.
 - The layout button is a grid, not a graph auto-layout engine; export routing avoids boxes on the shipped samples (unit-tested), not on every possible layout. The interactive canvas routes edges on its own.
 - No live cloud discovery, no execution of SQL/DAX/Python/Spark, no real-time collaboration or server sync.
 - Observations are one-time reviewed imports, not subscriptions; DiagramCloud never polls another app.
