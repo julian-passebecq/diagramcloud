@@ -30,7 +30,7 @@ function distManifest():{hash:string;count:number}|null{
 const outcome=(v:string):ReceiptCheck['status']=>v==='success'||v==='passed'?'passed':v==='failure'||v==='failed'?'failed':v==='skipped'?'skipped':'not_run';
 const checks:ReceiptCheck[]=[];
 const evidence:EvidenceRef[]=[];
-const now=new Date().toISOString(),commit=process.env.GITHUB_SHA??git('rev-parse','HEAD');
+const now=new Date().toISOString(),commit=git('rev-parse','HEAD');
 const ref=(raw:Omit<EvidenceRef,'schema_version'|'captured_at'|'observed_revision'|'synthetic'|'producer_app'>)=>{const e=evidenceRefSchema.parse({schema_version:1,captured_at:now,observed_revision:commit,synthetic:false,producer_app:'diagramcloud',...raw});evidence.push(e);return e.evidence_id;};
 
 const [mode='run',...args]=process.argv.slice(2);
@@ -62,8 +62,8 @@ if(process.env.MANUAL_REVIEW){
  checks.push({check_id:'manual-visual',status:review.result==='passed'?'passed':'failed',summary:'Human visual review of screenshots and exports',evidence_ref_ids:[id]});
 }
 
-const dirty=!process.env.GITHUB_SHA&&git('status','--porcelain','--untracked-files=no').length>0;
-const receipt=verificationReceipt({productVersion:pkg.version,documentSchemaVersion:1,repository:process.env.GITHUB_REPOSITORY??'julian-passebecq/diagramcloud',commit,branch:process.env.GITHUB_REF_NAME??git('rev-parse','--abbrev-ref','HEAD'),dirty,checks,evidenceRefs:evidence,
+const dirty=!process.env.GITHUB_ACTIONS&&git('status','--porcelain','--untracked-files=no').length>0;
+const receipt=verificationReceipt({productVersion:pkg.version,documentSchemaVersion:1,repository:process.env.GITHUB_REPOSITORY??'julian-passebecq/diagramcloud',commit,branch:process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME||git('rev-parse','--abbrev-ref','HEAD'),dirty,checks,evidenceRefs:evidence,
  caveats:['Chromium is the only browser this receipt covers.']});
 mkdirSync('release',{recursive:true});
 writeFileSync('release/verification-receipt.json',JSON.stringify(receipt,null,2)+'\n');
