@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.9.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.10.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -310,3 +310,7 @@ A perspective is a property of a view (`view.perspective`, default System), not 
 ## 1.9 additions: MosaicStudio adapter
 
 `conceptSpec(doc, viewId)` maps the public ViewSpec to MosaicStudio's concept spec. Layers come from what a component does (storage and tables, processing, control, apps and reports, sources and people), bottom to top with heights 0, 1, 2…; domains are repository groups or the view, and a cell above three components spills into a continuation domain. Kinds come from the provider first (SQLite → sql-db, DuckLake → lakehouse, dbt → pipeline, React → web-app…), then from the DiagramCloud kind; `lake` is never emitted because the contract allows one, on the bottom layer, which is the Studio author's call. Basis planned becomes status planned. Provenance is `documented` only when every component cites a source URL or an evidence block. Parallel connections merge into one flow, as the contract requires. Positions, navigation, story and evidence content stay in DiagramCloud, and the loss report says so.
+
+## 1.10 additions: Technical Manual
+
+`technicalManualHtml(doc)` composes existing parts rather than adding a renderer: the views in drilldown order (`orderedViews`), one `viewSpec` per view for tables and omissions, and the editorial SVG for figures (its marker ID is suffixed per figure so the page has unique IDs). Each component is counted once in the basis summary, however many views show it. Evidence blocks print with their provenance label; image blocks are named but stay in the interactive HTML. A Content-Security-Policy of `default-src 'none'` and the absence of any script make the file safe to open from disk and to archive; `@page` and print rules give A4 sections.
