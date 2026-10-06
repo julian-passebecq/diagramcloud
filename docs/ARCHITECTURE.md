@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.3.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.4.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -286,3 +286,7 @@ The report lists every kind of loss with a count. Tests cover a hand-written mul
 - `index.ts`: `scanToDocument` and `scanPickedFolder` (`<input webkitdirectory>`; filters by path and size before reading).
 
 A rescan of a project already in the library keeps its revision, so the JSON / AI review shows the stable-ID change preview before applying.
+
+## 1.4 additions: AtlasNote cheatsheet export
+
+`src/export/atlasnote.ts` turns `publicDocument(project)` into AtlasNote's cheatsheet JSON (1200 × 1600 fixed pages, no raw SVG: AtlasNote renders its own grammar). Pages follow the drilldown order of the draw.io export (`orderedViews`). The diagram uses the shared export scene: box centres keep their canvas arrangement, boxes are drawn at 80 % × 60 % of their canvas size so AtlasNote's mid-gap connection labels fit, and the layout is scaled into the frame (spread up to 1.4× when sparse). AtlasNote's limits (64 pages, 80 nodes, 240 edges, 16 × 60 tables) are applied with the remainder counted on the page. Every frame is a fresh object: AtlasNote refuses shared objects as non-canonical JSON. `tests/contracts/atlasnote/validation.mjs` is AtlasNote's validator, vendored for the contract test.

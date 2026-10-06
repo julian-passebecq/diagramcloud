@@ -22,7 +22,7 @@ function nodeStyle(n:ProjectNode):string{
 }
 
 /** Public views reachable from the root, root first then each drilldown in order (publicDocument already dropped the rest). */
-function orderedViews(d:Project){
+export function orderedViews(d:Project){
  const out:string[]=[],visit=(id:string)=>{if(out.includes(id))return;const v=d.views.find(v=>v.id===id);if(!v)return;out.push(id);for(const n of d.nodes.filter(n=>v.nodeIds.includes(n.id)))if(n.childViewId)visit(n.childViewId);};
  visit(d.rootViewId);
  return out.map(id=>d.views.find(v=>v.id===id)!);

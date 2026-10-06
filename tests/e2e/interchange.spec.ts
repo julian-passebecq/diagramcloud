@@ -1,6 +1,7 @@
 import {test,expect,type Page} from '@playwright/test';
 import {mkdirSync,readFileSync} from 'node:fs';
 import {visioFixture} from '../fixtures/interchange/visio';
+import {validateCheatsheet} from '../contracts/atlasnote/validation.mjs';
 
 /*
  * 1.1: draw.io and Mermaid imports become new, reviewed projects with a report of what was kept and dropped, and
@@ -143,4 +144,16 @@ test('repository scan: a picked folder becomes system → containers → compone
  await expect(page.getByText('Existing project ID detected. Review the stable-ID diff below before applying.')).toBeVisible();
  await expect(page.getByRole('button',{name:'Apply imported document',exact:true})).toBeEnabled();
  expect(errors).toEqual([]);
+});
+
+test('AtlasNote export: a cheatsheet file the AtlasNote validator accepts, one page per public view with diagram and table',async({page})=>{
+ await page.goto('/');
+ await page.locator('.project-card').filter({hasText:'AWS serverless web application'}).click();
+ await page.getByRole('button',{name:'Export & share',exact:true}).click();
+ const wait=page.waitForEvent('download');await page.getByRole('button',{name:/AtlasNote cheatsheet/}).click();
+ const file=await wait;expect(file.suggestedFilename()).toBe('aws-serverless-web.atlasnote.json');await file.saveAs('test-results/interchange/aws-serverless.atlasnote.json');
+ const sheet=validateCheatsheet(JSON.parse(readFileSync('test-results/interchange/aws-serverless.atlasnote.json','utf8')));
+ expect(sheet.pages.filter((p:{id:string})=>p.id.startsWith('v.')).length).toBe(2);
+ for(const p of sheet.pages.filter((p:{id:string})=>p.id.startsWith('v.')))expect(p.blocks.map((b:{type:string})=>b.type)).toEqual(expect.arrayContaining(['diagram','table']));
+ await expect(page.getByText(/AtlasNote cheatsheet created/)).toBeVisible();
 });
