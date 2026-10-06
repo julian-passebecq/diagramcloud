@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.8.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.9.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,7 +44,8 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
-| 1.8.0 | head of the atlases PR (`feat/galaxy-atlas`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | galaxy map, Contoso Forecasting atlas; Chromium only |
+| 1.9.0 | head of the contracts PR (`feat/contracts`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | MosaicStudio concept export; Chromium only |
+| 1.8.0 | `074f307` (tag `v1.8.0`) | 37542475496 | E2E_VERIFIED (automated) | Vercel production from `main` | galaxy map, Contoso Forecasting atlas; Chromium only |
 | 1.7.0 | `fab0cf8` (tag `v1.7.0`) | 37540112120 | E2E_VERIFIED (automated) | Vercel production from `main` | blueprint and editorial renderings; Chromium only |
 | 1.6.0 | `29bf3f0` (tag `v1.6.0`) | 37538747043 | E2E_VERIFIED (automated) | Vercel production from `main` | perspectives, view spec; Chromium only |
 | 1.5.0 | `03953be` (tag `v1.5.0`) | 37537385507 | E2E_VERIFIED (automated) | Vercel production from `main` | project atlas, multi-repository snapshots; Chromium only |
@@ -54,3 +55,11 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 | 1.1.1 | `a84824c` (tag `v1.1.1`) | 37384387812 | E2E_VERIFIED (automated) | Vercel production from `main` | DataPass planning maps listed under Portfolio, not as cloud references |
 | 1.1.0 | `ca31b68` (tag `v1.1.0`), qualified at `f553e0f` | 37382412074 | E2E_VERIFIED (automated) | Vercel production from `main` | draw.io and Mermaid import, cloud gallery; Chromium only |
 | 1.0.0 | `4a2e5be` (tag `v1.0.0`), qualified at `7943f5b` | 37369437999 | E2E_VERIFIED | Vercel production from `main` | first V1 release |
+
+## Cross-app checks
+
+One contract at a time, against the owner's own reader. This is not a Galaxy qualification level.
+
+| Date | DiagramCloud | Contract | Owner reader | Command | Result |
+|---|---|---|---|---|---|
+| 2026-10-07 | 1.9.0 branch `feat/contracts` | `datapass.concept-spec/1` (spec 1.0.0) | MosaicStudio standalone concept viewer, studio-v0.8.1 `8b22d9c`, sha256 `7565fb29…b6a` (copy vendored by contoso-data-studio `61353848`) | `npx tsx scripts/qualify-concept.ts <concept-viewer.html>` | 3/3 views loaded `ok`, 0 warnings, 0 network requests (contoso-forecasting overview and fabric-target, total-project-controls overview) |

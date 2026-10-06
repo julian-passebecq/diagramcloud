@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test';
 import {mkdirSync,readFileSync} from 'node:fs';
+import {checkConceptSpec} from '../contracts/mosaicstudio/schema';
 
 /* 1.6: the same component through several perspectives, Back/Forward, provenance filter and the renderer-neutral view spec. */
 mkdirSync('test-results/perspectives',{recursive:true});
@@ -35,5 +36,11 @@ test('perspectives: switch a component from System to CI/CD with its parents kep
  const spec=JSON.parse(readFileSync('test-results/perspectives/delivery.viewspec.json','utf8'));
  expect(spec.format).toBe('diagramcloud.viewspec');expect(spec.viewId).toBe('delivery');expect(spec.perspective).toBe('cicd');
  expect(spec.path.map((p:{viewId:string})=>p.viewId)).toEqual(['overview','delivery']);
+ // The same view for MosaicStudio, checked with the owner's own validator.
+ const wait2=page.waitForEvent('download');await page.getByRole('button',{name:/MosaicStudio concept \(JSON\)/}).click();
+ const concept=await wait2;await concept.saveAs('test-results/perspectives/delivery.concept.json');
+ const check=checkConceptSpec(JSON.parse(readFileSync('test-results/perspectives/delivery.concept.json','utf8')));
+ expect(check.ok?[]:check.issues).toEqual([]);expect(check.warnings).toEqual([]);
+ await expect(page.getByText(/MosaicStudio concept spec exported/)).toBeVisible();
  expect(errors).toEqual([]);
 });
