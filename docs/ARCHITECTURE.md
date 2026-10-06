@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.6.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.7.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -298,3 +298,7 @@ A rescan of a project already in the library keeps its revision, so the JSON / A
 ## 1.6 additions: perspectives and view spec
 
 A perspective is a property of a view (`view.perspective`, default System), not a separate graph: one component keeps one ID and appears in as many views as the document says. `src/core/viewspec.ts` derives everything from the validated document: `pathTo` (breadcrumb from the root through drilldowns), `perspectivesFor` (per perspective: available, partial through a drilldown or parent view, unknown, unsupported), `repositoryOf` (atlas prefix → snapshot entry) and `viewSpec`, the serialisable renderer-neutral form of one view (public audience through publicDocument, with omissions stated). The app keeps an in-memory Back / Forward stack of {path, view, selection}, reset when another project opens.
+
+## 1.7 additions: rendering styles
+
+`src/export/styled.ts` renders one view in two more styles from the same inputs as every export: meaning from `viewSpec` (public audience), geometry from `buildScene`. Blueprint adds a grid, zone references derived from positions, kind symbols (storage drum line, control chamfer, application double frame), line patterns per edge kind, a legend limited to what is drawn, and a title block (project, view, perspective, revision vector, date, provenance, omissions). Editorial numbers the components and lists them in a key. Text is measured with the shared Arial metrics, so nothing re-wraps; output is static SVG with system fonts and `data-node-id` on every component. The canvas Blueprint toggle is CSS only.
