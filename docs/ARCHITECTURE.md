@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.4.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.5.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -290,3 +290,7 @@ A rescan of a project already in the library keeps its revision, so the JSON / A
 ## 1.4 additions: AtlasNote cheatsheet export
 
 `src/export/atlasnote.ts` turns `publicDocument(project)` into AtlasNote's cheatsheet JSON (1200 × 1600 fixed pages, no raw SVG: AtlasNote renders its own grammar). Pages follow the drilldown order of the draw.io export (`orderedViews`). The diagram uses the shared export scene: box centres keep their canvas arrangement, boxes are drawn at 80 % × 60 % of their canvas size so AtlasNote's mid-gap connection labels fit, and the layout is scaled into the frame (spread up to 1.4× when sparse). AtlasNote's limits (64 pages, 80 nodes, 240 edges, 16 × 60 tables) are applied with the remainder counted on the page. Every frame is a fresh object: AtlasNote refuses shared objects as non-canonical JSON. `tests/contracts/atlasnote/validation.mjs` is AtlasNote's validator, vendored for the contract test.
+
+## 1.5 additions: project atlas
+
+`src/core/atlas/` composes several repository scans into one document without a new graph model. `manifest.ts` validates the explicit membership (repository IDs ≤ 24 characters, locators without credentials, relationship endpoints). `compose.ts` builds the root view (one card per repository, declared relationships with basis `planned`), embeds each scan under the prefix `<repository>.` (IDs over 80 characters are shortened deterministically) with a budget shared across repositories (`scanBudget`), and appends a snapshot to `atlas.snapshots`. `rescanRepository` removes one prefix and embeds a new scan; `addRepository` adds an unscanned card. `snapshot.ts` compares revision vectors (a missing revision is `unknown`, never `unchanged`) and lists stale sources; it never polls. `publicDocument` keeps only the active snapshot, only repositories whose card is public, and drops runtime/context pointers. The CLI `scripts/atlas.ts` shares `scripts/lib/readRepo.ts` with `npm run scan`.

@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.4.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.5.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,7 +44,8 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
-| 1.4.0 | head of the AtlasNote export PR (`feat/atlasnote-export`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | AtlasNote cheatsheet export; Chromium only |
+| 1.5.0 | head of the project atlas PR (`feat/atlas-snapshot`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | project atlas, multi-repository snapshots; Chromium only |
+| 1.4.0 | `ed33556` (tag `v1.4.0`) | 37479911375 | E2E_VERIFIED (automated) | Vercel production from `main` | AtlasNote cheatsheet export; Chromium only |
 | 1.3.0 | `2c4e989` (tag `v1.3.0`) | 37477211863 | E2E_VERIFIED (automated) | Vercel production from `main` | repository scanner; Chromium only |
 | 1.2.0 | `4635d1d` (tag `v1.2.0`) | 37473334829 | E2E_VERIFIED (automated) | Vercel production from `main` | Visio import, draw.io export; Chromium only |
 | 1.1.1 | `a84824c` (tag `v1.1.1`) | 37384387812 | E2E_VERIFIED (automated) | Vercel production from `main` | DataPass planning maps listed under Portfolio, not as cloud references |

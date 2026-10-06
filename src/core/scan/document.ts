@@ -1,4 +1,4 @@
-import {documentSchema,validateDocument,type Project,type ProjectEdge} from '../model';
+import {documentSchema,validateDocument,type Perspective,type Project,type ProjectEdge} from '../model';
 import {layeredPositions,slug,type ImportResult} from '../interchange/graph';
 import type {Confidence,ScanItem,ScanLink,ScanModel} from './scanner';
 
@@ -12,12 +12,15 @@ import type {Confidence,ScanItem,ScanLink,ScanModel} from './scanner';
  * Every node carries a source-derived evidence table (file, line, finding, confidence). Scans are Planned/designed
  * information about code, never Observed/verified claims, and they are never marked reviewed.
  */
-const LIMITS={nodes:480,edges:1400,views:78,componentViews:20,fileViews:30,filesPerView:40,perView:120};
+export const SCAN_LIMITS={nodes:480,edges:1400,views:78,componentViews:20,fileViews:30,filesPerView:40,perView:120};
 const SUFFIX:Record<Confidence,string>={confirmed:'',inferred:' (inferred)',possible:' (possible)'};
+/** Which perspective each generated view belongs to. */
+export const scanPerspective=(viewId:string):Perspective=>viewId.startsWith('components-')||viewId.startsWith('files-')?'code':viewId==='data-lineage'?'data':viewId.startsWith('infrastructure-')?'cloud':'system';
 const clip=(s:string,n:number)=>s.length>n?`${s.slice(0,n-1)}…`:s;
 
-export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:string}={}):ImportResult{
- const now=options.now??new Date(),items=[...model.items.values()];
+/** `limits` lowers the budget when several repositories share one document (project atlas). */
+export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:string;limits?:Partial<typeof SCAN_LIMITS>}={}):ImportResult{
+ const L={...SCAN_LIMITS,...options.limits},now=options.now??new Date(),items=[...model.items.values()];
  const ids=new Map<string,string>(),taken=new Set<string>();
  const idOf=(key:string)=>{let id=ids.get(key);if(id)return id;const base=slug(key.replace(/^x:/,'ext-').replace(/^c:\.?/,'app-').replace(/[:/]/g,'-'),'n').slice(0,70)||'n';id=base;let k=2;while(taken.has(id))id=`${base}-${k++}`;taken.add(id);ids.set(key,id);return id;};
  const docId=`repo-${slug(model.name,'r').slice(0,60)}`;
@@ -29,7 +32,7 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
  const nodeOf=new Map<string,string>();
  const addNode=(it:ScanItem,childViewId?:string)=>{
   const id=idOf(it.key);if(nodeOf.has(it.key)){if(childViewId)doc.nodes.find(n=>n.id===id)!.childViewId??=childViewId;return id;}
-  if(doc.nodes.length>=LIMITS.nodes)return undefined;
+  if(doc.nodes.length>=L.nodes)return undefined;
   nodeOf.set(it.key,id);
   doc.nodes.push({id,label:clip(it.label,160),kind:it.kind,provider:clip(it.provider,80),icon:'generic',summary:clip(it.summary,500),role:'',status:'idle',blockIds:[],sourceIds:[],tags:[it.confidence,LAYER_TAG[it.layer]],visibility:'public',...(childViewId?{childViewId}:{})});
   return id;
@@ -41,7 +44,7 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
  for(const l of model.links)for(const e of l.evidence.slice(0,4))evidenceRow(l.to,[e.file,e.line,clip(`← ${model.items.get(l.from)?.label??l.from}: ${e.finding}`,300),e.confidence]);
  let edgeCount=0;
  const addEdge=(viewId:string,from:string,to:string,label:string,confidence:Confidence,kind:ProjectEdge['kind'],count=1)=>{
-  const s=nodeOf.get(from),t=nodeOf.get(to);if(!s||!t||s===t||edgeCount>=LIMITS.edges)return undefined;
+  const s=nodeOf.get(from),t=nodeOf.get(to);if(!s||!t||s===t||edgeCount>=L.edges)return undefined;
   const id=`${viewId}-e${edgeCount++}`.slice(0,80);
   doc.edges.push({id,source:s,target:t,label:clip(`${label}${count>1&&label==='imports'?` ×${count}`:''}${SUFFIX[confidence]}`,160),kind:confidence==='possible'?'dependency':kind,speed:'medium',visibility:'public'});
   return id;
@@ -65,27 +68,27 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
  // ---- Components (mini), one view per container with modules ----
  const componentViews=new Map<string,string>();let fileViews=0;
  for(const c of containers){
-  const mods=items.filter(i=>i.layer==='component'&&i.parent===c.key);if(mods.length<2||componentViews.size>=LIMITS.componentViews)continue;
+  const mods=items.filter(i=>i.layer==='component'&&i.parent===c.key);if(mods.length<2||componentViews.size>=L.componentViews)continue;
   const vid=`components-${idOf(c.key)}`.slice(0,80);componentViews.set(c.key,vid);
   const compLinks=model.links.filter(l=>l.layer==='component'&&mods.some(m=>m.key===l.from));
   const techs=[...new Set(compLinks.map(l=>l.to).filter(k=>!mods.some(m=>m.key===k)))];
   for(const m of mods){
-   const fl=items.filter(i=>i.layer==='file'&&i.parent===m.key);if(fl.length<2||fileViews>=LIMITS.fileViews)continue;
+   const fl=items.filter(i=>i.layer==='file'&&i.parent===m.key);if(fl.length<2||fileViews>=L.fileViews)continue;
    const fv=`files-${idOf(m.key)}`.slice(0,80);componentViews.set(m.key,fv);fileViews++;
-   const shownFiles=fl.slice(0,LIMITS.filesPerView);
+   const shownFiles=fl.slice(0,L.filesPerView);
    views.push({id:fv,title:`${c.label} / ${m.label}: files`,description:`Source files of the ${m.label} module and the imports between them.`,keys:shownFiles.map(f=>f.key),links:model.links.filter(l=>l.layer==='file'&&shownFiles.some(f=>f.key===l.from))});
   }
   views.push({id:vid,title:`${c.label}: components`,description:`Modules of ${c.label} (top-level folders of its source) and the imports between them. Edge counts are import statements.`,keys:[...mods.map(m=>m.key),...techs],links:compLinks});
  }
 
  // ---- Data lineage ----
- if(tables.length)views.push({id:'data-lineage',title:'Data lineage',description:'Tables, views and models from SQL, dbt and Prisma, and how data flows between them (CREATE … AS SELECT, INSERT … SELECT, ref/source, foreign keys and relations).',keys:tables.slice(0,LIMITS.perView).map(t=>t.key),links:model.links.filter(l=>l.layer==='data')});
+ if(tables.length)views.push({id:'data-lineage',title:'Data lineage',description:'Tables, views and models from SQL, dbt and Prisma, and how data flows between them (CREATE … AS SELECT, INSERT … SELECT, ref/source, foreign keys and relations).',keys:tables.slice(0,L.perView).map(t=>t.key),links:model.links.filter(l=>l.layer==='data')});
 
  // ---- Infrastructure, one view per provider ----
  const resources=byLayer('resource'),providers=[...new Set(resources.map(r=>r.provider))];
  const groupKeys:string[]=[];
  for(const p of providers){
-  const list=resources.filter(r=>r.provider===p).slice(0,LIMITS.perView),vid=`infrastructure-${slug(p,'p')}`.slice(0,80),gk=`group:${p}`;
+  const list=resources.filter(r=>r.provider===p).slice(0,L.perView),vid=`infrastructure-${slug(p,'p')}`.slice(0,80),gk=`group:${p}`;
   model.items.set(gk,{key:gk,label:p==='Generic'?'Terraform modules':`${p} infrastructure`,kind:'control',provider:p,layer:'group',summary:`${list.length} Terraform resource(s) or module(s)`,confidence:'confirmed',evidence:list[0]?.evidence.slice(0,1)??[]});
   for(const r of list)for(const e of r.evidence.slice(0,1))evidenceRow(gk,[e.file,e.line,clip(`${r.label}: ${e.finding}`,300),e.confidence]);
   groupKeys.push(gk);componentViews.set(gk,vid);
@@ -105,7 +108,7 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
 
  // ---- Materialize views (root first so drilldown cards exist before their children are referenced) ----
  const childOf=(key:string)=>key==='system'?'containers':key===dataKey?'data-lineage':componentViews.get(key);
- for(const v of views.slice(0,LIMITS.views)){
+ for(const v of views.slice(0,L.views)){
   const members:string[]=[];
   for(const key of v.keys){const it=model.items.get(key);if(!it)continue;const child=childOf(key);const id=addNode(it,child&&views.some(x=>x.id===child)?child:undefined);if(id&&!members.includes(id))members.push(id);}
   const edgeIds=v.links.map(l=>addEdge(v.id,l.from,l.to,l.label,l.confidence,l.kind,l.count)).filter((x):x is string=>!!x).filter(id=>{const e=doc.edges.find(e=>e.id===id)!;return members.includes(e.source)&&members.includes(e.target);});
@@ -131,6 +134,9 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
   ...(doc.views.some(v=>v.id==='data-lineage')?[{title:'Data lineage',viewId:'data-lineage',narration:'How tables, views and models feed each other.',highlightEdgeIds:[]}]:[]),
  ].map(s=>s.nodeId?s:{...s,nodeId:undefined}).map(({nodeId,...s})=>nodeId?{...s,nodeId}:s);
 
+ // Perspectives and basis: everything here is read from source or configuration.
+ for(const v of doc.views)v.perspective=scanPerspective(v.id);
+ for(const n of doc.nodes)n.basis='static-source';for(const e of doc.edges)e.basis='static-source';
  const document=validateDocument(doc);
  const counts=(layer:ScanItem['layer'])=>items.filter(i=>i.layer===layer).length;
  const conf=(c:Confidence)=>model.links.filter(l=>l.confidence===c).length;

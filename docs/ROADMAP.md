@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.5.0
+
+- **Project atlas, multi-repository snapshots** (Project Atlas brief §1): `diagramcloud.project-manifest/1` and DataPass `.datapass/project.json` as explicit membership; a document `atlas` field with up to 20 snapshots, each a revision vector (host, locator, revision, ref, scan status, authority per repository) plus runtime/context pointers for other apps; per-repository scans embedded under an ID prefix with a shared budget; rescan one repository, add a repository, compare snapshots, stale/missing detection; `npm run atlas`; `basis` (planned / static-source / unknown) on nodes and edges; `perspective` on views. Next: ViewSpec and perspective switcher, Blueprint mode, Galaxy and Contoso atlases, Lens/Brain/Studio contracts, Technical Manual.
+
 ## Shipped in 1.4.0
 
 - **AtlasNote cheatsheet export** (Idées de Julian, 2026-10-06): Export & share → AtlasNote cheatsheet writes `urn:atlasnote:cheatsheet:1.1` JSON (schema version 1.1, "architecture" preset): one page per public view in drilldown order with the diagram at its canvas positions, a component table and a story page. Tested against AtlasNote's own validator (vendored from AtlasNote `d162b31`) and checked visually with AtlasNote's renderer. Works for repository scans too, so AtlasNote can show a scanned repository. Next: list DiagramCloud as a producer of the cheatsheet format in `galaxy.json` (Claude Control owns that file).
