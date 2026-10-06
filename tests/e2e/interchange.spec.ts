@@ -1,12 +1,13 @@
 import {test,expect,type Page} from '@playwright/test';
-import {mkdirSync} from 'node:fs';
+import {mkdirSync,readFileSync} from 'node:fs';
+import {visioFixture} from '../fixtures/interchange/visio';
 
 /*
  * 1.1: draw.io and Mermaid imports become new, reviewed projects with a report of what was kept and dropped, and
  * the gallery filters to the cloud architecture references.
  */
 mkdirSync('test-results/interchange',{recursive:true});
-const openImport=async(page:Page)=>{await page.goto('/');await page.getByRole('button',{name:'Import draw.io / Mermaid',exact:true}).click();await expect(page.getByRole('dialog',{name:'JSON / AI workspace'})).toBeVisible();};
+const openImport=async(page:Page)=>{await page.goto('/');await page.getByRole('button',{name:'Import draw.io / Mermaid / Visio',exact:true}).click();await expect(page.getByRole('dialog',{name:'JSON / AI workspace'})).toBeVisible();};
 
 test('Mermaid pasted text: report, apply as a new project, survives a reload, open project untouched',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
@@ -66,7 +67,7 @@ test('a non-architecture Mermaid diagram is refused with a message and nothing i
 
 test('gallery: cloud architecture filter, a reference drilldown with the parent kept, and the what\'s-new card',async({page})=>{
  await page.goto('/');
- const news=page.getByRole('region',{name:"What's new"});await expect(news).toContainText('Import draw.io and Mermaid');
+ const news=page.getByRole('region',{name:"What's new"});await expect(news).toContainText('Import draw.io, Mermaid and Visio');
  await page.getByRole('button',{name:/^Cloud architectures/}).click();
  const cards=page.locator('.project-card');
  for(const title of ['AWS serverless web application','Azure web app with private data','Google Cloud streaming analytics','Microservices on Kubernetes','Event-driven orders with an outbox','Microsoft Fabric','Databricks'])await expect(cards.filter({hasText:title}).first()).toBeVisible();
@@ -78,4 +79,39 @@ test('gallery: cloud architecture filter, a reference drilldown with the parent 
  await page.getByRole('button',{name:'Explore Amazon API Gateway',exact:true}).click();
  await expect(page.getByTestId('view-overview')).toBeVisible();await expect(page.getByTestId('view-request-path')).toBeVisible();
  await page.screenshot({path:'test-results/interchange/gallery-aws.png',fullPage:true});
+});
+
+test('Visio .vsdx: converted on selection with its report, applied as a new project with page drilldowns',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await openImport(page);
+ await page.getByLabel('Import document').setInputFiles({name:'network.vsdx',mimeType:'application/vnd.ms-visio.drawing',buffer:Buffer.from(visioFixture())});
+ const report=page.getByTestId('import-report');
+ await expect(report).toContainText('Visio import');await expect(report).toContainText('network.vsdx');await expect(report).toContainText('2 pages');
+ await expect(report.getByRole('region',{name:'Not imported'})).toContainText('background page');
+ await page.screenshot({path:'test-results/interchange/visio-report.png'});
+ await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'network',exact:true,level:1})).toBeVisible();
+ await page.getByRole('button',{name:'Explore Overview',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Web app& API',exact:true}).or(page.getByRole('button',{name:'Explore Web app& API',exact:true})).first()).toBeVisible();
+ await openImport(page);
+ await page.getByLabel('Import document').setInputFiles({name:'old.vsd',mimeType:'application/vnd.visio',buffer:Buffer.from([0xd0,0xcf,0x11,0xe0,0,0,0,0])});
+ await expect(page.getByRole('alert')).toContainText('older binary Visio format');
+ expect(errors).toEqual([]);
+});
+
+test('draw.io export: every public view as a page, and the file imports back with the same components',async({page})=>{
+ await page.goto('/');
+ await page.locator('.project-card').filter({hasText:'AWS serverless web application'}).click();
+ await page.getByRole('button',{name:'Export & share',exact:true}).click();
+ const wait=page.waitForEvent('download');await page.getByRole('button',{name:/draw\.io diagram/}).click();
+ const file=await wait;expect(file.suggestedFilename()).toBe('aws-serverless-web.drawio');await file.saveAs('test-results/interchange/aws-serverless.drawio');
+ const xml=readFileSync('test-results/interchange/aws-serverless.drawio','utf8');
+ expect(xml).toMatch(/^<\?xml/);expect((xml.match(/<diagram /g)??[]).length).toBe(2);expect(xml).toContain('link="data:page/id,');
+ await expect(page.getByText(/draw\.io file created/)).toBeVisible();
+ await page.keyboard.press('Escape');
+ await openImport(page);
+ await page.getByLabel('Import document').setInputFiles('test-results/interchange/aws-serverless.drawio');
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
+ await expect(page.getByTestId('import-report')).toContainText('draw.io import');
+ await expect(page.getByTestId('import-report')).toContainText('page link(s) between them are drilldowns');
 });

@@ -1,18 +1,23 @@
 import {documentSchema,validateDocument,type Project,type ProjectEdge,type ProjectNode} from '../model';
 
 /**
- * Interchange graph: what every importer (draw.io, Mermaid) produces before it becomes a DiagramCloud document.
+ * Interchange graph: what every importer (draw.io, Mermaid, Visio) produces before it becomes a DiagramCloud document.
  * Importers are adapters, not round trips: they keep boxes, labels, connections, groups and (for draw.io) layout,
  * and they list everything they drop in the import report instead of silently approximating it.
  */
-export type ImportFormat='drawio'|'mermaid';
-export type GraphNode={key:string;label:string;kind?:ProjectNode['kind'];provider?:string;summary?:string;group?:string;x?:number;y?:number;w?:number;h?:number};
+export type ImportFormat='drawio'|'mermaid'|'visio';
+/**
+ * `id` is a DiagramCloud ID carried by the source (our own draw.io export) and kept when valid and free.
+ * `link` names the page this box opens (a draw.io page link): it becomes a drilldown when the pages form a tree.
+ */
+export type GraphNode={id?:string;link?:string;key:string;label:string;kind?:ProjectNode['kind'];provider?:string;summary?:string;group?:string;x?:number;y?:number;w?:number;h?:number};
 export type GraphEdge={source:string;target:string;label?:string;kind?:ProjectEdge['kind']};
-export type GraphPage={title:string;nodes:GraphNode[];edges:GraphEdge[];groups:string[];direction?:'LR'|'TB'};
+export type GraphPage={id?:string;title:string;nodes:GraphNode[];edges:GraphEdge[];groups:string[];direction?:'LR'|'TB'};
 export type ImportReport={format:ImportFormat;fileName:string;pages:number;nodes:number;edges:number;groups:number;kept:string[];lost:string[]};
 export type ImportResult={document:Project;report:ImportReport};
 
-export const FORMAT_LABEL:Record<ImportFormat,string>={drawio:'draw.io',mermaid:'Mermaid'};
+export const FORMAT_LABEL:Record<ImportFormat,string>={drawio:'draw.io',mermaid:'Mermaid',visio:'Visio'};
+const ID=/^[a-z][a-z0-9_.-]{0,79}$/;
 const MAX_NODES=500,MAX_EDGES=1500,MAX_VIEWS=79,COL=300,ROW=180;
 /** Card size on the canvas and in exports (NODE_WIDTH/NODE_HEIGHT in src/export/scene.ts). */
 const NODE_WIDTH=220,NODE_HEIGHT=100;
@@ -105,7 +110,7 @@ export function documentFromGraph(pages:GraphPage[],options:{format:ImportFormat
  const usable=pages.filter(p=>p.nodes.length);
  if(pages.length>usable.length)lost.push(`${pages.length-usable.length} empty page(s) skipped.`);
  if(usable.length>MAX_VIEWS){lost.push(`Only the first ${MAX_VIEWS} pages were imported (of ${usable.length}).`);usable.length=MAX_VIEWS;}
- const fileTitle=options.fileName.replace(/\.(drawio|xml|svg|png|mmd|mermaid|md|txt)$/i,'').replace(/\.drawio$/i,'');
+ const fileTitle=options.fileName.replace(/\.(drawio|xml|svg|png|mmd|mermaid|md|txt|vsdx|vsdm)$/i,'').replace(/\.drawio$/i,'');
  const title=clip(options.title?.trim()||(usable.length===1?usable[0].title:'')||fileTitle||`Imported ${FORMAT_LABEL[options.format]} diagram`,160);
  const suffix=options.idSuffix??crypto.randomUUID().slice(0,6);
  const docId=`import-${slug(title,'d').slice(0,50)}-${suffix}`.replace(/[^a-z0-9_.-]/g,'-').slice(0,80);
@@ -121,9 +126,9 @@ export function documentFromGraph(pages:GraphPage[],options:{format:ImportFormat
   for(const n of page.nodes){
    if(nodeCount>=MAX_NODES)break;
    const label=n.label.trim()||n.key;if(label.length>160)truncated++;
-   const id=unique(slug(options.format==='mermaid'?n.key:label),nodeIds);keyToId.set(n.key,id);members.push(id);nodeCount++;
+   const id=n.id&&ID.test(n.id)&&!nodeIds.has(n.id)?unique(n.id,nodeIds):unique(slug(options.format==='mermaid'?n.key:label),nodeIds);keyToId.set(n.key,id);members.push(id);nodeCount++;
    const hint=`${label} ${n.summary??''}`;
-   doc.nodes.push({id,label:clip(label,160),kind:n.kind??inferKind(hint),provider:clip(n.provider&&n.provider!=='Generic'?n.provider:inferProvider(hint),80),icon:'generic',summary:clip(n.summary??'',500),role:'',status:'idle',blockIds:[],sourceIds:[],tags:n.group?[clip(n.group,80)]:[],visibility:'public'});
+   doc.nodes.push({id,label:clip(label,160),kind:n.kind??inferKind(hint),provider:clip(n.provider&&(n.provider!=='Generic'||n.id)?n.provider:inferProvider(hint),80),icon:'generic',summary:clip(n.summary??'',500),role:'',status:'idle',blockIds:[],sourceIds:[],tags:n.group?[clip(n.group,80)]:[],visibility:'public'});
    if(n.group)groups.add(n.group);
   }
   for(const e of page.edges){
@@ -136,13 +141,30 @@ export function documentFromGraph(pages:GraphPage[],options:{format:ImportFormat
   const hasCoords=page.nodes.some(n=>n.x!==undefined);
   const raw=hasCoords?scaledPositions(page.nodes.filter(n=>keyToId.has(n.key))):layeredPositions({...page,nodes:page.nodes.filter(n=>keyToId.has(n.key)),edges:page.edges.filter(e=>keyToId.has(e.source)&&keyToId.has(e.target))});
   const positions=Object.fromEntries([...raw].map(([k,p])=>[keyToId.get(k)!,p]));
-  return {id:viewId,title:clip(page.title||title,160),description:'',nodeIds:members,edgeIds:edges,positions,visibility:'public' as const};
+  return {id:viewId,title:clip(page.title||title,160),description:'',nodeIds:members,edgeIds:edges,positions,visibility:'public' as const,keyToId};
  });
- if(usable.length===1)doc.views=[{...pageViews[0],id:'overview'}];
+ // Page links (a box that opens another page) become drilldowns when, followed from the first page, they reach
+ // every page exactly once: the first page is then the root view and no "Pages" view is needed.
+ const linkOf=new Map<string,number>();usable.forEach((p,i)=>{if(p.id)linkOf.set(p.id,i);});
+ const drill:{node:string;view:number}[]=[];
+ if(usable.length>1&&linkOf.size){
+  const seen=new Set([0]),stack=[0];
+  while(stack.length){const i=stack.pop()!;for(const n of usable[i].nodes){const t=n.link!==undefined?linkOf.get(n.link):undefined,id=pageViews[i].keyToId.get(n.key);if(t===undefined||!id||seen.has(t))continue;seen.add(t);stack.push(t);drill.push({node:id,view:t});}}
+  if(seen.size!==usable.length)drill.length=0;
+ }
+ const views=pageViews.map(({keyToId:_,...v})=>v);
+ if(usable.length===1)doc.views=[{...views[0],id:'overview'}];
+ else if(drill.length){
+  const ids=new Map(views.map((v,i)=>[i,i===0?'overview':v.id]));
+  doc.views=views.map((v,i)=>({...v,id:ids.get(i)!}));
+  for(const {node,view} of drill)doc.nodes.find(n=>n.id===node)!.childViewId=ids.get(view)!;
+  kept.push(`${usable.length} pages: the first is the root view and the ${drill.length} page link(s) between them are drilldowns.`);
+ }
  else{
+  if(linkOf.size&&usable.some(p=>p.nodes.some(n=>n.link)))lost.push('Page links that do not form a single tree from the first page were not imported; every page is reachable from the root “Pages” view instead.');
   // One card per page in a root view; each card drills into its page, so pages stay reachable in public exports.
-  const pageNodes=usable.map((page,i)=>{const id=unique(slug(`page-${page.title||i+1}`,'page'),nodeIds);doc.nodes.push({id,label:clip(page.title||`Page ${i+1}`,160),kind:'process',provider:'Generic',icon:'generic',summary:`${pageViews[i].nodeIds.length} components`,role:'',status:'idle',childViewId:pageViews[i].id,blockIds:[],sourceIds:[],tags:[],visibility:'public'});return id;});
-  doc.views=[{id:'overview',title,description:`${usable.length} pages imported from ${options.fileName}. Open a page to see its diagram.`,nodeIds:pageNodes,edgeIds:[],positions:Object.fromEntries(pageNodes.map((id,i)=>[id,{x:(i%3)*COL,y:Math.floor(i/3)*ROW}])),visibility:'public'},...pageViews];
+  const pageNodes=usable.map((page,i)=>{const id=unique(slug(`page-${page.title||i+1}`,'page'),nodeIds);doc.nodes.push({id,label:clip(page.title||`Page ${i+1}`,160),kind:'process',provider:'Generic',icon:'generic',summary:`${views[i].nodeIds.length} components`,role:'',status:'idle',childViewId:views[i].id,blockIds:[],sourceIds:[],tags:[],visibility:'public'});return id;});
+  doc.views=[{id:'overview',title,description:`${usable.length} pages imported from ${options.fileName}. Open a page to see its diagram.`,nodeIds:pageNodes,edgeIds:[],positions:Object.fromEntries(pageNodes.map((id,i)=>[id,{x:(i%3)*COL,y:Math.floor(i/3)*ROW}])),visibility:'public'},...views];
   kept.push(`${usable.length} pages, each as a view opened from the root “Pages” cards.`);
  }
  const total=usable.reduce((a,p)=>a+p.nodes.length,0),totalEdges=usable.reduce((a,p)=>a+p.edges.length,0);
