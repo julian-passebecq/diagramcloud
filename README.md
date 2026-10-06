@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.4.0** (`package.json`; shown in the header) |
+| Product version | **1.5.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -64,6 +64,18 @@ Modes: **Explore** is read-only. **Edit** adds dragging, connections, properties
 Ordinary authoring is visual: project metadata and sources; components (identity, meaning, design status, cited sources, visibility); connections; child views; workspace links; explanations, code, images, metrics and **tables** (columns, rows, reorder, paste from a spreadsheet); block order; the **transformation explainer** (input rows → logic → output rows, column mapping, grain/keys/quality rules; explanatory only); story steps; observation review, visibility and sharing.
 
 JSON / AI remains the path for whole-document edits, RFC 6902 patches addressed by stable ID (`@id` segments, refused when the base revision is stale), observation patches and Galaxy publication snapshots. Every import is validated, previewed item by item and applied only after review.
+
+## Project atlas: several repositories
+
+A project is often several repositories. **Import project manifest** in the gallery reads a `diagramcloud.project-manifest` JSON (or a DataPass `.datapass/project.json`) and creates one project: a root view with one card per repository and the relationships the manifest declares (basis *planned*). Membership only comes from that file or from an explicit **Add repository**: DiagramCloud never scans an account and guesses.
+
+Each repository keeps its own host, locator and revision: a snapshot is a **revision vector** (`shop @ a1b2…, billing @ c3d4…`), never one project SHA. **Project atlas** (header) lists the repositories with their revision, branch and scan status, names stale or missing sources (never scanned, scan failed, folder missing, revision unknown, scanned long ago, source moved on), compares two snapshots, and **Rescan…** replaces one repository from its local folder after the usual review, under its own ID prefix so the others are untouched. Up to 20 snapshots are kept; public exports keep only the current one, only for public repositories, without runtime or project-context pointers.
+
+```
+npm run atlas -- project.manifest.json --out atlas.json [--previous atlas.json] [--stale-days 30]
+```
+
+The CLI scans every repository that has a local `path` in the manifest, records each revision from `.git/HEAD`, and prints the revision vector, the comparison with `--previous` and stale or missing sources. It is read-only and never runs git or touches the network.
 
 ## Diagram from a repository
 

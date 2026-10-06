@@ -19,6 +19,9 @@ export function publicDocument(input:Project):Project{
  const sourceRefs=new Set([...d.nodes.flatMap(n=>n.sourceIds),...d.blocks.flatMap(b=>b.sourceIds)]);d.sources=d.sources.filter(s=>s.visibility==='public'&&sourceRefs.has(s.id));const sources=new Set(d.sources.map(s=>s.id));[...d.nodes,...d.blocks].forEach(item=>item.sourceIds=item.sourceIds.filter(id=>sources.has(id)));
  // Only reviewed, public observations about kept components are Presented; everything else stays in the authoring document.
  d.observations=d.observations.filter(o=>o.visibility==='public'&&!!o.reviewedAt&&keptNodes.has(o.nodeId)).map(o=>({...o,blockIds:o.blockIds.filter(id=>blocks.has(id))}));const observations=new Set(d.observations.map(o=>o.id));
+ // Atlas: only the active snapshot, only repositories whose component is public; runtime/context pointers stay in authoring JSON.
+ if(d.atlas){const active=d.atlas.snapshots.find(s=>s.id===d.atlas!.activeSnapshotId)!;const repositories=active.repositories.filter(r=>r.nodeId&&keptNodes.has(r.nodeId));
+  if(repositories.length)d.atlas={snapshots:[{...active,repositories,runtimeRefs:[],contextRefs:[]}],activeSnapshotId:active.id};else delete d.atlas;}
  d.story=d.story.filter(s=>keptViews.has(s.viewId)&&(!s.nodeId||keptNodes.has(s.nodeId))).map(s=>({...s,highlightEdgeIds:s.highlightEdgeIds.filter(id=>edges.has(id)),...(s.observationIds?{observationIds:s.observationIds.filter(id=>observations.has(id))}:{})}));return validateDocument(d);
 }
 export type History={past:Project[];present:Project;future:Project[]};

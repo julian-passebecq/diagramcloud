@@ -20,9 +20,19 @@ export const blockSchema = z.discriminatedUnion('type',[
  z.object({...baseBlock,type:z.literal('image'),assetId:id,caption:text.default('')}).strict(),
  z.object({...baseBlock,type:z.literal('metrics'),items:z.array(z.object({label:short,value:z.string().max(80),note:z.string().max(500).default('')}).strict()).max(12)}).strict()
 ]);
-export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),visibility}).strict();
-export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),visibility}).strict();
-export const viewSchema=z.object({id,title:short,description:z.string().max(2000).default(''),nodeIds:refs,edgeIds:refs,positions:z.record(id,point).default({}),visibility}).strict();
+/**
+ * Where a component or connection comes from, when it matters (project atlas). `planned`: declared intent (a project
+ * manifest, an author's design); `static-source`: read from source or configuration by a scan; `unknown`: membership is
+ * declared but nothing was read. Observed/verified facts are never a basis: they enter only as reviewed observations.
+ */
+export const BASES=['planned','static-source','unknown'] as const;
+const basis=z.enum(BASES).optional();
+/** Perspectives a view can belong to; the same stable component ID may appear in several. */
+export const PERSPECTIVES=['system','code','data','cloud','git','cicd','agents','decisions','evidence'] as const;
+export type Perspective=typeof PERSPECTIVES[number];
+export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),basis,visibility}).strict();
+export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),basis,visibility}).strict();
+export const viewSchema=z.object({id,title:short,description:z.string().max(2000).default(''),nodeIds:refs,edgeIds:refs,positions:z.record(id,point).default({}),perspective:z.enum(PERSPECTIVES).optional(),visibility}).strict();
 const instant=z.string().datetime({offset:true,message:'Use an ISO 8601 timestamp with a time zone, e.g. 2026-09-25T10:00:00Z'});
 const openUri=z.string().max(2000).refine(isOpenUri,'Only http(s) or vscode links without embedded credentials');
 /**
@@ -36,7 +46,24 @@ export const OBSERVATION_CLAIMS=['observed','verified','partial','not-observed']
 export const observationSchema=z.object({id,nodeId:id,sourceApp:z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/,'Source app is a lowercase Galaxy/app name such as datapass_vscode or datapass-vscode'),authority:short,observedAt:instant,sourceRevision:z.string().min(1).max(120),claim:z.enum(OBSERVATION_CLAIMS),summary:z.string().min(1).max(500),link:openUri.optional(),blockIds:refs,caveat:z.string().max(1000).default(''),visibility:z.enum(['public','private']).default('private'),reviewedAt:instant.optional(),shareable:z.boolean().default(false)}).strict();
 export const portfolioSchema=z.object({projectRef:z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/,'Use a stable project reference such as a DATAPASSCONTROL entity_id').optional(),openUri:openUri.optional(),lastReviewedAt:instant.optional(),indexVisibility:z.enum(['private','shareable']).default('private')}).strict();
 const stepSchema=z.object({title:short,viewId:id,nodeId:id.optional(),narration:z.string().max(2000),highlightEdgeIds:refs,observationIds:z.array(id).max(20).optional()}).strict();
-export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([]),observations:z.array(observationSchema).max(500).default([]),portfolio:portfolioSchema.optional(),experience:packSchema.optional()}).strict();
+/**
+ * Project atlas: a project made of N repositories. A snapshot is a revision vector captured at one time: each
+ * repository keeps its own host, locator and exact revision. There is no single project SHA. Runtime and project
+ * context references point at facts owned by other apps (Cloud, Lens, Brain…); DiagramCloud only presents them.
+ */
+const sha=z.string().regex(/^[0-9a-f]{7,64}$/,'A revision is a hexadecimal commit ID (7 to 64 characters)');
+const locator=z.string().min(1).max(500).refine(s=>!/^[a-z][a-z0-9+.-]*:\/\/[^/]*@/i.test(s)&&!/[?&](token|access_token|private_token|sig)=/i.test(s),'A repository locator never carries credentials');
+export const REPOSITORY_HOSTS=['github','gitlab','azure-devops','bitbucket','local','other'] as const;
+export const SCAN_STATUSES=['scanned','not-scanned','failed','missing'] as const;
+export const snapshotRepositorySchema=z.object({id,title:short,host:z.enum(REPOSITORY_HOSTS),locator,revision:sha.optional(),ref:z.string().max(200).optional(),
+ scanStatus:z.enum(SCAN_STATUSES),authority:z.enum(['git','manifest','lens','brain','author']),scannedAt:instant.optional(),nodeId:id.optional(),note:z.string().max(500).optional()}).strict();
+export const externalRefSchema=z.object({id,sourceApp:z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/),kind:short,ref:z.string().min(1).max(500),observedAt:instant.optional(),basis:z.enum(['planned','static-source','observed']),note:z.string().max(500).optional()}).strict();
+export const snapshotSchema=z.object({id,capturedAt:instant,label:z.string().max(160).optional(),repositories:z.array(snapshotRepositorySchema).max(60),runtimeRefs:z.array(externalRefSchema).max(200).default([]),contextRefs:z.array(externalRefSchema).max(200).default([])}).strict();
+export const atlasSchema=z.object({snapshots:z.array(snapshotSchema).min(1).max(20),activeSnapshotId:id}).strict();
+export type ProjectSnapshot=z.infer<typeof snapshotSchema>;
+export type SnapshotRepository=z.infer<typeof snapshotRepositorySchema>;
+export type ProjectAtlas=z.infer<typeof atlasSchema>;
+export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([]),observations:z.array(observationSchema).max(500).default([]),portfolio:portfolioSchema.optional(),experience:packSchema.optional(),atlas:atlasSchema.optional()}).strict();
 export type Project=z.infer<typeof documentSchema>;
 export type ProjectNode=z.infer<typeof nodeSchema>;
 export type ProjectEdge=z.infer<typeof edgeSchema>;
@@ -65,6 +92,9 @@ export function validateDocument(input:unknown):Project {
   for(const b of d.blocks.filter(b=>o.blockIds.includes(b.id)&&b.provenance==='synthetic'))errors.push(`${o.id}: synthetic block ${b.id} cannot back an observation; synthetic figures are never measured results`);
   if(o.shareable&&!(o.reviewedAt&&o.visibility==='public'))errors.push(`${o.id}: only a reviewed, public observation can be marked shareable`);});
  if(d.portfolio)for(const f of secretFindings(d.portfolio,'portfolio'))errors.push(`Refused ${f}`);
+ if(d.atlas){const snaps=ids(d.atlas.snapshots,'snapshot');check(d.atlas.activeSnapshotId,snaps,'atlas');
+  for(const s of d.atlas.snapshots){ids(s.repositories,`repository in ${s.id}`);for(const r of s.repositories){if(r.nodeId)check(r.nodeId,nodes,`${s.id}/${r.id}`);if(r.scanStatus==='scanned'&&!r.scannedAt)errors.push(`${s.id}/${r.id}: a scanned repository records when it was scanned`);}
+   for(const f of secretFindings(s,`atlas.${s.id}`))errors.push(`Refused ${f}`);}}
  for(const s of d.story){check(s.viewId,views,'story');for(const r of s.observationIds??[]){const o=d.observations.find(o=>o.id===r);if(!o)check(r,observations,'story');else if(!o.reviewedAt)errors.push(`Story cites observation ${r} before it is reviewed`);else if(!d.views.find(v=>v.id===s.viewId)?.nodeIds.includes(o.nodeId))errors.push(`Story observation ${r} is about a component outside ${s.viewId}`);}if(s.nodeId&&!d.views.find(v=>v.id===s.viewId)?.nodeIds.includes(s.nodeId))errors.push(`Story node ${s.nodeId} not in ${s.viewId}`);s.highlightEdgeIds.forEach(r=>{if(!d.views.find(v=>v.id===s.viewId)?.edgeIds.includes(r))errors.push(`Story edge ${r} not in ${s.viewId}`);});}
  // Data-flow cycles are legal. Recursive view expansion is not.
  const done=new Set<string>(),visiting=new Set<string>();

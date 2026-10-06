@@ -1,0 +1,14 @@
+{
+  "format": "diagramcloud.project-manifest",
+  "version": 1,
+  "project": {"id": "shop-platform", "title": "Shop platform (synthetic)", "summary": "Synthetic three-repository project used by the DiagramCloud atlas tests."},
+  "repositories": [
+    {"id": "shop", "title": "Shop", "purpose": "Web shop and its API (synthetic)", "role": "application", "host": "github", "locator": "https://github.com/example/shop", "path": "../repo-shop", "capabilities": ["Catalogue and checkout"], "boundaries": ["Does not hold payment data"]},
+    {"id": "billing", "title": "Billing", "purpose": "Payments ledger (synthetic)", "role": "service", "host": "gitlab", "locator": "https://gitlab.com/example/billing", "path": "../repo-billing"},
+    {"id": "handbook", "title": "Handbook", "purpose": "Operations handbook", "role": "documentation", "host": "github", "locator": "https://github.com/example/handbook", "revision": "1234567890abcdef1234567890abcdef12345678"}
+  ],
+  "relationships": [
+    {"from": "shop", "to": "billing", "label": "charges orders", "kind": "query"},
+    {"from": "handbook", "to": "shop", "label": "documents", "kind": "dependency"}
+  ]
+}
