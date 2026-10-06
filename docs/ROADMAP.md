@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.7.0
+
+- **Blueprint mode** (Project Atlas brief §4, §5, §6): Blueprint and Editorial SVG renderers built from the ViewSpec plus the shared export scene (the standard SVG export is unchanged), with a title block carrying the revision vector and provenance; a canvas Blueprint toggle (remembered per browser). SeeCode was rejected as a renderer (CDN fonts/encoders, no ID preservation); diagram-design is used as visual grammar only (`docs/research/seecode-diagram-design.md`).
+
 ## Shipped in 1.6.0
 
 - **Perspectives and ViewSpec** (Project Atlas brief §2, §3, §5): `perspectivesFor` (available / partial / unknown / unsupported), a Perspectives strip in the inspector, Back / Forward, perspective and repository revision in each view heading, a basis filter, `pathTo`, and `diagramcloud.viewspec/1` (`viewSpec`, export option). Repository scans add a CI/CD view (opened from the CI card) so a system appears in two perspectives with one ID.

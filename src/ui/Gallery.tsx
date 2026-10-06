@@ -29,15 +29,16 @@ export function projectMark(p:Project):string{
 }
 
 /** Release note card, dismissed per browser (storage may be unavailable: then it simply shows). */
-export const WHATS_NEW_ID='whats-new-1.6';
+export const WHATS_NEW_ID='whats-new-1.7';
 export function WhatsNew({onShow}:{onShow:(what:'import'|'cloud'|'scan')=>void}){
  const [hidden,setHidden]=useState(()=>{try{return localStorage.getItem(WHATS_NEW_ID)==='hidden';}catch{return false;}});
  if(hidden)return null;
  const hide=()=>{setHidden(true);try{localStorage.setItem(WHATS_NEW_ID,'hidden');}catch{/* private window: keep it hidden for this visit only */}};
  return <section className="whats-new" aria-label="What's new">
-  <div className="eyebrow">WHAT'S NEW · 1.6</div>
+  <div className="eyebrow">WHAT'S NEW · 1.7</div>
   <ul>
    <li><button type="button" className="link-button" onClick={()=>onShow('scan')}>Diagram from a repository</button>: pick a local Git folder and get its system context, containers, modules, files, data lineage and infrastructure, each link with its file and line and a confirmed / inferred / possible tag.</li>
+   <li><b>Blueprint</b>: an engineering-drawing rendering of the canvas, and Blueprint and Editorial SVG exports with a title block, legend and revision vector.</li>
    <li><b>Perspectives</b>: select a component to see it in System, Code, Data, Cloud or CI/CD views (or why it is not available), with Back / Forward and a basis filter.</li>
    <li><b>Project atlas</b>: import a project manifest (or a DataPass project file) to see a project made of several repositories, each at its own revision; rescan one repository at a time and compare snapshots.</li>
    <li><b>AtlasNote cheatsheet</b> in Export &amp; share: every public view becomes a printable AtlasNote page with its diagram, component table and story, ready for AtlasNote's cheatsheet import.</li>
