@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.11.0
+
+- **Lens Git projections** (Project Atlas brief §8): `datapass.lens.minimap/1` (tern-vscode `minimapProjection`, branch `feat/tern-v01` @ `15a425b`, not yet on main) read into a new reviewed snapshot as observed runtime pointers; scans go stale against Lens heads; unknown revisions filled with authority `lens`; credential-bearing links dropped; unmatched repositories reported. Not done, on purpose: a commit graph, churn or "lines changed" views (Lens leaves them out; lines changed are not productivity). **Brain project context**: no Brain format exists on disk (survey 2026-10-07); `contextRefs` stays the slot, DiagramCloud works without it.
+
 ## Shipped in 1.10.0
 
 - **Technical Manual preset** (Project Atlas brief §13): one static HTML manual from publicDocument and the ViewSpec, printable to PDF; cover with snapshot, revision vector, generated time, audience, provenance, basis counts and omissions. PPTX and AtlasNote keep their own exports. Next: Lens Git projections (`datapass.lens.minimap/1`, still on an unmerged tern-vscode branch) and the Brain project-context contract (no Brain format exists yet).

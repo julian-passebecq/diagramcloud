@@ -45,5 +45,19 @@ test('project atlas: manifest → reviewed project → rescan one repository →
  // Survives a reload.
  await page.reload();await page.locator('.project-card').filter({hasText:'Shop platform (synthetic)'}).click();await page.getByRole('button',{name:'Project atlas',exact:true}).click();
  await expect(page.getByTestId('atlas-repo-warehouse')).toBeVisible();
+ // 1.11: a Lens minimap adds observed Git and delivery pointers after review; components stay. Warehouse was added explicitly above, so it matches.
+ await page.keyboard.press('Escape');await page.getByRole('tab',{name:'Edit',exact:true}).click();
+ const nodes=await page.locator('.component-node').count();
+ await page.getByRole('button',{name:'Project atlas',exact:true}).click();
+ await page.getByLabel('Read Lens minimap').setInputFiles('tests/fixtures/atlas/lens.minimap.json');
+ await expect(report.getByRole('region',{name:'Kept'})).toContainText('Shop: main @ eeeeeeeeeeee, CI FAILED');
+ await expect(report.getByRole('region',{name:'Kept'})).toContainText('Warehouse: main @ 111111111111');await expect(report.getByRole('region',{name:'Not imported'})).toContainText('request 43 link carries credentials');
+ await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
+ await page.getByRole('button',{name:'Project atlas',exact:true}).click();
+ const lens=panel.getByRole('region',{name:'Observed by Lens'});
+ await expect(lens.getByTestId('lens-shop')).toContainText('FAILED @ eeeeeeeeeeee');await expect(lens.getByTestId('lens-shop')).toContainText('https://github.com/example/shop/pull/42');
+ await expect(lens.getByTestId('lens-billing')).toContainText('SUCCESS');await expect(panel).not.toContainText('SECRET-TOKEN');
+ await page.screenshot({path:'test-results/atlas/atlas-lens.png',fullPage:true});
+ await page.keyboard.press('Escape');await expect(page.locator('.component-node')).toHaveCount(nodes);
  expect(errors).toEqual([]);
 });

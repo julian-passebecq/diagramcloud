@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.10.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.11.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,7 +44,8 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
-| 1.10.0 | head of the manual PR (`feat/technical-manual`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | Technical Manual preset; Chromium only |
+| 1.11.0 | head of the Lens PR (`feat/lens`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | Lens minimap reader; Chromium only |
+| 1.10.0 | `5667af4` (tag `v1.10.0`) | 37545174738 | E2E_VERIFIED (automated) | Vercel production from `main` | Technical Manual preset; Chromium only |
 | 1.9.0 | `f853467` (tag `v1.9.0`) | 37543927209 | E2E_VERIFIED (automated) | Vercel production from `main` | MosaicStudio concept export; Chromium only |
 | 1.8.0 | `074f307` (tag `v1.8.0`) | 37542475496 | E2E_VERIFIED (automated) | Vercel production from `main` | galaxy map, Contoso Forecasting atlas; Chromium only |
 | 1.7.0 | `fab0cf8` (tag `v1.7.0`) | 37540112120 | E2E_VERIFIED (automated) | Vercel production from `main` | blueprint and editorial renderings; Chromium only |

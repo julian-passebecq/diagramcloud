@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.10.0** (`package.json`; shown in the header) |
+| Product version | **1.11.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -75,7 +75,11 @@ Each repository keeps its own host, locator and revision: a snapshot is a **revi
 npm run atlas -- project.manifest.json --out atlas.json [--previous atlas.json] [--stale-days 30]
 ```
 
-The CLI scans every repository that has a local `path` in the manifest, records each revision from `.git/HEAD`, and prints the revision vector, the comparison with `--previous` and stale or missing sources. It is read-only and never runs git or touches the network. A repository without a card on the canvas reaches public exports only when its author marked it `visibility: "public"`.
+The CLI scans every repository that has a local `path` in the manifest, records each revision from `.git/HEAD`, and prints the revision vector, the comparison with `--previous` and stale or missing sources. It is read-only and never runs git or touches the network.
+
+**Read Lens minimap** (Project atlas, Edit) reads a `datapass.lens.minimap/1` export from DataPass Lens, the authority for observed Git and delivery state. Repositories are matched to atlas members by name and host; others are reported, never added. After review, a new snapshot records, per matched repository, the observed default-branch head, exact-head CI, request states, agent sessions and attention counts as runtime pointers (basis observed). They are not components, never change a design status and never reach public exports. A scanned repository keeps the revision its content was read at; when Lens sees a newer head, the panel marks it stale ("source is now at …"). An unknown revision is filled from Lens, labelled "from lens".
+
+A repository without a card on the canvas reaches public exports only when its author marked it `visibility: "public"`.
 
 The gallery's **Contoso Forecasting** reference atlas is read by hand from the public `contoso-data-studio` repository at one revision: the local lab as built (static source, each component linked to its file), the Fabric App target (planned; shared code keeps the same IDs in both views), and a data-zone view kept separate from the environment. Latency figures are the repository's own report, shown as a source-derived note, not an observation.
 

@@ -1,0 +1,57 @@
+{
+  "format": "datapass.lens.minimap",
+  "version": 1,
+  "observedAt": "2026-10-20T10:00:00.000Z",
+  "refreshing": false,
+  "omittedRepositories": 0,
+  "repositories": [
+    {
+      "repositoryId": "github.com/example/shop",
+      "name": "shop",
+      "gitHost": "github.com",
+      "defaultBranch": "main",
+      "head": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "heads": [{"worktreeId": "wt-main", "branch": "main", "head": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}, {"worktreeId": "wt-feature", "branch": "feat/cart", "head": "ffffffffffffffffffffffffffffffffffffffff"}],
+      "activeBranches": ["feat/cart"],
+      "activeWorktrees": ["wt-feature"],
+      "requestState": [
+        {"provider": "github", "number": 42, "state": "open", "revision": "ffffffffffffffffffffffffffffffffffffffff", "url": "https://github.com/example/shop/pull/42"},
+        {"provider": "github", "number": 43, "state": "open", "url": "https://github.com/example/shop/pull/43?access_token=SECRET-TOKEN"}
+      ],
+      "ciState": "FAILED",
+      "agentAssociations": [{"provider": "claude", "sessionId": "session-123", "workOrder": "WO-7 cart", "status": "running", "observedAt": "2026-10-20T09:58:00.000Z", "source": "agent-reported"}],
+      "attention": {"conflictedWorktrees": 0, "dirtyWorktrees": 1, "failedAtHead": 1, "unavailableProviders": 0},
+      "bounds": {"omittedHeads": 0, "omittedAgents": 0, "omittedRequests": 0}
+    },
+    {
+      "repositoryId": "gitlab.com/example/billing",
+      "name": "billing",
+      "gitHost": "gitlab.com",
+      "defaultBranch": "release",
+      "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "heads": [{"worktreeId": "wt-b", "branch": "release", "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}],
+      "activeBranches": [],
+      "activeWorktrees": [],
+      "requestState": [],
+      "ciState": "SUCCESS",
+      "agentAssociations": [],
+      "attention": {"conflictedWorktrees": 0, "dirtyWorktrees": 0, "failedAtHead": 0, "unavailableProviders": 0},
+      "bounds": {"omittedHeads": 0, "omittedAgents": 0, "omittedRequests": 0}
+    },
+    {
+      "repositoryId": "github.com/example/warehouse",
+      "name": "warehouse",
+      "gitHost": "github.com",
+      "defaultBranch": "main",
+      "head": "1111111111111111111111111111111111111111",
+      "heads": [],
+      "activeBranches": [],
+      "activeWorktrees": [],
+      "requestState": [],
+      "ciState": "UNKNOWN",
+      "agentAssociations": [],
+      "attention": {"conflictedWorktrees": 0, "dirtyWorktrees": 0, "failedAtHead": 0, "unavailableProviders": 0},
+      "bounds": {"omittedHeads": 0, "omittedAgents": 0, "omittedRequests": 0}
+    }
+  ]
+}

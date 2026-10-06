@@ -54,7 +54,7 @@ function embedScan(doc:Project,repo:string,model:ScanModel,limits:ReturnType<typ
 
 function snapshotId(now:Date,taken:Set<string>){const base=`snap-${now.toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'').toLowerCase()}`;let id=base,k=2;while(taken.has(id))id=`${base}-${k++}`;return id;}
 
-function appendSnapshot(doc:Project,repositories:SnapshotRepository[],now:Date,previous?:Project['atlas']){
+export function appendSnapshot(doc:Project,repositories:SnapshotRepository[],now:Date,previous?:Project['atlas']){
  const history=(previous?.snapshots??[]).slice(-19),snap:ProjectSnapshot={id:snapshotId(now,new Set(history.map(s=>s.id))),capturedAt:now.toISOString(),repositories,runtimeRefs:[],contextRefs:[]};
  doc.atlas={snapshots:[...history,snap],activeSnapshotId:snap.id};
 }
@@ -93,7 +93,7 @@ export function documentFromAtlas(manifest:ProjectManifest,scans:Record<string,A
  return {document,report:{format:'atlas',fileName:options.fileName??`${manifest.project.id}.manifest.json`,pages:document.views.length,nodes:document.nodes.length,edges:document.edges.length,groups:repos.length,kept,lost}};
 }
 
-const activeSnapshot=(doc:Project)=>{const a=doc.atlas;if(!a)throw new Error('This project is not a project atlas.');return a.snapshots.find(s=>s.id===a.activeSnapshotId)!;};
+export const activeSnapshot=(doc:Project)=>{const a=doc.atlas;if(!a)throw new Error('This project is not a project atlas.');return a.snapshots.find(s=>s.id===a.activeSnapshotId)!;};
 
 /** Replace one repository's scan (all IDs under its prefix) and record a new snapshot; other repositories are untouched. */
 export function rescanRepository(input:Project,repo:string,model:ScanModel,now=new Date()):ImportResult{

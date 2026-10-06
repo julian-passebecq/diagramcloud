@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Button} from '@fluentui/react-components';
 import {REPOSITORY_HOSTS,type Project,type SnapshotRepository} from '../core/model';
-import {compareSnapshots,staleRepositories,REPOSITORY_ROLES,type ManifestRepository} from '../core/atlas';
+import {compareSnapshots,staleRepositories,lensHeads,lensRepositoryOf,REPOSITORY_ROLES,type ManifestRepository} from '../core/atlas';
 
 type NewRepository={id:string;title:string;host:SnapshotRepository['host'];locator:string;role:ManifestRepository['role'];purpose?:string};
 const CHANGE_LABEL={added:'added',removed:'removed','revision-changed':'new revision',unchanged:'same revision',unknown:'unknown (a revision is missing)'} as const;
@@ -13,7 +13,7 @@ const when=(iso?:string)=>iso?iso.slice(0,19).replace('T',' '):'—';
  * project SHA), stale or missing sources, comparison with an earlier snapshot, and the explicit actions that change
  * membership or content: rescan one repository from a picked folder, or declare another repository.
  */
-export function AtlasPanel({doc,readOnly,busy,onRescan,onAdd}:{doc:Project;readOnly:boolean;busy:boolean;onRescan:(repoId:string,files:FileList)=>void;onAdd:(repo:NewRepository)=>void}){
+export function AtlasPanel({doc,readOnly,busy,onRescan,onAdd,onLens}:{doc:Project;readOnly:boolean;busy:boolean;onRescan:(repoId:string,files:FileList)=>void;onAdd:(repo:NewRepository)=>void;onLens:(file:File)=>void}){
  const atlas=doc.atlas!;
  // '' follows the current snapshot (it changes after a rescan or an added repository); undefined compares with the one before it.
  const [shown,setShown]=useState(''),[picked,setAgainst]=useState<string|undefined>();
@@ -21,11 +21,13 @@ export function AtlasPanel({doc,readOnly,busy,onRescan,onAdd}:{doc:Project;readO
  const snap=atlas.snapshots.find(s=>s.id===shown)??atlas.snapshots.find(s=>s.id===atlas.activeSnapshotId)!;
  const previous=atlas.snapshots[atlas.snapshots.findIndex(s=>s.id===snap.id)-1],against=picked??previous?.id??'';
  const other=atlas.snapshots.find(s=>s.id===against&&s.id!==snap.id);
- const stale=new Map(staleRepositories(snap).map(s=>[s.id,s.reasons]));
+ // Lens-observed heads (when the snapshot carries them) make a scan stale as soon as the source moves on.
+ const stale=new Map(staleRepositories(snap,{current:lensHeads(snap)}).map(s=>[s.id,s.reasons]));
+ const lens=snap.runtimeRefs.filter(r=>r.sourceApp==='lens'),lensAt=lens.find(r=>r.observedAt)?.observedAt;
  const changes=other?compareSnapshots(other.capturedAt<snap.capturedAt?other:snap,other.capturedAt<snap.capturedAt?snap:other):[];
  const valid=/^[a-z][a-z0-9-]{0,23}$/.test(draft.id)&&draft.title.trim()&&draft.locator.trim();
  return <div className="atlas-panel" data-testid="atlas-panel">
-  <p>Each repository keeps its own revision: this is a <b>revision vector</b>, not one project SHA. Nothing is polled or fetched; a repository changes only when you rescan it from a local folder.</p>
+  <p>Each repository keeps its own revision: this is a <b>revision vector</b>, not one project SHA. Nothing is polled or fetched: a repository changes only when you rescan it from a local folder, and observed Git and delivery state arrives only when you read a Lens export.</p>
   <div className="atlas-controls">
    <label>Snapshot <select aria-label="Snapshot" value={shown&&shown!==atlas.activeSnapshotId?snap.id:''} onChange={e=>setShown(e.target.value)}>{atlas.snapshots.map(s=><option key={s.id} value={s.id===atlas.activeSnapshotId?'':s.id}>{when(s.capturedAt)}{s.id===atlas.activeSnapshotId?' (current)':''}</option>)}</select></label>
    {atlas.snapshots.length>1&&<label>Compare with <select aria-label="Compare with snapshot" value={against} onChange={e=>setAgainst(e.target.value)}><option value="">—</option>{atlas.snapshots.filter(s=>s.id!==snap.id).map(s=><option key={s.id} value={s.id}>{when(s.capturedAt)}</option>)}</select></label>}
@@ -43,6 +45,11 @@ export function AtlasPanel({doc,readOnly,busy,onRescan,onAdd}:{doc:Project;readO
   {other&&<section aria-label="Snapshot comparison"><h4>Changes between {when(other.capturedAt<snap.capturedAt?other.capturedAt:snap.capturedAt)} and {when(other.capturedAt<snap.capturedAt?snap.capturedAt:other.capturedAt)}</h4>
    <ul className="atlas-changes">{changes.map(c=><li key={c.id} data-change={c.change}><b>{c.title}</b>: {CHANGE_LABEL[c.change]}{c.change==='revision-changed'?` (${short(c.from)} → ${short(c.to)})`:''}</li>)}</ul>
    <p className="micro">Component-level differences are shown by the review when a rescan is applied (same IDs, changed content).</p></section>}
+  {lens.length>0&&<section aria-label="Observed by Lens" className="atlas-lens"><h4>Observed by Lens · {when(lensAt)} UTC</h4>
+   <p className="micro">Pointers to what Lens observed (Git heads, exact-head CI, requests, agent sessions). They are not components, never change a design status, and never reach public exports.</p>
+   <ul>{snap.repositories.filter(r=>lens.some(x=>lensRepositoryOf(x.id)===r.id)).map(r=><li key={r.id} data-testid={`lens-${r.id}`}><b>{r.title}</b>
+    <ul>{lens.filter(x=>lensRepositoryOf(x.id)===r.id).map(x=><li key={x.id}><span className="micro">{x.kind}</span> {x.kind==='default-branch-head'?<code>{short(x.ref)}</code>:x.ref}{x.note?<span className="micro"> · {x.note}</span>:null}</li>)}</ul></li>)}</ul></section>}
+  {!readOnly&&<label className={`file-button${busy?' disabled':''}`} title="A datapass.lens.minimap export from DataPass Lens. Matched repositories get observed Git and delivery pointers in a new snapshot, after review.">Read Lens minimap…<input type="file" accept=".json,application/json" aria-label="Read Lens minimap" disabled={busy} onChange={e=>{const f=e.target.files?.[0];if(f)onLens(f);e.target.value='';}}/></label>}
   {!readOnly&&<details className="atlas-add"><summary>Add repository</summary>
    <p className="micro">Membership is explicit: the repository is added as a card, not scanned, revision unknown until you rescan it.</p>
    <div className="atlas-form">
