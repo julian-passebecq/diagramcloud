@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.8.0
+
+- **Galaxy and Contoso atlases** (Project Atlas brief §11, §12): `galaxy.json` read as a project manifest (members from apps, relationships from connections, live = static source, branch/planned = planned, self-reads and unknown apps reported); the real Galaxy atlas is generated locally (private repository names, not committed). Contoso Forecasting reference atlas from `contoso-data-studio` at `61353848b4e7`: lab as built vs Fabric target, data zones separate from environment. Repository `visibility` for cardless repositories in public output. draw.io import merges a component a DiagramCloud export repeats on several pages (same ID) instead of duplicating it.
+
 ## Shipped in 1.7.0
 
 - **Blueprint mode** (Project Atlas brief §4, §5, §6): Blueprint and Editorial SVG renderers built from the ViewSpec plus the shared export scene (the standard SVG export is unchanged), with a title block carrying the revision vector and provenance; a canvas Blueprint toggle (remembered per browser). SeeCode was rejected as a renderer (CDN fonts/encoders, no ID preservation); diagram-design is used as visual grammar only (`docs/research/seecode-diagram-design.md`).

@@ -38,6 +38,6 @@ test('gallery buckets and marks',()=>{
  assert.deepEqual(gallery.map(projectMark),['A','Az','G','K8','E']);
  // The DataPass planning maps are the author's own work: portfolio, never presented as vendor cloud references.
  for(const id of ['project-constellation','datapass-platform']){const s=samples.find(s=>s.id===id)!;assert.equal(galleryBucket(s),'portfolio',id);assert.equal(galleryCaption(s),'Portfolio map');}
- assert.deepEqual(samples.filter(s=>galleryBucket(s)==='cloud').map(s=>s.id),['fabric-medallion','databricks-reference',...gallery.map(p=>p.id)]);
+ assert.deepEqual(samples.filter(s=>galleryBucket(s)==='cloud').map(s=>s.id),['fabric-medallion','databricks-reference',...gallery.map(p=>p.id),'contoso-forecasting']);
  assert.equal(galleryCaption(gallery[0]),'Cloud architecture · AWS');
 });

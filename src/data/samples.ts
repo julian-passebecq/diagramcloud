@@ -1,6 +1,7 @@
 import {validateDocument,type Project} from '../core/model';
 import {block,node,note,project,view} from './builders';
 import {cloudGallery} from './cloudGallery';
+import {contosoForecasting} from './contosoForecasting';
 import {examplePack} from '../experience/sample';
 
 function experience(rootId:string,id:string,title:string){const p=examplePack();p.rootId=rootId;p.id=id;p.title=title;return p;}
@@ -687,4 +688,4 @@ platform.story=[
 
 const blank=project('blank-project','Start from a blank project','Build a small architecture, attach evidence, then add one drilldown at a time.','Blank',['Your project']);
 node(blank,'first-node','Your first component','process',{summary:'Switch to Edit to change this component.'});view(blank,'overview','Architecture overview','A diagram is the entry point; the evidence explains the work.',['first-node'],[]);
-export const samples:Project[]=[validateDocument(constellation),validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),...cloudGallery(),validateDocument(blank)];
+export const samples:Project[]=[validateDocument(constellation),validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),...cloudGallery(),contosoForecasting(),validateDocument(blank)];

@@ -119,14 +119,17 @@ export function documentFromGraph(pages:GraphPage[],options:{format:ImportFormat
   summary:`Imported from ${FORMAT_LABEL[options.format]} (${options.fileName}). Review labels, component types and visibility before publishing.`,
   provenance:`Imported from the ${FORMAT_LABEL[options.format]} file “${options.fileName}” on ${(options.now??new Date()).toISOString().slice(0,10)}. Boxes, labels, connections and groups were kept; styles, colours and vendor artwork were not. Component types and providers were inferred from labels and shapes.`,
   nodes:[],edges:[],views:[{id:'overview',title}]});
- let nodeCount=0,edgeCount=0,truncated=0,selfLoops=0,dangling=0;const groups=new Set<string>();
+ let nodeCount=0,edgeCount=0,truncated=0,selfLoops=0,dangling=0;const groups=new Set<string>();const explicit=new Set<string>();let repeated=0;
  const pageViews=usable.map((page,pi)=>{
   const viewId=usable.length===1?'overview':unique(slug(page.title||`page-${pi+1}`,'page'),viewIds);
   const keyToId=new Map<string,string>(),members:string[]=[],edges:string[]=[];
   for(const n of page.nodes){
    if(nodeCount>=MAX_NODES)break;
    const label=n.label.trim()||n.key;if(label.length>160)truncated++;
+   // An explicit ID already created on an earlier page is the same component shown again (a DiagramCloud export repeats shared components per view).
+   if(n.id&&explicit.has(n.id)&&!members.includes(n.id)){keyToId.set(n.key,n.id);members.push(n.id);repeated++;continue;}
    const id=n.id&&ID.test(n.id)&&!nodeIds.has(n.id)?unique(n.id,nodeIds):unique(slug(options.format==='mermaid'?n.key:label),nodeIds);keyToId.set(n.key,id);members.push(id);nodeCount++;
+   if(n.id===id)explicit.add(id);
    const hint=`${label} ${n.summary??''}`;
    doc.nodes.push({id,label:clip(label,160),kind:n.kind??inferKind(hint),provider:clip(n.provider&&(n.provider!=='Generic'||n.id)?n.provider:inferProvider(hint),80),icon:'generic',summary:clip(n.summary??'',500),role:'',status:'idle',blockIds:[],sourceIds:[],tags:n.group?[clip(n.group,80)]:[],visibility:'public'});
    if(n.group)groups.add(n.group);
@@ -168,7 +171,7 @@ export function documentFromGraph(pages:GraphPage[],options:{format:ImportFormat
   kept.push(`${usable.length} pages, each as a view opened from the root “Pages” cards.`);
  }
  const total=usable.reduce((a,p)=>a+p.nodes.length,0),totalEdges=usable.reduce((a,p)=>a+p.edges.length,0);
- if(total>nodeCount)lost.push(`Only the first ${MAX_NODES} boxes were imported (of ${total}).`);
+ if(total-repeated>nodeCount)lost.push(`Only the first ${MAX_NODES} boxes were imported (of ${total}).`);
  if(totalEdges-dangling-selfLoops>edgeCount)lost.push(`Only the first ${MAX_EDGES} connections were imported.`);
  if(dangling)lost.push(`${dangling} connection(s) without a box at both ends were dropped.`);
  if(selfLoops)lost.push(`${selfLoops} self-connection(s) were dropped.`);
