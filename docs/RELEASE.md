@@ -44,7 +44,7 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
-| 1.11.0 | head of the Lens PR (`feat/lens`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | Lens minimap reader; Chromium only |
+| 1.11.0 | `73da4d9` (tag `v1.11.0`) | 37546640948 | E2E_VERIFIED (automated) | Vercel production from `main` | Lens minimap reader; Chromium only |
 | 1.10.0 | `5667af4` (tag `v1.10.0`) | 37545174738 | E2E_VERIFIED (automated) | Vercel production from `main` | Technical Manual preset; Chromium only |
 | 1.9.0 | `f853467` (tag `v1.9.0`) | 37543927209 | E2E_VERIFIED (automated) | Vercel production from `main` | MosaicStudio concept export; Chromium only |
 | 1.8.0 | `074f307` (tag `v1.8.0`) | 37542475496 | E2E_VERIFIED (automated) | Vercel production from `main` | galaxy map, Contoso Forecasting atlas; Chromium only |
@@ -59,6 +59,8 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 | 1.0.0 | `4a2e5be` (tag `v1.0.0`), qualified at `7943f5b` | 37369437999 | E2E_VERIFIED | Vercel production from `main` | first V1 release |
 
 ## Cross-app checks
+
+The Project Atlas brief qualification record (1.5.0 to 1.11.0) is in [qualification/project-atlas.md](qualification/project-atlas.md).
 
 One contract at a time, against the owner's own reader. This is not a Galaxy qualification level.
 
