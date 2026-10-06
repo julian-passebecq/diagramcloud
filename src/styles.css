@@ -45,3 +45,7 @@
 .atlas-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:8px 0}.atlas-form .wide{grid-column:1/-1}.atlas-form input,.atlas-form select,.atlas-controls select{font:inherit;padding:4px 6px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .studio[data-theme=dark] .atlas-stale{color:#f2b36b}
+.perspective-strip{margin:0 0 14px}.perspective-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.perspective-chip{border:1px solid var(--border);border-radius:999px;padding:2px 9px;font-size:11px;background:var(--panel);color:var(--muted)}
+button.perspective-chip{cursor:pointer}.perspective-chip.state-available{border-color:var(--blue);color:var(--blue);background:var(--blue-soft);font-weight:600}.perspective-chip.state-partial{border-style:dashed;color:var(--ink)}.perspective-chip.state-unsupported{opacity:.5;text-decoration:line-through}
+.nav-buttons{display:inline-flex;gap:4px;margin-right:8px}.nav-buttons button{border:1px solid var(--border);background:var(--panel);color:var(--ink);border-radius:5px;padding:0 7px;font-size:12px}.nav-buttons button:disabled{opacity:.4}
+.view-context{font-size:9px;letter-spacing:1px;color:var(--muted);margin-left:6px}.basis-label select{border:1px solid var(--border);padding:5px;border-radius:5px;background:var(--panel);color:var(--ink)}
