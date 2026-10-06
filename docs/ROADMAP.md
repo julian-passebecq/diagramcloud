@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.9.0
+
+- **MosaicStudio adapter** (Project Atlas brief §7): a view as `datapass.concept-spec/1` built from the public ViewSpec, with a loss report and an ID map; checked in unit and browser tests with the owner's validator (vendored from datapass-mosaicstudio `8b22d9c`), and cross-app with MosaicStudio's standalone viewer (`scripts/qualify-concept.ts`, record in docs/RELEASE.md). Next: Lens Git projections, Brain project context, Technical Manual preset.
+
 ## Shipped in 1.8.0
 
 - **Galaxy and Contoso atlases** (Project Atlas brief §11, §12): `galaxy.json` read as a project manifest (members from apps, relationships from connections, live = static source, branch/planned = planned, self-reads and unknown apps reported); the real Galaxy atlas is generated locally (private repository names, not committed). Contoso Forecasting reference atlas from `contoso-data-studio` at `61353848b4e7`: lab as built vs Fabric target, data zones separate from environment. Repository `visibility` for cardless repositories in public output. draw.io import merges a component a DiagramCloud export repeats on several pages (same ID) instead of duplicating it.
