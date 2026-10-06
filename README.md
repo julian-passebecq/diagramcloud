@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.5.0** (`package.json`; shown in the header) |
+| Product version | **1.6.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -76,6 +76,12 @@ npm run atlas -- project.manifest.json --out atlas.json [--previous atlas.json] 
 ```
 
 The CLI scans every repository that has a local `path` in the manifest, records each revision from `.git/HEAD`, and prints the revision vector, the comparison with `--previous` and stale or missing sources. It is read-only and never runs git or touches the network.
+
+## Perspectives and the view spec
+
+Every view has a perspective: System, Code, Data, Cloud, Git, CI/CD, Agents, Decisions or Evidence (views without one count as System). Selecting a component shows a **Perspectives** strip: *available* (the same component ID appears in a view of that perspective), *partial* (one of its drilldowns or the view that opens it has it), *unknown* (the project has that perspective, not for this component) or *not in this project*. Opening a perspective keeps the drilldown parents visible; **← / →** go back and forward through paths and selections. Each view heading names its perspective and, in a project atlas, the repository and revision it comes from. The **Basis** filter dims components that are not planned, read from source, unknown or unstated.
+
+**Export & share → View spec (JSON)** writes `diagramcloud.viewspec/1` for the current public view: stable IDs, typed edges, basis, confidence, evidence and source references, presented realization, drilldown path and children, repository groups, the revision vector, a legend and what was omitted. It is the renderer-neutral contract for other renderers (a MosaicStudio scene, an editorial publisher); every built-in export reads the same document.
 
 ## Diagram from a repository
 

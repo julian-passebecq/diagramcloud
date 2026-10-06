@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.5.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.6.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -294,3 +294,7 @@ A rescan of a project already in the library keeps its revision, so the JSON / A
 ## 1.5 additions: project atlas
 
 `src/core/atlas/` composes several repository scans into one document without a new graph model. `manifest.ts` validates the explicit membership (repository IDs ≤ 24 characters, locators without credentials, relationship endpoints). `compose.ts` builds the root view (one card per repository, declared relationships with basis `planned`), embeds each scan under the prefix `<repository>.` (IDs over 80 characters are shortened deterministically) with a budget shared across repositories (`scanBudget`), and appends a snapshot to `atlas.snapshots`. `rescanRepository` removes one prefix and embeds a new scan; `addRepository` adds an unscanned card. `snapshot.ts` compares revision vectors (a missing revision is `unknown`, never `unchanged`) and lists stale sources; it never polls. `publicDocument` keeps only the active snapshot, only repositories whose card is public, and drops runtime/context pointers. The CLI `scripts/atlas.ts` shares `scripts/lib/readRepo.ts` with `npm run scan`.
+
+## 1.6 additions: perspectives and view spec
+
+A perspective is a property of a view (`view.perspective`, default System), not a separate graph: one component keeps one ID and appears in as many views as the document says. `src/core/viewspec.ts` derives everything from the validated document: `pathTo` (breadcrumb from the root through drilldowns), `perspectivesFor` (per perspective: available, partial through a drilldown or parent view, unknown, unsupported), `repositoryOf` (atlas prefix → snapshot entry) and `viewSpec`, the serialisable renderer-neutral form of one view (public audience through publicDocument, with omissions stated). The app keeps an in-memory Back / Forward stack of {path, view, selection}, reset when another project opens.

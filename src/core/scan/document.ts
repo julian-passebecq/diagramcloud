@@ -15,7 +15,7 @@ import type {Confidence,ScanItem,ScanLink,ScanModel} from './scanner';
 export const SCAN_LIMITS={nodes:480,edges:1400,views:78,componentViews:20,fileViews:30,filesPerView:40,perView:120};
 const SUFFIX:Record<Confidence,string>={confirmed:'',inferred:' (inferred)',possible:' (possible)'};
 /** Which perspective each generated view belongs to. */
-export const scanPerspective=(viewId:string):Perspective=>viewId.startsWith('components-')||viewId.startsWith('files-')?'code':viewId==='data-lineage'?'data':viewId.startsWith('infrastructure-')?'cloud':'system';
+export const scanPerspective=(viewId:string):Perspective=>viewId.startsWith('components-')||viewId.startsWith('files-')?'code':viewId==='data-lineage'?'data':viewId.startsWith('infrastructure-')?'cloud':viewId==='delivery'?'cicd':'system';
 const clip=(s:string,n:number)=>s.length>n?`${s.slice(0,n-1)}…`:s;
 
 /** `limits` lowers the budget when several repositories share one document (project atlas). */
@@ -106,8 +106,12 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
   links:[...[...lift].map(([to,v])=>({from:'system',to,label:'uses',confidence:v.confidence,kind:'batch' as const,count:1})),...ci.map(c=>({from:c.key,to:'system',label:'builds and tests',confidence:'confirmed' as Confidence,kind:'control' as const,count:1})),
    ...model.links.filter(l=>l.layer==='ci'),...groupKeys.map(g=>({from:g,to:'system',label:'hosts',confidence:'inferred' as Confidence,kind:'dependency' as const,count:1}))]});
 
+ // CI/CD perspective: the same system card, with how it is built and where it is deployed (only when CI was found).
+ if(ci.length)views.push({id:'delivery',title:'CI/CD',description:`How ${model.name} is built, tested and deployed, from its CI workflow files. Targets are what the workflow declares, not observed deployments.`,
+  keys:['system',...deploy.map(d=>d.key)],links:model.links.filter(l=>l.layer==='ci'&&l.to.startsWith('deploy:')).map(l=>({...l,from:'system',label:clip(`${l.label} (${model.items.get(l.from)?.label??'CI'})`,120)}))});
+
  // ---- Materialize views (root first so drilldown cards exist before their children are referenced) ----
- const childOf=(key:string)=>key==='system'?'containers':key===dataKey?'data-lineage':componentViews.get(key);
+ const childOf=(key:string)=>key==='system'?'containers':key===ci[0]?.key?'delivery':key===dataKey?'data-lineage':componentViews.get(key);
  for(const v of views.slice(0,L.views)){
   const members:string[]=[];
   for(const key of v.keys){const it=model.items.get(key);if(!it)continue;const child=childOf(key);const id=addNode(it,child&&views.some(x=>x.id===child)?child:undefined);if(id&&!members.includes(id))members.push(id);}
