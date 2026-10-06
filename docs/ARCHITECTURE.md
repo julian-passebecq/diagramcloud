@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.2.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.3.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -276,3 +276,13 @@ The report lists every kind of loss with a count. Tests cover a hand-written mul
 - `src/core/interchange/visio.ts` follows `visio/pages/pages.xml` and its relationships to each page part, inherits cells and text from master shapes (`visio/masters/`), converts Visio coordinates (inches, y up, group-local pins) to the page, and builds the same interchange graph as draw.io: shapes (text, else master name), groups of an icon and a caption as one component, groups of several labelled shapes and `msvStructureType` containers as frames, captions beside an unlabelled icon or on a frame, connectors from `<Connect>` glue or the shape under a loose end, arrows on the begin end reversed. Binary `.vsd`, `.vdx` and stencils are refused.
 - `src/export/drawio.ts` writes an uncompressed `mxfile` from `publicDocument`: pages in drilldown order, `UserObject` boxes carrying `dcId`/`dcKind`/`dcProvider` (and a presented realization line), edges with `dcKind` in the style, exit/entry constraints and the scene's interior route points, so draw.io draws the same orthogonal lines. Labels are plain text (`html=0`), XML-escaped once.
 - `documentFromGraph` keeps a carried DiagramCloud ID when valid and free, and turns page links into drilldowns when they reach every page exactly once from the first page (no "Pages" root view then).
+
+## 1.3 additions: repository scanner
+
+`src/core/scan/` is pure TypeScript shared by the browser and `scripts/scan-repo.ts`.
+
+- `scanner.ts`: `wantedFile` filters paths before anything is read (ignored folders, secret files, size and count limits); `scanRepository` turns `{path,text}[]` into a model of items (system, containers, external systems, components, files, tables, Terraform resources, CI) and links, each with evidence `{file,line,finding,confidence}`. Detectors: manifests (npm, pip, pyproject, go.mod) through the catalogue in `tech.ts`, Dockerfiles, docker-compose (`yaml` package), Kubernetes workloads/Services/Ingresses, Terraform blocks and references, GitHub Actions deploy steps, example env key names, SQL/dbt/Prisma lineage, TypeScript/JavaScript/Python imports resolved to modules and files. Technology links resolve last, so a compose or Kubernetes service running PostgreSQL is preferred over an external PostgreSQL node.
+- `document.ts`: one project with drilldown views (System context → Containers → Components → Files; Data lineage; Infrastructure per provider), node IDs derived from scan keys (stable across rescans), a source-derived evidence table per node, confidence as a tag and on non-confirmed edge labels, layered positions, and the import report.
+- `index.ts`: `scanToDocument` and `scanPickedFolder` (`<input webkitdirectory>`; filters by path and size before reading).
+
+A rescan of a project already in the library keeps its revision, so the JSON / AI review shows the stable-ID change preview before applying.

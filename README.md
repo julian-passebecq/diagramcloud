@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.2.0** (`package.json`; shown in the header) |
+| Product version | **1.3.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -64,6 +64,29 @@ Modes: **Explore** is read-only. **Edit** adds dragging, connections, properties
 Ordinary authoring is visual: project metadata and sources; components (identity, meaning, design status, cited sources, visibility); connections; child views; workspace links; explanations, code, images, metrics and **tables** (columns, rows, reorder, paste from a spreadsheet); block order; the **transformation explainer** (input rows → logic → output rows, column mapping, grain/keys/quality rules; explanatory only); story steps; observation review, visibility and sharing.
 
 JSON / AI remains the path for whole-document edits, RFC 6902 patches addressed by stable ID (`@id` segments, refused when the base revision is stale), observation patches and Galaxy publication snapshots. Every import is validated, previewed item by item and applied only after review.
+
+## Diagram from a repository
+
+**Diagram from a repository** in the gallery reads a local Git folder in the browser (nothing is uploaded) and builds a project with four levels of detail, each a drilldown:
+
+| Level | View | From |
+|---|---|---|
+| Macro | System context: the repository as one system, the external systems it uses, CI/CD and its deployment targets, its infrastructure as code per cloud provider | dependencies, example env files, GitHub Actions, Terraform |
+| Medium | Containers: packages, compose services, Kubernetes workloads and ingresses, datastores, and a data model card | `package.json`, `requirements*.txt`, `pyproject.toml`, `go.mod`, Dockerfiles, docker-compose, Kubernetes manifests |
+| Mini | Components: the modules (top-level source folders) of each container and the imports between them, with counts | TypeScript/JavaScript and Python import statements |
+| Files | The files of each module and the imports between them | the same import statements |
+
+Plus a **Data lineage** view (SQL `CREATE … AS SELECT`, `INSERT … SELECT`, foreign keys, dbt `ref`/`source`, Prisma relations) and an **Infrastructure** view per provider (Terraform resources and references).
+
+Every component carries a *source-derived* evidence table (file, line, finding) and every link a confidence: **confirmed** (declared: `depends_on`, an import, a Terraform reference, a foreign key), **inferred** (implied: a database driver in the dependencies, a host name in configuration) or **possible** (a key name in an example env file; drawn dashed). Secret files (`.env`, keys, certificates, `tfvars`, state) are never read, environment values never enter the document, and only `HEAD` and refs are read from `.git` (to record the branch and commit). Scanning the same repository again produces the same IDs, so the import review shows what changed.
+
+The same scanner runs from the command line for agents and CI:
+
+```
+npm run scan -- <repository folder> --out diagramcloud.json
+```
+
+It detects declarations, not runtime behaviour: calls, traffic and resources declared outside the repository are not seen, and other languages' imports are not read.
 
 ## Import draw.io, Mermaid and Visio
 
@@ -131,6 +154,7 @@ Credential-like values and `.env`-looking text are refused where content crosses
 These are the genuine post-V1 boundaries (full list and candidates in [docs/ROADMAP.md](docs/ROADMAP.md)):
 
 - Chrome/Chromium only is qualified; other browsers are untested.
+- The repository scanner is deterministic and declaration-based: no call graph, no runtime traffic, imports only for TypeScript/JavaScript and Python, Terraform parsed by pattern (no HCL evaluation), no git history or diff between commits other than the stable-ID review of a rescan.
 - draw.io, Mermaid and Visio import are adapters with a loss report: no styles or vendor artwork, no binary `.vsd`, no Lucidchart native file (use its `.vsdx` export), no arbitrary SVG → editable graph, no lossless Mermaid round trip, only Mermaid flowchart / architecture-beta, and no export to Visio. draw.io export → import is a tested round trip for components, connections and drilldowns, not for styles.
 - The layout button is a grid, not a graph auto-layout engine; export routing avoids boxes on the shipped samples (unit-tested), not on every possible layout. The interactive canvas routes edges on its own.
 - No live cloud discovery, no execution of SQL/DAX/Python/Spark, no real-time collaboration or server sync.

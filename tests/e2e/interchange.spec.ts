@@ -115,3 +115,32 @@ test('draw.io export: every public view as a page, and the file imports back wit
  await expect(page.getByTestId('import-report')).toContainText('draw.io import');
  await expect(page.getByTestId('import-report')).toContainText('page link(s) between them are drilldowns');
 });
+
+test('repository scan: a picked folder becomes system → containers → components → files, with evidence; a rescan is reviewed by stable ID',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/');
+ await expect(page.getByRole('region',{name:"What's new"})).toContainText('Diagram from a repository');
+ await page.getByLabel('Scan repository folder').setInputFiles('tests/fixtures/repo-shop');
+ const report=page.getByTestId('import-report');
+ await expect(report).toContainText('Repository scan');await expect(report).toContainText('repo-shop');
+ await expect(report.getByRole('region',{name:'Kept'})).toContainText('docker-compose file');
+ await expect(page.getByText('A new local project will be added.')).toBeVisible();
+ await page.screenshot({path:'test-results/interchange/scan-report.png'});
+ await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'shop architecture (scanned)',exact:true,level:1})).toBeVisible();
+ await page.getByRole('button',{name:'Explore shop',exact:true}).click();
+ await expect(page.getByTestId('view-containers')).toBeVisible();
+ await page.getByRole('button',{name:'Explore api-client',exact:true}).click();
+ const components=page.locator('[data-testid^="view-components-"]');await expect(components).toBeVisible();
+ await expect(page.getByTestId('view-overview')).toBeVisible();
+ await components.getByRole('button',{name:'Explore routes',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Scan evidence'}).first()).toBeVisible();
+ await expect(page.getByRole('cell',{name:'apps/api/src/routes/orders.ts',exact:true}).first()).toBeVisible();
+ await page.screenshot({path:'test-results/interchange/scan-drilldown.png',fullPage:true});
+ // Scanning the same folder again targets the same project and goes through the change review.
+ await page.getByRole('button',{name:'Project gallery',exact:true}).click();
+ await page.getByLabel('Scan repository folder').setInputFiles('tests/fixtures/repo-shop');
+ await expect(page.getByText('Existing project ID detected. Review the stable-ID diff below before applying.')).toBeVisible();
+ await expect(page.getByRole('button',{name:'Apply imported document',exact:true})).toBeEnabled();
+ expect(errors).toEqual([]);
+});

@@ -1,0 +1,21 @@
+services:
+  web:
+    build: ./apps/web
+    ports: ["3000:3000"]
+    depends_on: [api]
+  api:
+    build:
+      context: ./apps/api
+    environment:
+      DATABASE_URL: postgres://shop:shop@db:5432/shop
+      REDIS_URL: redis://cache:6379
+    depends_on:
+      - db
+      - cache
+  db:
+    image: postgres:16
+  cache:
+    image: redis:7
+  worker:
+    build: ./worker
+    depends_on: [db]

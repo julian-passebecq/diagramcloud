@@ -2,6 +2,16 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.3.0
+
+- **Repository scanner:** a local Git folder (browser folder picker, read in the browser) or `npm run scan` becomes System context → Containers → Components → Files, plus Data lineage and Infrastructure views, from manifests, Dockerfiles, docker-compose, Kubernetes, Terraform, GitHub Actions, SQL/dbt/Prisma and TypeScript/JavaScript/Python imports. Evidence (file, line, finding) and confidence (confirmed / inferred / possible) on everything; secret files never read; stable IDs so a rescan is reviewed as a diff. Informed by the 2026-10 gap analysis (Groma.md, Tecture, Compass, CodeFlow).
+
+## Idées de Julian (2026-10-06)
+
+- **AtlasNote visualisation (target 1.4):** export a DiagramCloud view or a repository scan as an AtlasNote cheatsheet (the "Architecture" starter on its native SVG grammar, `urn:atlasnote:cheatsheet:1.1`) so AtlasNote can show what DiagramCloud generates; check `galaxy.json` before adding a cross-app format.
+- **Content database:** a Git repository of DiagramCloud documents (`diagramcloud.json` per project, already the sidecar format) that other apps read from outside; the CLI scanner can refresh it in CI.
+- **Repository → many formats:** a scan already exports to draw.io, Mermaid, SVG, PowerPoint and HTML; next candidates are D2, PlantUML, Structurizr and LikeC4 (gap analysis ranks 2, 4, 8).
+
 ## Shipped in 1.2.0
 
 - **Visio import:** `.vsdx` / `.vsdm` / `.vstx` packages read in the browser (a small ZIP reader over `DecompressionStream`): pages, shape text or master names, glued and dropped connectors, containers, frames and captions, with a loss report. Checked during development against 12 public `.vsdx` files (the BSD-licensed `dave-howard/vsdx` test drawings and the Azure Architecture Center AKS baseline drawing), none committed. Binary `.vsd` and `.vdx` are refused with a message.
@@ -33,7 +43,7 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 | Azure and Databricks vendor artwork | Needs per-icon terms review (Azure ships a separate download; Databricks publishes no icon terms) |
 | Firefox / Safari qualification | 1.0 qualifies Chromium only |
 | Canvas routing shared with the export scene | The interactive canvas still routes edges with React Flow |
-| Repository scanner: a diagram from a local Git folder (manifests, compose, Kubernetes, Terraform, CI, schemas, imports) at several levels of detail with confirmed / inferred / possible evidence | Ranked first in the 2026-10 gap analysis; next |
+| Repository scanner next steps: diff between two commits, more languages (Go, Java, C#), call graph, Helm and Bicep, OpenAPI routes | 1.3 ships the declaration-based scanner |
 | Structurizr DSL import; D2, PlantUML, Lucid CSV/.lucid, Excalidraw, LikeC4 and mingrammer `diagrams` exports | draw.io, Mermaid and Visio import and draw.io export shipped; the others are not started |
 | Graph auto-layout (layered, ELK-style) | The layout button is still a grid |
 | Architecture diff between two documents or scans (stable-ID overlay) | Not started |
