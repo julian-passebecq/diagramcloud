@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {parseManifest,documentFromAtlas,rescanRepository,addRepository,compareSnapshots,staleRepositories,type AtlasScan} from '../src/core/atlas';
+import {parseManifest,documentFromAtlas,rescanRepository,addRepository,compareSnapshots,staleRepositories,parseLensMinimap,applyLensMinimap,lensHeads,type AtlasScan} from '../src/core/atlas';
 import {scanRepository} from '../src/core/scan';
 import {validateDocument,type Project} from '../src/core/model';
 import {publicDocument} from '../src/core/operations';
@@ -118,4 +118,30 @@ test('galaxy map: apps become declared members, connections become labelled rela
  assert.match(notes!.join(' '),/hub → hub \(control-db\): an app reading its own contract/);assert.match(notes!.join(' '),/ghost → hub: unknown app/);
  const {document:d}=documentFromAtlas(manifest,{},{now:NOW});assert.doesNotThrow(()=>validateDocument(d));
  assert.ok(d.atlas!.snapshots[0].repositories.every(r=>r.scanStatus==='not-scanned'),'reading the map scans nothing');
+});
+
+test('Lens minimap: observed Git and delivery pointers in a new snapshot; components untouched; unknown repositories never added; scans go stale when the head moves',()=>{
+ const {document:d}=atlas();
+ const out=applyLensMinimap(d,parseLensMinimap(readFileSync('tests/fixtures/atlas/lens.minimap.json','utf8')),{now:LATER});
+ const after=out.document,snap=after.atlas!.snapshots.at(-1)!;
+ assert.equal(after.atlas!.snapshots.length,2);assert.equal(after.atlas!.activeSnapshotId,snap.id);assert.match(snap.label!,/Lens observation of 2026-10-20 10:00 UTC/);
+ assert.deepEqual({n:after.nodes,e:after.edges,v:after.views},{n:d.nodes,e:d.edges,v:d.views},'components, connections and views are unchanged');
+ // The scanned revision stays (it describes the content); Lens's head makes shop stale; billing is at the same head.
+ assert.deepEqual(snap.repositories.map(r=>[r.id,r.revision,r.authority]),[['shop',SHA_A,'git'],['billing',SHA_B,'git'],['handbook','1234567890abcdef1234567890abcdef12345678','manifest']]);
+ assert.deepEqual(lensHeads(snap),{shop:'e'.repeat(40),billing:SHA_B});
+ const stale=Object.fromEntries(staleRepositories(snap,{now:LATER,current:lensHeads(snap)}).map(s=>[s.id,s.reasons.join('; ')]));
+ assert.match(stale.shop,/source is now at eeeeeeeeeeee, snapshot has aaaaaaaaaaaa/);assert.ok(!stale.billing);
+ const ref=(id:string)=>snap.runtimeRefs.find(r=>r.id===id);
+ assert.equal(ref('lens.shop.ci')?.ref,'FAILED @ eeeeeeeeeeee');assert.ok(snap.runtimeRefs.every(r=>r.basis==='observed'&&r.sourceApp==='lens'));
+ assert.equal(ref('lens.shop.request.1')?.ref,'https://github.com/example/shop/pull/42');assert.ok(!JSON.stringify(after).includes('SECRET-TOKEN'),'credential-bearing links are dropped');
+ assert.match(ref('lens.shop.agent.1')!.note!,/Agent-reported running · WO-7 cart/);
+ assert.match(out.report.lost.join(' '),/warehouse: not a member of this atlas, not added/);assert.match(out.report.lost.join(' '),/request 43 link carries credentials/);
+ assert.match(out.report.kept.join(' '),/Shop: main @ eeeeeeeeeeee, CI FAILED, 2 request\(s\), 1 agent session\(s\)\. The scan is at aaaaaaaaaaaa: rescan to follow\./);
+ assert.ok(!snap.repositories.some(r=>r.id==='warehouse'));
+ // Public output carries none of it.
+ assert.deepEqual(publicDocument(after).atlas!.snapshots[0].runtimeRefs,[]);
+ // Refusals change nothing.
+ assert.throws(()=>parseLensMinimap('{"format":"datapass.lens.minimap","version":2}'),/rejected/);
+ const none=JSON.parse(readFileSync('tests/fixtures/atlas/lens.minimap.json','utf8'));none.repositories=none.repositories.slice(2);
+ assert.throws(()=>applyLensMinimap(d,parseLensMinimap(JSON.stringify(none))),/No repository of this Lens minimap is a member/);
 });

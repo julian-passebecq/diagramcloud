@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.10.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.11.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -314,3 +314,7 @@ A perspective is a property of a view (`view.perspective`, default System), not 
 ## 1.10 additions: Technical Manual
 
 `technicalManualHtml(doc)` composes existing parts rather than adding a renderer: the views in drilldown order (`orderedViews`), one `viewSpec` per view for tables and omissions, and the editorial SVG for figures (its marker ID is suffixed per figure so the page has unique IDs). Each component is counted once in the basis summary, however many views show it. Evidence blocks print with their provenance label; image blocks are named but stay in the interactive HTML. A Content-Security-Policy of `default-src 'none'` and the absence of any script make the file safe to open from disk and to archive; `@page` and print rules give A4 sections.
+
+## 1.11 additions: Lens projections
+
+Lens owns observed Git and delivery state; DiagramCloud keeps three meanings apart and adds no fourth. `applyLensMinimap` appends a snapshot whose `runtimeRefs` are `lens.<repo>.<kind>[.<n>]` pointers (default-branch-head, ci-state, work-in-progress, request, agent-session), all basis observed with the minimap's `observedAt`. Nodes, edges, views and design status are byte-for-byte unchanged, so nothing observed can be mistaken for Planned or Presented, and `publicDocument` already empties runtime pointers. The revision of a scanned repository is the one its content was read at; `lensHeads(snapshot)` feeds `staleRepositories({current})`, which already explains a moved source. Matching is by repository ID, locator basename or title, guarded by host; ambiguous and unknown entries are reported.
