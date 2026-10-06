@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.7.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.8.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -302,3 +302,7 @@ A perspective is a property of a view (`view.perspective`, default System), not 
 ## 1.7 additions: rendering styles
 
 `src/export/styled.ts` renders one view in two more styles from the same inputs as every export: meaning from `viewSpec` (public audience), geometry from `buildScene`. Blueprint adds a grid, zone references derived from positions, kind symbols (storage drum line, control chamfer, application double frame), line patterns per edge kind, a legend limited to what is drawn, and a title block (project, view, perspective, revision vector, date, provenance, omissions). Editorial numbers the components and lists them in a key. Text is measured with the shared Arial metrics, so nothing re-wraps; output is static SVG with system fonts and `data-node-id` on every component. The canvas Blueprint toggle is CSS only.
+
+## 1.8 additions: galaxy map and reference atlases
+
+`parseManifest` reads a third input, the Claude Control galaxy map, without changing its format: apps with a repository become manifest members (host from the repository string, `path` for the CLI only), connections become relationships whose label is `contract · status`. Basis follows what the map can support: `live` with a source file is static source; `branch` and `planned` are planned; self-reads and unknown apps are reported, not drawn. A snapshot repository may carry `visibility`; without a card, only an author-marked public repository reaches `publicDocument`. The draw.io importer treats a repeated explicit `dcId` across pages as one component, which is how DiagramCloud exports a component shared by two views.

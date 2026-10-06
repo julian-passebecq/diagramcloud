@@ -109,3 +109,13 @@ test('atlas: many scanned repositories stay inside document limits',()=>{
  assert.doesNotThrow(()=>validateDocument(d));assert.ok(d.nodes.length<=500&&d.edges.length<=1500&&d.views.length<=80);
  assert.ok(manifest.repositories.every(r=>d.nodes.find(n=>n.id===`repo-${r.id}`)?.childViewId),'every scanned repository still drills down');
 });
+
+test('galaxy map: apps become declared members, connections become labelled relationships; live is static source, branch and planned stay planned',()=>{
+ const {manifest,source,notes}=parseManifest(readFileSync('tests/fixtures/atlas/galaxy.sample.json','utf8'));
+ assert.equal(source,'galaxy');assert.equal(manifest.project.id,'galaxy');
+ assert.deepEqual(manifest.repositories.map(r=>[r.id,r.host,r.locator,r.role]),[['hub','github','https://github.com/example/hub','platform'],['notes','gitlab','example-group/notes','application'],['board','local','board','application'],['react','gitlab','example-react','application']]);
+ assert.deepEqual(manifest.relationships.map(r=>[r.from,r.to,r.label,r.kind,r.basis]),[['notes','hub','notes.overview/1 · live','batch','static-source'],['hub','board','hub-reports · branch','query','planned'],['react','notes','notes-link · planned','control','planned']]);
+ assert.match(notes!.join(' '),/hub → hub \(control-db\): an app reading its own contract/);assert.match(notes!.join(' '),/ghost → hub: unknown app/);
+ const {document:d}=documentFromAtlas(manifest,{},{now:NOW});assert.doesNotThrow(()=>validateDocument(d));
+ assert.ok(d.atlas!.snapshots[0].repositories.every(r=>r.scanStatus==='not-scanned'),'reading the map scans nothing');
+});

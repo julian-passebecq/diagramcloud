@@ -1,0 +1,13 @@
+{"generated":"2026-09-25","note":"Synthetic galaxy map for tests (shape of Claude Control galaxy.json; names are illustrative).",
+ "apps":[
+  {"id":"hub","name":"Example Hub","path":"../repo-shop","repo":"example/hub","branch":"main","what":"Reads every projection.","hub":true},
+  {"id":"notes","name":"Example Notes","path":"../repo-billing","repo":"example-group/notes (GitLab, private)","branch":"main"},
+  {"id":"board","name":"Status board","path":null,"repo":null,"branch":null},
+  {"id":"react","name":"Example React","repo":"gitlab: example-react","branch":"main"}],
+ "contracts":[{"id":"notes.overview/1","status":"live"}],
+ "connections":[
+  {"from":"hub","to":"hub","kind":"mongo-read","contract":"control-db","status":"live","source":"hub/src/db.ts"},
+  {"from":"notes","to":"hub","kind":"projection-export","contract":"notes.overview/1","status":"live","source":"hub/src/projection.ts"},
+  {"from":"hub","to":"board","kind":"http","contract":"hub-reports","status":"branch"},
+  {"from":"react","to":"notes","kind":"deep-link","contract":"notes-link","status":"planned"},
+  {"from":"ghost","to":"hub","kind":"file","contract":"x","status":"live","source":"x"}]}

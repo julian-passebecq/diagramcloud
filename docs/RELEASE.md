@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.7.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.8.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,7 +44,8 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
-| 1.7.0 | head of the blueprint PR (`feat/blueprint`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | blueprint and editorial renderings; Chromium only |
+| 1.8.0 | head of the atlases PR (`feat/galaxy-atlas`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | galaxy map, Contoso Forecasting atlas; Chromium only |
+| 1.7.0 | `fab0cf8` (tag `v1.7.0`) | 37540112120 | E2E_VERIFIED (automated) | Vercel production from `main` | blueprint and editorial renderings; Chromium only |
 | 1.6.0 | `29bf3f0` (tag `v1.6.0`) | 37538747043 | E2E_VERIFIED (automated) | Vercel production from `main` | perspectives, view spec; Chromium only |
 | 1.5.0 | `03953be` (tag `v1.5.0`) | 37537385507 | E2E_VERIFIED (automated) | Vercel production from `main` | project atlas, multi-repository snapshots; Chromium only |
 | 1.4.0 | `ed33556` (tag `v1.4.0`) | 37479911375 | E2E_VERIFIED (automated) | Vercel production from `main` | AtlasNote cheatsheet export; Chromium only |

@@ -56,7 +56,7 @@ const locator=z.string().min(1).max(500).refine(s=>!/^[a-z][a-z0-9+.-]*:\/\/[^/]
 export const REPOSITORY_HOSTS=['github','gitlab','azure-devops','bitbucket','local','other'] as const;
 export const SCAN_STATUSES=['scanned','not-scanned','failed','missing'] as const;
 export const snapshotRepositorySchema=z.object({id,title:short,host:z.enum(REPOSITORY_HOSTS),locator,revision:sha.optional(),ref:z.string().max(200).optional(),
- scanStatus:z.enum(SCAN_STATUSES),authority:z.enum(['git','manifest','lens','brain','author']),scannedAt:instant.optional(),nodeId:id.optional(),note:z.string().max(500).optional()}).strict();
+ scanStatus:z.enum(SCAN_STATUSES),authority:z.enum(['git','manifest','lens','brain','author']),scannedAt:instant.optional(),nodeId:id.optional(),note:z.string().max(500).optional(),visibility:z.enum(['public','private']).optional()}).strict();
 export const externalRefSchema=z.object({id,sourceApp:z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/),kind:short,ref:z.string().min(1).max(500),observedAt:instant.optional(),basis:z.enum(['planned','static-source','observed']),note:z.string().max(500).optional()}).strict();
 export const snapshotSchema=z.object({id,capturedAt:instant,label:z.string().max(160).optional(),repositories:z.array(snapshotRepositorySchema).max(60),runtimeRefs:z.array(externalRefSchema).max(200).default([]),contextRefs:z.array(externalRefSchema).max(200).default([])}).strict();
 export const atlasSchema=z.object({snapshots:z.array(snapshotSchema).min(1).max(20),activeSnapshotId:id}).strict();
