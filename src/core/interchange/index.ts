@@ -1,12 +1,13 @@
 import {drawioFromPng,importDrawio,looksLikeDrawio} from './drawio';
 import {importMermaid,looksLikeMermaid} from './mermaid';
 import type {ImportResult} from './graph';
+import {VISIO_ACCEPT,importVisio,isVisioFile} from './visio';
 
 export {FORMAT_LABEL,type ImportReport,type ImportResult} from './graph';
-export {looksLikeDrawio,looksLikeMermaid};
+export {looksLikeDrawio,looksLikeMermaid,importVisio,isVisioFile};
 
-/** File types the import button accepts besides DiagramCloud JSON/SVG. */
-export const INTERCHANGE_ACCEPT='.drawio,.xml,.drawio.svg,.drawio.png,.png,.mmd,.mermaid,.md';
+/** File types the import button accepts besides DiagramCloud JSON/SVG. Visio files are binary and go straight to importVisio. */
+export const INTERCHANGE_ACCEPT=`.drawio,.xml,.drawio.svg,.drawio.png,.png,.mmd,.mermaid,.md,${VISIO_ACCEPT},.vsd,.vdx`;
 
 /** Diagram text DiagramCloud can convert (draw.io XML, an editable draw.io SVG, Mermaid), or null for JSON and anything else. */
 export function interchangeFormat(raw:string):'drawio'|'mermaid'|null{

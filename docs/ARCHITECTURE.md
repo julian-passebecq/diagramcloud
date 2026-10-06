@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.1.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.2.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -269,3 +269,10 @@ In PowerPoint the icon is an SVG with a PNG fallback. In the browser pptxgenjs d
 The report lists every kind of loss with a count. Tests cover a hand-written multi-page AWS file, compressed/SVG/PNG containers, malformed input, every Mermaid link form, round trips of our own Mermaid export for every sample, and refusals.
 
 **Gallery.** `src/data/cloudGallery.ts` adds five independently authored references through the shared builders in `src/data/builders.ts`; `src/ui/Gallery.tsx` holds the gallery filters, card marks and the dismissible "What's new" card (browser storage only for the dismissal).
+
+## 1.2 additions: Visio import and draw.io export
+
+- `src/core/interchange/zip.ts` reads the central directory of a ZIP package and inflates parts with `DecompressionStream('deflate-raw')`; no ZIP64 or encryption, 64 MiB per part.
+- `src/core/interchange/visio.ts` follows `visio/pages/pages.xml` and its relationships to each page part, inherits cells and text from master shapes (`visio/masters/`), converts Visio coordinates (inches, y up, group-local pins) to the page, and builds the same interchange graph as draw.io: shapes (text, else master name), groups of an icon and a caption as one component, groups of several labelled shapes and `msvStructureType` containers as frames, captions beside an unlabelled icon or on a frame, connectors from `<Connect>` glue or the shape under a loose end, arrows on the begin end reversed. Binary `.vsd`, `.vdx` and stencils are refused.
+- `src/export/drawio.ts` writes an uncompressed `mxfile` from `publicDocument`: pages in drilldown order, `UserObject` boxes carrying `dcId`/`dcKind`/`dcProvider` (and a presented realization line), edges with `dcKind` in the style, exit/entry constraints and the scene's interior route points, so draw.io draws the same orthogonal lines. Labels are plain text (`html=0`), XML-escaped once.
+- `documentFromGraph` keeps a carried DiagramCloud ID when valid and free, and turns page links into drilldowns when they reach every page exactly once from the first page (no "Pages" root view then).

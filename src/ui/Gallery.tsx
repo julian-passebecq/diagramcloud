@@ -28,15 +28,15 @@ export function projectMark(p:Project):string{
 }
 
 /** Release note card, dismissed per browser (storage may be unavailable: then it simply shows). */
-export const WHATS_NEW_ID='whats-new-1.1';
+export const WHATS_NEW_ID='whats-new-1.2';
 export function WhatsNew({onShow}:{onShow:(what:'import'|'cloud')=>void}){
  const [hidden,setHidden]=useState(()=>{try{return localStorage.getItem(WHATS_NEW_ID)==='hidden';}catch{return false;}});
  if(hidden)return null;
  const hide=()=>{setHidden(true);try{localStorage.setItem(WHATS_NEW_ID,'hidden');}catch{/* private window: keep it hidden for this visit only */}};
  return <section className="whats-new" aria-label="What's new">
-  <div className="eyebrow">WHAT'S NEW · 1.1</div>
+  <div className="eyebrow">WHAT'S NEW · 1.2</div>
   <ul>
-   <li><button type="button" className="link-button" onClick={()=>onShow('import')}>Import draw.io and Mermaid</button> diagrams: boxes, labels, connections, groups and pages, with a report of what was not imported.</li>
+   <li><button type="button" className="link-button" onClick={()=>onShow('import')}>Import draw.io, Mermaid and Visio</button> diagrams: boxes, labels, connections, groups and pages, with a report of what was not imported. Export any project back to draw.io.</li>
    <li><button type="button" className="link-button" onClick={()=>onShow('cloud')}>Cloud architecture gallery</button>: AWS, Azure, Google Cloud, Kubernetes and event-driven references with drilldowns and evidence.</li>
   </ul>
   <button type="button" className="link-button dismiss" onClick={hide} aria-label="Dismiss what's new">Dismiss</button>

@@ -2,6 +2,12 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.2.0
+
+- **Visio import:** `.vsdx` / `.vsdm` / `.vstx` packages read in the browser (a small ZIP reader over `DecompressionStream`): pages, shape text or master names, glued and dropped connectors, containers, frames and captions, with a loss report. Checked during development against 12 public `.vsdx` files (the BSD-licensed `dave-howard/vsdx` test drawings and the Azure Architecture Center AKS baseline drawing), none committed. Binary `.vsd` and `.vdx` are refused with a message.
+- **draw.io export:** every public view as an editable draw.io page with the shared orthogonal routes pinned, drilldowns as page links, and DiagramCloud IDs/types/providers as shape data; re-import is round-trip tested for every sample and rendered in diagrams.net.
+- **Research:** `docs/research/2026-10-gap-analysis.md` (user needs, interchange formats, repo-to-architecture generators) feeds the ranked candidates below.
+
 ## Shipped in 1.1.0
 
 - **Interchange import:** draw.io / diagrams.net (`.drawio`, `.xml`, compressed pages, editable `.drawio.svg` / `.drawio.png`, multi-page, containers and frames, C4 placeholders, AWS/Azure/GCP stencil names, unsnapped connectors, junction dots) and Mermaid (`flowchart`/`graph`, `architecture-beta`), each with a kept / not-imported report, into a new reviewed project. Checked against 19 public draw.io examples from jgraph/drawio-diagrams (AWS, Azure, IBM, C4, network, data-flow) during development.
@@ -27,7 +33,10 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 | Azure and Databricks vendor artwork | Needs per-icon terms review (Azure ships a separate download; Databricks publishes no icon terms) |
 | Firefox / Safari qualification | 1.0 qualifies Chromium only |
 | Canvas routing shared with the export scene | The interactive canvas still routes edges with React Flow |
-| More interchange adapters (D2, LikeC4, Structurizr, Visio) and export to draw.io | draw.io and Mermaid import shipped in 1.1; the others are not started |
+| Repository scanner: a diagram from a local Git folder (manifests, compose, Kubernetes, Terraform, CI, schemas, imports) at several levels of detail with confirmed / inferred / possible evidence | Ranked first in the 2026-10 gap analysis; next |
+| Structurizr DSL import; D2, PlantUML, Lucid CSV/.lucid, Excalidraw, LikeC4 and mingrammer `diagrams` exports | draw.io, Mermaid and Visio import and draw.io export shipped; the others are not started |
+| Graph auto-layout (layered, ELK-style) | The layout button is still a grid |
+| Architecture diff between two documents or scans (stable-ID overlay) | Not started |
 | Read-only metadata adapters (dbt manifest, SQL DDL, Databricks Jobs, Fabric items) | Explicit V1 non-goal; would mark observed vs authored relationships |
 | Graph auto-layout (ELK or similar) preserving user overrides | Licensing and UX evaluation pending |
 | Portfolio composition layouts (executive / technical / interview) | Current deck and story cover the release |
@@ -36,7 +45,7 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 
 ## Not implemented, by design (V1 non-goals)
 
-No Visio import; no lossless draw.io or Mermaid round trip (imports are adapters with a loss report); no arbitrary SVG → editable graph; no universal graph auto-layout; no live Azure/Fabric/Databricks discovery or infrastructure control; no SQL/DAX/Python/Spark execution; no real-time collaboration or server sync; no complete arbitrary-layout PPTX fidelity; no exhaustive cloud icon pack; no GIS engine; no Electron/desktop distribution; no automatic confidentiality approval.
+No binary .vsd or Lucidchart native import; no lossless Mermaid round trip (imports are adapters with a loss report); no arbitrary SVG → editable graph; no universal graph auto-layout; no live Azure/Fabric/Databricks discovery or infrastructure control; no SQL/DAX/Python/Spark execution; no real-time collaboration or server sync; no complete arbitrary-layout PPTX fidelity; no exhaustive cloud icon pack; no GIS engine; no Electron/desktop distribution; no automatic confidentiality approval.
 
 ## Sample scope
 

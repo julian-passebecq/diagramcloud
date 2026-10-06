@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.1.1** (`package.json`; shown in the header) |
+| Product version | **1.2.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -65,14 +65,15 @@ Ordinary authoring is visual: project metadata and sources; components (identity
 
 JSON / AI remains the path for whole-document edits, RFC 6902 patches addressed by stable ID (`@id` segments, refused when the base revision is stale), observation patches and Galaxy publication snapshots. Every import is validated, previewed item by item and applied only after review.
 
-## Import draw.io and Mermaid
+## Import draw.io, Mermaid and Visio
 
-**Import draw.io / Mermaid** in the gallery (or the file button in JSON / AI) turns an existing diagram into a new DiagramCloud project. You can also paste Mermaid or draw.io XML into the JSON box.
+**Import draw.io / Mermaid / Visio** in the gallery (or the file button in JSON / AI) turns an existing diagram into a new DiagramCloud project. You can also paste Mermaid or draw.io XML into the JSON box. Visio files are converted as soon as you pick them.
 
 | Source | Read | Kept | Not imported (listed in the report) |
 |---|---|---|---|
 | draw.io / diagrams.net | `.drawio`, `.xml` (plain or compressed pages), editable `.drawio.svg` and `.drawio.png` | every page (more than one page gives a root view of page cards that drill into each page), boxes, labels (HTML stripped, `%placeholders%` and C4 fields resolved), connectors and their labels, containers and drawn frames as group tags, the arrangement (rescaled for DiagramCloud cards), unlabelled AWS/Azure/GCP stencils named after their shape, provider names | colours, fonts, styles, waypoints, vendor artwork (generic symbols are drawn), free text, decorative shapes; connectors with a loose end; unsnapped connector ends are attached to the box under them and counted |
 | Mermaid | `flowchart`/`graph` and `architecture-beta` (`.mmd`, `.mermaid`, or the first ```` ```mermaid ```` block of a `.md`) | node IDs as stable component IDs, labels, shapes as component types, links and labels (every link form, chains, `&` lists, edge IDs, `@{ shape }` data), subgraphs/groups as tags, the title, LR/TB direction with a layered layout | `classDef`, `class`, `style`, `linkStyle`, `click`, Markdown formatting; other diagram types (sequence, class, ER, Gantt…) are refused with a message |
+| Visio | `.vsdx` drawings (also `.vsdm`, `.vstx`, `.vstm`); Lucidchart and most diagram tools can save as `.vsdx` | every foreground page (a root view of page cards when there is more than one), shape text or, without text, the master shape's name, connectors glued to shapes or dropped on them, containers and drawn frames as group tags, captions placed next to an unlabelled icon or at the top of a frame as its name, the arrangement, provider names from master shapes | themes, fills, lines, fonts, shape data, layers, pictures, background pages, connector routes; binary `.vsd` and Visio 2003 `.vdx` are refused with a "save as .vsdx" message |
 
 Every import shows a report of what was kept and what was not, then becomes a **new** project (the open one never changes) after the usual validation and review. Component types and providers are inferred from labels and shapes: check them in the Inspector. Imported diagrams are public by default like any authored project; review before publishing.
 
@@ -108,6 +109,7 @@ Illustrative financial scenarios are not combined or presented as employer achie
 | PowerPoint | Native editable shapes, text, tables; realization badges, notes and appendix; source notes; drilldown hyperlinks | Static; a semantic reconstruction, not a screenshot |
 | Project deck | Cover, linked contents, architecture, every public task screen, realization section, sources | Max 180 slides |
 | Scope deck | One scope's report screens (Evidence workspaces) | Task screens only |
+| draw.io | Every public view as an editable page: boxes at their positions, the export routes pinned as waypoints, labels, storage cylinders, drilldown cards as page links; component ID, type, provider and presented realization as shape data | No evidence, sources or story; generic symbols, not vendor artwork. Imports back with the same IDs, types, connections and drilldowns |
 | Mermaid | Flowchart of the current view, realization as classes and comments | Lossy: no evidence, hierarchy or caveats |
 | Print / PDF | Browser print of the expanded public views and selected evidence | Not an all-project pagination engine |
 | Portfolio index | `diagramcloud.portfolio-index/1` for Mongoku's read-only view | Only reviewed, public, shareable observations; ≤ 25 items, ≤ 64 KiB |
@@ -129,7 +131,7 @@ Credential-like values and `.env`-looking text are refused where content crosses
 These are the genuine post-V1 boundaries (full list and candidates in [docs/ROADMAP.md](docs/ROADMAP.md)):
 
 - Chrome/Chromium only is qualified; other browsers are untested.
-- draw.io and Mermaid import are adapters with a loss report, not round trips: no Visio import, no export back to draw.io, no arbitrary SVG → editable graph, no lossless Mermaid round trip, and only Mermaid flowchart / architecture-beta.
+- draw.io, Mermaid and Visio import are adapters with a loss report: no styles or vendor artwork, no binary `.vsd`, no Lucidchart native file (use its `.vsdx` export), no arbitrary SVG → editable graph, no lossless Mermaid round trip, only Mermaid flowchart / architecture-beta, and no export to Visio. draw.io export → import is a tested round trip for components, connections and drilldowns, not for styles.
 - The layout button is a grid, not a graph auto-layout engine; export routing avoids boxes on the shipped samples (unit-tested), not on every possible layout. The interactive canvas routes edges on its own.
 - No live cloud discovery, no execution of SQL/DAX/Python/Spark, no real-time collaboration or server sync.
 - Observations are one-time reviewed imports, not subscriptions; DiagramCloud never polls another app.
