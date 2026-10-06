@@ -2,13 +2,17 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.4.0
+
+- **AtlasNote cheatsheet export** (Idées de Julian, 2026-10-06): Export & share → AtlasNote cheatsheet writes `urn:atlasnote:cheatsheet:1.1` JSON (schema version 1.1, "architecture" preset): one page per public view in drilldown order with the diagram at its canvas positions, a component table and a story page. Tested against AtlasNote's own validator (vendored from AtlasNote `d162b31`) and checked visually with AtlasNote's renderer. Works for repository scans too, so AtlasNote can show a scanned repository. Next: list DiagramCloud as a producer of the cheatsheet format in `galaxy.json` (Claude Control owns that file).
+
 ## Shipped in 1.3.0
 
 - **Repository scanner:** a local Git folder (browser folder picker, read in the browser) or `npm run scan` becomes System context → Containers → Components → Files, plus Data lineage and Infrastructure views, from manifests, Dockerfiles, docker-compose, Kubernetes, Terraform, GitHub Actions, SQL/dbt/Prisma and TypeScript/JavaScript/Python imports. Evidence (file, line, finding) and confidence (confirmed / inferred / possible) on everything; secret files never read; stable IDs so a rescan is reviewed as a diff. Informed by the 2026-10 gap analysis (Groma.md, Tecture, Compass, CodeFlow).
 
 ## Idées de Julian (2026-10-06)
 
-- **AtlasNote visualisation (target 1.4):** export a DiagramCloud view or a repository scan as an AtlasNote cheatsheet (the "Architecture" starter on its native SVG grammar, `urn:atlasnote:cheatsheet:1.1`) so AtlasNote can show what DiagramCloud generates; check `galaxy.json` before adding a cross-app format.
+- **AtlasNote visualisation (shipped in 1.4.0):** export a DiagramCloud view or a repository scan as an AtlasNote cheatsheet (the "Architecture" starter on its native SVG grammar, `urn:atlasnote:cheatsheet:1.1`) so AtlasNote can show what DiagramCloud generates; check `galaxy.json` before adding a cross-app format.
 - **Content database:** a Git repository of DiagramCloud documents (`diagramcloud.json` per project, already the sidecar format) that other apps read from outside; the CLI scanner can refresh it in CI.
 - **Repository → many formats:** a scan already exports to draw.io, Mermaid, SVG, PowerPoint and HTML; next candidates are D2, PlantUML, Structurizr and LikeC4 (gap analysis ranks 2, 4, 8).
 

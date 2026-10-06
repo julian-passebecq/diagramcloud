@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.3.0** (`package.json`; shown in the header) |
+| Product version | **1.4.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -133,6 +133,7 @@ Illustrative financial scenarios are not combined or presented as employer achie
 | Project deck | Cover, linked contents, architecture, every public task screen, realization section, sources | Max 180 slides |
 | Scope deck | One scope's report screens (Evidence workspaces) | Task screens only |
 | draw.io | Every public view as an editable page: boxes at their positions, the export routes pinned as waypoints, labels, storage cylinders, drilldown cards as page links; component ID, type, provider and presented realization as shape data | No evidence, sources or story; generic symbols, not vendor artwork. Imports back with the same IDs, types, connections and drilldowns |
+| AtlasNote cheatsheet | Every public view (≤ 64 pages) as a 1200 × 1600 page in AtlasNote's validated cheatsheet format (`schemaVersion` 1.1): title, description, a graph diagram at the canvas positions, a component table (type, provider, drilldown target, presented realization) and a story page. Load it in AtlasNote → Cheatsheet source | ≤ 80 boxes and 240 connections per diagram and 10 table rows per page, with the remainder counted on the page; straight connections and generic shapes (AtlasNote draws its own); no evidence tables, sources or images |
 | Mermaid | Flowchart of the current view, realization as classes and comments | Lossy: no evidence, hierarchy or caveats |
 | Print / PDF | Browser print of the expanded public views and selected evidence | Not an all-project pagination engine |
 | Portfolio index | `diagramcloud.portfolio-index/1` for Mongoku's read-only view | Only reviewed, public, shareable observations; ≤ 25 items, ≤ 64 KiB |
