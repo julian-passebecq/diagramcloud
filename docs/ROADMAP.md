@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.10.0
+
+- **Technical Manual preset** (Project Atlas brief §13): one static HTML manual from publicDocument and the ViewSpec, printable to PDF; cover with snapshot, revision vector, generated time, audience, provenance, basis counts and omissions. PPTX and AtlasNote keep their own exports. Next: Lens Git projections (`datapass.lens.minimap/1`, still on an unmerged tern-vscode branch) and the Brain project-context contract (no Brain format exists yet).
+
 ## Shipped in 1.9.0
 
 - **MosaicStudio adapter** (Project Atlas brief §7): a view as `datapass.concept-spec/1` built from the public ViewSpec, with a loss report and an ID map; checked in unit and browser tests with the owner's validator (vendored from datapass-mosaicstudio `8b22d9c`), and cross-app with MosaicStudio's standalone viewer (`scripts/qualify-concept.ts`, record in docs/RELEASE.md). Next: Lens Git projections, Brain project context, Technical Manual preset.
