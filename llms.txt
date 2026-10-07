@@ -1,0 +1,16 @@
+# DiagramCloud
+
+> Local-first project studio that graphs repositories and multi-repository projects from their source (deterministic scanner, per-repository Git revisions) and draws public views as editorial figures. Agents write manifests, design briefs or revision-guarded patches; a person reviews them. Agents never hand-edit documents, invent facts, or present scans or synthetic values as verified results.
+
+## For agents
+
+- [AI guide](docs/AI_GUIDE.md): commands, the formats an agent writes (project manifest, design brief, patch), choosing a figure, worked flows, and what never to do.
+- [Diagram Design skill](skills/diagramcloud-design/SKILL.md): step-by-step skill for graphing a codebase and drawing it.
+- [Contributor rules and current limits](AGENTS.md)
+
+## Reference
+
+- [Document contract](src/core/model.ts): `validateDocument` is the gate; JSON Schema alone is not enough.
+- Generated JSON Schema: `npm run generate` writes `public/diagramcloud.schema.json` (structural guidance only)
+- [Example design brief](docs/design-brief.example.json)
+- [Architecture](docs/ARCHITECTURE.md), [Roadmap](docs/ROADMAP.md), [Release qualification](docs/RELEASE.md)
