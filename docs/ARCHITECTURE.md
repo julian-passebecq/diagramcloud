@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.16.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.17.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -338,3 +338,7 @@ Lens owns observed Git and delivery state; DiagramCloud keeps three meanings apa
 ## 1.16 additions: context, status, lineage, radial
 
 Four renderers in `src/export/design/` (`systemContext.ts`, `status.ts`, `lineage.ts`, `radial.ts`), all from the public ViewSpec: the context figure classifies components by connection direction only; lineage reuses `flowRanks` and traces transitive upstream/downstream of one subject; radial does an undirected breadth-first search to three steps; the status board reads the designed status. Custom SVG attributes use the `data-dd-` prefix.
+
+## 1.17 additions: suggestions and the quality check
+
+`recommendFigures(input, viewId)` scores every figure type (0–100, ties in `DESIGN_TYPES` order) from facts of the public view spec: numeric table evidence (`chartableTable`), providers running two or more components, drilldown children and parent, flow depth (`flowRanks`), the most connected component, story steps, basis and confidence mix, designed statuses, entry points and sinks (`contextRoles`). It never changes `resolveDesignType`: a view without a hint is still Architecture. `tests/design-quality.test.ts` estimates text boxes with the kit's width helpers and checks overlap, viewBox bounds and non-empty output for every figure.

@@ -13,6 +13,10 @@ test('Diagram Design mode: figures, open a level, save a hint, apply a design br
  await toggle.click();await expect(toggle).toHaveAttribute('aria-pressed','true');
  const preview=page.getByTestId('design-preview'),figure=preview.locator('img.design-figure');
  await expect(figure).toHaveAttribute('data-design-type','architecture');
+ // Suggestions: three figures ranked from the view's public facts, each with its reason; one click shows it.
+ const suggest=page.getByLabel('Suggested figures');await expect(suggest.getByRole('button')).toHaveCount(3);
+ await suggest.getByRole('button').first().click();await expect(figure).not.toHaveAttribute('data-design-type','architecture');
+ await page.getByLabel('Figure type').selectOption('auto');await expect(figure).toHaveAttribute('data-design-type','architecture');
  await expect.poll(()=>figure.evaluate((i:HTMLImageElement)=>i.complete&&i.naturalWidth)).toBeGreaterThan(600);
  await page.screenshot({path:'test-results/design/architecture.png'});
  for(const type of ['layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line','context','status','lineage','radial']){
