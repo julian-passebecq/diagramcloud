@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.17.0** (`package.json`; shown in the header) |
+| Product version | **1.18.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -85,7 +85,7 @@ The gallery's **Contoso Forecasting** reference atlas is read by hand from the p
 
 ## Diagram Design mode
 
-**Diagram Design** (canvas toolbar) draws the current public view as an editorial figure in the visual grammar of [diagram-design](https://github.com/cathrynlavery/diagram-design) (MIT; see THIRD_PARTY_NOTICES.md): semantic colour roles, rectangular type tags, rounded right-angle connectors with masked uppercase labels, fanned attach points, zones per repository, a legend strip and accessible SVG. The facts stay DiagramCloud's (scans, atlas, basis, revision vector, public redaction); only the drawing changes. 18 figures:
+**Diagram Design** (canvas toolbar) draws the current public view as an editorial figure in the visual grammar of [diagram-design](https://github.com/cathrynlavery/diagram-design) (MIT; see THIRD_PARTY_NOTICES.md): semantic colour roles, rectangular type tags, rounded right-angle connectors with masked uppercase labels, fanned attach points, zones per repository, a legend strip and accessible SVG. The facts stay DiagramCloud's (scans, atlas, basis, revision vector, public redaction); only the drawing changes. 19 figures:
 
 | Figure | Draws | Best for |
 |---|---|---|
@@ -107,6 +107,7 @@ The gallery's **Contoso Forecasting** reference atlas is read by hand from the p
 | Status board | components in columns by their designed status; says it is not an observation | what is designed in which state |
 | Lineage | left-to-right flow around one component: everything upstream and downstream of it, the rest muted | where this comes from and goes |
 | Radial reach | rings of components 1, 2 and 3 connection steps from one component | what a change here can reach |
+| Atlas revisions | one card per repository of an atlas (`npm run atlas`): short revision, ref, authority, scan state; Δ old → new, + added, − removed since the previous snapshot; declared relationships dashed; no single project revision | which repositories moved |
 
 Themes: light, dark and editorial (adds drilldown path, revision vector and provenance cards). One or two **focal** components get the accent; without a hint, the single clearly most-connected component does, and the legend says so. In Edit, **Use for this view** stores the figure and theme on the view (`view.design`), so the **Diagram Design figure (SVG)** export and other people get the same figure. Figures are static, offline SVG with no script, built from `publicDocument`.
 
