@@ -1,8 +1,9 @@
 import test from 'node:test';
+import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {designSvg} from '../src/export/design';
 import {monoWidth,sansWidth} from '../src/export/design/kit';
-import {DESIGN_TYPES,type DesignType,type Project} from '../src/core/model';
+import {DESIGN_TYPES,parseDocument,type DesignType,type Project} from '../src/core/model';
 import {publicDocument} from '../src/core/operations';
 import {samples} from '../src/data/samples';
 import {contosoForecasting} from '../src/data/contosoForecasting';
@@ -43,7 +44,9 @@ test('design quality: the checker itself sees overlaps, overflow, transforms and
 
 test('design quality: no overlapping text, every text inside the viewBox, never an empty figure',()=>{
  const failures:string[]=[];let figures=0,unresolved=0,texts=0;
- for(const d of [contosoForecasting(),...samples] as Project[])for(const view of publicDocument(d).views)for(const type of DESIGN_TYPES.filter(t=>t!=='auto') as DesignType[])for(const theme of ['light','dark'] as const){
+ // DIAGRAMCLOUD_QUALITY_DOCS=a.json,b.json adds local documents (for example a private Galaxy atlas) without committing them.
+ const extra=(process.env.DIAGRAMCLOUD_QUALITY_DOCS??'').split(',').filter(Boolean).map(p=>parseDocument(readFileSync(p,'utf8')));
+ for(const d of [contosoForecasting(),...samples,...extra] as Project[])for(const view of publicDocument(d).views)for(const type of DESIGN_TYPES.filter(t=>t!=='auto') as DesignType[])for(const theme of ['light','dark'] as const){
   const label=`${type}/${d.id}/${view.id}/${theme}`,{boxes,vb,unresolved:u,shapes}=collect(designSvg(d,view.id,{type,theme,now:NOW}));figures++;unresolved+=u;texts+=boxes.length;
   if(!shapes)failures.push(`${label}: empty figure`);
   for(const b of boxes)if(b.x<vb.x-TOL||b.y<vb.y-TOL||b.x+b.w>vb.x+vb.w+TOL||b.y+b.h>vb.y+vb.h+TOL)failures.push(`${label}: outside viewBox "${b.s.slice(0,60)}" [${Math.round(b.x)},${Math.round(b.y)} ${Math.round(b.w)}×${Math.round(b.h)}] vb ${vb.w}×${vb.h}`);
@@ -51,5 +54,5 @@ test('design quality: no overlapping text, every text inside the viewBox, never 
  }
  if(unresolved)console.log(`design quality: ${unresolved} text(s) under an unresolved transform skipped`);
  assert.ok(figures>0&&texts>figures*3,`${texts} text boxes in ${figures} figures`);
- assert.equal(failures.length,0,`${failures.length} geometric defect(s) in ${figures} figures:\n${failures.slice(0,80).join('\n')}`);
+ assert.equal(failures.length,0,`${failures.length} geometric defect(s) in ${figures} figures:\n${failures.slice(0,400).join('\n')}`);
 });
