@@ -14,7 +14,7 @@ test('Diagram Design mode: figures, open a level, save a hint, apply a design br
  await expect(figure).toHaveAttribute('data-design-type','architecture');
  await expect.poll(()=>figure.evaluate((i:HTMLImageElement)=>i.complete&&i.naturalWidth)).toBeGreaterThan(600);
  await page.screenshot({path:'test-results/design/architecture.png'});
- for(const type of ['layers','exploded','tree']){
+ for(const type of ['layers','exploded','tree','swimlane','sequence','timeline','chart']){
   await preview.getByLabel('Figure type').selectOption(type);await expect(figure).toHaveAttribute('data-design-type',type);
   await expect.poll(()=>figure.evaluate((i:HTMLImageElement)=>i.complete&&i.naturalWidth)).toBeGreaterThan(400);
   await page.screenshot({path:`test-results/design/${type}.png`});

@@ -57,16 +57,24 @@ export function summaryCards(c:DesignContext,x:number,y:number,width:number):{sv
   txt(k.toUpperCase(),cx+14,y+22,{size:8,fill:t.accent,font:MONO,tracking:0.14})+lines(sansLines(v,w-28,11,4),cx+14,y+42,15,{size:11,fill:t.ink});}).join('')};
 }
 
-export function architectureSvg(input:Parameters<typeof designContext>[0],viewId:string,options:DesignOptions={}):string{
- const c=designContext(input,viewId,'architecture',options),{doc,view,spec,t}=c,scene=buildScene(doc,view),b=scene.bounds;
+/** A computed placement for the architecture renderer: positions in canvas units and optional lanes drawn behind. */
+export type ArchitectureLayout={type:string;label:string;positions:Record<string,{x:number;y:number}>;lanes?:{id:string;title:string;members:string[]}[];desc?:string};
+
+export function architectureSvg(input:Parameters<typeof designContext>[0],viewId:string,options:DesignOptions={},layout?:(c:DesignContext)=>ArchitectureLayout):string{
+ const c0=designContext(input,viewId,'architecture',options),plan=layout?.(c0),c=plan?{...c0,slug:c0.slug.replace(/-architecture$/,`-${plan.type}`)}:c0;
+ const {doc,spec,t}=c,view=plan?{...c.view,positions:plan.positions}:c.view,scene=buildScene(doc,view),b=scene.bounds;
  const byId=new Map(spec.nodes.map(n=>[n.id,n])),edgeById=new Map(spec.edges.map(e=>[e.id,e]));
- const W0=b.width*S,contentW=Math.max(W0,640),hdr=header(eyebrowOf(c,'Architecture'),spec.title,c.purpose,M,M,contentW,t,c.editorial);
+ const W0=b.width*S,contentW=Math.max(W0,640),hdr=header(eyebrowOf(c,plan?.label??'Architecture'),spec.title,c.purpose,M,M,contentW,t,c.editorial);
  const ox=M+(contentW-W0)/2-b.x*S,oy=M+hdr.height+28-b.y*S,X=(p:P):P=>({x:p.x*S+ox,y:p.y*S+oy});
  const boxes=scene.nodes.map(n=>({id:n.id,x:n.x*S+ox,y:n.y*S+oy,w:n.w*S,h:n.h*S}));
  const routes=fanAttachPoints(scene.edges.map(e=>e.points.map(X)),boxes);
  // Zones (at most three): one per repository group, only when the frame encloses its members and nothing else.
  const zones:string[]=[],zoneBoxes:Box[]=[];
- if(spec.groups.length>=2&&spec.groups.length<=3)for(const g of spec.groups){const mem=boxes.filter(x=>g.members.includes(x.id));if(!mem.length)continue;
+ // Lanes (swimlane layouts): full-width bands behind the boxes, one per lane, label in the band head.
+ for(const lane of plan?.lanes??[]){const mem=boxes.filter(x=>lane.members.includes(x.id));if(!mem.length)continue;
+  const y0=Math.min(...mem.map(m=>m.y))-32,y1=Math.max(...mem.map(m=>m.y+m.h))+16;
+  zones.push(`<g data-lane="${xml(lane.id)}"><rect x="${f(M-12)}" y="${f(y0)}" width="${f(contentW+24)}" height="${f(y1-y0)}" rx="6" fill="${t.wash}" stroke="${t.rule}" stroke-width="1"/>${txt(lane.title.toUpperCase().slice(0,48),M,y0+16,{size:8,fill:t.soft,font:MONO,tracking:0.14})}</g>`);}
+ if(!plan?.lanes&&spec.groups.length>=2&&spec.groups.length<=3)for(const g of spec.groups){const mem=boxes.filter(x=>g.members.includes(x.id));if(!mem.length)continue;
   const z={x:Math.min(...mem.map(m=>m.x))-20,y:Math.min(...mem.map(m=>m.y))-32,w:0,h:0};z.w=Math.max(...mem.map(m=>m.x+m.w))+20-z.x;z.h=Math.max(...mem.map(m=>m.y+m.h))+20-z.y;
   if(boxes.some(x=>!g.members.includes(x.id)&&overlaps(x,z))||zoneBoxes.some(o=>overlaps(o,z,8)))continue;zoneBoxes.push(z);
   const label=g.title.toUpperCase().slice(0,40),lw=label.length*8*0.76+12;
@@ -90,6 +98,6 @@ export function architectureSvg(input:Parameters<typeof designContext>[0],viewId
  const legend=legendStrip(items,M,areaBottom+28,contentW,t);
  let y=areaBottom+28+legend.height+12;const cards=c.editorial?summaryCards(c,M,y+8,contentW):undefined;if(cards)y+=cards.height+24;
  const foot=footerLine(footerParts(c),M,y+12,contentW,t),height=y+12+M-12;
- return svgDocument({slug:c.slug,width:contentW+2*M,height,title:`${spec.title} · ${spec.projectTitle}`,desc:`Architecture of the public view ${spec.viewId}: ${spec.nodes.length} components and ${spec.edges.length} connections.${spec.omissions.length?` ${spec.omissions.join(' ')}`:''}`,
-  t,theme:c.theme,type:'architecture',viewId:spec.viewId,defs:markers(c.slug,t),body:hdr.svg+zones.join('')+arrows+nodes+labels+legend.svg+(cards?.svg??'')+foot});
+ return svgDocument({slug:c.slug,width:contentW+2*M,height,title:`${spec.title} · ${spec.projectTitle}`,desc:`${plan?.desc??'Architecture'} of the public view ${spec.viewId}: ${spec.nodes.length} components and ${spec.edges.length} connections.${spec.omissions.length?` ${spec.omissions.join(' ')}`:''}`,
+  t,theme:c.theme,type:plan?.type??'architecture',viewId:spec.viewId,defs:markers(c.slug,t),body:hdr.svg+zones.join('')+arrows+nodes+labels+legend.svg+(cards?.svg??'')+foot});
 }
