@@ -54,6 +54,8 @@ Themes: `light`, `dark`, `editorial` (adds the drilldown path, revision vector a
 
 ## 5. Render or hand over
 
+- What changed after a rescan: `npm run design -- new.json --delta old.json --out figures/` (Before · Changes · After per view, by stable ID).
+
 - Render every public view: `npm run design -- atlas.json --brief brief.json --out figures/` (static offline SVG plus `index.html`; the document file is not modified).
 - Or give the brief to the person: in DiagramCloud, open **Diagram Design**, switch to Edit, choose **Read design brief…**, review, apply.
 

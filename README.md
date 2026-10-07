@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.13.0** (`package.json`; shown in the header) |
+| Product version | **1.14.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -99,6 +99,8 @@ The gallery's **Contoso Forecasting** reference atlas is read by hand from the p
 | Chart | the first table evidence block of the view's components with numbers, as bars; its provenance (synthetic, source-derived, reference, author) is printed on the figure | the numbers behind a component |
 
 Themes: light, dark and editorial (adds drilldown path, revision vector and provenance cards). One or two **focal** components get the accent; without a hint, the single clearly most-connected component does, and the legend says so. In Edit, **Use for this view** stores the figure and theme on the view (`view.design`), so the **Diagram Design figure (SVG)** export and other people get the same figure. Figures are static, offline SVG with no script, built from `publicDocument`.
+
+**Architecture delta.** In Diagram Design mode, **Compare with another version…** reads another `diagramcloud.json` or authoring export of the same project (for example before a rescan) and draws Before · Changes · After for the current view, following diagram-design's architecture-delta conventions: components and connections compared by stable ID; added (+), removed (−, dashed), changed (Δ, with old → new in the ledger), moved (↗) and rewired (dotted) are readable without colour; unchanged objects stay quiet. The lower revision is Before. Nothing is imported, both versions go through `publicDocument`, and the figure says that a delta does not establish order or cause. `npm run design -- new.json --delta old.json` writes a delta per view.
 
 **Design brief (AI bridge).** An agent that has scanned a repository or an atlas writes a `diagramcloud.design-brief/1` JSON: per view, the figure type, up to two focal component IDs, a theme, a caption and a short reason. **Read design brief…** (Diagram Design, Edit) shows what it changes and what it skips before you apply; it never touches components, connections, basis or observations. `npm run design -- <document.json> [--brief brief.json] [--out folder]` renders every public view without changing the file. The agent instructions are in `skills/diagramcloud-design/SKILL.md`; an example brief is `docs/design-brief.example.json`.
 
