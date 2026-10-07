@@ -12,6 +12,8 @@ import {buildScene} from './scene';
 const FILL:Record<ProjectNode['kind'],string>={source:'#eef6ff',process:'#ffffff',storage:'#eefaf3',model:'#f4f0ff',report:'#fff8e8',app:'#eef6ff',control:'#fff1f1',physics:'#f3f6f9',function:'#f0f7ff',table:'#f3f6f9'};
 const STROKE='#9aa9bb',INK='#16263d',EDGE='#45556d';
 
+/** A connection quantity as style keys (URI-encoded, since a style value cannot hold ; or =), so importing the file back keeps it. */
+const quantityStyle=(q:Project['edges'][number]['quantity'])=>q?`dcQuantity=${q.value};dcUnit=${encodeURIComponent(q.unit)};dcProvenance=${q.provenance};${q.note?`dcQuantityNote=${encodeURIComponent(q.note)};`:''}`:'';
 /** XML attribute value: draw.io reads plain text labels (html=0), so only XML escaping applies. */
 const attr=(s:string)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\r?\n/g,'&#10;').replace(/\t/g,'&#9;');
 const round=(n:number)=>Math.round(n*100)/100;
@@ -45,7 +47,7 @@ export function drawioDiagram(input:Project,now=new Date()):string{
    const first=e.points[0],last=e.points[e.points.length-1],inner=e.points.slice(1,-1);
    // Pin both ends where the route meets the box so draw.io draws the same orthogonal line.
    const pin=(p:{x:number;y:number},box:{x:number;y:number;w:number;h:number},side:'exit'|'entry')=>`${side}X=${round((p.x-box.x)/box.w)};${side}Y=${round((p.y-box.y)/box.h)};${side}Dx=0;${side}Dy=0;${side}Perimeter=0;`;
-   const style=`edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=${EDGE};fontColor=${EDGE};fontFamily=Arial;fontSize=10;labelBackgroundColor=#ffffff;${e.dashed||edge.kind==='dependency'?'dashed=1;':''}dcKind=${edge.kind};${pin(first,a,'exit')}${pin(last,b,'entry')}`;
+   const style=`edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=${EDGE};fontColor=${EDGE};fontFamily=Arial;fontSize=10;labelBackgroundColor=#ffffff;${e.dashed||edge.kind==='dependency'?'dashed=1;':''}dcKind=${edge.kind};${quantityStyle(edge.quantity)}${pin(first,a,'exit')}${pin(last,b,'entry')}`;
    const points=inner.length?`<Array as="points">${inner.map(p=>`<mxPoint x="${round(p.x)}" y="${round(p.y)}"/>`).join('')}</Array>`:'';
    cells.push(`<mxCell id="e-${k}-${attr(edge.id)}" value="${attr(edge.label)}" style="${attr(style)}" edge="1" parent="1" source="n-${attr(edge.source)}" target="n-${attr(edge.target)}"><mxGeometry relative="1" as="geometry">${points}</mxGeometry></mxCell>`);
   }
