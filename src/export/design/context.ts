@@ -4,7 +4,7 @@ import {viewSpec,PERSPECTIVE_LABEL,type ViewSpec} from '../../core/viewspec';
 import {tokensFor,slugOf,type Tokens} from './kit';
 
 export type DesignOptions={type?:DesignType;theme?:DesignTheme;now?:Date};
-export type DesignContext={input:Project;doc:Project;view:ProjectView;spec:ViewSpec;theme:DesignTheme;t:Tokens;editorial:boolean;focal:Set<string>;focalReason:'hint'|'auto'|'none';slug:string;now:Date};
+export type DesignContext={input:Project;doc:Project;view:ProjectView;spec:ViewSpec;theme:DesignTheme;t:Tokens;editorial:boolean;focal:Set<string>;focalReason:'hint'|'auto'|'none';slug:string;now:Date;purpose:string};
 
 /**
  * Everything a Diagram Design renderer needs, from the public document only: the view (falling back to the root when
@@ -21,7 +21,7 @@ export function designContext(input:Project,viewId:string,type:string,options:De
   const ranked=[...degree].sort((a,b)=>b[1]-a[1]);
   if(ranked.length&&ranked[0][1]>=3&&(ranked.length<2||ranked[0][1]>ranked[1][1])){focal=new Set([ranked[0][0]]);focalReason='auto';}
  }
- return {input,doc,view,spec,theme,t:tokensFor(theme),editorial:theme==='editorial',focal,focalReason,slug:slugOf(`${id}-${type}`),now};
+ return {input,doc,view,spec,theme,t:tokensFor(theme),editorial:theme==='editorial',focal,focalReason,slug:slugOf(`${id}-${type}`),now,purpose:view.design?.caption||spec.purpose||spec.projectTitle};
 }
 
 export const eyebrowOf=(c:DesignContext,what:string)=>`${c.spec.projectTitle} · ${PERSPECTIVE_LABEL[c.spec.perspective]} · ${what}`;

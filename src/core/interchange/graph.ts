@@ -5,7 +5,7 @@ import {documentSchema,validateDocument,type Project,type ProjectEdge,type Proje
  * Importers are adapters, not round trips: they keep boxes, labels, connections, groups and (for draw.io) layout,
  * and they list everything they drop in the import report instead of silently approximating it.
  */
-export type ImportFormat='drawio'|'mermaid'|'visio'|'repository'|'atlas';
+export type ImportFormat='drawio'|'mermaid'|'visio'|'repository'|'atlas'|'design-brief';
 /**
  * `id` is a DiagramCloud ID carried by the source (our own draw.io export) and kept when valid and free.
  * `link` names the page this box opens (a draw.io page link): it becomes a drilldown when the pages form a tree.
@@ -16,7 +16,7 @@ export type GraphPage={id?:string;title:string;nodes:GraphNode[];edges:GraphEdge
 export type ImportReport={format:ImportFormat;fileName:string;pages:number;nodes:number;edges:number;groups:number;kept:string[];lost:string[]};
 export type ImportResult={document:Project;report:ImportReport};
 
-export const FORMAT_LABEL:Record<ImportFormat,string>={drawio:'draw.io',mermaid:'Mermaid',visio:'Visio',repository:'Repository',atlas:'Project atlas'};
+export const FORMAT_LABEL:Record<ImportFormat,string>={drawio:'draw.io',mermaid:'Mermaid',visio:'Visio',repository:'Repository',atlas:'Project atlas','design-brief':'Design brief'};
 const ID=/^[a-z][a-z0-9_.-]{0,79}$/;
 const MAX_NODES=500,MAX_EDGES=1500,MAX_VIEWS=79,COL=300,ROW=180;
 /** Card size on the canvas and in exports (NODE_WIDTH/NODE_HEIGHT in src/export/scene.ts). */

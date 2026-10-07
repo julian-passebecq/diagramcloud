@@ -18,7 +18,7 @@ const basisLine=(ns:SpecNode[])=>{const read=ns.filter(n=>n.basis==='static-sour
 /** Layer stack: full-width bands, index tag, name and basis line, component chips, links counted between bands, one focal band. */
 export function layerStackSvg(input:Project,viewId:string,options:DesignOptions={}):string{
  const c=designContext(input,viewId,'layers',options),{spec,t}=c,layers=layersOf(spec.nodes),contentW=880;
- const hdr=header(eyebrowOf(c,'Layer stack'),spec.title,spec.purpose||spec.projectTitle,M,M,contentW,t,c.editorial);
+ const hdr=header(eyebrowOf(c,'Layer stack'),spec.title,c.purpose,M,M,contentW,t,c.editorial);
  const gutter=56,bx=M+gutter,bw=contentW-gutter,bh=72,gap=28,top=M+hdr.height+28;
  const layerOf=new Map(layers.flatMap((l,i)=>l.nodes.map(n=>[n.id,i] as const)));
  const focalLayer=layers.findIndex(l=>l.nodes.some(n=>c.focal.has(n.id)));
@@ -87,7 +87,7 @@ export function explodedPlanes(c:DesignContext):{planes:Plane[];basis:'drilldown
 export function explodedSvg(input:Project,viewId:string,options:DesignOptions={}):string{
  const c=designContext(input,viewId,'exploded',options),{spec,t}=c,{planes,basis}=explodedPlanes(c),N=planes.length;
  const labelW=300,stackW=PW+PD,contentW=stackW+60+labelW;
- const hdr=header(eyebrowOf(c,basis==='drilldown'?'Exploded drilldown':'Exploded layers'),spec.title,spec.purpose||spec.projectTitle,M,M,contentW,t,c.editorial);
+ const hdr=header(eyebrowOf(c,basis==='drilldown'?'Exploded drilldown':'Exploded layers'),spec.title,c.purpose,M,M,contentW,t,c.editorial);
  const zMax=(N-1)*GAP,ox=M+PD,oy=M+hdr.height+40+zMax,iso=(x:number,y:number,z:number):P=>({x:ox+x-y,y:oy+(x+y)/2-z}),pts=(ps:P[])=>ps.map(p=>`${f(p.x)},${f(p.y)}`).join(' ');
  const zOf=(i:number)=>(N-1-i)*GAP,tile=(p:Plane['nodes'][number])=>({x:24+p.u*(PW-48-TW),y:24+p.v*(PD-48-TD)});
  const out:string[]=[],traces:string[]=[],treatments=new Set<Treatment>();

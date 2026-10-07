@@ -60,7 +60,7 @@ export function summaryCards(c:DesignContext,x:number,y:number,width:number):{sv
 export function architectureSvg(input:Parameters<typeof designContext>[0],viewId:string,options:DesignOptions={}):string{
  const c=designContext(input,viewId,'architecture',options),{doc,view,spec,t}=c,scene=buildScene(doc,view),b=scene.bounds;
  const byId=new Map(spec.nodes.map(n=>[n.id,n])),edgeById=new Map(spec.edges.map(e=>[e.id,e]));
- const W0=b.width*S,contentW=Math.max(W0,640),hdr=header(eyebrowOf(c,'Architecture'),spec.title,spec.purpose||spec.projectTitle,M,M,contentW,t,c.editorial);
+ const W0=b.width*S,contentW=Math.max(W0,640),hdr=header(eyebrowOf(c,'Architecture'),spec.title,c.purpose,M,M,contentW,t,c.editorial);
  const ox=M+(contentW-W0)/2-b.x*S,oy=M+hdr.height+28-b.y*S,X=(p:P):P=>({x:p.x*S+ox,y:p.y*S+oy});
  const boxes=scene.nodes.map(n=>({id:n.id,x:n.x*S+ox,y:n.y*S+oy,w:n.w*S,h:n.h*S}));
  const routes=fanAttachPoints(scene.edges.map(e=>e.points.map(X)),boxes);

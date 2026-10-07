@@ -1,0 +1,12 @@
+{
+  "format": "diagramcloud.design-brief",
+  "version": 1,
+  "projectId": "contoso-forecasting",
+  "author": "example brief (as an AI agent would write it)",
+  "views": [
+    {"viewId": "overview", "type": "exploded", "focal": ["api", "operational"], "theme": "light", "caption": "One save, three levels: the lab, who may change a forecast, and where the data lands.", "why": "The story is the drilldown; the API and the SQL store are where a save is decided and kept."},
+    {"viewId": "policy", "type": "architecture", "focal": ["forecast-entity"], "why": "One entity, two roles."},
+    {"viewId": "data-zones", "type": "layers", "theme": "editorial", "why": "Zones read as a stack: operational, bronze, gold."},
+    {"viewId": "fabric-target", "type": "architecture", "theme": "dark", "focal": ["fabric-sql"]}
+  ]
+}
