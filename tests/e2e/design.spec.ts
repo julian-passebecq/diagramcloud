@@ -73,6 +73,13 @@ test('Diagram Design mode: figures, open a level, save a hint, apply a design br
  const reader=await page.context().newPage();const blocked:string[]=[];await reader.route('**/*',r=>{if(!r.request().url().startsWith('file:')){blocked.push(r.request().url());return r.abort();}return r.continue();});
  await reader.goto('file:///'+process.cwd().replace(/\\/g,'/')+'/'+bookPath);await expect(reader.locator('section svg')).toHaveCount(4);
  await reader.screenshot({path:'test-results/design/figures.png',fullPage:false});expect(blocked).toEqual([]);await reader.close();
+ // Diagram Design deck: a cover plus one picture slide per public view, each a real PNG rasterised in the browser.
+ const waitDeck=page.waitForEvent('download');await page.getByRole('button',{name:/Diagram Design deck \(PowerPoint\)/}).click();
+ const deck=await waitDeck;expect(deck.suggestedFilename()).toBe('contoso-forecasting.figures.pptx');
+ const deckPath='test-results/design/figures.pptx';await deck.saveAs(deckPath);const zip=readFileSync(deckPath);expect(zip.subarray(0,2).toString()).toBe('PK');
+ const {default:JSZip}=await import('jszip');const z=await JSZip.loadAsync(zip),names=Object.keys(z.files);
+ expect(names.filter(n=>/^ppt\/slides\/slide\d+\.xml$/.test(n))).toHaveLength(5);const media=names.filter(n=>/^ppt\/media\/.+\.png$/.test(n));expect(media.length).toBeGreaterThanOrEqual(4);
+ for(const m of media)expect((await z.file(m)!.async('nodebuffer')).subarray(1,4).toString()).toBe('PNG');
  await page.keyboard.press('Escape');
  await page.setViewportSize({width:390,height:800});
  await expect(page.getByTestId('design-preview').locator('img.design-figure')).toBeVisible();

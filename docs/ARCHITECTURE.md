@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.18.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.19.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -346,3 +346,7 @@ Four renderers in `src/export/design/` (`systemContext.ts`, `status.ts`, `lineag
 ## 1.18 additions: atlas revisions figure
 
 `atlasCards(input, doc)` takes the active snapshot from the public document and the snapshot before it from the authoring document, filtered to repositories reachable in public output (a public card, or marked public when removed), then `compareSnapshots` gives changed / added / removed. `atlasSvg` lays the cards out from the root view, draws the declared relationships dashed and prints revisions at seven characters.
+
+## 1.19 additions: Diagram Design deck
+
+`buildDesignDeck(PptxGenJS, input, {raster})` renders each public view with `designSvg`, asks the injected `raster` for a PNG data URL (the browser passes `pngFromSvg`; tests pass a stub), fits it to a 13.33 × 7.5 in slide from the SVG viewBox and sets the figure's `<title>` and `<desc>` as alt text. Injecting the rasteriser keeps the module testable in Node without a canvas.

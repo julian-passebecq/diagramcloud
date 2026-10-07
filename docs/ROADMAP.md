@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.19.0
+
+- **Diagram Design deck (PowerPoint)**: cover plus one picture slide per public view, alt text from the figure, slide colour from the figure's theme; checked by unit tests (slide count, redaction, alt text), an e2e download with real PNG media, and a visual pass rendered by PowerPoint.
+
 ## Shipped in 1.18.0
 
 - **Atlas revisions figure**: an atlas document's repositories as cards with their own short revision, ref, authority and scan state, changes since the previous snapshot (Δ old → new, +, −) and the declared relationships; the figure states that there is no single project revision. Empty state points to `npm run atlas`.
