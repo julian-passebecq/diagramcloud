@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.20.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.21.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -354,3 +354,7 @@ Four renderers in `src/export/design/` (`systemContext.ts`, `status.ts`, `lineag
 ## 1.20 additions: quantities, Sankey, PDF, real-data hardening
 
 `edgeSchema.quantity` is optional and strict (`value` finite ≥ 0, `unit` ≤ 24 characters, `provenance` from the evidence block enum, optional `note`); `publicDocument`, `viewSpec` (`SpecEdge.quantity`) and the draw.io adapter keep it. `sankeySvg` uses `flowRanks` columns and the most common unit; bands are cubic curves, synthetic bands dashed. The CLI's `--pdf` loads Playwright only on demand, renders `book.html` and each figure offline and writes nothing if any step fails. `readRepository` skips a sub-folder that has its own `.git`. The atlas figure lists relationships instead of drawing them above 16.
+
+## 1.21 additions: auto layout and shape checks
+
+`layeredLayout(doc, viewId)` (src/core/layout.ts) is pure: `flowRanks` columns (longest path, cycles broken in view order), barycentre sweeps within columns (ties by id), groups contiguous, disconnected components in a final band; the canvas applies it through the same undoable position update as the grid layout. `tests/helpers/designGeometry.ts` collects text boxes and component shapes (rects, isometric tile outlines) for the quality and stress tests.
