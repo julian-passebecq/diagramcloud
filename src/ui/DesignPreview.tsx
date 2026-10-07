@@ -15,7 +15,7 @@ export function DesignPreview({project,viewId,appTheme,edit,busy,onOpen,onSaveHi
  onOpen:(viewId:string)=>void;onSaveHint:(viewId:string,type:DesignType,theme:DesignTheme)=>void;onBrief:(file:File)=>void}){
  const safe=useMemo(()=>publicDocument(project),[project]),shownId=safe.views.some(v=>v.id===viewId)?viewId:safe.rootViewId,view=safe.views.find(v=>v.id===shownId)!;
  const [type,setType]=useState<DesignType>(view.design?.type??'auto'),[theme,setTheme]=useState<DesignTheme>(view.design?.theme??(appTheme==='dark'?'dark':'light'));
- useEffect(()=>{setType(view.design?.type??'auto');setTheme(view.design?.theme??(appTheme==='dark'?'dark':'light'));},[shownId]);// eslint-disable-line react-hooks/exhaustive-deps
+ useEffect(()=>{setType(view.design?.type??'auto');setTheme(view.design?.theme??(appTheme==='dark'?'dark':'light'));},[project.id,shownId,view.design?.type,view.design?.theme]);// eslint-disable-line react-hooks/exhaustive-deps
  const resolved=resolveDesignType(project,shownId,type);
  const svg=useMemo(()=>designSvg(project,shownId,{type,theme}),[project,shownId,type,theme]);
  const [url,setUrl]=useState('');

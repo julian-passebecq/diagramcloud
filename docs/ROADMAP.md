@@ -2,6 +2,15 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.12.0
+
+- **Diagram Design mode** (Idées de Julian, 2026-10-07): the visual grammar of cathrynlavery/diagram-design (MIT, `d137637`) as a mode of DiagramCloud rather than a new project: Architecture, Layer stack, Exploded stack (3D) and Drilldown tree, light / dark / editorial, focal components, `view.design` hints, the Diagram Design figure export, `npm run design`, and the `diagramcloud.design-brief/1` bridge so an AI agent picks figures and focal components after scanning (`skills/diagramcloud-design/SKILL.md`). Next candidates from diagram-design's 44 types, each from facts already in the model: architecture delta (two atlas snapshots), swimlane / data flow (repositories as lanes), sequence (story steps), timeline (snapshots), dependency graph (scan), medallion (data perspective), and charts from table evidence blocks (bar, line, heatmap, treemap). Sankey and loop need edge quantities and a cycle layout first.
+
+## Idées de Julian (2026-10-07)
+
+- **diagram-design + DiagramCloud = "a true beast"**: integrate as much of diagram-design as possible. Decision (Julian, 2026-10-07): a Diagram Design **mode inside DiagramCloud**, not a new project and not a rebuild, so the scanner, Git lineage, atlas, Lens, redaction and exports keep working. Shipped in 1.12.0; more figure types per release.
+- **AI bridge**: an AI writes tips (a design brief) so DiagramCloud can graph every project. Shipped in 1.12.0 as `diagramcloud.design-brief/1` plus the repository skill.
+
 ## Shipped in 1.11.0
 
 - **Lens Git projections** (Project Atlas brief §8): `datapass.lens.minimap/1` (tern-vscode `minimapProjection`, branch `feat/tern-v01` @ `15a425b`, not yet on main) read into a new reviewed snapshot as observed runtime pointers; scans go stale against Lens heads; unknown revisions filled with authority `lens`; credential-bearing links dropped; unmatched repositories reported. Not done, on purpose: a commit graph, churn or "lines changed" views (Lens leaves them out; lines changed are not productivity). **Brain project context**: no Brain format exists on disk (survey 2026-10-07); `contextRefs` stays the slot, DiagramCloud works without it.

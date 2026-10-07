@@ -64,6 +64,36 @@ Azure and Databricks artwork is not bundled: Azure icons are a separate download
 
 The icon registry in `src/core/icons.ts` is the source of truth for every icon ID: a vendor icon is drawn only if it is registered with its source, version, blob and terms, and `scripts/icons.ts` fails the build for an unregistered or modified file in `public/icons`. Other symbols in `src/ui/Canvas.tsx` are original generic component symbols, not representations claimed to be official vendor logos. The activity animation surrounds the icon; it does not rotate the Microsoft artwork.
 
+## diagram-design (visual grammar of Diagram Design mode, 1.12)
+
+Diagram Design mode (`src/export/design/`) and the design brief adapt the visual grammar of **diagram-design** by Cathryn Lavery: semantic colour roles and their light/dark values, rectangular type tags, rounded right-angle connectors (r = 8) with masked uppercase labels, fanned attach points, zones, the bottom legend strip, the accessible SVG contract, the layer-stack and exploded-axonometric conventions, and its figure-selection guidance. DiagramCloud's renderers are an independent TypeScript implementation that draws from the DiagramCloud model; no diagram-design code, templates, icons or fonts are copied. Instrument Serif, Geist and Geist Mono are only named in font stacks with system fallbacks: no font files are shipped and nothing is fetched. The Tabler, Simple Icons, log-z and Devicon artwork bundled with diagram-design is not used.
+
+Upstream: https://github.com/cathrynlavery/diagram-design at commit `d1376371965f513d99cc9ec388835d255c5c88d5` (skill v2.6, read 2026-10-07).
+
+```
+MIT License
+
+Copyright (c) 2025 Cathryn Lavery
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
 ## Fonts and portfolio content
 
 No font binaries are distributed. The UI uses installed system fonts; exported PowerPoint refers to fonts installed on the reader's machine and may substitute them. No font files may be added to an output archive without independently verified redistribution rights.
