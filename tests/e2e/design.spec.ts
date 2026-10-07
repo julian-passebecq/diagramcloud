@@ -15,7 +15,7 @@ test('Diagram Design mode: figures, open a level, save a hint, apply a design br
  await expect(figure).toHaveAttribute('data-design-type','architecture');
  await expect.poll(()=>figure.evaluate((i:HTMLImageElement)=>i.complete&&i.naturalWidth)).toBeGreaterThan(600);
  await page.screenshot({path:'test-results/design/architecture.png'});
- for(const type of ['layers','exploded','tree','swimlane','sequence','timeline','chart']){
+ for(const type of ['layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line']){
   await preview.getByLabel('Figure type').selectOption(type);await expect(figure).toHaveAttribute('data-design-type',type);
   await expect.poll(()=>figure.evaluate((i:HTMLImageElement)=>i.complete&&i.naturalWidth)).toBeGreaterThan(400);
   await page.screenshot({path:`test-results/design/${type}.png`});
@@ -61,6 +61,14 @@ test('Diagram Design mode: figures, open a level, save a hint, apply a design br
  const path='test-results/design/export.svg';await file.saveAs(path);const svg=readFileSync(path,'utf8');
  expect(svg).toContain('data-design-type="exploded"');expect(svg).toContain('One save, three levels');
  expect([...svg.matchAll(/https?:\/\/[^"']+/g)].map(m=>m[0])).toEqual(['http://www.w3.org/2000/svg']);expect(svg).not.toMatch(/<script/i);
+ // Figure book: every public view as its chosen figure on one offline page; it opens without any network request.
+ const waitBook=page.waitForEvent('download');await page.getByRole('button',{name:/Diagram Design figure book \(HTML\)/}).click();
+ const book=await waitBook;expect(book.suggestedFilename()).toBe('contoso-forecasting.figures.html');
+ const bookPath='test-results/design/figures.html';await book.saveAs(bookPath);const html=readFileSync(bookPath,'utf8');
+ expect((html.match(/<svg /g)??[]).length).toBe(4);expect(html).toContain('data-design-type="exploded"');expect(html).not.toMatch(/<script/i);
+ const reader=await page.context().newPage();const blocked:string[]=[];await reader.route('**/*',r=>{if(!r.request().url().startsWith('file:')){blocked.push(r.request().url());return r.abort();}return r.continue();});
+ await reader.goto('file:///'+process.cwd().replace(/\\/g,'/')+'/'+bookPath);await expect(reader.locator('section svg')).toHaveCount(4);
+ await reader.screenshot({path:'test-results/design/figures.png',fullPage:false});expect(blocked).toEqual([]);await reader.close();
  await page.keyboard.press('Escape');
  await page.setViewportSize({width:390,height:800});
  await expect(page.getByTestId('design-preview').locator('img.design-figure')).toBeVisible();

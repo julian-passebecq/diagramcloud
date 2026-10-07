@@ -32,3 +32,13 @@ test('technical manual: offline, no script, escaped, private items removed, dete
  // Synthetic evidence stays labelled.
  const total=technicalManualHtml(samples.find(x=>x.id==='total-project-controls')!,{now:NOW});assert.match(total,/Synthetic example/);
 });
+
+test('technical manual: a view with a Diagram Design hint is printed as that figure, others stay editorial; ids stay unique',async()=>{
+ const {applyDesignBrief,parseDesignBrief}=await import('../src/core/designBrief');const {readFileSync:read}=await import('node:fs');const {contosoForecasting}=await import('../src/data/contosoForecasting');
+ const doc=applyDesignBrief(contosoForecasting(),parseDesignBrief(read('docs/design-brief.example.json','utf8'))).document;
+ const html=technicalManualHtml(doc,{now:new Date('2026-10-07T09:00:00Z')});
+ assert.equal((html.match(/data-style="design"/g)??[]).length,4);assert.ok(html.includes('Exploded stack (3D) figure, as chosen for this view'));
+ assert.ok(!html.includes('data-theme="dark"'),'dark figures print light');
+ const ids=[...html.matchAll(/ id="([^"]+)"/g)].map(m=>m[1]);assert.equal(new Set(ids).size,ids.length);
+ const plain=technicalManualHtml(contosoForecasting(),{now:new Date('2026-10-07T09:00:00Z')});assert.equal((plain.match(/data-style="design"/g)??[]).length,0);
+});

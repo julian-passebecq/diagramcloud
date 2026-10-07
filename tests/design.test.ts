@@ -16,7 +16,7 @@ import {samples} from '../src/data/samples';
 import {contosoForecasting} from '../src/data/contosoForecasting';
 import {parseXml,walk,find} from '../src/core/interchange/xml';
 
-const NOW=new Date('2026-10-07T09:00:00Z'),TYPES=['architecture','layers','exploded','tree','swimlane','sequence','timeline','chart'] as const;
+const NOW=new Date('2026-10-07T09:00:00Z'),TYPES=['architecture','layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line'] as const;
 const els=(svg:string)=>[...walk(parseXml(svg))];
 const attr=(svg:string,name:string)=>els(svg).filter(e=>e.attrs[name]!==undefined).map(e=>e.attrs[name]);
 const texts=(svg:string)=>els(svg).filter(e=>e.name==='text'||e.name==='title'||e.name==='desc').map(e=>e.text).join(' ');
@@ -174,4 +174,12 @@ test('architecture delta: Before · Changes · After by stable ID, statuses in t
  const hidden=structuredClone(after);hidden.views.find(v=>v.id==='policy')!.visibility='private';
  assert.throws(()=>compareView(before,validateDocument(hidden),'policy'),/not public in the newer version/);
  assert.equal(compareView(before,before,'overview').ledger.length,0);
+});
+
+test('figure book: every public view in drilldown order, offline, no script, unique ids, hints respected',async()=>{
+ const {designBookHtml}=await import('../src/export/design/book');
+ const doc=applyDesignBrief(contosoForecasting(),parseDesignBrief(readFileSync('docs/design-brief.example.json','utf8'))).document,html=designBookHtml(doc,{now:NOW});
+ assert.equal((html.match(/<svg /g)??[]).length,publicDocument(doc).views.length);assert.ok(html.includes('data-design-type="exploded"')&&html.includes('data-theme="dark"'));
+ assert.doesNotMatch(html,/<script|https?:\/\/(?!www\.w3\.org\/2000\/svg)/);assert.ok(html.includes("default-src 'none'"));
+ const ids=[...html.matchAll(/ id="([^"]+)"/g)].map(m=>m[1]);assert.equal(new Set(ids).size,ids.length);
 });
