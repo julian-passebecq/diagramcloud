@@ -2,9 +2,14 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.23.0
+
+- **Labels never under cards**: canvas connection labels are placed along or beside the route where no card is (`src/ui/labelPlace.ts`), shortened with … and a tooltip when a gap is too short.
+- **Auto layout never worse than the authored layout**: best of several ordering passes, neighbour swaps, a one-column shift when it removes a crossing, and a re-seed from the authored order; tested on every sample view (portfolio-flow 1 → 0; a real 14-repository atlas 32 authored → 2).
+
 ## Shipped in 1.22.0
 
-- **Canvas routes from the export scene**: `sceneRoutes` (src/export/scene.ts) routes around the canvas's measured cards and `src/ui/SceneEdge.tsx` draws them; the AGENTS limit "the canvas does not route edges" is lifted. Known limit: a label on a short gap between two cards can be partly hidden under a card.
+- **Canvas routes from the export scene**: `sceneRoutes` (src/export/scene.ts) routes around the canvas's measured cards and `src/ui/SceneEdge.tsx` draws them; the AGENTS limit "the canvas does not route edges" is lifted. Connection labels are placed clear of every card (src/ui/labelPlace.ts): along or just beside any route segment, clipped with an ellipsis (full text in the tooltip) when the gap is short.
 - **Auto layout wraps** flows longer than 6 columns into left-to-right bands (`layeredLayout(doc, viewId, {maxColumns})`, guarded by `layoutCrossings`).
 
 ## Shipped in 1.21.0

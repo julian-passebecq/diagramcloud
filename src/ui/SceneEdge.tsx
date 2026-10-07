@@ -1,5 +1,6 @@
 import {BaseEdge,EdgeLabelRenderer,getSmoothStepPath,type Edge,type EdgeProps} from '@xyflow/react';
-import {routeLabel,type ScenePoint} from '../export/scene';
+import type {ScenePoint} from '../export/scene';
+import {LABEL_HEIGHT,type PlacedLabel} from './labelPlace';
 import {elbowPath} from '../export/design/kit';
 
 /**
@@ -25,18 +26,25 @@ export const SCENE_CORNER_RADIUS=8;
 export type SceneEdgeData={kind:string;speed:string;motion:boolean;dimmed:boolean;highlighted:boolean;
  /** The scene route in flow coordinates; absent when the scene has none for this connection. */
  route?:ScenePoint[];
+ /** Where the label pill goes (src/ui/labelPlace.ts): clear of every card, clipped with an ellipsis when space is short. */
+ labelAt?:PlacedLabel;
  /** True while an end is being dragged (or not yet committed): draw React Flow's smooth step from the live handles. */
  live?:boolean};
 export type FlowEdge=Edge<SceneEdgeData,'dataflow'>;
 
 export function SceneEdge(props:EdgeProps<FlowEdge>){
  const d=props.data,routed=!!d?.route&&d.route.length>1&&!d.live;
- let path:string,x:number,y:number;
- if(routed){const pts=d!.route!;path=elbowPath(pts,SCENE_CORNER_RADIUS);const at=routeLabel(pts);x=at.x;y=at.y;}
- else [path,x,y]=getSmoothStepPath({...props,borderRadius:14});
+ const text=String(props.label??''),at=d?.labelAt;
+ let path:string;
+ if(routed){const pts=d!.route!;path=elbowPath(pts,SCENE_CORNER_RADIUS);}
+ else [path]=getSmoothStepPath({...props,borderRadius:14});
  return <g className={`data-edge ${routed?'scene-routed':'smooth-step'} ${d?.motion?'moving':''} speed-${d?.speed??'medium'} ${d?.dimmed?'dimmed':''} ${d?.highlighted?'highlighted':''} ${props.selected?'edge-selected':''}`} data-route={routed?'scene':'live'}>
   <BaseEdge id={props.id} path={path} markerEnd={props.markerEnd} style={{stroke:d?.highlighted?'#2563eb':'#93a5be',strokeWidth:d?.highlighted?2.6:1.7,strokeDasharray:d?.kind==='control'?'5 5':undefined}}/>
   {d?.motion&&<path className="flow-dashes" d={path} fill="none" stroke="#4b78bf" strokeWidth="2" strokeDasharray="3 16" pointerEvents="none"/>}
-  <EdgeLabelRenderer><span className="edge-label" style={{transform:`translate(-50%,-50%) translate(${x}px,${y}px)`,opacity:d?.dimmed?.25:1}}>{String(props.label??'')}</span></EdgeLabelRenderer>
+  {text&&<EdgeLabelRenderer>{routed?(at&&!at.hidden
+   ?<span className={`edge-label placed${at.clipped?' clipped':''}`} title={text} data-full={text} style={{width:at.width,height:LABEL_HEIGHT,transform:`translate(-50%,-50%) translate(${at.x}px,${at.y}px)`,opacity:d?.dimmed?.25:1}}>{text}</span>
+   :<span className="edge-label placed hidden-label" title={text} data-full={text} aria-label={text}/>)
+   // While an end is dragged the cards move under the label: hide it until the drop places it again.
+   :null}</EdgeLabelRenderer>}
  </g>;
 }

@@ -93,3 +93,30 @@ test('dragging a card follows the live handles, then the scene route returns aft
  await page.waitForTimeout(300);await view.screenshot({path:'test-results/routes/contoso-after-drag.png'});
  expect(errors).toEqual([]);
 });
+
+/** Label pills and cards on screen (one viewport transform for both). */
+const labelProblems=(view:Locator)=>view.evaluate(root=>{
+ const cards=[...root.querySelectorAll('.react-flow__node')].map(n=>({id:(n as HTMLElement).dataset.id,r:n.getBoundingClientRect()}));
+ const labels=[...root.querySelectorAll('.edge-label')].map(l=>({el:l as HTMLElement,r:l.getBoundingClientRect()}));
+ const ov=(a:DOMRect,b:DOMRect)=>Math.min(Math.min(a.right,b.right)-Math.max(a.left,b.left),Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
+ const out:string[]=[];
+ labels.forEach((l,i)=>{const full=l.el.dataset.full??'';
+  if(!full||(l.el.textContent!==full&&l.el.title!==full))out.push(`label ${i} has no full text`);
+  if(!l.r.width)return;
+  for(const c of cards)if(ov(l.r,c.r)>0)out.push(`"${full}" overlaps card ${c.id}`);
+  labels.slice(i+1).forEach(m=>{if(m.r.width&&ov(l.r,m.r)>2)out.push(`"${full}" overlaps "${m.el.dataset.full}"`);});});
+ return {out,count:labels.length,visible:labels.filter(l=>l.r.width>0).length};});
+
+for(const sample of ['Contoso Forecasting','TotalEnergies','Datapass | project architecture map'])
+ test(`connection labels never sit under a card: ${sample}`,async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');await page.locator('.project-card').filter({hasText:sample}).first().click();
+  const view=page.locator('[data-testid^="view-"]').first();await expect(view).toBeVisible();
+  await expect(view.locator('.react-flow__edge-path').first()).toBeAttached();
+  await expect.poll(async()=>routeProblems(await edgeInfo(view),await boxes(view))).toEqual([]);
+  await expect.poll(async()=>(await labelProblems(view)).out).toEqual([]);
+  const r=await labelProblems(view);expect(r.count).toBeGreaterThan(0);expect(r.visible).toBeGreaterThan(0);
+  mkdirSync('test-results/routes',{recursive:true});await page.waitForTimeout(300);
+  await view.screenshot({path:`test-results/routes/labels-${sample.replace(/[^a-z]+/gi,'-').toLowerCase()}.png`});
+  expect(errors).toEqual([]);
+ });

@@ -9,7 +9,7 @@ import {publicDocument} from '../src/core/operations';
 import {contosoForecasting} from '../src/data/contosoForecasting';
 
 /** docs/AI_GUIDE.md is read by agents as instructions: its examples, figure types, commands and links must stay true. */
-const guide=readFileSync('docs/AI_GUIDE.md','utf8'),blocks=[...guide.matchAll(/```json\n([\s\S]*?)```/g)].map(m=>JSON.parse(m[1]));
+const guide=readFileSync('docs/AI_GUIDE.md','utf8').split('\r').join(''),blocks=[...guide.matchAll(/```json\n([\s\S]*?)```/g)].map(m=>JSON.parse(m[1]));
 const byFormat=(f:string)=>{const b=blocks.find(x=>x.format===f);assert.ok(b,`the guide has a ${f} example`);return b;};
 
 test('AI guide: every JSON example passes the real validator and applies cleanly',()=>{
