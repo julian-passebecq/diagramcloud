@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.16.0
+
+- Four more Diagram Design figures from the public view spec, built by a second parallel wave: System context, Status board, Lineage, Radial reach.
+
 ## Shipped in 1.15.0
 
 - **Figure book** (every public view as its Diagram Design figure on one offline page; also `book.html` from `npm run design`) and the **Technical manual** printing each view's chosen figure. New figures: Deployment, Evidence matrix, Treemap, Hub, Heatmap, Line chart, built in parallel by a six-coder workflow, each from facts already in the model.
