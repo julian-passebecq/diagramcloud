@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {samples} from '../src/data/samples';
 import {clone,edgeSchema,nodeSchema,type Project} from '../src/core/model';
-import {flowRanks as coreRanks,layeredLayout,LAYOUT_NODE_HEIGHT,LAYOUT_NODE_WIDTH} from '../src/core/layout';
+import {flowRanks as coreRanks,layeredLayout,layoutCrossings,LAYOUT_COLUMN,LAYOUT_ROW,LAYOUT_NODE_HEIGHT,LAYOUT_NODE_WIDTH} from '../src/core/layout';
 import {flowRanks} from '../src/export/design/flow';
 
 type Pos=Record<string,{x:number;y:number}>;
@@ -62,3 +62,57 @@ test('members of one repository stay contiguous within a column',()=>{
 });
 
 test('flowRanks moved to core keeps the design export working',()=>{assert.equal(flowRanks,coreRanks);});
+
+const viewEdges=(d:Project,viewId:string)=>{const v=d.views.find(x=>x.id===viewId)!;
+ return d.edges.filter(e=>v.edgeIds.includes(e.id)&&v.nodeIds.includes(e.source)&&v.nodeIds.includes(e.target));};
+/** Crossings of one view's connections only (the helper above counts every edge of a one-view project). */
+const viewCrossings=(d:Project,viewId:string,p:Pos)=>crossings({...d,edges:viewEdges(d,viewId).filter(e=>p[e.source]&&p[e.target])},p);
+const contoso=()=>samples.find(s=>s.id==='contoso-forecasting')!;
+
+test('wrap: Contoso Forecasting overview folds into bands of at most 6 columns',()=>{
+ const d=contoso(),flat=layeredLayout(d,'overview',{maxColumns:Infinity}),p=layeredLayout(d,'overview');
+ const xs=(q:Pos)=>new Set(Object.values(q).map(b=>b.x)).size;
+ assert.ok(xs(flat)>6,`unwrapped has ${xs(flat)} columns`);
+ assert.ok(xs(p)<=6,`wrapped has ${xs(p)} columns`);
+ const width=(q:Pos)=>Math.max(...Object.values(q).map(b=>b.x))+LAYOUT_NODE_WIDTH;
+ assert.ok(width(p)<=6*LAYOUT_COLUMN,`width ${width(p)}`);
+ assert.ok(!overlaps(p));
+ assert.deepEqual(layeredLayout(clone(d),'overview'),p);
+ const again=clone(d);again.views.find(v=>v.id==='overview')!.positions=p;assert.deepEqual(layeredLayout(again,'overview'),p,'idempotent');
+});
+
+test('wrap: column k sits in band floor(k/6), bands read left to right, order inside a column kept',()=>{
+ const ids=Array.from({length:14},(_,i)=>`n${String(i).padStart(2,'0')}`),links=ids.slice(1).map((id,i)=>`${ids[i]}>${id}`);
+ links.push('n02>x','x>n04');const all=[...ids,'x'],d=project(all,links);
+ const flat=layeredLayout(d,'v',{maxColumns:Infinity}),p=layeredLayout(d,'v'),col=(id:string)=>Math.round(flat[id].x/LAYOUT_COLUMN);
+ const bandTop=(k:number)=>Math.min(...all.filter(n=>Math.floor(col(n)/6)===k).map(n=>p[n].y));
+ const bandBottom=(k:number)=>Math.max(...all.filter(n=>Math.floor(col(n)/6)===k).map(n=>p[n].y))+LAYOUT_NODE_HEIGHT;
+ for(const id of all){
+  const k=Math.floor(col(id)/6);
+  assert.equal(p[id].x,(col(id)%6)*LAYOUT_COLUMN,`${id}: column ${col(id)} at slot ${col(id)%6} of band ${k}`);
+  assert.ok(p[id].y>=bandTop(k)&&p[id].y+LAYOUT_NODE_HEIGHT<=bandBottom(k));
+ }
+ for(let k=1;k<=Math.floor(col('n13')/6);k++)assert.ok(bandTop(k)-bandBottom(k-1)>=LAYOUT_ROW-LAYOUT_NODE_HEIGHT+100,`lane above band ${k}`);
+ assert.equal(Math.floor(col('n13')/6),2);
+ // Column 3 holds n03 and x: same vertical order as unwrapped.
+ assert.equal(Math.sign(p.x.y-p.n03.y),Math.sign(flat.x.y-flat.n03.y));
+ assert.ok(!overlaps(p));
+ // At 4 columns the n03/x → n04 connectors would cross n02 → x: the wrap is refused and the row stays unwrapped.
+ assert.deepEqual(layeredLayout(d,'v',{maxColumns:4}),flat);
+ const chain=project(ids,ids.slice(1).map((id,i)=>`${ids[i]}>${id}`)),four=layeredLayout(chain,'v',{maxColumns:4});
+ assert.deepEqual(layeredLayout(clone(chain),'v',{maxColumns:4}),four);
+ assert.equal(new Set(Object.values(four).map(b=>b.x)).size,4);assert.equal(new Set(Object.values(four).map(b=>b.y)).size,4);
+ assert.throws(()=>layeredLayout(d,'v',{maxColumns:0}));
+});
+
+test('wrap: crossings never increase versus unwrapped, and never exceed the authored layout where the view wraps',()=>{
+ for(const s of samples)for(const v of s.views){
+  const flat=layeredLayout(s,v.id,{maxColumns:Infinity}),p=layeredLayout(s,v.id),depth=new Set(Object.values(flat).map(b=>b.x)).size;
+  const w=viewCrossings(s,v.id,p),u=viewCrossings(s,v.id,flat),ref=`${s.id}/${v.id}`;
+  assert.ok(w<=u,`${ref}: wrapped ${w} > unwrapped ${u}`);
+  assert.ok(!overlaps(p),`${ref} overlaps`);
+  const authored=Object.fromEntries(Object.entries(v.positions).filter(([id])=>v.nodeIds.includes(id)));
+  if(depth>6&&Object.keys(authored).length===Object.keys(p).length)assert.ok(w<=viewCrossings(s,v.id,authored),`${ref}: wrapped ${w} > authored`);
+ }
+ assert.equal(layoutCrossings([{from:'a',to:'d'},{from:'b',to:'c'}],{a:{x:0,y:0},b:{x:0,y:200},c:{x:400,y:0},d:{x:400,y:200}}),1);
+});

@@ -8,6 +8,10 @@ export type SceneBounds={x:number;y:number;width:number;height:number};
 export const NODE_WIDTH=220;
 export const NODE_HEIGHT=100;
 export const ROUTE_CLEARANCE=38;
+/** A box size. Routing takes an optional size per end (the canvas passes its measured cards); exports use NODE_WIDTH x NODE_HEIGHT. */
+export type SceneSize={w:number;h:number};
+export type SizedPoint=ScenePoint&Partial<SceneSize>;
+const wOf=(p:SizedPoint)=>p.w??NODE_WIDTH,hOf=(p:SizedPoint)=>p.h??NODE_HEIGHT;
 
 export function sceneBounds(points:ScenePoint[],padding=30):SceneBounds{
  const x=Math.min(0,...points.map(p=>p.x))-padding;
@@ -20,9 +24,10 @@ export function sceneBounds(points:ScenePoint[],padding=30):SceneBounds{
 }
 
 /** Deterministic Manhattan route shared by vector and presentation exports. */
-export function orthogonalRoute(source:ScenePoint,target:ScenePoint,clearance=ROUTE_CLEARANCE):ScenePoint[]{
- const s={left:source.x,right:source.x+NODE_WIDTH,top:source.y,bottom:source.y+NODE_HEIGHT,cx:source.x+NODE_WIDTH/2,cy:source.y+NODE_HEIGHT/2};
- const t={left:target.x,right:target.x+NODE_WIDTH,top:target.y,bottom:target.y+NODE_HEIGHT,cx:target.x+NODE_WIDTH/2,cy:target.y+NODE_HEIGHT/2};
+export function orthogonalRoute(source:SizedPoint,target:SizedPoint,clearance=ROUTE_CLEARANCE):ScenePoint[]{
+ const sw=wOf(source),sh=hOf(source),tw=wOf(target),th=hOf(target);
+ const s={left:source.x,right:source.x+sw,top:source.y,bottom:source.y+sh,cx:source.x+sw/2,cy:source.y+sh/2};
+ const t={left:target.x,right:target.x+tw,top:target.y,bottom:target.y+th,cx:target.x+tw/2,cy:target.y+th/2};
  if(t.left>=s.right+clearance/2){const mid=(s.right+t.left)/2;return[{x:s.right,y:s.cy},{x:mid,y:s.cy},{x:mid,y:t.cy},{x:t.left,y:t.cy}];}
  if(s.left>=t.right+clearance/2){const mid=(t.right+s.left)/2;return[{x:s.left,y:s.cy},{x:mid,y:s.cy},{x:mid,y:t.cy},{x:t.right,y:t.cy}];}
  if(t.top>=s.bottom+clearance/2){const mid=(s.bottom+t.top)/2;return[{x:s.cx,y:s.bottom},{x:s.cx,y:mid},{x:t.cx,y:mid},{x:t.cx,y:t.top}];}
@@ -88,8 +93,7 @@ export function buildScene(d:Project,view:ProjectView):Scene{
  });
  const boxes=nodes.map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
  const shown=d.edges.filter(e=>view.edgeIds.includes(e.id));
- const routes=separateLanes(shown.map(e=>{const s=positionFor(view,e.source),t=positionFor(view,e.target);
-  return simplifyRoute(routeAround(s,t,boxes.filter(b=>!(b.x===s.x&&b.y===s.y)&&!(b.x===t.x&&b.y===t.y)),boxes));}));
+ const routes=sceneRoutes(d,view).map(r=>r.points);
  const placed:Box[]=[];
  const edges=shown.map((e,k):SceneEdge=>({id:e.id,points:routes[k],dashed:e.kind==='control',...(e.label?{label:clearOf(edgeLabel(e.label,routes[k],boxes),placed,boxes,routes)}:{})}));
  const vendorIcons=[...new Set(nodes.flatMap(n=>n.icon?[n.icon.entry]:[]))];
@@ -97,6 +101,20 @@ export function buildScene(d:Project,view:ProjectView):Scene{
  const base=sceneBounds(view.nodeIds.map(id=>positionFor(view,id))),extra=edges.flatMap(e=>[...e.points,...(e.label?[{x:e.label.x,y:e.label.y-e.label.size}]:[])]);
  const minX=Math.min(base.x,...extra.map(q=>q.x-30)),minY=Math.min(base.y,...extra.map(q=>q.y-30)),maxX=Math.max(base.x+base.width,...extra.map(q=>q.x+30)),maxY=Math.max(base.y+base.height,...extra.map(q=>q.y+30));
  return {bounds:{x:minX,y:minY,width:maxX-minX,height:maxY-minY},nodes,edges,vendorIcons};
+}
+
+/**
+ * The scene's connection routes for one view, in view layout pixels (the coordinates of view.positions, box top-left).
+ * buildScene uses it with the fixed export box; the canvas passes its measured card sizes so the same algorithm
+ * routes around the cards it actually draws. Same order as the view's shown edges.
+ */
+export function sceneRoutes(d:Pick<Project,'nodes'|'edges'>,view:ProjectView,sizeOf:(id:string)=>SceneSize|undefined=()=>undefined):{id:string;points:ScenePoint[]}[]{
+ const at=(id:string):Required<SizedPoint>=>{const p=positionFor(view,id),z=sizeOf(id);return {x:p.x,y:p.y,w:z?.w??NODE_WIDTH,h:z?.h??NODE_HEIGHT};};
+ const boxes=d.nodes.filter(n=>view.nodeIds.includes(n.id)).map(n=>at(n.id));
+ const shown=d.edges.filter(e=>view.edgeIds.includes(e.id));
+ const routes=separateLanes(shown.map(e=>{const s=at(e.source),t=at(e.target);
+  return simplifyRoute(routeAround(s,t,boxes.filter(b=>!(b.x===s.x&&b.y===s.y)&&!(b.x===t.x&&b.y===t.y)),boxes));}));
+ return shown.map((e,k)=>({id:e.id,points:routes[k]}));
 }
 
 type Box={x:number;y:number;w:number;h:number};
@@ -137,19 +155,19 @@ const crossings=(points:ScenePoint[],obstacles:Box[])=>points.slice(1).reduce((n
  * between columns (horizontal first), or a lane just below or above every box in the way. Ties keep the order
  * listed, so routes only change where a box was in the way.
  */
-export function routeAround(source:ScenePoint,target:ScenePoint,obstacles:Box[],all:Box[]=obstacles):ScenePoint[]{
+export function routeAround(source:SizedPoint,target:SizedPoint,obstacles:Box[],all:Box[]=obstacles):ScenePoint[]{
  const direct=orthogonalRoute(source,target);
  if(!crossings(direct,obstacles))return direct;
- const W=NODE_WIDTH,H=NODE_HEIGHT,sx=source.x+W/2,tx=target.x+W/2,sy=source.y+H/2,ty=target.y+H/2,lo=Math.min(sx,tx),hi=Math.max(sx,tx);
+ const SW=wOf(source),SH=hOf(source),TW=wOf(target),TH=hOf(target),sx=source.x+SW/2,tx=target.x+TW/2,sy=source.y+SH/2,ty=target.y+TH/2,lo=Math.min(sx,tx),hi=Math.max(sx,tx);
  const candidates:ScenePoint[][]=[direct];
- if(target.y>=source.y+H){const mid=(source.y+H+target.y)/2;candidates.push([{x:sx,y:source.y+H},{x:sx,y:mid},{x:tx,y:mid},{x:tx,y:target.y}]);}
- if(source.y>=target.y+H){const mid=(target.y+H+source.y)/2;candidates.push([{x:sx,y:source.y},{x:sx,y:mid},{x:tx,y:mid},{x:tx,y:target.y+H}]);}
- if(target.x>=source.x+W){const mid=(source.x+W+target.x)/2;candidates.push([{x:source.x+W,y:sy},{x:mid,y:sy},{x:mid,y:ty},{x:target.x,y:ty}]);}
- if(source.x>=target.x+W){const mid=(target.x+W+source.x)/2;candidates.push([{x:source.x,y:sy},{x:mid,y:sy},{x:mid,y:ty},{x:target.x+W,y:ty}]);}
+ if(target.y>=source.y+SH){const mid=(source.y+SH+target.y)/2;candidates.push([{x:sx,y:source.y+SH},{x:sx,y:mid},{x:tx,y:mid},{x:tx,y:target.y}]);}
+ if(source.y>=target.y+TH){const mid=(target.y+TH+source.y)/2;candidates.push([{x:sx,y:source.y},{x:sx,y:mid},{x:tx,y:mid},{x:tx,y:target.y+TH}]);}
+ if(target.x>=source.x+SW){const mid=(source.x+SW+target.x)/2;candidates.push([{x:source.x+SW,y:sy},{x:mid,y:sy},{x:mid,y:ty},{x:target.x,y:ty}]);}
+ if(source.x>=target.x+TW){const mid=(target.x+TW+source.x)/2;candidates.push([{x:source.x,y:sy},{x:mid,y:sy},{x:mid,y:ty},{x:target.x+TW,y:ty}]);}
  const inWay=obstacles.filter(b=>b.x<hi&&b.x+b.w>lo);
  const top=Math.min(source.y,target.y,...inWay.map(b=>b.y))-ROUTE_CLEARANCE/2,bottom=Math.max(source.y,target.y,...inWay.map(b=>b.y+b.h))+ROUTE_CLEARANCE/2;
  const minY=Math.min(...all.map(b=>b.y)),maxY=Math.max(...all.map(b=>b.y+b.h)),between=(y:number)=>y>minY&&y<maxY;
- const under=[{x:sx,y:source.y+H},{x:sx,y:bottom},{x:tx,y:bottom},{x:tx,y:target.y+H}],over=[{x:sx,y:source.y},{x:sx,y:top},{x:tx,y:top},{x:tx,y:target.y}];
+ const under=[{x:sx,y:source.y+SH},{x:sx,y:bottom},{x:tx,y:bottom},{x:tx,y:target.y+TH}],over=[{x:sx,y:source.y},{x:sx,y:top},{x:tx,y:top},{x:tx,y:target.y}];
  candidates.push(...(between(bottom)||!between(top)?[under,over]:[over,under]));
  const best=candidates.map((r,k)=>({r,k,n:crossings(r,obstacles)})).sort((p,q)=>p.n-q.n||p.k-q.k)[0];
  return best.n?channelRoute(source,target,all)??best.r:best.r;
@@ -162,11 +180,11 @@ const BEND=100;
  * It leaves the middle of a side of the source and enters the middle of a side of the target, and no segment passes
  * through any box, its own two ends included. Undefined when no such route exists.
  */
-export function channelRoute(source:ScenePoint,target:ScenePoint,all:Box[]):ScenePoint[]|undefined{
- const W=NODE_WIDTH,H=NODE_HEIGHT,c=ROUTE_CLEARANCE/2,s={...source,w:W,h:H},t={...target,w:W,h:H},boxes=[...all,s,t];
+export function channelRoute(source:SizedPoint,target:SizedPoint,all:Box[]):ScenePoint[]|undefined{
+ const c=ROUTE_CLEARANCE/2,s={x:source.x,y:source.y,w:wOf(source),h:hOf(source)},t={x:target.x,y:target.y,w:wOf(target),h:hOf(target)},boxes=[...all,s,t];
  const lines=(edges:number[],ends:number[])=>{const e=[...new Set(edges)].sort((p,q)=>p-q);
   return [...new Set([e[0]-c,...e.slice(1).map((v,i)=>(e[i]+v)/2),e.at(-1)!+c,...ends])].sort((p,q)=>p-q);};
- const xs=lines(boxes.flatMap(b=>[b.x,b.x+b.w]),[s.x+W/2,t.x+W/2]),ys=lines(boxes.flatMap(b=>[b.y,b.y+b.h]),[s.y+H/2,t.y+H/2]);
+ const xs=lines(boxes.flatMap(b=>[b.x,b.x+b.w]),[s.x+s.w/2,t.x+t.w/2]),ys=lines(boxes.flatMap(b=>[b.y,b.y+b.h]),[s.y+s.h/2,t.y+t.h/2]);
  const DIRS=[[1,0],[0,1],[-1,0],[0,-1]],free=(a:ScenePoint,z:ScenePoint)=>!boxes.some(b=>crosses(a,z,b));
  const beyond=(v:number[],from:number,step:number)=>{if(!step)return v.indexOf(from);for(let k=step>0?0:v.length-1;k>=0&&k<v.length;k+=step)if(step*(v[k]-from)>0)return k;return -1;};
  // Side midpoints, bottom first, with the outward direction d (an index in DIRS); each joins the grid at the first line beyond its side.
