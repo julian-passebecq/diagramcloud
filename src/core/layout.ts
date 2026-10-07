@@ -9,6 +9,13 @@ import {repositoryOf} from './viewspec';
 export const LAYOUT_NODE_WIDTH=220,LAYOUT_NODE_HEIGHT=160;
 /** Column pitch leaves room for an edge label between columns; row pitch matches the grid layout's 180 px. */
 export const LAYOUT_COLUMN=LAYOUT_NODE_WIDTH+120,LAYOUT_ROW=180,LAYOUT_BAND_GAP=70;
+/** Columns per band before a long flow wraps, and the extra vertical lane left between bands for the connectors that cross from one band to the next. */
+export const LAYOUT_MAX_COLUMNS=6,LAYOUT_WRAP_GAP=120;
+
+export type LayeredLayoutOptions={
+ /** Columns per band; a longer flow folds into bands stacked top to bottom, all reading left to right. Infinity: no wrap. */
+ maxColumns?:number;
+};
 
 type RankNode={id:string;position:{x:number;y:number}};
 type RankEdge={from:string;to:string};
@@ -39,9 +46,15 @@ const cmp=(a:string,b:string)=>a<b?-1:a>b?1:0;
  * twice changes nothing.
  * - Columns: longest-path reading order (flowRanks), cycles broken at the earliest component in view order.
  * - Rows: barycentre sweeps (4 passes, ties by id) to reduce crossings; members of one repository stay contiguous.
+ * - Wrap: more than `maxColumns` (default 6) columns fold into bands of at most `maxColumns` columns, stacked top to
+ *   bottom and all reading left to right (column k sits in band floor(k/maxColumns)), with a lane between bands for
+ *   the connector into the next band. Kept only when it does not add edge crossings (straight lines between box
+ *   centres); otherwise the unwrapped row is returned.
  * - Components with no connection in the view go in a band under the main flow.
  */
-export function layeredLayout(doc:Project,viewId:string):Record<string,{x:number;y:number}>{
+export function layeredLayout(doc:Project,viewId:string,options:LayeredLayoutOptions={}):Record<string,{x:number;y:number}>{
+ const maxColumns=options.maxColumns??LAYOUT_MAX_COLUMNS;
+ if(!(maxColumns>=1))throw new Error('maxColumns must be at least 1.');
  const view=doc.views.find(v=>v.id===viewId);
  if(!view)throw new Error(`Unknown view ${viewId}.`);
  const known=new Set(doc.nodes.map(n=>n.id)),ids=view.nodeIds.filter(id=>known.has(id)),inView=new Set(ids),index=new Map(ids.map((id,i)=>[id,i]));
@@ -72,12 +85,42 @@ export function layeredLayout(doc:Project,viewId:string):Record<string,{x:number
   const forward=pass%2===0,order=forward?columns.map((_,r)=>r):columns.map((_,r)=>columns.length-1-r);
   for(const r of order){const side=(n:string)=>forward?ranks.get(n)!<r:ranks.get(n)!>r;columns[r]=arrange(columns[r],id=>barycentre(id,side));place(columns[r]);}
  }
- const out:Record<string,{x:number;y:number}>={},tallest=Math.max(0,...columns.map(c=>c.length));
- columns.forEach((col,r)=>col.forEach((id,i)=>{out[id]={x:r*LAYOUT_COLUMN,y:Math.round((i+(tallest-col.length)/2)*LAYOUT_ROW)};}));
+ const flow=(width:number)=>{
+  const out:Record<string,{x:number;y:number}>={},bands=depth<=width?Math.min(depth,1):Math.ceil(depth/width);let top=0;
+  for(let b=0;b<bands;b++){
+   const cols=columns.slice(b*width,(b+1)*width),tallest=Math.max(0,...cols.map(c=>c.length));
+   cols.forEach((col,k)=>col.forEach((id,i)=>{out[id]={x:k*LAYOUT_COLUMN,y:top+Math.round((i+(tallest-col.length)/2)*LAYOUT_ROW)};}));
+   top+=tallest*LAYOUT_ROW+(b<bands-1?LAYOUT_WRAP_GAP:0);
+  }
+  return {out,height:top,width:Math.min(depth,width)};
+ };
+ let placed=flow(Infinity);
+ if(depth>maxColumns){
+  const wrapped=flow(maxColumns);
+  if(layoutCrossings(edges,wrapped.out)<=layoutCrossings(edges,placed.out))placed=wrapped;
+ }
+ const out=placed.out;
  if(loose.length){
   const sorted=[...loose].sort((a,b)=>cmp(group.get(a)!,group.get(b)!)||index.get(a)!-index.get(b)!);
-  const perRow=Math.max(depth,Math.ceil(Math.sqrt(sorted.length)),3),top=tallest?tallest*LAYOUT_ROW+LAYOUT_BAND_GAP:0;
+  const perRow=Math.max(placed.width,Math.ceil(Math.sqrt(sorted.length)),3),top=placed.height?placed.height+LAYOUT_BAND_GAP:0;
   sorted.forEach((id,i)=>{out[id]={x:(i%perRow)*LAYOUT_COLUMN,y:top+Math.floor(i/perRow)*LAYOUT_ROW};});
  }
  return out;
+}
+
+type Point={x:number;y:number};
+/**
+ * Edge crossings of a layout, counted as proper intersections of straight segments between box centres (edges that
+ * share an endpoint never count). A layout quality measure only: the canvas and exports route edges their own way.
+ */
+export function layoutCrossings(edges:RankEdge[],positions:Record<string,Point>):number{
+ const c=(id:string)=>({x:positions[id].x+LAYOUT_NODE_WIDTH/2,y:positions[id].y+LAYOUT_NODE_HEIGHT/2});
+ const seg=edges.filter(e=>positions[e.from]&&positions[e.to]&&e.from!==e.to).map(e=>({a:c(e.from),b:c(e.to),from:e.from,to:e.to}));
+ const o=(a:Point,b:Point,q:Point)=>Math.sign((b.x-a.x)*(q.y-a.y)-(b.y-a.y)*(q.x-a.x));
+ let n=0;
+ for(let i=0;i<seg.length;i++)for(let j=i+1;j<seg.length;j++){
+  const s=seg[i],t=seg[j];if(new Set([s.from,s.to,t.from,t.to]).size<4)continue;
+  if(o(s.a,s.b,t.a)*o(s.a,s.b,t.b)<0&&o(t.a,t.b,s.a)*o(t.a,t.b,s.b)<0)n++;
+ }
+ return n;
 }
