@@ -32,7 +32,13 @@ export const PERSPECTIVES=['system','code','data','cloud','git','cicd','agents',
 export type Perspective=typeof PERSPECTIVES[number];
 export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),basis,visibility}).strict();
 export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),basis,visibility}).strict();
-export const viewSchema=z.object({id,title:short,description:z.string().max(2000).default(''),nodeIds:refs,edgeIds:refs,positions:z.record(id,point).default({}),perspective:z.enum(PERSPECTIVES).optional(),visibility}).strict();
+/** Diagram Design render hints (visual grammar adapted from diagram-design, MIT): which figure type, which 1-2 focal components, which theme. Presentation only: never facts. */
+export const DESIGN_TYPES=['auto','architecture','layers','exploded','tree'] as const;
+export type DesignType=typeof DESIGN_TYPES[number];
+export const DESIGN_THEMES=['light','dark','editorial'] as const;
+export type DesignTheme=typeof DESIGN_THEMES[number];
+export const designSchema=z.object({type:z.enum(DESIGN_TYPES).default('auto'),focal:z.array(id).max(2).default([]),theme:z.enum(DESIGN_THEMES).optional(),caption:z.string().max(300).optional()}).strict();
+export const viewSchema=z.object({id,title:short,description:z.string().max(2000).default(''),nodeIds:refs,edgeIds:refs,positions:z.record(id,point).default({}),perspective:z.enum(PERSPECTIVES).optional(),design:designSchema.optional(),visibility}).strict();
 const instant=z.string().datetime({offset:true,message:'Use an ISO 8601 timestamp with a time zone, e.g. 2026-09-25T10:00:00Z'});
 const openUri=z.string().max(2000).refine(isOpenUri,'Only http(s) or vscode links without embedded credentials');
 /**
@@ -85,7 +91,7 @@ export function validateDocument(input:unknown):Project {
  for(const n of d.nodes){n.blockIds.forEach(r=>check(r,blocks,n.id));n.sourceIds.forEach(r=>check(r,sources,n.id));if(n.childViewId)check(n.childViewId,views,n.id);}
  for(const e of d.edges){check(e.source,nodes,e.id);check(e.target,nodes,e.id);}
  for(const b of d.blocks){b.sourceIds.forEach(r=>check(r,sources,b.id));if(b.type==='image')check(b.assetId,assets,b.id);if(b.type==='table'&&b.rows.some(r=>r.length!==b.columns.length))errors.push(`${b.id}: each row must match the column count`);}
- for(const v of d.views){v.nodeIds.forEach(r=>check(r,nodes,v.id));v.edgeIds.forEach(r=>check(r,edges,v.id));if(new Set(v.nodeIds).size!==v.nodeIds.length||new Set(v.edgeIds).size!==v.edgeIds.length)errors.push(`${v.id}: duplicate view membership`);for(const key of Object.keys(v.positions))if(!v.nodeIds.includes(key))errors.push(`${v.id}: position for non-member ${key}`);for(const e of d.edges.filter(e=>v.edgeIds.includes(e.id)))if(!v.nodeIds.includes(e.source)||!v.nodeIds.includes(e.target))errors.push(`${v.id}: edge ${e.id} has an endpoint outside this view`);}
+ for(const v of d.views){v.nodeIds.forEach(r=>check(r,nodes,v.id));v.edgeIds.forEach(r=>check(r,edges,v.id));if(new Set(v.nodeIds).size!==v.nodeIds.length||new Set(v.edgeIds).size!==v.edgeIds.length)errors.push(`${v.id}: duplicate view membership`);for(const key of Object.keys(v.positions))if(!v.nodeIds.includes(key))errors.push(`${v.id}: position for non-member ${key}`);for(const f of v.design?.focal??[])if(!v.nodeIds.includes(f))errors.push(`${v.id}: focal component ${f} is not in this view`);for(const e of d.edges.filter(e=>v.edgeIds.includes(e.id)))if(!v.nodeIds.includes(e.source)||!v.nodeIds.includes(e.target))errors.push(`${v.id}: edge ${e.id} has an endpoint outside this view`);}
  // External observations: no credentials or .env text, no synthetic backing, no self-promotion to shareable.
  d.observations.forEach((o,i)=>{check(o.nodeId,nodes,o.id);o.blockIds.forEach(r=>check(r,blocks,o.id));
   for(const f of secretFindings(o,`observations[${i}]`))errors.push(`Refused ${f}. Remove credentials and .env values; reference them by name only.`);
