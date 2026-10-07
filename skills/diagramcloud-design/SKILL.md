@@ -29,6 +29,12 @@ Rules: never add a component, link or repository the scan or manifest did not pr
 | The path of one request, save or event | `sequence` | lifelines and numbered messages from the view's connections (reading order, not timing) |
 | The walkthrough | `timeline` | the guided story steps on an axis |
 | The numbers behind a component | `chart` | bars from a table evidence block; its provenance stays printed (synthetic stays synthetic) |
+| Where things run (providers, platforms) | `deployment` | components nested by provider |
+| How much is backed by source | `matrix` | basis × confidence grid |
+| How big each part is | `treemap` | drilldown hierarchy as nested tiles |
+| What touches one component | `hub` | the component and its direct neighbours |
+| Patterns across a table | `heatmap` | shaded cells, provenance printed |
+| A trend in a table | `line` | lines with direct labels, provenance printed |
 
 Leave `auto` (= architecture) when unsure. Budget: a figure reads well up to about 9 components and 12 connections; above 24, explain with drilldown views instead of one large picture.
 

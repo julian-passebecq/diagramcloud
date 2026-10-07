@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.14.0** (`package.json`; shown in the header) |
+| Product version | **1.15.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -85,7 +85,7 @@ The gallery's **Contoso Forecasting** reference atlas is read by hand from the p
 
 ## Diagram Design mode
 
-**Diagram Design** (canvas toolbar) draws the current public view as an editorial figure in the visual grammar of [diagram-design](https://github.com/cathrynlavery/diagram-design) (MIT; see THIRD_PARTY_NOTICES.md): semantic colour roles, rectangular type tags, rounded right-angle connectors with masked uppercase labels, fanned attach points, zones per repository, a legend strip and accessible SVG. The facts stay DiagramCloud's (scans, atlas, basis, revision vector, public redaction); only the drawing changes. Eight figures:
+**Diagram Design** (canvas toolbar) draws the current public view as an editorial figure in the visual grammar of [diagram-design](https://github.com/cathrynlavery/diagram-design) (MIT; see THIRD_PARTY_NOTICES.md): semantic colour roles, rectangular type tags, rounded right-angle connectors with masked uppercase labels, fanned attach points, zones per repository, a legend strip and accessible SVG. The facts stay DiagramCloud's (scans, atlas, basis, revision vector, public redaction); only the drawing changes. 14 figures:
 
 | Figure | Draws | Best for |
 |---|---|---|
@@ -97,8 +97,16 @@ The gallery's **Contoso Forecasting** reference atlas is read by hand from the p
 | Sequence | the view's components as participants with lifelines; every connection is one numbered message, in reading order (derived from the connections, not timing) | the path of one request or save |
 | Story timeline | the guided story as numbered steps on an axis, steps on the current view highlighted; private steps counted, never drawn | the walkthrough at a glance |
 | Chart | the first table evidence block of the view's components with numbers, as bars; its provenance (synthetic, source-derived, reference, author) is printed on the figure | the numbers behind a component |
+| Deployment | components nested in one zone per provider (where they run), connections between them | where things run |
+| Evidence matrix | components in a grid of basis (planned, read from source, unknown) by confidence (confirmed, inferred, possible) | how much is backed by source |
+| Treemap | the drilldown hierarchy as nested tiles, area by number of components, current view highlighted | size of each part |
+| Hub | one component (focal or most connected) at the centre with its direct upstream and downstream neighbours | what touches this part |
+| Heatmap | a table evidence block as a grid of cells shaded per column, provenance printed | patterns in a table |
+| Line chart | a table evidence block as up to three lines with direct labels, provenance printed | a trend in a table |
 
 Themes: light, dark and editorial (adds drilldown path, revision vector and provenance cards). One or two **focal** components get the accent; without a hint, the single clearly most-connected component does, and the legend says so. In Edit, **Use for this view** stores the figure and theme on the view (`view.design`), so the **Diagram Design figure (SVG)** export and other people get the same figure. Figures are static, offline SVG with no script, built from `publicDocument`.
+
+**Figure book and manual.** **Diagram Design figure book (HTML)** (Export & share) puts every public view on one offline page as its chosen figure, in drilldown order; `npm run design` also writes `book.html`. The **Technical manual** prints a view's Diagram Design figure when the view has a hint (dark prints light), and the numbered editorial figure otherwise.
 
 **Architecture delta.** In Diagram Design mode, **Compare with another version…** reads another `diagramcloud.json` or authoring export of the same project (for example before a rescan) and draws Before · Changes · After for the current view, following diagram-design's architecture-delta conventions: components and connections compared by stable ID; added (+), removed (−, dashed), changed (Δ, with old → new in the ledger), moved (↗) and rewired (dotted) are readable without colour; unchanged objects stay quiet. The lower revision is Before. Nothing is imported, both versions go through `publicDocument`, and the figure says that a delta does not establish order or cause. `npm run design -- new.json --delta old.json` writes a delta per view.
 

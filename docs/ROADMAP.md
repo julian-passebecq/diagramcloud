@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.15.0
+
+- **Figure book** (every public view as its Diagram Design figure on one offline page; also `book.html` from `npm run design`) and the **Technical manual** printing each view's chosen figure. New figures: Deployment, Evidence matrix, Treemap, Hub, Heatmap, Line chart, built in parallel by a six-coder workflow, each from facts already in the model.
+
 ## Shipped in 1.14.0
 
 - **Architecture delta** (diagram-design `type-architecture-delta`): two versions of one project, one view, Before · Changes · After with a change ledger; added / removed / changed / moved / rewired by stable ID with non-colour encodings (badges, dash patterns), `data-snapshot` / `data-object-id` / `data-status` metadata. In the app (Compare with another version…, nothing imported) and the CLI (`--delta`). Pairs naturally with rescans and Lens: a rescan's review shows the change list, the delta shows it as a figure.
