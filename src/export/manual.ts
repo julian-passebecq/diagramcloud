@@ -4,6 +4,7 @@ import {viewSpec,PERSPECTIVE_LABEL,type ViewSpec} from '../core/viewspec';
 import {xml} from './diagram';
 import {orderedViews} from './drawio';
 import {editorialSvg} from './styled';
+import {DESIGN_TYPE_LABEL,designSvg,resolveDesignType} from './design';
 
 /**
  * Technical Manual publication preset: one static HTML file that reads on screen and prints to PDF (one section per
@@ -27,6 +28,14 @@ function block(b:EvidenceBlock):string{
  }
 }
 
+/** A view with a Diagram Design hint is printed as that figure (dark falls back to light on paper); others get the numbered editorial figure. */
+function figure(d:Project,spec:ViewSpec,index:number,now:Date):string{
+ const hint=publicDocument(d).views.find(v=>v.id===spec.viewId)?.design;
+ if(hint){const type=resolveDesignType(d,spec.viewId,hint.type);
+  return `<figure>${designSvg(d,spec.viewId,{type,theme:hint.theme==='editorial'?'editorial':'light',now})}<figcaption>Figure ${index+1}. ${xml(spec.title)}. ${xml(DESIGN_TYPE_LABEL[type])} figure, as chosen for this view; the tables below list every component and connection.</figcaption></figure>`;}
+ return `<figure>${editorialSvg(d,spec.viewId,now).replace(/ed-arrow/g,`ed-arrow-${index}`)}<figcaption>Figure ${index+1}. ${xml(spec.title)}. Numbers match the component table.</figcaption></figure>`;
+}
+
 function section(d:Project,spec:ViewSpec,index:number,now:Date):string{
  const label=(id:string)=>spec.nodes.find(n=>n.id===id)?.label??id;
  const trail=spec.path.map(p=>xml(p.title)).join(' › ');
@@ -34,7 +43,7 @@ function section(d:Project,spec:ViewSpec,index:number,now:Date):string{
 <p class="eyebrow">${index+1} · ${xml(PERSPECTIVE_LABEL[spec.perspective])} perspective · view <code>${xml(spec.viewId)}</code></p>
 <h2 id="h-${xml(spec.viewId)}">${xml(spec.title)}</h2>
 ${spec.path.length>1?`<p class="trail">Reached from: ${trail}</p>`:''}${spec.purpose?`<p>${xml(spec.purpose)}</p>`:''}
-<figure>${editorialSvg(d,spec.viewId,now).replace(/ed-arrow/g,`ed-arrow-${index}`)}<figcaption>Figure ${index+1}. ${xml(spec.title)}. Numbers match the component table.</figcaption></figure>
+${figure(d,spec,index,now)}
 <h3>Components</h3>${table(['#','ID','Component','Type','Provider','Basis','Confidence','Opens','Backed by'],spec.nodes.map((n,i)=>[i+1,n.id,n.label,n.kind,n.provider,BASIS_LABEL[n.basis??'unspecified'],n.confidence??'',n.opens?d.views.find(v=>v.id===n.opens)?.title??n.opens:'',[n.sourceRefs.length?`${n.sourceRefs.length} source(s)`:'',n.evidenceRefs.length?`${n.evidenceRefs.length} evidence block(s)`:''].filter(Boolean).join(', ')||'—']),`Components of ${spec.title}`)}
 <h3>Connections</h3>${table(['From','To','Label','Type','Basis'],spec.edges.map(e=>[label(e.from),label(e.to),e.label,e.kind,BASIS_LABEL[e.basis??'unspecified']]),`Connections of ${spec.title}`)}
 ${spec.nodes.some(n=>n.observation)?`<h3>Observed</h3>${table(['Component','Claim','Source app','Observed','Source revision'],spec.nodes.filter(n=>n.observation).map(n=>[n.label,n.observation!.claim,n.observation!.sourceApp,n.observation!.observedAt.slice(0,10),n.observation!.sourceRevision]),`Observations in ${spec.title}`)}`:''}

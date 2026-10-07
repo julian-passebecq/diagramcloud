@@ -12,6 +12,7 @@ import {publicDocument} from '../src/core/operations';
 import {applyDesignBrief,parseDesignBrief} from '../src/core/designBrief';
 import {designSvg,resolveDesignType} from '../src/export/design';
 import {deltaSvg} from '../src/export/design/delta';
+import {designBookHtml} from '../src/export/design/book';
 import {xml} from '../src/export/diagram';
 
 const args=process.argv.slice(2),flag=(n:string)=>{const i=args.indexOf(n);return i>=0?args.splice(i,2)[1]:undefined;};
@@ -33,4 +34,5 @@ for(const v of publicDocument(doc).views){
  process.stderr.write(`  ${file}\n`);
 }
 writeFileSync(join(out,'index.html'),`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'unsafe-inline'"><title>${xml(doc.title)} · Diagram Design figures</title><style>body{font:15px system-ui,sans-serif;margin:32px;color:#2d3142;background:#f5f5f5}</style></head><body><h1>${xml(doc.title)}</h1><p>Public views drawn in Diagram Design mode (${now.toISOString().slice(0,10)}).</p><ul>${rows.join('')}</ul></body></html>\n`);
-process.stderr.write(`${rows.length} figure(s) in ${out}\n`);
+writeFileSync(join(out,'book.html'),designBookHtml(doc,{type,theme,now}));
+process.stderr.write(`${rows.length} figure(s) and book.html in ${out}\n`);
