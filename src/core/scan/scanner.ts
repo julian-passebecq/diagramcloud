@@ -40,6 +40,13 @@ export const SECRET_FILE=/(^|\/)(\.env(\.(?!example$|sample$|template$|dist$)[^/
 const SOURCE=/\.(ts|tsx|js|jsx|mjs|cjs|py)$/;
 const GIT_FILES=/^\.git\/(HEAD|packed-refs|refs\/heads\/.+)$/;
 /** Whether a repository-relative path is worth reading (used by the browser folder picker and the CLI walker). */
+/** Sub-folders that carry their own `.git` (a nested clone, submodule or git worktree): another repository, never part of this one. */
+export function nestedRepositoryPrefixes(paths:string[]):string[]{
+ const out=new Set<string>();for(const p of paths){const m=/^(.+?)\/\.git(\/|$)/.exec(p);if(m)out.add(m[1]);}
+ return [...out].sort();
+}
+/** Paths outside every nested repository. */
+export function outsideNestedRepositories<T extends {path:string}>(items:T[]):T[]{const nested=nestedRepositoryPrefixes(items.map(i=>i.path));return items.filter(i=>!nested.some(n=>i.path===n||i.path.startsWith(`${n}/`)));}
 export function wantedFile(path:string):boolean{
  if(GIT_FILES.test(path))return true;
  if(IGNORED_DIR.test(path)||SECRET_FILE.test(path))return false;

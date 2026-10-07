@@ -117,3 +117,10 @@ test('repository reader: a nested clone or git worktree (its own .git) is skippe
   assert.ok(paths.includes('package.json')&&paths.includes('lib/index.ts')&&paths.includes('.git/HEAD'));assert.ok(!paths.some(p=>p.startsWith('tools/other')),paths.join(','));
  }finally{rmSync(root,{recursive:true,force:true});}
 });
+
+test('folder picker: files under a sub-folder with its own .git are left out, the repository root is kept',async()=>{
+ const {nestedRepositoryPrefixes,outsideNestedRepositories}=await import('../src/core/scan/scanner');
+ const paths=['.git/HEAD','package.json','src/a.ts','tools/other/.git','tools/other/package.json','vendor2/lib/.git/HEAD','vendor2/lib/x.ts','vendor2/keep.ts'];
+ assert.deepEqual(nestedRepositoryPrefixes(paths),['tools/other','vendor2/lib']);
+ assert.deepEqual(outsideNestedRepositories(paths.map(path=>({path}))).map(x=>x.path),['.git/HEAD','package.json','src/a.ts','vendor2/keep.ts']);
+});

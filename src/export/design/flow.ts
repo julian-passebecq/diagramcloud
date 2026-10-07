@@ -5,23 +5,10 @@ import {designContext,eyebrowOf,footerParts,type DesignContext,type DesignOption
 import {layersOf} from './layers';
 import {clipMono,f,footerLine,header,KIND_TAG,labelText,legendStrip,markers,monoWidth,MONO,nodeBox,svgDocument,treatmentOf,txt,type LegendItem,type Treatment} from './kit';
 import {xml} from '../diagram';
+import {flowRanks} from '../../core/layout';
 
-/**
- * Reading order of a view: a rank per component (longest path from the components nothing points to), cycles broken
- * at the earliest component in canvas order. Deterministic, and only a reading aid: it is not a measured time order.
- */
-export function flowRanks(nodes:SpecNode[],edges:SpecEdge[]):Map<string,number>{
- const order=[...nodes].sort((a,b)=>a.position.x-b.position.x||a.position.y-b.position.y||a.id.localeCompare(b.id)),ids=new Set(order.map(n=>n.id));
- const inner=edges.filter(e=>ids.has(e.from)&&ids.has(e.to)&&e.from!==e.to),indeg=new Map(order.map(n=>[n.id,0])),rank=new Map<string,number>(),done=new Set<string>();
- for(const e of inner)indeg.set(e.to,indeg.get(e.to)!+1);
- while(done.size<order.length){
-  let next=order.find(n=>!done.has(n.id)&&indeg.get(n.id)===0);
-  if(!next)next=order.filter(n=>!done.has(n.id)).sort((a,b)=>indeg.get(a.id)!-indeg.get(b.id)!)[0];// cycle: break it
-  done.add(next.id);rank.set(next.id,Math.max(0,...inner.filter(e=>e.to===next!.id&&done.has(e.from)&&e.from!==next!.id).map(e=>(rank.get(e.from)??0)+1)));
-  for(const e of inner)if(e.from===next.id&&!done.has(e.to))indeg.set(e.to,indeg.get(e.to)!-1);
- }
- return rank;
-}
+/** Reading order of a view; lives in core (`src/core/layout.ts`) and is re-exported here for existing callers. */
+export {flowRanks};
 
 /** Swimlane: one lane per repository (two or more), else per layer; columns follow the reading order. */
 export function swimlaneLayout(c:DesignContext):ArchitectureLayout{
