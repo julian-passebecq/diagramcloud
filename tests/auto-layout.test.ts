@@ -116,3 +116,17 @@ test('wrap: crossings never increase versus unwrapped, and never exceed the auth
  }
  assert.equal(layoutCrossings([{from:'a',to:'d'},{from:'b',to:'c'}],{a:{x:0,y:0},b:{x:0,y:200},c:{x:400,y:0},d:{x:400,y:200}}),1);
 });
+
+test('every view of every sample: auto crossings never exceed the authored layout; deterministic and idempotent',()=>{
+ const all=[...samples,...(samples.includes(contoso())?[]:[contoso()])];
+ for(const s of all)for(const v of s.views){
+  const p=layeredLayout(s,v.id),ref=`${s.id}/${v.id}`,auto=viewCrossings(s,v.id,p);
+  const authored=Object.fromEntries(Object.entries(v.positions).filter(([id])=>v.nodeIds.includes(id)));
+  if(Object.keys(authored).length===Object.keys(p).length)assert.ok(auto<=viewCrossings(s,v.id,authored),`${ref}: auto ${auto} > authored ${viewCrossings(s,v.id,authored)}`);
+  assert.ok(!overlaps(p),`${ref} overlaps`);
+  assert.deepEqual(layeredLayout(clone(s),v.id),p,`${ref} deterministic`);
+  const again=clone(s);again.views.find(x=>x.id===v.id)!.positions=p;assert.deepEqual(layeredLayout(again,v.id),p,`${ref} idempotent`);
+ }
+ const dp=samples.find(s=>s.views.some(v=>v.id==='portfolio-flow'))!;
+ assert.equal(viewCrossings(dp,'portfolio-flow',layeredLayout(dp,'portfolio-flow')),0);
+});

@@ -41,11 +41,12 @@ export function flowRanks(nodes:RankNode[],edges:RankEdge[]):Map<string,number>{
 const cmp=(a:string,b:string)=>a<b?-1:a>b?1:0;
 
 /**
- * Layered (left-to-right) layout of one view, computed from its connections only. Pure and deterministic: positions in
- * the document are not read, so the same view membership and connections always give the same result, and applying it
- * twice changes nothing.
+ * Layered (left-to-right) layout of one view, computed from its connections only. Pure and deterministic: positions are
+ * read only by the final guard below, and applying the layout twice changes nothing.
  * - Columns: longest-path reading order (flowRanks), cycles broken at the earliest component in view order.
- * - Rows: barycentre sweeps (4 passes, ties by id) to reduce crossings; members of one repository stay contiguous.
+ * - Rows: barycentre sweeps (up to 12 passes, best kept, ties by id), then adjacent-swap (transpose) refinement, to
+ *   reduce crossings; members of one repository stay contiguous. If the view's authored positions still have fewer
+ *   crossings, columns are re-seeded from the authored vertical order and the better result is kept.
  * - Wrap: more than `maxColumns` (default 6) columns fold into bands of at most `maxColumns` columns, stacked top to
  *   bottom and all reading left to right (column k sits in band floor(k/maxColumns)), with a lane between bands for
  *   the connector into the next band. Kept only when it does not add edge crossings (straight lines between box
@@ -81,12 +82,8 @@ export function layeredLayout(doc:Project,viewId:string,options:LayeredLayoutOpt
  // Initial order: repository blocks, then view order.
  columns.forEach((col,r)=>{columns[r]=arrange(col,id=>index.get(id)!);place(columns[r]);});
  const barycentre=(id:string,side:(n:string)=>boolean)=>{const ns=neighbours.get(id)!.filter(side);return ns.length?ns.reduce((s,n)=>s+slot.get(n)!,0)/ns.length:slot.get(id)!;};
- for(let pass=0;pass<4;pass++){
-  const forward=pass%2===0,order=forward?columns.map((_,r)=>r):columns.map((_,r)=>columns.length-1-r);
-  for(const r of order){const side=(n:string)=>forward?ranks.get(n)!<r:ranks.get(n)!>r;columns[r]=arrange(columns[r],id=>barycentre(id,side));place(columns[r]);}
- }
  const flow=(width:number)=>{
-  const out:Record<string,{x:number;y:number}>={},bands=depth<=width?Math.min(depth,1):Math.ceil(depth/width);let top=0;
+  const depth=columns.length,out:Record<string,{x:number;y:number}>={},bands=depth<=width?Math.min(depth,1):Math.ceil(depth/width);let top=0;
   for(let b=0;b<bands;b++){
    const cols=columns.slice(b*width,(b+1)*width),tallest=Math.max(0,...cols.map(c=>c.length));
    cols.forEach((col,k)=>col.forEach((id,i)=>{out[id]={x:k*LAYOUT_COLUMN,y:top+Math.round((i+(tallest-col.length)/2)*LAYOUT_ROW)};}));
@@ -94,16 +91,77 @@ export function layeredLayout(doc:Project,viewId:string,options:LayeredLayoutOpt
   }
   return {out,height:top,width:Math.min(depth,width)};
  };
- let placed=flow(Infinity);
- if(depth>maxColumns){
-  const wrapped=flow(maxColumns);
-  if(layoutCrossings(edges,wrapped.out)<=layoutCrossings(edges,placed.out))placed=wrapped;
+ const score=()=>layoutCrossings(edges,flow(Infinity).out);
+ const snapshot=()=>columns.map(c=>[...c]);
+ const restore=(s:string[][])=>s.forEach((c,r)=>{columns[r]=[...c];place(columns[r]);});
+ // Barycentre sweeps, alternating direction; the best ordering seen is kept (ties keep the earliest).
+ let best=snapshot(),bestScore=score();
+ for(let pass=0;pass<12&&bestScore>0;pass++){
+  const forward=pass%2===0,order=forward?columns.map((_,r)=>r):columns.map((_,r)=>columns.length-1-r);
+  for(const r of order){const side=(n:string)=>forward?ranks.get(n)!<r:ranks.get(n)!>r;columns[r]=arrange(columns[r],id=>barycentre(id,side));place(columns[r]);}
+  const sc=score();if(sc<bestScore){best=snapshot();bestScore=sc;}
  }
- const out=placed.out;
- if(loose.length){
-  const sorted=[...loose].sort((a,b)=>cmp(group.get(a)!,group.get(b)!)||index.get(a)!-index.get(b)!);
-  const perRow=Math.max(placed.width,Math.ceil(Math.sqrt(sorted.length)),3),top=placed.height?placed.height+LAYOUT_BAND_GAP:0;
-  sorted.forEach((id,i)=>{out[id]={x:(i%perRow)*LAYOUT_COLUMN,y:top+Math.floor(i/perRow)*LAYOUT_ROW};});
+ restore(best);
+ // Transpose: swap adjacent repository blocks, or adjacent members inside one block, while it strictly removes crossings.
+ const transpose=()=>{
+  let current=score(),improved=current>0;
+  while(improved){
+   improved=false;
+   for(let r=0;r<columns.length&&current>0;r++){
+    const key=(id:string)=>group.get(id)?`g:${group.get(id)}`:`n:${id}`;
+    const blocks=():string[][]=>{const out:string[][]=[];for(const id of columns[r]){const last=out[out.length-1];if(last&&key(last[0])===key(id))last.push(id);else out.push([id]);}return out;};
+    const tryOrder=(next:string[])=>{const prev=columns[r];columns[r]=next;place(next);const sc=score();if(sc<current){current=sc;improved=true;return true;}columns[r]=prev;place(prev);return false;};
+    for(let i=0;i+1<blocks().length;i++){const b=blocks();tryOrder([...b.slice(0,i).flat(),...b[i+1],...b[i],...b.slice(i+2).flat()]);}
+    for(let i=0;i+1<columns[r].length;i++){const c=columns[r];if(key(c[i])!==key(c[i+1]))continue;tryOrder([...c.slice(0,i),c[i+1],c[i],...c.slice(i+2)]);}
+   }
+  }
+ };
+ transpose();
+ // Shift: move a component one column right (keeping every forward connection left to right) when that strictly removes
+ // crossings, e.g. a 2×2 complete link between two columns, which straight layers cannot draw without a crossing.
+ for(let moved=true;moved;){
+  moved=false;
+  for(const id of [...main].sort((a,b)=>ranks.get(a)!-ranks.get(b)!||cmp(a,b))){
+   const r=ranks.get(id)!,before=score();
+   if(before===0)break;
+   if(edges.some(e=>e.from===id&&ranks.get(e.to)!>r&&ranks.get(e.to)!<=r+1))continue;
+   const base=snapshot();
+   if(r+1===columns.length)columns.push([]);
+   columns[r]=columns[r].filter(n=>n!==id);ranks.set(id,r+1);columns[r+1]=arrange([...columns[r+1],id],n=>n===id?barycentre(id,m=>ranks.get(m)!<=r):slot.get(n)!);
+   const empty=columns[r].length===0;
+   if(!empty){place(columns[r]);place(columns[r+1]);transpose();}
+   if(!empty&&score()<before){moved=true;break;}
+   ranks.set(id,r);while(columns.length>base.length)columns.pop();restore(base);
+  }
+ }
+ const finish=()=>{
+  let placed=flow(Infinity);
+  if(columns.length>maxColumns){
+   const wrapped=flow(maxColumns);
+   if(layoutCrossings(edges,wrapped.out)<=layoutCrossings(edges,placed.out))placed=wrapped;
+  }
+  const out=placed.out;
+  if(loose.length){
+   const sorted=[...loose].sort((a,b)=>cmp(group.get(a)!,group.get(b)!)||index.get(a)!-index.get(b)!);
+   const perRow=Math.max(placed.width,Math.ceil(Math.sqrt(sorted.length)),3),top=placed.height?placed.height+LAYOUT_BAND_GAP:0;
+   sorted.forEach((id,i)=>{out[id]={x:(i%perRow)*LAYOUT_COLUMN,y:top+Math.floor(i/perRow)*LAYOUT_ROW};});
+  }
+  return out;
+ };
+ let out=finish();
+ // Guard: when the authored positions still have fewer crossings, seed each column from the authored vertical order,
+ // refine it the same way and keep it only if it beats the connection-only result. A seeded result is a fixed point
+ // of this step, so applying the layout twice changes nothing.
+ const authored=view.positions??{};
+ if(main.every(id=>authored[id])){
+  const target=layoutCrossings(edges,authored),own=layoutCrossings(edges,out);
+  if(own>target){
+   const base=snapshot();
+   columns.forEach((col,r)=>{columns[r]=arrange(col,id=>authored[id].y*1e-3+authored[id].x*1e-9);place(columns[r]);});
+   transpose();
+   const seeded=finish();
+   if(layoutCrossings(edges,seeded)<own)out=seeded;else restore(base);
+  }
  }
  return out;
 }
