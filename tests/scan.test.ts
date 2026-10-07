@@ -99,3 +99,10 @@ test('scanner: an unrelated folder has only the system; limits hold on a large s
  assert.ok(document.nodes.length<=500&&document.views.length<=80&&document.edges.length<=1500);
  assert.doesNotThrow(()=>validateDocument(document));
 });
+
+test('scanner: nested agent worktrees (.claude/worktrees) are skipped like node_modules, the repository itself is not',async()=>{
+ const {IGNORED_DIR}=await import('../src/core/scan/scanner');
+ for(const p of ['.claude/worktrees/','.claude/worktrees/agent-1/src/index.ts','app/.claude/worktrees/x/package.json'])assert.ok(IGNORED_DIR.test(p),p);
+ for(const p of ['src/index.ts','.claude/settings.json','docs/worktrees/guide.md'])assert.ok(!IGNORED_DIR.test(p),p);
+ assert.equal(wantedFile('.claude/worktrees/agent-1/package.json'),false);
+});
