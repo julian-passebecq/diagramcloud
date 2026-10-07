@@ -5,7 +5,7 @@ import {DESIGN_TYPES,validateDocument,type DesignType,type Project,type ProjectN
 import {publicDocument} from '../src/core/operations';
 import {contosoForecasting} from '../src/data/contosoForecasting';
 import {parseXml,walk} from '../src/core/interchange/xml';
-import {defects} from './helpers/designGeometry';
+import {collectShapes,defects,defectSummary,shapeDefects} from './helpers/designGeometry';
 
 /**
  * Synthetic stress documents for the geometric quality check: each view reproduces a defect class first seen on a large
@@ -49,14 +49,18 @@ function stressDocument():Project{
  const fanE=[...Array.from({length:13},(_,i)=>edge(`fan-in${i}`,'fan-src',`fan-${i}`)),...Array.from({length:12},(_,i)=>edge(`fan-aux${i}`,`fan-${i}`,`aux-${i}`)),
   ...Array.from({length:13},(_,i)=>edge(`fan-out${i}`,`fan-${i}`,'fan-sink')),edge('fan-back','fan-sink','fan-0','imports ×2')];
  add(fan,fanE,view('stress-cycle','Labelled cycle from the last column',fan,fanE,n=>n.id==='fan-src'?{x:0,y:0}:n.id==='fan-sink'?{x:600,y:1300}:{x:n.id.startsWith('aux')?600:300,y:+n.id.slice(4)*100}));
+ // 6. One plane of forty: forty services in one layer, authored on a tight grid, so the Exploded plane once drew its tiles on top of each other.
+ const plane=Array.from({length:40},(_,i)=>node(`plane-${i}`,i%4?`Worker ${i}`:LONG[0],'process'));
+ const planeE=plane.slice(1).filter((_,i)=>i%3===0).map((n,i)=>edge(`plane-e${i}`,plane[0].id,n.id));
+ add(plane,planeE,view('stress-plane','Forty components on one plane',plane,planeE,(_,i)=>({x:(i%8)*60,y:Math.floor(i/8)*40})));
  // Publication keeps only the views reachable from the root: one opener per stress view joins the root view.
  const root=d.views.find(v=>v.id===d.rootViewId)!;
- for(const [i,id] of ['stress-crowd','stress-parent','stress-unsure','stress-hidden','stress-table','stress-cycle'].entries()){
+ for(const [i,id] of ['stress-crowd','stress-parent','stress-unsure','stress-hidden','stress-table','stress-cycle','stress-plane'].entries()){
   d.nodes.push(node(`open-${id}`,`Open ${id}`,'process',{childViewId:id}));root.nodeIds.push(`open-${id}`);root.positions[`open-${id}`]={x:i*200,y:2000};}
  return validateDocument(d);
 }
 
-const STRESS_VIEWS=['stress-crowd','stress-dense','stress-parent','stress-unsure','stress-hidden','stress-table','stress-cycle'];
+const STRESS_VIEWS=['stress-crowd','stress-dense','stress-parent','stress-unsure','stress-hidden','stress-table','stress-cycle','stress-plane'];
 const textsOf=(svg:string)=>[...walk(parseXml(svg))].filter(e=>e.name==='text').map(e=>e.text);
 const titlesOf=(svg:string)=>[...walk(parseXml(svg))].filter(e=>e.name==='title').map(e=>e.text);
 
@@ -70,7 +74,7 @@ test('design stress: every figure of every stress view has no overlapping text, 
  const d=stressDocument(),failures:string[]=[];
  for(const id of STRESS_VIEWS)for(const type of DESIGN_TYPES.filter(t=>t!=='auto') as DesignType[])for(const theme of ['light','dark'] as const)
   failures.push(...defects(designSvg(d,id,{type,theme,now:NOW}),`${type}/${id}/${theme}`).failures);
- assert.equal(failures.length,0,`${failures.length} geometric defect(s):\n${failures.slice(0,200).join('\n')}`);
+ assert.equal(failures.length,0,`${failures.length} geometric defect(s):\n${defectSummary(failures)}\n${failures.slice(0,200).join('\n')}`);
 });
 
 test('design stress: thinned isometric labels are counted and every name stays in a tooltip',()=>{
@@ -88,4 +92,15 @@ test('design stress: the empty matrix keeps every row and count, the clipped cat
  assert.ok(titlesOf(line).some(s=>s.startsWith(CATEGORY)),'full category in a point title');
  assert.ok(textsOf(line).includes('SYNTHETIC DATA'),'provenance kept');
  assert.ok(textsOf(designSvg(d,'stress-cycle',{type:'lineage',now:NOW})).some(s=>/IMPORTS/.test(s)),'cycle label kept on the canvas');
+});
+
+test('design stress: forty components on one Exploded plane each keep their own tile, none over another, all inside the canvas',()=>{
+ const d=stressDocument();
+ for(const theme of ['light','dark'] as const){const svg=designSvg(d,'stress-plane',{type:'exploded',theme,now:NOW}),{shapes}=collectShapes(svg);
+  const tiles=shapes.filter(s=>s.marker==='data-node-id'&&s.id.startsWith('plane-'));
+  assert.equal(new Set(tiles.map(s=>s.id)).size,40,'one tile per component');
+  assert.deepEqual(shapeDefects(svg,`exploded/stress-plane/${theme}`).failures,[]);
+  for(let i=0;i<40;i++)assert.ok(titlesOf(svg).some(s=>s.startsWith(i%4?`Worker ${i}`:LONG[0])),`plane-${i} in a title`);}
+ // The same forty, authored on top of each other, are spread apart in the Architecture figure rather than stacked.
+ assert.deepEqual(shapeDefects(designSvg(d,'stress-plane',{type:'architecture',now:NOW}),'architecture/stress-plane').failures,[]);
 });
