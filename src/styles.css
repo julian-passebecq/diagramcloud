@@ -63,3 +63,4 @@ button.perspective-chip{cursor:pointer}.perspective-chip.state-available{border-
 .design-open .link-button{background:none;border:0;padding:0;color:var(--accent,#2563eb);text-decoration:underline;cursor:pointer;font:inherit}
 
 .design-suggest{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;margin:4px 0;font-size:13px}.design-suggest button[aria-pressed="true"]{font-weight:600;text-decoration:none}
+.quantity-fields{border:1px solid var(--line,rgba(0,0,0,.12));border-radius:6px;padding:8px 10px;display:grid;gap:6px;margin:4px 0}.quantity-fields legend{font-size:12px;padding:0 4px}

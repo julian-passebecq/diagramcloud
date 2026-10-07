@@ -36,7 +36,7 @@ export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process'
 export const quantitySchema=z.object({value:z.number().finite().min(0).max(1e15),unit:z.string().min(1).max(24),provenance:z.enum(PROVENANCES),note:z.string().max(200).optional()}).strict();
 export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),basis,quantity:quantitySchema.optional(),visibility}).strict();
 /** Diagram Design render hints (visual grammar adapted from diagram-design, MIT): which figure type, which 1-2 focal components, which theme. Presentation only: never facts. */
-export const DESIGN_TYPES=['auto','architecture','layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line','context','status','lineage','radial','atlas'] as const;
+export const DESIGN_TYPES=['auto','architecture','layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line','context','status','lineage','radial','atlas','sankey'] as const;
 export type DesignType=typeof DESIGN_TYPES[number];
 export const DESIGN_THEMES=['light','dark','editorial'] as const;
 export type DesignTheme=typeof DESIGN_THEMES[number];
