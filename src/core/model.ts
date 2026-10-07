@@ -10,7 +10,8 @@ const point = z.object({x:z.number().finite().min(-100000).max(100000),y:z.numbe
 const sourceSchema = z.object({id,title:short,location:text.default(''),url:z.string().url().refine(s=>/^https?:\/\//i.test(s),'Only HTTP(S) source links').optional(),visibility}).strict();
 const remoteAssetSchema=z.object({provider:z.literal('google-drive'),fileId:z.string().regex(/^[A-Za-z0-9_-]{1,256}$/,'Invalid Google Drive file ID'),fileName:short,mimeType:z.enum(['image/png','image/jpeg','image/webp']),webViewLink:z.string().url().refine(s=>/^https:\/\//i.test(s),'Drive links must use HTTPS').optional(),modifiedTime:z.string().datetime({offset:true}).optional(),size:z.string().regex(/^\d+$/).optional(),savedAt:z.string().datetime({offset:true})}).strict();
 export const assetSchema = z.object({id,name:short,data:z.string().max(3*1024*1024).regex(/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/,'Embedded PNG, JPEG or WebP only'),rights:z.string().max(1000),visibility,remote:remoteAssetSchema.optional()}).strict();
-const baseBlock = {id,title:short,visibility,sourceIds:refs,provenance:z.enum(['source-derived','synthetic','reference','author']).default('author'),
+export const PROVENANCES=['source-derived','synthetic','reference','author'] as const;
+const baseBlock = {id,title:short,visibility,sourceIds:refs,provenance:z.enum(PROVENANCES).default('author'),
  /** Optional step when the block is part of an explained transformation (input → logic → output); display only. */
  transform:z.enum(['input','logic','output','mapping','rules']).optional()};
 export const blockSchema = z.discriminatedUnion('type',[
@@ -31,9 +32,11 @@ const basis=z.enum(BASES).optional();
 export const PERSPECTIVES=['system','code','data','cloud','git','cicd','agents','decisions','evidence'] as const;
 export type Perspective=typeof PERSPECTIVES[number];
 export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),basis,visibility}).strict();
-export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),basis,visibility}).strict();
+/** An optional amount carried by a connection (rows/day, GB, events/s…), with its provenance; drawn by the Sankey figure. Never inferred by an importer. */
+export const quantitySchema=z.object({value:z.number().finite().min(0).max(1e15),unit:z.string().min(1).max(24),provenance:z.enum(PROVENANCES),note:z.string().max(200).optional()}).strict();
+export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),basis,quantity:quantitySchema.optional(),visibility}).strict();
 /** Diagram Design render hints (visual grammar adapted from diagram-design, MIT): which figure type, which 1-2 focal components, which theme. Presentation only: never facts. */
-export const DESIGN_TYPES=['auto','architecture','layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line','context','status','lineage','radial','atlas'] as const;
+export const DESIGN_TYPES=['auto','architecture','layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line','context','status','lineage','radial','atlas','sankey'] as const;
 export type DesignType=typeof DESIGN_TYPES[number];
 export const DESIGN_THEMES=['light','dark','editorial'] as const;
 export type DesignTheme=typeof DESIGN_THEMES[number];

@@ -39,6 +39,7 @@ Rules: never add a component, link or repository the scan or manifest did not pr
 | Which parts are in which designed state | `status` | board by designed status (not observed) |
 | Where something comes from and goes | `lineage` | upstream and downstream of one component |
 | What a change here could reach | `radial` | rings at 1, 2 and 3 steps |
+| How much moves along each connection | `sankey` | bands sized by connection quantities, provenance printed (needs `quantity` on connections) |
 | Which repositories moved since the last atlas | `atlas` | per-repository revisions, Δ / + / − (atlas documents only) |
 
 Leave `auto` (= architecture) when unsure. Budget: a figure reads well up to about 9 components and 12 connections; above 24, explain with drilldown views instead of one large picture.

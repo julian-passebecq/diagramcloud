@@ -87,3 +87,17 @@ test('atlas: a document without an atlas gets the empty state and lists the view
  assert.equal(attr(svg,'data-dd-empty')[0],'atlas');assert.match(texts(svg),/npm run atlas/);assert.equal(attr(svg,'data-dd-repo').length,0);
  const root=publicDocument(d).views.find(v=>v.id===d.rootViewId)!;assert.equal(attr(svg,'data-node-id').length,Math.min(24,root.nodeIds.length));
 });
+
+test('atlas: more than 16 declared relationships are listed, not drawn; drawn connectors never leave the canvas',()=>{
+ const d=structuredClone(base()),root=d.views.find(v=>v.id===d.rootViewId)!,first=d.edges.find(e=>root.edgeIds.includes(e.id))!;
+ // Sparse: every connector point stays inside the viewBox (a backward route used to run off the left edge).
+ const back={...first,id:'back-route',source:first.target,target:first.source};d.edges.push(back);root.edgeIds.push(back.id);
+ const sparse=atlasSvg(validateDocument(d),d.rootViewId,{now:RENDER}),[,,W]=find(parseXml(sparse),'svg')!.attrs.viewBox.split(' ').map(Number);
+ for(const p of els(sparse).filter(e=>e.name==='path'&&e.attrs['data-edge-id']))for(const [x] of [...p.attrs.d.matchAll(/(-?[\d.]+)[ ,](-?[\d.]+)/g)].map(m=>[Number(m[1]),Number(m[2])]))assert.ok(x>=0&&x<=W,`${p.attrs['data-edge-id']}: x ${x} inside 0..${W}`);
+ for(let i=0;i<17;i++){const e={...first,id:`extra-${i}`,label:`contract ${i}`};d.edges.push(e);root.edgeIds.push(e.id);}
+ const dense=atlasSvg(validateDocument(d),d.rootViewId,{now:RENDER});
+ assert.equal(els(dense).filter(e=>e.name==='path'&&e.attrs['data-edge-id']).length,0,'no connector drawn');
+ const total=root.edgeIds.length;assert.ok(total>16);
+ assert.equal(els(dense).filter(e=>e.name==='g'&&e.attrs['data-edge-id']).length,total,'every relationship listed');
+ assert.match(texts(dense),new RegExp(`DECLARED RELATIONSHIPS · ${total} · LISTED, NOT DRAWN`));assert.match(texts(dense),/listed rather than drawn/);
+});

@@ -35,7 +35,7 @@ const join=(...parts:string[])=>normalize(parts.filter(Boolean).join('/'));
 function normalize(p:string):string{const out:string[]=[];for(const s of p.split('/')){if(!s||s==='.')continue;if(s==='..')out.pop();else out.push(s);}return out.join('/');}
 
 /** Directories never scanned, and files never read because they may hold secrets. */
-export const IGNORED_DIR=/(^|\/)(node_modules|\.git|dist|build|out|coverage|vendor|target|\.venv|venv|env|__pycache__|\.next|\.nuxt|\.turbo|\.cache|\.idea|\.vscode|bin|obj|\.terraform|site-packages|test-results|playwright-report)(\/|$)/;
+export const IGNORED_DIR=/(^|\/)(node_modules|\.git|dist|build|out|coverage|vendor|target|\.venv|venv|env|__pycache__|\.next|\.nuxt|\.turbo|\.cache|\.idea|\.vscode|bin|obj|\.terraform|site-packages|test-results|playwright-report|\.claude\/worktrees|\.worktrees)(\/|$)/;
 export const SECRET_FILE=/(^|\/)(\.env(\.(?!example$|sample$|template$|dist$)[^/]*)?|\.npmrc|\.pypirc|id_[a-z0-9]+|[^/]*\.(pem|key|p12|pfx|jks|keystore|tfstate|tfstate\.backup|tfvars)|[^/]*(secret|credential)s?[^/]*\.(json|ya?ml|txt))$/i;
 const SOURCE=/\.(ts|tsx|js|jsx|mjs|cjs|py)$/;
 const GIT_FILES=/^\.git\/(HEAD|packed-refs|refs\/heads\/.+)$/;

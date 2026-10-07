@@ -2,8 +2,8 @@ import type {Project,ProjectNode} from '../../core/model';
 import type {SpecNode} from '../../core/viewspec';
 import {designContext,eyebrowOf,footerParts,type DesignContext,type DesignOptions} from './context';
 import {summaryCards} from './architecture';
-import {clipMono,f,footerLine,header,labelChip,legendStrip,lines,markers,monoWidth,MONO,sansLines,svgDocument,treatmentOf,treatmentStyle,TREATMENT_LABEL,txt,
- type LegendItem,type P,type Treatment} from './kit';
+import {clipMono,f,footerLine,header,labelChip,legendStrip,lines,markers,monoWidth,MONO,overlaps,sansLines,svgDocument,treatmentOf,treatmentStyle,TREATMENT_LABEL,txt,
+ type Box,type LegendItem,type P,type Treatment} from './kit';
 import {xml} from '../diagram';
 
 const M=48;
@@ -57,7 +57,7 @@ export function layerStackSvg(input:Project,viewId:string,options:DesignOptions=
 
 // ------------------------------------------------------------------------------------------------ exploded stack
 type Plane={key:string;title:string;sub:string;names:string[];nodes:{id:string;label:string;kind:ProjectNode['kind'];basis:string;u:number;v:number}[];edges:[number,number][];focal:boolean;via?:number};
-const PW=340,PD=150,TH=8,GAP=200,TW=40,TD=26,TZ=6;
+const PW=340,PD=150,TH=8,GAP=200,TW=40,TD=26,TZ=6,MAX_TILE_LABELS=12;
 
 /** Planes: the drilldown chain through this view (parent kept on top), else the view's layers. */
 export function explodedPlanes(c:DesignContext):{planes:Plane[];basis:'drilldown'|'layers'}{
@@ -91,6 +91,14 @@ export function explodedSvg(input:Project,viewId:string,options:DesignOptions={}
  const zMax=(N-1)*GAP,ox=M+PD,oy=M+hdr.height+40+zMax,iso=(x:number,y:number,z:number):P=>({x:ox+x-y,y:oy+(x+y)/2-z}),pts=(ps:P[])=>ps.map(p=>`${f(p.x)},${f(p.y)}`).join(' ');
  const zOf=(i:number)=>(N-1-i)*GAP,tile=(p:Plane['nodes'][number])=>({x:24+p.u*(PW-48-TW),y:24+p.v*(PD-48-TD)});
  const out:string[]=[],traces:string[]=[],treatments=new Set<Treatment>();
+ // Tile labels: at most MAX_TILE_LABELS per plane, placed top plane first and, within a plane, the component that opens the next level, then the
+ // focal ones, then document order; a label that would touch one already placed is left out, and the plane's entry counts what stays in tooltips.
+ const shown=new Map<number,Map<number,string>>();{const placed:Box[]=[];
+  planes.forEach((p,i)=>{const z=zOf(i),m=new Map<number,string>(),order=p.nodes.map((n,k)=>({k,rank:p.via===k?0:c.focal.has(n.id)?1:2})).sort((a,b)=>a.rank-b.rank||a.k-b.k);
+   for(const {k} of order){if(m.size>=MAX_TILE_LABELS)break;const T=tile(p.nodes[k]),at=iso(T.x+TW/2,T.y+TD,z),label=clipMono(p.nodes[k].label,64,7),w=monoWidth(label,7);
+    const b={x:at.x-w/2-2,y:at.y+11-7*0.75-2,w:w+4,h:7*0.97+4};if(placed.some(q=>overlaps(b,q,0)))continue;placed.push(b);
+    m.set(k,txt(label,at.x,at.y+11,{size:7,fill:t.muted,font:MONO,anchor:'middle',extra:` stroke="${p.focal?t.accentTint:t.wash}" stroke-width="3" stroke-linejoin="round" paint-order="stroke"`}));}
+   shown.set(i,m);});}
  for(let i=N-1;i>=0;i--){const p=planes[i],z=zOf(i),focal=p.focal;
   const top=[iso(0,0,z),iso(PW,0,z),iso(PW,PD,z),iso(0,PD,z)],left=[iso(0,PD,z),iso(PW,PD,z),iso(PW,PD,z-TH),iso(0,PD,z-TH)],right=[iso(PW,0,z),iso(PW,PD,z),iso(PW,PD,z-TH),iso(PW,0,z-TH)];
   const stroke=focal?t.accent:t.externalStroke;
@@ -100,23 +108,24 @@ export function explodedSvg(input:Project,viewId:string,options:DesignOptions={}
   // Connections in the plane: right-angle in plane coordinates, so they read as isometric runs.
   for(const [a,b] of p.edges.slice(0,24)){const A=tile(p.nodes[a]),B=tile(p.nodes[b]),ax=A.x+TW/2,ay=A.y+TD/2,bx2=B.x+TW/2,by=B.y+TD/2;
    out.push(`<polyline points="${pts([iso(ax,ay,z),iso(bx2,ay,z),iso(bx2,by,z)])}" fill="none" stroke="${t.muted}" stroke-width="0.8" stroke-opacity="0.7"/>`);}
-  const labelled=p.nodes.length<=12;
   p.nodes.forEach((n,k)=>{const T=tile(n),fc=c.focal.has(n.id)&&!!spec.nodes.find(s=>s.id===n.id),tr=treatmentOf(n.kind,n.basis,fc),s=treatmentStyle(tr,t);treatments.add(tr);
    const tz=z+TZ,tt=[iso(T.x,T.y,tz),iso(T.x+TW,T.y,tz),iso(T.x+TW,T.y+TD,tz),iso(T.x,T.y+TD,tz)],tl=[iso(T.x,T.y+TD,tz),iso(T.x+TW,T.y+TD,tz),iso(T.x+TW,T.y+TD,z),iso(T.x,T.y+TD,z)],trr=[iso(T.x+TW,T.y,tz),iso(T.x+TW,T.y+TD,tz),iso(T.x+TW,T.y+TD,z),iso(T.x+TW,T.y,z)];
    const via=p.via===k;
    out.push(`<g data-node-id="${xml(n.id)}"><title>${xml(`${n.label} · ${n.kind}${via?' · opens the next level':''}`)}</title>`,
     ...[tl,trr].map((poly,j)=>`<polygon points="${pts(poly)}" fill="${t.backend}"/><polygon points="${pts(poly)}" fill="${j?t.faceRight:t.faceLeft}" stroke="${s.stroke}" stroke-width="0.6"/>`),
     `<polygon points="${pts(tt)}" fill="${t.backend}"/><polygon points="${pts(tt)}" fill="${s.fill}" stroke="${via?t.accent:s.stroke}" stroke-width="${via?1.2:0.8}"${s.dash?` stroke-dasharray="${s.dash}"`:''}/>`,
-    labelled?txt(clipMono(n.label,64,7),iso(T.x+TW/2,T.y+TD,z).x,iso(T.x+TW/2,T.y+TD,z).y+11,{size:7,fill:t.muted,font:MONO,anchor:'middle'}):'','</g>');
+    '</g>');
    if(via&&i<N-1){const from=iso(T.x+TW/2,T.y+TD/2,z),to=iso(PW/2,PD/2,zOf(i+1));traces.push(`<line x1="${f(from.x)}" y1="${f(from.y)}" x2="${f(from.x)}" y2="${f(to.y)}" stroke="${t.accent}" stroke-width="1" stroke-dasharray="4,3"/><circle cx="${f(from.x)}" cy="${f(to.y)}" r="2.5" fill="${t.accent}"/>`);}
   });
-  out.push('</g>');
+  // Tile labels after every tile of the plane, so a later tile never covers an earlier label.
+  out.push(...(shown.get(i)?.values()??[]),'</g>');
  }
  // Label column: one entry per plane on a horizontal leader from the plane's right corner.
- const lx=M+stackW+60,labels=planes.map((p,i)=>{const corner=iso(PW,0,zOf(i)),y=corner.y;
+ const hidden=(i:number)=>planes[i].nodes.length-(shown.get(i)?.size??0),lx=M+stackW+60,labels=planes.map((p,i)=>{const corner=iso(PW,0,zOf(i)),y=corner.y;
   return `<line x1="${f(corner.x+6)}" y1="${f(y)}" x2="${f(lx-10)}" y2="${f(y)}" stroke="${p.focal?t.accent:t.ruleSolid}" stroke-width="0.8"/><circle cx="${f(corner.x+6)}" cy="${f(y)}" r="2" fill="${p.focal?t.accent:t.soft}"/>`+
    txt(String(i+1).padStart(2,'0'),lx,y-14,{size:9,fill:p.focal?t.accent:t.soft,font:MONO,tracking:0.14})+txt(clipMono(p.title,labelW,13*0.9),lx,y+4,{size:13,fill:t.ink,weight:600})+
-   lines(sansLines(p.sub,labelW,10,2),lx,y+20,13,{size:10,fill:t.muted})+txt(clipMono(p.names.join(' · '),labelW,8),lx,y+20+13*sansLines(p.sub,labelW,10,2).length+4,{size:8,fill:t.soft,font:MONO});}).join('');
+   lines(sansLines(p.sub,labelW,10,2),lx,y+20,13,{size:10,fill:t.muted})+txt(clipMono(p.names.join(' · '),labelW,8),lx,y+20+13*sansLines(p.sub,labelW,10,2).length+4,{size:8,fill:t.soft,font:MONO})+
+   (hidden(i)?txt(`${p.nodes.length-hidden(i)} of ${p.nodes.length} labelled · ${hidden(i)} name${hidden(i)===1?'':'s'} in tooltips`,lx,y+20+13*sansLines(p.sub,labelW,10,2).length+17,{size:8,fill:t.soft,font:MONO}):'');}).join('');
  const bottom=oy+(PW+PD)/2+TH+12;
  const items:LegendItem[]=[{kind:'box',treatment:'focal',label:basis==='drilldown'?'Current level / focal':'Focal layer'},...(['backend','store','external','input','optional'] as Treatment[]).filter(x=>treatments.has(x)).map(x=>({kind:'box' as const,treatment:x,label:TREATMENT_LABEL[x]})),
   ...(traces.length?[{kind:'line' as const,stroke:'accent' as const,dashed:true,label:'Opens the level below'}]:[])];

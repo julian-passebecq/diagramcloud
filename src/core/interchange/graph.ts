@@ -11,7 +11,7 @@ export type ImportFormat='drawio'|'mermaid'|'visio'|'repository'|'atlas'|'design
  * `link` names the page this box opens (a draw.io page link): it becomes a drilldown when the pages form a tree.
  */
 export type GraphNode={id?:string;link?:string;key:string;label:string;kind?:ProjectNode['kind'];provider?:string;summary?:string;group?:string;x?:number;y?:number;w?:number;h?:number};
-export type GraphEdge={source:string;target:string;label?:string;kind?:ProjectEdge['kind']};
+export type GraphEdge={source:string;target:string;label?:string;kind?:ProjectEdge['kind'];quantity?:ProjectEdge['quantity']};
 export type GraphPage={id?:string;title:string;nodes:GraphNode[];edges:GraphEdge[];groups:string[];direction?:'LR'|'TB'};
 export type ImportReport={format:ImportFormat;fileName:string;pages:number;nodes:number;edges:number;groups:number;kept:string[];lost:string[]};
 export type ImportResult={document:Project;report:ImportReport};
@@ -139,7 +139,7 @@ export function documentFromGraph(pages:GraphPage[],options:{format:ImportFormat
    if(!s||!t){dangling++;continue;}if(s===t){selfLoops++;continue;}
    if(edgeCount>=MAX_EDGES)break;
    const id=unique(`${viewId}-e${edges.length+1}`.slice(0,80),edgeIds);edges.push(id);edgeCount++;
-   doc.edges.push({id,source:s,target:t,label:clip(e.label?.trim()??'',160),kind:e.kind??'batch',speed:'medium',visibility:'public'});
+   doc.edges.push({id,source:s,target:t,label:clip(e.label?.trim()??'',160),kind:e.kind??'batch',speed:'medium',...(e.quantity?{quantity:e.quantity}:{}),visibility:'public'});
   }
   const hasCoords=page.nodes.some(n=>n.x!==undefined);
   const raw=hasCoords?scaledPositions(page.nodes.filter(n=>keyToId.has(n.key))):layeredPositions({...page,nodes:page.nodes.filter(n=>keyToId.has(n.key)),edges:page.edges.filter(e=>keyToId.has(e.source)&&keyToId.has(e.target))});

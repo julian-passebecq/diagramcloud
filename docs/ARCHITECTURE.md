@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.19.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.20.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -350,3 +350,7 @@ Four renderers in `src/export/design/` (`systemContext.ts`, `status.ts`, `lineag
 ## 1.19 additions: Diagram Design deck
 
 `buildDesignDeck(PptxGenJS, input, {raster})` renders each public view with `designSvg`, asks the injected `raster` for a PNG data URL (the browser passes `pngFromSvg`; tests pass a stub), fits it to a 13.33 × 7.5 in slide from the SVG viewBox and sets the figure's `<title>` and `<desc>` as alt text. Injecting the rasteriser keeps the module testable in Node without a canvas.
+
+## 1.20 additions: quantities, Sankey, PDF, real-data hardening
+
+`edgeSchema.quantity` is optional and strict (`value` finite ≥ 0, `unit` ≤ 24 characters, `provenance` from the evidence block enum, optional `note`); `publicDocument`, `viewSpec` (`SpecEdge.quantity`) and the draw.io adapter keep it. `sankeySvg` uses `flowRanks` columns and the most common unit; bands are cubic curves, synthetic bands dashed. The CLI's `--pdf` loads Playwright only on demand, renders `book.html` and each figure offline and writes nothing if any step fails. `readRepository` skips a sub-folder that has its own `.git`. The atlas figure lists relationships instead of drawing them above 16.

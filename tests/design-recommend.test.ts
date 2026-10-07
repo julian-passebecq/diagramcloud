@@ -45,3 +45,11 @@ test('recommend: drilldowns, providers and story steps are named as facts',()=>{
  assert.match(by('tree').reason,/child views? below this one/);assert.match(by('deployment').reason,/^\d+ providers, mostly one component each$/);assert.ok(by('deployment').score<by('tree').score);
  assert.match(by('timeline').reason,/public story step/);assert.ok(by('tree').score>by('chart').score);
 });
+
+test('recommend: connection quantities in one unit put the Sankey first and say when they are synthetic',async()=>{
+ const {contosoForecasting}=await import('../src/data/contosoForecasting'),{validateDocument}=await import('../src/core/model');
+ const d=structuredClone(contosoForecasting()),root=d.views.find(v=>v.id===d.rootViewId)!;
+ d.edges.filter(e=>root.edgeIds.includes(e.id)).slice(0,4).forEach((e,i)=>{e.quantity={value:100*(i+1),unit:'rows/day',provenance:'synthetic'};});
+ const r=recommendFigures(validateDocument(d),d.rootViewId);assert.equal(r[0].type,'sankey');assert.match(r[0].reason,/4 connections with quantities in rows\/day \(synthetic\)/);
+ assert.match(recommendFigures(contosoForecasting(),'overview').find(x=>x.type==='sankey')!.reason,/no connection quantities/);
+});

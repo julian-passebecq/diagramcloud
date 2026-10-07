@@ -43,7 +43,7 @@ export function matrixSvg(input:Project,viewId:string,options:DesignOptions={}):
    out.push('</g>');});
   out.push('</g>');y+=h;});
  if(!cols.length)out.push(txt('This view has no public component to place.',M,top+20,{size:11,fill:t.muted,italic:true}));
- const bottom=cols.length?y:top+32;
+ const bottom=y;
  const items:LegendItem[]=[...(ns.some(n=>c.focal.has(n.id))?[{kind:'swatch' as const,fill:t.accent,label:c.focalReason==='auto'?'Focal · most connected':'Focal'}]:[]),{kind:'swatch',fill:t.ruleSolid,label:'Component'},
   ...(ns.some(n=>n.basis==='unknown')?[{kind:'box' as const,treatment:'optional' as const,label:'Declared, not read'}]:[])];
  const legend=legendStrip(items,M,bottom+28,contentW,t);

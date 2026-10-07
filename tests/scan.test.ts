@@ -99,3 +99,21 @@ test('scanner: an unrelated folder has only the system; limits hold on a large s
  assert.ok(document.nodes.length<=500&&document.views.length<=80&&document.edges.length<=1500);
  assert.doesNotThrow(()=>validateDocument(document));
 });
+
+test('scanner: nested agent worktrees (.claude/worktrees) are skipped like node_modules, the repository itself is not',async()=>{
+ const {IGNORED_DIR}=await import('../src/core/scan/scanner');
+ for(const p of ['.claude/worktrees/','.claude/worktrees/agent-1/src/index.ts','app/.claude/worktrees/x/package.json','.worktrees/feature/src/a.ts'])assert.ok(IGNORED_DIR.test(p),p);
+ for(const p of ['src/index.ts','.claude/settings.json','docs/worktrees/guide.md'])assert.ok(!IGNORED_DIR.test(p),p);
+ assert.equal(wantedFile('.claude/worktrees/agent-1/package.json'),false);
+});
+
+test('repository reader: a nested clone or git worktree (its own .git) is skipped, the root repository is read',async()=>{
+ const {mkdtempSync,mkdirSync,writeFileSync,rmSync}=await import('node:fs'),{tmpdir}=await import('node:os'),{readRepository}=await import('../scripts/lib/readRepo');
+ const root=mkdtempSync(join(tmpdir(),'dc-nested-'));
+ try{mkdirSync(join(root,'.git','refs','heads'),{recursive:true});writeFileSync(join(root,'.git','HEAD'),'ref: refs/heads/main\n');writeFileSync(join(root,'package.json'),'{"name":"root"}');
+  mkdirSync(join(root,'tools','other'),{recursive:true});writeFileSync(join(root,'tools','other','.git'),'gitdir: ../../.git/worktrees/other\n');writeFileSync(join(root,'tools','other','package.json'),'{"name":"other"}');
+  mkdirSync(join(root,'lib'));writeFileSync(join(root,'lib','index.ts'),'export const a=1;');
+  const paths=readRepository(root).map(f=>f.path);
+  assert.ok(paths.includes('package.json')&&paths.includes('lib/index.ts')&&paths.includes('.git/HEAD'));assert.ok(!paths.some(p=>p.startsWith('tools/other')),paths.join(','));
+ }finally{rmSync(root,{recursive:true,force:true});}
+});

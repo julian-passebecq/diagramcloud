@@ -5,7 +5,7 @@ import {placeLabel} from './architecture';
 import {clipMono,elbowPath,f,footerLine,header,labelText,markers,monoWidth,MONO,sansLines,svgDocument,txt,lines,type Box,type P,type Tokens} from './kit';
 import {xml} from '../diagram';
 
-const M=56,CW=236,CH=124,GX=120,GY=28,MINW=760,MAX_ROWS=8;
+const M=56,CW=236,CH=124,GX=120,GY=28,MINW=760,MAX_ROWS=8,DENSE=16,PADX=40;
 export type RevisionState='changed'|'added'|'removed'|'unchanged'|'unknown'|'baseline';
 export type AtlasCard={id:string;title:string;nodeId?:string;revision?:string;from?:string;ref?:string;authority:SnapshotRepository['authority'];scanStatus:SnapshotRepository['scanStatus'];opens:boolean;state:RevisionState;column:number;row:number};
 const short=(s?:string)=>s?s.slice(0,7):'unknown';
@@ -98,13 +98,13 @@ export function atlasSvg(input:Project,viewId:string,options:DesignOptions={}):s
    t,theme:c.theme,type:'atlas',viewId:spec.viewId,defs:markers(c.slug,t),body:hdr.svg+out.join('')+footerLine(footerParts(c),M,y+24,width,t)});
  }
  const captured=`${active.capturedAt.slice(0,16).replace('T',' ')} UTC`,root=c.doc.views.find(v=>v.id===c.doc.rootViewId)!;
- const ncol=Math.max(1,...cards.map(k=>k.column+1)),width=Math.max(MINW,ncol*CW+(ncol-1)*GX);
+ const ncol=Math.max(1,...cards.map(k=>k.column+1)),width=Math.max(MINW,ncol*CW+(ncol-1)*GX+2*PADX);
  const hdr=header(eyebrowOf(c,'Atlas · repository revisions'),root.title,`Each repository keeps its own revision; there is no single project revision. Snapshot captured ${captured}.`,M,M,width,t,c.editorial);
  const counts=(s:RevisionState)=>cards.filter(k=>k.state===s).length;
  const compare=previous?`Compared with the snapshot of ${previous.capturedAt.slice(0,10)}: ${counts('changed')} changed · ${counts('added')} added · ${counts('removed')} removed · ${counts('unchanged')} unchanged · ${counts('unknown')} unknown`
   :'No earlier snapshot kept: nothing to compare against.';
  const top0=M+hdr.height+20;out.push(txt(clipMono(compare.toUpperCase(),width,8,0.08),M,top0,{size:8,fill:t.soft,font:MONO,tracking:0.08}));
- const top=top0+28,x0=M+(width-(ncol*CW+(ncol-1)*GX))/2,colX=(i:number)=>x0+i*(CW+GX);
+ const top=top0+28,x0=M+Math.max(PADX,(width-(ncol*CW+(ncol-1)*GX))/2),colX=(i:number)=>x0+i*(CW+GX);
  const boxOf=new Map<string,Box>(),shown:AtlasCard[]=[];let hidden=0;
  for(let i=0;i<ncol;i++)cards.filter(k=>k.column===i).forEach((k,r)=>{if(r>=MAX_ROWS){hidden++;return;}boxOf.set(k.id,{x:colX(i),y:top+r*(CH+GY),w:CW,h:CH});shown.push(k);});
  const cardsBottom=Math.max(...[...boxOf.values()].map(b=>b.y+b.h));
@@ -114,23 +114,29 @@ export function atlasSvg(input:Project,viewId:string,options:DesignOptions={}):s
  for(const e of edges){const s=byNode.get(e.source)!.id,d=byNode.get(e.target)!.id;outs.set(s,[...(outs.get(s)??[]),e.id]);ins.set(d,[...(ins.get(d)??[]),e.id]);}
  const attach=(m:Map<string,string[]>,card:string,eid:string)=>{const l=m.get(card)!,b=boxOf.get(card)!,i=l.indexOf(eid);return Math.round((b.y+40+(b.h-48)*(i+1)/(l.length+1))/2)*2;};
  const slot=new Map<number,number>(),take=(g:number)=>{const n=slot.get(g)??0;slot.set(g,n+1);return n%Math.floor((GX-24)/8);};
- let lane=0;const routes=new Map<string,P[]>();
- for(const e of edges){const s=byNode.get(e.source)!,d=byNode.get(e.target)!,sb=boxOf.get(s.id)!,db=boxOf.get(d.id)!,sy=attach(outs,s.id,e.id),ty=attach(ins,d.id,e.id);
+ // Above DENSE relationships, connectors stop being readable: they are listed under the cards instead of drawn.
+ const dense=edges.length>DENSE;let lane=0;const routes=new Map<string,P[]>();
+ for(const e of dense?[]:edges){const s=byNode.get(e.source)!,d=byNode.get(e.target)!,sb=boxOf.get(s.id)!,db=boxOf.get(d.id)!,sy=attach(outs,s.id,e.id),ty=attach(ins,d.id,e.id);
   const sx=sb.x+sb.w,tx=db.x;
   if(d.column===s.column+1){const gx=tx-16-take(d.column)*8;routes.set(e.id,sy===ty?[{x:sx,y:sy},{x:tx,y:ty}]:[{x:sx,y:sy},{x:gx,y:sy},{x:gx,y:ty},{x:tx,y:ty}]);}
-  else{const gs=sx+16+take(s.column+1)*8,gt=tx-16-take(d.column)*8,ly=cardsBottom+20+(lane++)*10;routes.set(e.id,[{x:sx,y:sy},{x:gs,y:sy},{x:gs,y:ly},{x:gt,y:ly},{x:gt,y:ty},{x:tx,y:ty}]);}}
+  else{const gs=sx+16+take(s.column+1)*8,gt=Math.max(M+4,tx-16-take(d.column)*8),ly=cardsBottom+20+(lane++)*10;routes.set(e.id,[{x:sx,y:sy},{x:gs,y:sy},{x:gs,y:ly},{x:gt,y:ly},{x:gt,y:ty},{x:tx,y:ty}]);}}
  const label=(id:string)=>shown.find(k=>k.nodeId===id)?.title??id;
- for(const e of edges)out.push(`<path data-edge-id="${xml(e.id)}" data-dd-basis="${xml(e.basis??'unspecified')}" d="${elbowPath(routes.get(e.id)!)}" fill="none" stroke="${t.muted}" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#${c.slug}-arrow)"><title>${xml(`${label(e.source)} → ${label(e.target)}${e.label?`: ${e.label}`:''} (declared, ${e.basis??'basis not stated'})`)}</title></path>`);
+ for(const e of dense?[]:edges)out.push(`<path data-edge-id="${xml(e.id)}" data-dd-basis="${xml(e.basis??'unspecified')}" d="${elbowPath(routes.get(e.id)!)}" fill="none" stroke="${t.muted}" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#${c.slug}-arrow)"><title>${xml(`${label(e.source)} → ${label(e.target)}${e.label?`: ${e.label}`:''} (declared, ${e.basis??'basis not stated'})`)}</title></path>`);
  for(const k of shown)out.push(cardSvg(k,boxOf.get(k.id)!,t));
  const placed:Box[]=[],boxes=[...boxOf.values()];
- for(const e of edges){const chip=placeLabel(labelText(e.label||e.kind),routes.get(e.id)!,boxes,placed,t);if(chip){placed.push(chip.box);out.push(chip.svg);}}
- const areaBottom=Math.max(cardsBottom,lane?cardsBottom+20+(lane-1)*10:0);
+ for(const e of dense?[]:edges){const chip=placeLabel(labelText(e.label||e.kind),routes.get(e.id)!,boxes,placed,t);if(chip){placed.push(chip.box);out.push(chip.svg);}}
+ let areaBottom=Math.max(cardsBottom,lane?cardsBottom+20+(lane-1)*10:0);
+ if(dense){const cols=width>=1100?3:2,colW=width/cols,y0=cardsBottom+40,sorted=[...edges].sort((a,b)=>label(a.source).localeCompare(label(b.source))||label(a.target).localeCompare(label(b.target))||a.id.localeCompare(b.id)),per=Math.ceil(sorted.length/cols);
+  out.push(txt(`DECLARED RELATIONSHIPS · ${edges.length} · LISTED, NOT DRAWN`,M,y0,{size:8,fill:t.soft,font:MONO,tracking:0.14}));
+  sorted.forEach((e,i)=>{const x=M+Math.floor(i/per)*colW,y=y0+22+(i%per)*16,line=`${label(e.source)} → ${label(e.target)}${e.label?` · ${e.label}`:''}`;
+   out.push(`<g data-edge-id="${xml(e.id)}" data-dd-basis="${xml(e.basis??'unspecified')}"><title>${xml(`${line} (declared, ${e.basis??'basis not stated'})`)}</title>`+txt(clipMono(line,colW-16,9),x,y,{size:9,fill:t.muted,font:MONO})+'</g>');});
+  areaBottom=y0+22+(per-1)*16+4;notes.push(`${edges.length} declared relationships: more than ${DENSE}, so they are listed rather than drawn as connectors.`);}
  if(!cards.length)notes.push('No repository of this snapshot is public.');
  if(hidden)notes.push(`${hidden} more repositor${hidden>1?'ies':'y'} not drawn (limit ${MAX_ROWS} per column).`);
  notes.push('Relationships are declared by the project manifest (planned); revisions come from git or the manifest, as each card says. Not runtime evidence.');
  notes.forEach((n,i)=>out.push(txt(n,M,areaBottom+32+i*15,{size:10,fill:t.muted,italic:true})));
  const items=(['changed','added','removed','unchanged','unknown'] as RevisionState[]).map(s=>({label:STATE_LABEL[s],...styleOf(s,t)}));
- if(edges.length)items.push({label:'Declared relationship',stroke:t.muted,dash:'5,4',line:true} as never);
+ if(edges.length&&!dense)items.push({label:'Declared relationship',stroke:t.muted,dash:'5,4',line:true} as never);
  const ly=areaBottom+32+notes.length*15+12,leg=legend(items,M,ly,width,t),y=ly+leg.height+12;
  return svgDocument({slug:c.slug,width:width+2*M,height:y+12+M-12,title:`${root.title} · atlas`,
   desc:`Project atlas of ${root.title}: ${cards.length} repositor${cards.length===1?'y':'ies'}, each at its own revision (no single project revision), snapshot captured ${captured}${previous?`, compared with ${previous.capturedAt.slice(0,10)}`:''}.`,

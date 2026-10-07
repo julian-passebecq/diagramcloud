@@ -81,6 +81,8 @@ export function lineageSvg(input:Project,viewId:string,options:DesignOptions={})
    title:`${s.label} · ${s.kind} · ${role==='both'?'upstream and downstream (cycle)':role}${s.opens?' · opens a detail view':''}`},t)+bar+'</g>');}
  const placed:Box[]=[];
  for(const p of plans){if(!subject||edgeRole(p.e,roles)==='other'||!p.e.label)continue;const chip=placeLabel(labelText(p.e.label.replace(/\s*\((inferred|possible)\)$/,'')),routes.get(p.e.id)!,boxes,placed,t);if(chip){placed.push(chip.box);out.push(chip.svg);}}
+ // A chip on a cycle run in the right-hand gap may reach past the content: the canvas grows to hold it.
+ const right=Math.max(M+contentW,...placed.map(b=>Math.ceil(b.x+b.w)));
  const areaBottom=spec.nodes.length?rowY(rows-1)+BH+GV/2:top,unrelated=count('unrelated'),both=count('both');
  const notes=[...(!spec.nodes.length?['This view has no public components.']:!edges.some(e=>e.from===subject?.id||e.to===subject?.id)?[`${subject?.label} has no connections in this view: it has no lineage here.`]:[]),
   ...(unrelated>0?[`${unrelated} unrelated component(s) muted (neither upstream nor downstream of ${subject?.label}).`]:[]),
@@ -95,7 +97,7 @@ export function lineageSvg(input:Project,viewId:string,options:DesignOptions={})
   ...(used.has('dashed')?[{kind:'line' as const,stroke:'muted' as const,dashed:true,label:'Control / dependency'}]:[]),...(used.has('other')?[{kind:'line' as const,stroke:'muted' as const,dashed:true,label:'Not on the lineage'}]:[])]:[];
  const ly=areaBottom+28+notes.length*15+12,legend=legendStrip(items,M,ly,contentW,t);
  let y=ly+legend.height+12;const cards=c.editorial?summaryCards(c,M,y+8,contentW):undefined;if(cards)y+=cards.height+24;
- return svgDocument({slug:c.slug,width:contentW+2*M,height:y+12+M-12,title:`${spec.title} · lineage`,
+ return svgDocument({slug:c.slug,width:right+M,height:y+12+M-12,title:`${spec.title} · lineage`,
   desc:subject?`Lineage of ${subject.label} in the public view ${spec.viewId}: ${count('upstream')+both} upstream and ${count('downstream')+both} downstream component(s); ${unrelated} unrelated component(s) muted.`:`Lineage of the public view ${spec.viewId}: no public components.`,
   t,theme:c.theme,type:'lineage',viewId:spec.viewId,defs:markers(c.slug,t),body:hdr.svg+out.join('')+legend.svg+(cards?.svg??'')+footerLine(footerParts(c),M,y+12,contentW,t)});
 }

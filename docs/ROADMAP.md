@@ -2,6 +2,13 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.20.0
+
+- **Connection quantities** (optional `quantity` on a connection: value, unit, provenance, note), edited in the connection editor, and the **Sankey** figure built on them.
+- **PDF from the design CLI** (`--pdf`: `book.pdf` and one PDF per view, offline).
+- **Real-data hardening**: the figure quality check run against a real local 49-view atlas found defects the samples never triggered (dense atlas connectors, crowded exploded planes, matrix height, clipped labels); fixed, with synthetic stress fixtures committed. The repository reader now skips nested repositories and git worktrees.
+- Known limit: on a crowded exploded plane the tiles themselves can still overlap (labels are thinned to 12 per plane, the rest in tooltips); the quality check measures text, not tile geometry. Candidate: an exploded-plane grid that grows with the component count.
+
 ## Shipped in 1.19.0
 
 - **Diagram Design deck (PowerPoint)**: cover plus one picture slide per public view, alt text from the figure, slide colour from the figure's theme; checked by unit tests (slide count, redaction, alt text), an e2e download with real PNG media, and a visual pass rendered by PowerPoint.

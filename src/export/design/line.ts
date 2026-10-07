@@ -40,10 +40,10 @@ export function lineSvg(input:Project,viewId:string,options:DesignOptions={}):st
   const px=M+56,pw=contentW-56-LABEL_W,py=top+44,ph=260,lo=ticks[0],hi=ticks[ticks.length-1],Y=(v:number)=>py+ph-(v-lo)/(hi-lo||1)*ph;
   const inset=16,step=(pw-2*inset)/Math.max(1,rows.length-1),X=(i:number)=>px+inset+i*step;
   for(const v of ticks)out.push(`<line x1="${px}" y1="${f(Y(v))}" x2="${px+pw}" y2="${f(Y(v))}" stroke="${v===0?t.ruleSolid:t.rule}" stroke-width="${v===0?1.2:1}"/>`,txt(fmt(v),px-8,Y(v)+3,{size:8,fill:t.soft,font:MONO,anchor:'end'}));
-  // Category labels: every row when they fit, otherwise every k-th one (first and last always kept).
+  // Category labels: every row when they fit, otherwise every k-th one (first and last always kept), clipped to stay inside the margins (full text in the point titles).
   const every=Math.max(1,Math.ceil(36/step));
   rows.forEach((r,i)=>{out.push(`<line x1="${f(X(i))}" y1="${py+ph}" x2="${f(X(i))}" y2="${py+ph+4}" stroke="${t.ruleSolid}" stroke-width="1"/>`);
-   if(i%every===0||i===rows.length-1&&(i%every)*step>=36)out.push(txt(clipMono(String(r[category]??i+1),Math.max(step*every-6,36),8),X(i),py+ph+16,{size:8,fill:t.muted,font:MONO,anchor:'middle'}));});
+   if(i%every===0||i===rows.length-1&&(i%every)*step>=36)out.push(txt(clipMono(String(r[category]??i+1),Math.min(Math.max(step*every-6,36),2*Math.min(X(i)-M,M+contentW-X(i))),8),X(i),py+ph+16,{size:8,fill:t.muted,font:MONO,anchor:'middle'}));});
   const colour=(s:number)=>t.series[s%t.series.length],ends:{s:number;x:number;y:number}[]=[];
   series.forEach((k,s)=>{const segs:string[][]=[[]],dots:string[]=[];
    rows.forEach((r,i)=>{const v=num(r,k);if(v===null){if(segs[segs.length-1].length)segs.push([]);return;}
