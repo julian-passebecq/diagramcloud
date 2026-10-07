@@ -1,9 +1,15 @@
 import {documentFromGraph,inferKind,inferProvider,plainLabel,type GraphEdge,type GraphNode,type GraphPage,type ImportResult} from './graph';
 import {find,parseXml,type XmlElement} from './xml';
-import type {ProjectEdge,ProjectNode} from '../model';
+import {quantitySchema,type ProjectEdge,type ProjectNode} from '../model';
 
 /** DiagramCloud's own draw.io export carries its component type, provider and ID so a round trip keeps them. */
 const NODE_KINDS:readonly string[]=['source','process','storage','model','report','app','control','physics','function','table'] satisfies ProjectNode['kind'][];
+/** A connection quantity only from DiagramCloud's own style keys (written by our draw.io export); never inferred from a label. */
+function quantityOf(style:string):ProjectEdge['quantity']{
+ const key=(k:string)=>style.match(new RegExp(`(?:^|;)${k}=([^;]*)`))?.[1],dec=(v?:string)=>{try{return v===undefined?undefined:decodeURIComponent(v);}catch{return undefined;}};
+ const v=key('dcQuantity');if(v===undefined)return undefined;const note=dec(key('dcQuantityNote'));
+ const q=quantitySchema.safeParse({value:Number(v),unit:dec(key('dcUnit')),provenance:key('dcProvenance'),...(note!==undefined?{note}:{})});return q.success?q.data:undefined;
+}
 const EDGE_KINDS:readonly string[]=['batch','stream','query','control','dependency'] satisfies ProjectEdge['kind'][];
 
 /**
@@ -114,7 +120,7 @@ function pageGraph(title:string,cells:Cell[],lost:Map<string,number>):GraphPage{
   const label=[plainLabel(c.value),...(children.get(c.id)??[]).filter(k=>k.vertex).map(k=>plainLabel(k.value))].filter(Boolean).join(' · ');
   if(c.points)count('connector waypoint set(s) replaced by DiagramCloud routing');
   if(/startArrow=(?!none)[a-z]/i.test(c.style)&&/endArrow=(?!none)[a-z]/i.test(c.style)||/endArrow=none/.test(c.style)&&!/startArrow=(?!none)[a-z]/i.test(c.style))count('two-way or undirected connector(s) imported as one direction');
-  edges.push({source:s&&nodeIds.has(s)?s:'',target:t&&nodeIds.has(t)?t:'',label,kind:EDGE_KINDS.includes(c.style.match(/(?:^|;)dcKind=([a-z]+)/)?.[1]??'')?c.style.match(/(?:^|;)dcKind=([a-z]+)/)![1] as ProjectEdge['kind']:/dashed=1/.test(c.style)?'dependency':'batch'});
+  edges.push({source:s&&nodeIds.has(s)?s:'',target:t&&nodeIds.has(t)?t:'',label,kind:EDGE_KINDS.includes(c.style.match(/(?:^|;)dcKind=([a-z]+)/)?.[1]??'')?c.style.match(/(?:^|;)dcKind=([a-z]+)/)![1] as ProjectEdge['kind']:/dashed=1/.test(c.style)?'dependency':'batch',...(quantityOf(c.style)?{quantity:quantityOf(c.style)}:{})});
  }
  // Small unlabelled dots that connectors meet at are junctions: replace each by direct connections through it.
  const junctions=new Set(nodes.filter(n=>n.label==='Untitled'&&(n.w??0)<=24&&(n.h??0)<=24).map(n=>n.key));

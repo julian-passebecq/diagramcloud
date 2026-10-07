@@ -27,7 +27,7 @@ nav ol{columns:2;list-style:none;padding-left:0;color:var(--muted)}nav a{color:i
 section{margin:48px 0;border-top:1px solid var(--rule);padding-top:24px}h2{font:600 18px system-ui,sans-serif}h2 span{font:600 12px ui-monospace,monospace;color:var(--accent);margin-right:8px}
 section svg{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--rule)}.cap{font:12px ui-monospace,monospace;color:var(--muted)}
 footer{color:var(--muted);font-size:12px;border-top:1px solid var(--rule);padding-top:16px}
-@media print{section{break-inside:avoid;page-break-inside:avoid}nav{display:none}}
+@media print{section{break-inside:avoid;page-break-inside:avoid;break-before:page;margin:0;border-top:0;padding-top:0}section svg{max-height:165mm;width:auto;max-width:100%;margin:0 auto}nav{display:none}}
 </style></head><body><main>
 <header><p class="eyebrow">Diagram Design · figure book</p><h1>${xml(d.title)}</h1>${d.summary?`<p>${xml(d.summary)}</p>`:''}</header>
 <nav aria-label="Figures"><ol>${toc}</ol></nav>

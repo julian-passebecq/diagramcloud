@@ -11,7 +11,7 @@ import {presentedObservation,CLAIM_LABEL} from './realization';
  */
 export type SpecNode={id:string;label:string;kind:ProjectNode['kind'];provider:string;summary:string;basis:ProjectNode['basis']|'unspecified';confidence?:string;
  designStatus:ProjectNode['status'];opens?:string;evidenceRefs:string[];sourceRefs:string[];observation?:{claim:string;sourceApp:string;observedAt:string;sourceRevision:string};position:{x:number;y:number};group?:string};
-export type SpecEdge={id:string;from:string;to:string;label:string;kind:ProjectEdge['kind'];basis:ProjectEdge['basis']|'unspecified';confidence?:string};
+export type SpecEdge={id:string;from:string;to:string;label:string;kind:ProjectEdge['kind'];basis:ProjectEdge['basis']|'unspecified';confidence?:string;quantity?:NonNullable<ProjectEdge['quantity']>};
 export type ViewSpec={format:'diagramcloud.viewspec';version:1;projectId:string;projectRevision:number;projectTitle:string;viewId:string;title:string;purpose:string;
  audience:'public'|'author';perspective:Perspective;path:{viewId:string;title:string;via?:string}[];children:{nodeId:string;viewId:string;title:string}[];
  snapshot?:{id:string;capturedAt:string;repositories:{id:string;title:string;revision?:string;ref?:string;scanStatus:string}[]};
@@ -51,7 +51,7 @@ export function viewSpec(input:Project,viewId:string,options:{audience?:'public'
   return {id:n.id,label:n.label,kind:n.kind,provider:n.provider,summary:n.summary,basis:n.basis??'unspecified',...(conf?{confidence:conf}:{}),designStatus:n.status,...(n.childViewId?{opens:n.childViewId}:{}),
    evidenceRefs:n.blockIds,sourceRefs:n.sourceIds,...(obs?{observation:{claim:CLAIM_LABEL[obs.claim],sourceApp:obs.sourceApp,observedAt:obs.observedAt,sourceRevision:obs.sourceRevision}}:{}),
    position:view.positions[n.id]??{x:0,y:0},...(g?{group:g}:{})};});
- const specEdges:SpecEdge[]=edges.map(e=>{const c=edgeConfidence(e.label);return {id:e.id,from:e.source,to:e.target,label:e.label,kind:e.kind,basis:e.basis??'unspecified',...(c?{confidence:c}:{})};});
+ const specEdges:SpecEdge[]=edges.map(e=>{const c=edgeConfidence(e.label);return {id:e.id,from:e.source,to:e.target,label:e.label,kind:e.kind,basis:e.basis??'unspecified',...(c?{confidence:c}:{}),...(e.quantity?{quantity:{...e.quantity}}:{})};});
  const groups=[...new Set(specNodes.map(n=>n.group).filter((g):g is string=>!!g))].map(g=>({id:g,title:repositoryOf(doc,`${g}.x`)?.title??g,members:specNodes.filter(n=>n.group===g).map(n=>n.id)}));
  const omissions:string[]=[];
  if(audience==='public'){const full=input.views.find(v=>v.id===viewId);if(full){const hidden=full.nodeIds.length-view.nodeIds.length,hiddenEdges=full.edgeIds.length-view.edgeIds.length;
