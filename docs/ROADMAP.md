@@ -4,7 +4,7 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 
 ## Shipped in 1.22.0
 
-- **Canvas routes from the export scene**: `sceneRoutes` (src/export/scene.ts) routes around the canvas's measured cards and `src/ui/SceneEdge.tsx` draws them; the AGENTS limit "the canvas does not route edges" is lifted. Known limit: a label on a short gap between two cards can be partly hidden under a card.
+- **Canvas routes from the export scene**: `sceneRoutes` (src/export/scene.ts) routes around the canvas's measured cards and `src/ui/SceneEdge.tsx` draws them; the AGENTS limit "the canvas does not route edges" is lifted. Connection labels are placed clear of every card (src/ui/labelPlace.ts): along or just beside any route segment, clipped with an ellipsis (full text in the tooltip) when the gap is short.
 - **Auto layout wraps** flows longer than 6 columns into left-to-right bands (`layeredLayout(doc, viewId, {maxColumns})`, guarded by `layoutCrossings`).
 
 ## Shipped in 1.21.0
