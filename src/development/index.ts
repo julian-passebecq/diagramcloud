@@ -15,7 +15,7 @@ export function atlasToDiagramDocument(input:unknown):Project{
  const a=validateDevelopmentAtlas(input),entities=atlasEntities(a);
  const nodes=entities.map(e=>({id:e.id,label:e.label,kind:e.kind==='file'?'source':'process',provider:e.kind,summary:`${e.basis} · ${String(e.data.status??e.data.sha??e.data.branch??'')}`.slice(0,500),basis:'unknown',tags:[e.basis],status:'idle'}));
  const edges=a.relations.map(r=>({id:r.id,source:r.source,target:r.target,label:`${r.basis} · ${r.label}`.slice(0,160),kind:'dependency',basis:'unknown'}));
- const views=DEVELOPMENT_VIEWS.map(id=>{const selected=entities.filter(e=>kinds[id].includes(e.kind)).filter(e=>id!=='active-work'||!a.scope.worktree||e.kind==='repository'||e.data.worktreePath===a.scope.worktree||e.data.path===a.scope.worktree||e.kind==='component');const ids=new Set(selected.map(e=>e.id));return {id,title:titles[id],description:`Runtime facts captured ${a.capturedAt}. Evidence bases remain in the Atlas; design status is not telemetry.`,nodeIds:selected.map(e=>e.id),edgeIds:edges.filter(e=>ids.has(e.source)&&ids.has(e.target)).map(e=>e.id),positions:{},perspective:id==='agent-worktree'?'agents':'git'};});
+ const views=DEVELOPMENT_VIEWS.map(id=>{let files=0;const selected=entities.filter(e=>kinds[id].includes(e.kind)).filter(e=>!['repository-blueprint','active-work','review-impact'].includes(id)||!a.scope.worktree||e.kind==='repository'||e.kind==='review'||e.kind==='ci'||e.data.worktreePath===a.scope.worktree||e.data.path===a.scope.worktree).filter(e=>id!=='repository-blueprint'||e.kind!=='file'||e.data.blueprint===true).filter(e=>e.kind!=='file'||++files<=40);const ids=new Set(selected.map(e=>e.id));return {id,title:titles[id],description:`Runtime facts captured ${a.capturedAt}. File views show at most 40 files in the selected worktree; full facts stay in the Atlas inspector. Evidence bases remain in the Atlas; design status is not telemetry.`,nodeIds:selected.map(e=>e.id),edgeIds:edges.filter(e=>ids.has(e.source)&&ids.has(e.target)).map(e=>e.id),positions:{},perspective:id==='agent-worktree'?'agents':'git'};});
  const doc=validateDocument({schemaVersion:1,id:'development-atlas',title:a.scope.project,rootViewId:'active-work',provenance:'Runtime projection from development-atlas/1. No reviewed or published observations.',nodes,edges,views});
  for(const v of doc.views)v.positions=layeredLayout(doc,v.id,{maxColumns:6});
  return doc;
@@ -26,7 +26,8 @@ export function buildDevelopmentView(input:unknown,view:DevelopmentView='active-
  return {atlas,document,viewSpec:viewSpec(document,view,{now:new Date(atlas.capturedAt)}),scene:buildScene(document,v)};
 }
 export function renderDevelopmentSvg(input:unknown,view:DevelopmentView='active-work',theme:'light'|'dark'='light'){
- const {document,atlas}=buildDevelopmentView(input,view);
+ const atlas=validateDevelopmentAtlas(input),document={...atlasToDiagramDocument(atlas),rootViewId:view};
+ if(!DEVELOPMENT_VIEWS.includes(view))throw Error('Unknown development view');
  return architectureSvg(document,view,{theme,now:new Date(atlas.capturedAt)},c=>({type:'development',label:'Development Atlas',positions:c.view.positions}));
 }
 export function compareDevelopmentViews(before:DevelopmentAtlas,after:DevelopmentAtlas,view:DevelopmentView='active-work'){
