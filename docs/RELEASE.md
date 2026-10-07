@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.22.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.23.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,7 +44,8 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
-| 1.22.0 | head of the wave 7 PR (`feat/wave7`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | Routed canvas connections, layout wrap; Chromium only |
+| 1.23.0 | head of the wave 8 PR (`feat/wave8`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | Label placement, crossing-free auto layout; Chromium only |
+| 1.22.0 | `d1afe47` (tag `v1.22.0`) | 37573627433 | E2E_VERIFIED (automated) | Vercel production from `main` | Routed canvas connections, layout wrap; Chromium only |
 | 1.21.0 | `c645f62` (tag `v1.21.0`) | 37570701431 | E2E_VERIFIED (automated) | Vercel production from `main` | Auto layout, component-shape quality check; Chromium only |
 | 1.20.0 | `00f5c21` (tag `v1.20.0`) | 37567459298 | E2E_VERIFIED (automated) | Vercel production from `main` | Sankey and connection quantities, CLI PDF, real-atlas hardening; Chromium only |
 | 1.19.0 | `03a24c4` (tag `v1.19.0`) | 37563512545 | E2E_VERIFIED (automated) | Vercel production from `main` | Diagram Design deck; Chromium only |
