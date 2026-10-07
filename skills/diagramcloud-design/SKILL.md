@@ -35,6 +35,10 @@ Rules: never add a component, link or repository the scan or manifest did not pr
 | What touches one component | `hub` | the component and its direct neighbours |
 | Patterns across a table | `heatmap` | shaded cells, provenance printed |
 | A trend in a table | `line` | lines with direct labels, provenance printed |
+| What enters and leaves a system | `context` | boundary with sources left, sinks right |
+| Which parts are in which designed state | `status` | board by designed status (not observed) |
+| Where something comes from and goes | `lineage` | upstream and downstream of one component |
+| What a change here could reach | `radial` | rings at 1, 2 and 3 steps |
 
 Leave `auto` (= architecture) when unsure. Budget: a figure reads well up to about 9 components and 12 connections; above 24, explain with drilldown views instead of one large picture.
 

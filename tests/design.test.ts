@@ -16,7 +16,7 @@ import {samples} from '../src/data/samples';
 import {contosoForecasting} from '../src/data/contosoForecasting';
 import {parseXml,walk,find} from '../src/core/interchange/xml';
 
-const NOW=new Date('2026-10-07T09:00:00Z'),TYPES=['architecture','layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line'] as const;
+const NOW=new Date('2026-10-07T09:00:00Z'),TYPES=['architecture','layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line','context','status','lineage','radial'] as const;
 const els=(svg:string)=>[...walk(parseXml(svg))];
 const attr=(svg:string,name:string)=>els(svg).filter(e=>e.attrs[name]!==undefined).map(e=>e.attrs[name]);
 const texts=(svg:string)=>els(svg).filter(e=>e.name==='text'||e.name==='title'||e.name==='desc').map(e=>e.text).join(' ');

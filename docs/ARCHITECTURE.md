@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.15.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.16.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -334,3 +334,7 @@ Lens owns observed Git and delivery state; DiagramCloud keeps three meanings apa
 ## 1.15 additions: figure book, manual figures, more figure types
 
 `designBookHtml` concatenates the per-view figures (each SVG keeps its own slug, so IDs stay unique on one page) under a strict CSP. The manual's `figure()` uses `designSvg` when the public view carries `design`, else the editorial figure with numbered callouts. New renderers, one file each in `src/export/design/`: `deployment.ts`, `matrix.ts`, `treemap.ts`, `hub.ts`, `heatmap.ts`, `line.ts`; all take the same `designContext` and print only public facts.
+
+## 1.16 additions: context, status, lineage, radial
+
+Four renderers in `src/export/design/` (`systemContext.ts`, `status.ts`, `lineage.ts`, `radial.ts`), all from the public ViewSpec: the context figure classifies components by connection direction only; lineage reuses `flowRanks` and traces transitive upstream/downstream of one subject; radial does an undirected breadth-first search to three steps; the status board reads the designed status. Custom SVG attributes use the `data-dd-` prefix.
