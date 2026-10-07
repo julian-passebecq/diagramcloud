@@ -122,9 +122,10 @@ export function legendStrip(items:LegendItem[],x:number,y:number,width:number,t:
 
 /** Header: tracked mono eyebrow, serif title, one muted line of purpose. */
 export function header(eyebrow:string,title:string,purpose:string,x:number,y:number,width:number,t:Tokens,editorial:boolean):{svg:string;height:number}{
- const size=editorial?34:26,ps=sansLines(purpose,width,12,2);
- return {height:24+size+8+ps.length*17+(editorial?8:0),svg:txt(clipMono(eyebrow.toUpperCase(),width,9,0.14),x,y+10,{size:9,fill:editorial?t.accent:t.soft,font:MONO,tracking:0.14})+
-  txt(title,x,y+18+size,{size,fill:t.ink,font:SERIF})+lines(ps,x,y+18+size+22,17,{size:12,fill:t.muted})};
+ // The title is wrapped on the (wider) sans budget rather than clipped: a long view name stays whole inside the canvas.
+ const size=editorial?34:26,ts=sansLines(title,width,size,3),tl=Math.round(size*1.15),extra=(ts.length-1)*tl,ps=sansLines(purpose,width,12,2);
+ return {height:24+size+extra+8+ps.length*17+(editorial?8:0),svg:txt(clipMono(eyebrow.toUpperCase(),width,9,0.14),x,y+10,{size:9,fill:editorial?t.accent:t.soft,font:MONO,tracking:0.14})+
+  lines(ts,x,y+18+size,tl,{size,fill:t.ink,font:SERIF})+lines(ps,x,y+18+size+extra+22,17,{size:12,fill:t.muted})};
 }
 
 /** Footer line: identity, revision vector, date and publication policy, in soft mono. */
