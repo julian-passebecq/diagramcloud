@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.21.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.22.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -358,3 +358,7 @@ Four renderers in `src/export/design/` (`systemContext.ts`, `status.ts`, `lineag
 ## 1.21 additions: auto layout and shape checks
 
 `layeredLayout(doc, viewId)` (src/core/layout.ts) is pure: `flowRanks` columns (longest path, cycles broken in view order), barycentre sweeps within columns (ties by id), groups contiguous, disconnected components in a final band; the canvas applies it through the same undoable position update as the grid layout. `tests/helpers/designGeometry.ts` collects text boxes and component shapes (rects, isometric tile outlines) for the quality and stress tests.
+
+## 1.22 additions: routed canvas, layout wrap
+
+The canvas sets `nodeOrigin={[0,0]}`, so scene coordinates equal React Flow coordinates; `sceneRoutes(doc, viewId, sizes)` runs the export router with the canvas's measured card sizes, memoised per view, positions and graph. `layeredLayout` folds more than `maxColumns` (6) columns into bands with a 120 px lane and keeps the fold only when `layoutCrossings` does not increase.

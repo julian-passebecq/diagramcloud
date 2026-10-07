@@ -2,6 +2,11 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.22.0
+
+- **Canvas routes from the export scene**: `sceneRoutes` (src/export/scene.ts) routes around the canvas's measured cards and `src/ui/SceneEdge.tsx` draws them; the AGENTS limit "the canvas does not route edges" is lifted. Known limit: a label on a short gap between two cards can be partly hidden under a card.
+- **Auto layout wraps** flows longer than 6 columns into left-to-right bands (`layeredLayout(doc, viewId, {maxColumns})`, guarded by `layoutCrossings`).
+
 ## Shipped in 1.21.0
 
 - **Auto layout** on the canvas: a deterministic layered layout (`src/core/layout.ts`, `layeredLayout`; `flowRanks` moved to core) applied as one undoable edit.
