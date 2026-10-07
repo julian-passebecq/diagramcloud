@@ -6,7 +6,7 @@ stable-ID delta. The app and external hosts use those same source functions.
 `src/development` adds the bounded runtime adapter, not another renderer.
 
 `development-atlas/1` is validated before projection. Runtime evidence bases
-remain in the Atlas and its host inspector. Diagram nodes use unknown design
+remain in the Atlas and its host inspector. Diagram nodes use unspecified design
 basis and idle illustration status; no runtime fact is promoted into a reviewed
 or published DiagramCloud Observation. The requested view becomes the root
 before public projection, so unreachable views cannot silently substitute.
@@ -25,3 +25,4 @@ Future Bricks/isometric renderers may map repo to campus, modules to buildings,
 files to blocks, dependencies to bridges, worktrees to variants, changed files
 to highlights and CI to overlays. They must consume factual contracts first;
 spatial placement must never invent a second source of repository truth.
+
