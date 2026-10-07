@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.13.0
+
+- **Diagram Design figures, second set:** Swimlane (repositories or layers as lanes, columns in reading order, on the shared routes), Sequence (participants and numbered messages from the view's connections; labelled reading order, not timing), Story timeline (guided story steps; private steps counted) and Chart (bars from a table evidence block, provenance printed on the figure). Still candidates: architecture delta (two atlas snapshots), dependency graph styling for scans, line and heatmap charts, sankey and loop (need edge quantities and a cycle layout).
+
 ## Shipped in 1.12.0
 
 - **Diagram Design mode** (Idées de Julian, 2026-10-07): the visual grammar of cathrynlavery/diagram-design (MIT, `d137637`) as a mode of DiagramCloud rather than a new project: Architecture, Layer stack, Exploded stack (3D) and Drilldown tree, light / dark / editorial, focal components, `view.design` hints, the Diagram Design figure export, `npm run design`, and the `diagramcloud.design-brief/1` bridge so an AI agent picks figures and focal components after scanning (`skills/diagramcloud-design/SKILL.md`). Next candidates from diagram-design's 44 types, each from facts already in the model: architecture delta (two atlas snapshots), swimlane / data flow (repositories as lanes), sequence (story steps), timeline (snapshots), dependency graph (scan), medallion (data perspective), and charts from table evidence blocks (bar, line, heatmap, treemap). Sankey and loop need edge quantities and a cycle layout first.

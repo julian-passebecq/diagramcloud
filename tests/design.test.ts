@@ -7,6 +7,8 @@ import {designContext} from '../src/export/design/context';
 import {elbowPath} from '../src/export/design/kit';
 import {fanAttachPoints} from '../src/export/design/architecture';
 import {applyDesignBrief,parseDesignBrief} from '../src/core/designBrief';
+import {niceTicks} from '../src/export/design/chart';
+import {flowRanks,flowMessages,swimlaneLayout} from '../src/export/design/flow';
 import {validateDocument,DESIGN_THEMES,type Project} from '../src/core/model';
 import {publicDocument} from '../src/core/operations';
 import {viewSpec} from '../src/core/viewspec';
@@ -14,7 +16,7 @@ import {samples} from '../src/data/samples';
 import {contosoForecasting} from '../src/data/contosoForecasting';
 import {parseXml,walk,find} from '../src/core/interchange/xml';
 
-const NOW=new Date('2026-10-07T09:00:00Z'),TYPES=['architecture','layers','exploded','tree'] as const;
+const NOW=new Date('2026-10-07T09:00:00Z'),TYPES=['architecture','layers','exploded','tree','swimlane','sequence','timeline','chart'] as const;
 const els=(svg:string)=>[...walk(parseXml(svg))];
 const attr=(svg:string,name:string)=>els(svg).filter(e=>e.attrs[name]!==undefined).map(e=>e.attrs[name]);
 const texts=(svg:string)=>els(svg).filter(e=>e.name==='text'||e.name==='title'||e.name==='desc').map(e=>e.text).join(' ');
@@ -54,12 +56,12 @@ test('connectors sharing one side of a box fan out at L·k/(N+1); bends have rad
 });
 
 test('Diagram Design figures are public: private components, labels and focal hints never appear',()=>{
- const d=contosoForecasting(),secret=d.nodes.find(n=>n.id==='chart')!;secret.visibility='private';secret.label='Secret console <&>';
- const root=d.views.find(v=>v.id===d.rootViewId)!;root.design={type:'architecture',focal:['chart'],theme:'dark'};
+ const d=contosoForecasting(),secret=d.nodes.find(n=>n.id==='bronze')!;secret.visibility='private';secret.label='Secret console <&>';
+ const root=d.views.find(v=>v.id===d.rootViewId)!;root.design={type:'architecture',focal:['bronze'],theme:'dark'};
  const doc=validateDocument(d);
  assert.deepEqual(publicDocument(doc).views.find(v=>v.id===d.rootViewId)!.design!.focal,[]);
  for(const type of TYPES){const svg=designSvg(doc,doc.rootViewId,{type,now:NOW});
-  assert.ok(!svg.includes('Secret console')&&!svg.includes('chart"'),type);assert.ok(!attr(svg,'data-node-id').includes('chart'),type);}
+  assert.ok(!svg.includes('Secret console')&&!svg.includes('"bronze"'),type);assert.ok(!attr(svg,'data-node-id').includes('bronze'),type);}
 });
 
 test('focal: design hints win (at most two), else one strictly most-connected component, else none; accent stays on focal only',()=>{
@@ -120,4 +122,39 @@ test('text is escaped once: markup in labels stays text',()=>{
  const d=structuredClone(contosoForecasting()),n=d.nodes.find(n=>d.views.find(v=>v.id===d.rootViewId)!.nodeIds.includes(n.id))!;n.label='A <b>&</b> "q"';
  const doc=validateDocument(d as Project);
  for(const type of TYPES){const svg=designSvg(doc,doc.rootViewId,{type,now:NOW});assert.ok(!svg.includes('<b>'),type);parseXml(svg);}
+});
+
+test('reading order: longest path from the components nothing points to, cycles broken deterministically',()=>{
+ const n=(id:string,x:number)=>({id,label:id,kind:'process' as const,provider:'',summary:'',basis:'unspecified' as const,designStatus:'idle' as const,evidenceRefs:[],sourceRefs:[],position:{x,y:0}});
+ const e=(id:string,from:string,to:string)=>({id,from,to,label:'',kind:'batch' as const,basis:'unspecified' as const});
+ const nodes=[n('a',0),n('b',300),n('c',600),n('d',900)],edges=[e('1','a','b'),e('2','b','c'),e('3','c','b'),e('4','a','c'),e('5','c','d')];
+ assert.deepEqual(Object.fromEntries(flowRanks(nodes,edges)),{a:0,b:1,c:2,d:3});
+ assert.deepEqual(flowMessages(nodes,edges).map(m=>m.id),['1','4','2','3','5']);
+});
+
+test('swimlane: one lane per layer (or repository), every component in exactly one lane, columns in reading order',()=>{
+ const d=contosoForecasting(),c=designContext(d,d.rootViewId,'swimlane',{now:NOW}),plan=swimlaneLayout(c);
+ const members=plan.lanes!.flatMap(l=>l.members);assert.deepEqual([...members].sort(),c.spec.nodes.map(n=>n.id).sort());
+ const svg=designSvg(d,d.rootViewId,{type:'swimlane',now:NOW});assert.equal(attr(svg,'data-lane').length,plan.lanes!.length);
+ assert.ok(plan.positions.planner.x<plan.positions.chart.x);
+});
+
+test('sequence: every connection of the view is one numbered message; the order is labelled as reading order',()=>{
+ const d=contosoForecasting(),spec=viewSpec(d,d.rootViewId,{now:NOW}),svg=designSvg(d,d.rootViewId,{type:'sequence',now:NOW});
+ assert.deepEqual(attr(svg,'data-edge-id').sort(),spec.edges.map(e=>e.id).sort());assert.ok(texts(svg).includes('not from timing'));
+});
+
+test('story timeline: public steps only, private ones counted; no story is said, not invented',()=>{
+ const d=structuredClone(contosoForecasting());d.views.find(v=>v.id==='policy')!.visibility='private';
+ const doc=validateDocument(d),svg=designSvg(doc,doc.rootViewId,{type:'timeline',now:NOW}),shown=publicDocument(doc).story.length;
+ assert.equal(attr(svg,'data-step').length,shown);if(shown<doc.story.length)assert.ok(texts(svg).includes('on private views not drawn'));
+ const empty=validateDocument({...structuredClone(contosoForecasting()),story:[]});assert.ok(texts(designSvg(empty,empty.rootViewId,{type:'timeline',now:NOW})).includes('no public story yet'));
+});
+
+test('chart: a table evidence block of the view, its provenance printed on the figure; axis covers every value',()=>{
+ const total=samples.find(s=>s.id==='total-project-controls')!,svg=designSvg(total,'reporting',{type:'chart',now:NOW});
+ assert.equal(attr(svg,'data-provenance')[0],'synthetic');assert.ok(texts(svg).includes('SYNTHETIC DATA'));assert.ok(texts(svg).includes('Not a measured or verified result'));
+ assert.deepEqual(attr(svg,'data-value').map(Number),[120,120,180,300,220,520,260,780]);
+ const ticks=niceTicks(0,780);assert.ok(ticks[ticks.length-1]>=780&&ticks[0]===0);assert.deepEqual(niceTicks(-1000,420000).slice(0,2),[-100000,0]);
+ const none=designSvg(contosoForecasting(),'overview',{type:'chart',now:NOW});assert.ok(texts(none).includes('No table evidence with numbers'));assert.equal(attr(none,'data-value').length,0);
 });

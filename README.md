@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.12.0** (`package.json`; shown in the header) |
+| Product version | **1.13.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -85,7 +85,7 @@ The gallery's **Contoso Forecasting** reference atlas is read by hand from the p
 
 ## Diagram Design mode
 
-**Diagram Design** (canvas toolbar) draws the current public view as an editorial figure in the visual grammar of [diagram-design](https://github.com/cathrynlavery/diagram-design) (MIT; see THIRD_PARTY_NOTICES.md): semantic colour roles, rectangular type tags, rounded right-angle connectors with masked uppercase labels, fanned attach points, zones per repository, a legend strip and accessible SVG. The facts stay DiagramCloud's (scans, atlas, basis, revision vector, public redaction); only the drawing changes. Four figures:
+**Diagram Design** (canvas toolbar) draws the current public view as an editorial figure in the visual grammar of [diagram-design](https://github.com/cathrynlavery/diagram-design) (MIT; see THIRD_PARTY_NOTICES.md): semantic colour roles, rectangular type tags, rounded right-angle connectors with masked uppercase labels, fanned attach points, zones per repository, a legend strip and accessible SVG. The facts stay DiagramCloud's (scans, atlas, basis, revision vector, public redaction); only the drawing changes. Eight figures:
 
 | Figure | Draws | Best for |
 |---|---|---|
@@ -93,6 +93,10 @@ The gallery's **Contoso Forecasting** reference atlas is read by hand from the p
 | Layer stack | one band per layer (experience, services, control, data, sources), component chips, links counted between bands | what sits on what |
 | Exploded stack (3D) | the drilldown chain through the view as stacked axonometric planes, parent on top, dashed traces from the component that opens each level; a view without drilldown is exploded by layer | levels of detail |
 | Drilldown tree | every public view under the component that opens it, current view highlighted | where everything is |
+| Swimlane | one lane per repository (two or more) or per layer, columns in reading order, on the same box-avoiding routes | who owns which step |
+| Sequence | the view's components as participants with lifelines; every connection is one numbered message, in reading order (derived from the connections, not timing) | the path of one request or save |
+| Story timeline | the guided story as numbered steps on an axis, steps on the current view highlighted; private steps counted, never drawn | the walkthrough at a glance |
+| Chart | the first table evidence block of the view's components with numbers, as bars; its provenance (synthetic, source-derived, reference, author) is printed on the figure | the numbers behind a component |
 
 Themes: light, dark and editorial (adds drilldown path, revision vector and provenance cards). One or two **focal** components get the accent; without a hint, the single clearly most-connected component does, and the legend says so. In Edit, **Use for this view** stores the figure and theme on the view (`view.design`), so the **Diagram Design figure (SVG)** export and other people get the same figure. Figures are static, offline SVG with no script, built from `publicDocument`.
 

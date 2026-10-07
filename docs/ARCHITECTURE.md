@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.12.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.13.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -322,3 +322,7 @@ Lens owns observed Git and delivery state; DiagramCloud keeps three meanings apa
 ## 1.12 additions: Diagram Design mode
 
 `src/export/design/` is a fourth family of renderers next to standard, blueprint/editorial and the manual. `designContext` builds everything from `publicDocument` and `viewSpec(input)` (so omissions are counted against the full input) and resolves the focal set: `view.design.focal` (at most two, validated as members of the view and filtered by `publicDocument`), else one strictly most-connected component with at least three connections, else none. `kit.ts` holds the tokens (diagram-design's semantic roles, light and dark), node box, rounded elbow path, masked labels, legend strip, header and the accessible SVG wrapper with per-figure marker IDs. Architecture reuses `buildScene` (scaled 0.8) for positions and box-avoiding routes, then fans shared attach points and places labels only where their mask clears every box. Layer stack and the exploded stack share one kind-to-layer table (the MosaicStudio layer cake reading); the exploded stack uses the drilldown chain through the view (the parent kept on top, at most four planes) and falls back to layers. The tree walks drilldowns from the root, first parent wins. The canvas preview shows the SVG as an image, never as injected markup. `designBrief.ts` turns an agent's brief into a reviewed change of `view.design` only, reported like an import.
+
+## 1.13 additions: more Diagram Design figures
+
+`flowRanks` gives each component of a view a reading-order rank (longest path from the components nothing points to; a cycle is broken at the earliest component in canvas order). The swimlane is the architecture renderer with a computed layout (`ArchitectureLayout`: positions in canvas units plus lanes), so it keeps the shared box-avoiding routes, fanned ports and label placement; lanes are repositories when a view spans two or more, else layers. The sequence figure orders the same connections by rank and says on the figure that the order is derived, not timed. The story timeline reads `story` from the public document only. The chart picks the first table block of the view's components with a numeric column and prints the block's provenance before the bars.

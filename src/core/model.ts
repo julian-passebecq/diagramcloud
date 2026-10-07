@@ -33,7 +33,7 @@ export type Perspective=typeof PERSPECTIVES[number];
 export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),basis,visibility}).strict();
 export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),basis,visibility}).strict();
 /** Diagram Design render hints (visual grammar adapted from diagram-design, MIT): which figure type, which 1-2 focal components, which theme. Presentation only: never facts. */
-export const DESIGN_TYPES=['auto','architecture','layers','exploded','tree'] as const;
+export const DESIGN_TYPES=['auto','architecture','layers','exploded','tree','swimlane','sequence','timeline','chart'] as const;
 export type DesignType=typeof DESIGN_TYPES[number];
 export const DESIGN_THEMES=['light','dark','editorial'] as const;
 export type DesignTheme=typeof DESIGN_THEMES[number];

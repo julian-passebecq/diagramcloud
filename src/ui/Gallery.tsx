@@ -29,16 +29,16 @@ export function projectMark(p:Project):string{
 }
 
 /** Release note card, dismissed per browser (storage may be unavailable: then it simply shows). */
-export const WHATS_NEW_ID='whats-new-1.12';
+export const WHATS_NEW_ID='whats-new-1.13';
 export function WhatsNew({onShow}:{onShow:(what:'import'|'cloud'|'scan')=>void}){
  const [hidden,setHidden]=useState(()=>{try{return localStorage.getItem(WHATS_NEW_ID)==='hidden';}catch{return false;}});
  if(hidden)return null;
  const hide=()=>{setHidden(true);try{localStorage.setItem(WHATS_NEW_ID,'hidden');}catch{/* private window: keep it hidden for this visit only */}};
  return <section className="whats-new" aria-label="What's new">
-  <div className="eyebrow">WHAT'S NEW · 1.12</div>
+  <div className="eyebrow">WHAT'S NEW · 1.13</div>
   <ul>
    <li><button type="button" className="link-button" onClick={()=>onShow('scan')}>Diagram from a repository</button>: pick a local Git folder and get its system context, containers, modules, files, data lineage and infrastructure, each link with its file and line and a confirmed / inferred / possible tag.</li>
-   <li><b>Diagram Design</b>: a mode that draws the current view as an editorial figure (architecture, layer stack, exploded 3D stack or drilldown tree; light, dark or full editorial), from the same facts as the canvas. An AI agent can write a design brief that picks the figure and the focal components for each view; you review it before it applies.</li>
+   <li><b>Diagram Design</b>: a mode that draws the current view as an editorial figure (architecture, swimlane, sequence, layer stack, exploded 3D stack, drilldown tree, story timeline, or a chart of a table, always labelled synthetic or source-derived; light, dark or full editorial), from the same facts as the canvas. An AI agent can write a design brief that picks the figure and the focal components for each view; you review it before it applies.</li>
    <li><b>Lens</b>: read a Lens minimap into a project atlas. Observed heads, CI, requests and agent sessions are recorded as pointers in a new snapshot, and scans go stale when the source moves on.</li>
    <li><b>Technical manual</b>: every public view as one printable page set, with the snapshot, revision vector, audience, provenance and omissions on its cover. Print it to PDF.</li>
    <li><b>MosaicStudio</b>: export any view as a concept spec for the layer cake, isometric and 3D viewers, with IDs kept and every loss listed.</li>

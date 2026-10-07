@@ -10,13 +10,13 @@ import {xml} from '../diagram';
  * fallbacks, so an export never fetches anything. Every renderer here draws from a ViewSpec and the public document.
  */
 export type Tokens={paper:string;paper2:string;ink:string;inkStrong:string;muted:string;soft:string;rule:string;ruleSolid:string;accent:string;accentTint:string;link:string;
- backend:string;store:string;external:string;externalStroke:string;optionalStroke:string;wash:string;faceLeft:string;faceRight:string;accentLeft:string;accentRight:string};
+ backend:string;store:string;external:string;externalStroke:string;optionalStroke:string;wash:string;faceLeft:string;faceRight:string;accentLeft:string;accentRight:string;series:string[]};
 export const LIGHT:Tokens={paper:'#f5f5f5',paper2:'#ececec',ink:'#2d3142',inkStrong:'#111111',muted:'#4f5d75',soft:'#7a8399',rule:'rgba(45,49,66,0.12)',ruleSolid:'#bfc0c0',
  accent:'#eb6c36',accentTint:'rgba(235,108,54,0.08)',link:'#2e5aa8',backend:'#ffffff',store:'rgba(45,49,66,0.05)',external:'rgba(45,49,66,0.03)',externalStroke:'rgba(45,49,66,0.30)',
- optionalStroke:'rgba(45,49,66,0.20)',wash:'rgba(45,49,66,0.02)',faceLeft:'rgba(45,49,66,0.07)',faceRight:'rgba(45,49,66,0.15)',accentLeft:'rgba(235,108,54,0.20)',accentRight:'rgba(235,108,54,0.32)'};
+ optionalStroke:'rgba(45,49,66,0.20)',wash:'rgba(45,49,66,0.02)',faceLeft:'rgba(45,49,66,0.07)',faceRight:'rgba(45,49,66,0.15)',accentLeft:'rgba(235,108,54,0.20)',accentRight:'rgba(235,108,54,0.32)',series:['#5e7a9b','#7c8f6f','#b8915a','#9c6b50','#6e6479']};
 export const DARK:Tokens={paper:'#2d3142',paper2:'#393e53',ink:'#f5f5f5',inkStrong:'#111111',muted:'#bfc0c0',soft:'#8e98ac',rule:'rgba(245,245,245,0.12)',ruleSolid:'rgba(191,192,192,0.25)',
  accent:'#f08a59',accentTint:'rgba(240,138,89,0.10)',link:'#6a95d8',backend:'#393e53',store:'rgba(245,245,245,0.06)',external:'rgba(245,245,245,0.04)',externalStroke:'rgba(245,245,245,0.30)',
- optionalStroke:'rgba(245,245,245,0.22)',wash:'rgba(245,245,245,0.03)',faceLeft:'rgba(0,0,0,0.18)',faceRight:'rgba(0,0,0,0.32)',accentLeft:'rgba(240,138,89,0.22)',accentRight:'rgba(240,138,89,0.34)'};
+ optionalStroke:'rgba(245,245,245,0.22)',wash:'rgba(245,245,245,0.03)',faceLeft:'rgba(0,0,0,0.18)',faceRight:'rgba(0,0,0,0.32)',accentLeft:'rgba(240,138,89,0.22)',accentRight:'rgba(240,138,89,0.34)',series:['#82a0c0','#9caf8f','#d3ad7a','#b88670','#8d8298']};
 export const tokensFor=(theme:DesignTheme):Tokens=>theme==='dark'?DARK:LIGHT;
 export const SANS="Geist, Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif";
 export const MONO="'Geist Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas, 'Liberation Mono', monospace";
@@ -103,7 +103,7 @@ export function labelChip(s:string,cx:number,baseline:number,t:Tokens,anchor:'mi
  return {box,svg:`<rect x="${f(box.x)}" y="${f(box.y)}" width="${w}" height="12" rx="2" fill="${t.paper}"/>${txt(s,anchor==='middle'?cx:cx,baseline,{size:8,fill:t.soft,font:MONO,anchor,tracking:0.06})}`};
 }
 
-export type LegendItem={label:string;kind:'box';treatment:Treatment}|{label:string;kind:'line';stroke:'muted'|'accent'|'link';dashed?:boolean};
+export type LegendItem={label:string;kind:'box';treatment:Treatment}|{label:string;kind:'swatch';fill:string}|{label:string;kind:'line';stroke:'muted'|'accent'|'link';dashed?:boolean};
 /** Legend strip: a hairline above a single row (wrapping when needed) of samples with mono uppercase labels. */
 export function legendStrip(items:LegendItem[],x:number,y:number,width:number,t:Tokens):{svg:string;height:number}{
  if(!items.length)return {svg:'',height:0};
@@ -112,7 +112,8 @@ export function legendStrip(items:LegendItem[],x:number,y:number,width:number,t:
  for(const it of items){
   const label=it.label.toUpperCase(),w=28+monoWidth(label,8,0.08)+20;
   if(cx+w>x+width){cx=x+72;cy+=20;}
-  if(it.kind==='box'){const s=treatmentStyle(it.treatment,t);out.push(`<rect x="${f(cx)}" y="${f(cy-9)}" width="18" height="12" rx="3" fill="${s.fill}" stroke="${s.stroke}"${s.dash?` stroke-dasharray="${s.dash}"`:''}/>`);}
+  if(it.kind==='swatch')out.push(`<rect x="${f(cx)}" y="${f(cy-9)}" width="18" height="12" rx="2" fill="${it.fill}"/>`);
+  else if(it.kind==='box'){const s=treatmentStyle(it.treatment,t);out.push(`<rect x="${f(cx)}" y="${f(cy-9)}" width="18" height="12" rx="3" fill="${s.fill}" stroke="${s.stroke}"${s.dash?` stroke-dasharray="${s.dash}"`:''}/>`);}
   else out.push(`<line x1="${f(cx)}" y1="${f(cy-3)}" x2="${f(cx+18)}" y2="${f(cy-3)}" stroke="${t[it.stroke]}" stroke-width="1.2"${it.dashed?' stroke-dasharray="5,4"':''}/>`);
   out.push(txt(label,cx+26,cy,{size:8,fill:t.muted,font:MONO,tracking:0.08}));cx+=w;
  }

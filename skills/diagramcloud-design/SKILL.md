@@ -25,6 +25,10 @@ Rules: never add a component, link or repository the scan or manifest did not pr
 | What sits on what (experience, services, control, data, sources) | `layers` | one band per layer, links counted between bands |
 | Levels of detail: overview, then what is inside one part | `exploded` | the drilldown chain as stacked 3D planes, the parent kept on top |
 | Where everything is (all views and what opens them) | `tree` | the drilldown hierarchy, current view highlighted |
+| Who owns which step (several repositories or layers) | `swimlane` | lanes by repository, else by layer; columns in reading order |
+| The path of one request, save or event | `sequence` | lifelines and numbered messages from the view's connections (reading order, not timing) |
+| The walkthrough | `timeline` | the guided story steps on an axis |
+| The numbers behind a component | `chart` | bars from a table evidence block; its provenance stays printed (synthetic stays synthetic) |
 
 Leave `auto` (= architecture) when unsure. Budget: a figure reads well up to about 9 components and 12 connections; above 24, explain with drilldown views instead of one large picture.
 
