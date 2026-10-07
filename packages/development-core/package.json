@@ -1,0 +1,1 @@
+{"name":"@diagramcloud/development-core","version":"0.1.0","type":"module","license":"MIT","exports":{".":"./dist/index.mjs","./contracts":"./dist/contracts.mjs"},"files":["dist","LICENSE"],"scripts":{"build":"node build.mjs"}}

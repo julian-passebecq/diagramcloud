@@ -2,6 +2,7 @@ import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'reac
 import {Badge,Button,FluentProvider,Input,Tab,TabList,webDarkTheme,webLightTheme} from '@fluentui/react-components';
 import type {Connection} from '@xyflow/react';
 import {samples} from './data/samples';
+import {atlasToDiagramDocument} from './development';
 import {MAX_DOCUMENT_BYTES,clone,edgeSchema,errorMessage,newId,nodeSchema,parseDocument,validateDocument,viewSchema,type Observation,type Project,type ProjectNode,type EvidenceBlock} from './core/model';
 import {observationPatch} from './core/realization';
 import {deepLink,readDeepLink} from './core/links';
@@ -115,7 +116,8 @@ export default function App(){
   const format=interchangeFormat(raw);
   if(format){const out=await importDiagram(raw,importName||(format==='mermaid'?'pasted.mmd':'pasted.drawio'));setStaged(out.document);setImportReport(out.report);setImportError('');return;}
   const obj:unknown=JSON.parse(raw);
-  if(isPatch(obj)){const out=applyDocumentPatch(project,obj);setPatched(out);setStaged(out.result);}
+  if((obj as {version?:string})?.version==='development-atlas/1'){setStaged(atlasToDiagramDocument(obj));}
+  else if(isPatch(obj)){const out=applyDocumentPatch(project,obj);setPatched(out);setStaged(out.result);}
   else if(isPublicationSnapshot(obj)){const snap=stagePublicationSnapshot(project,obj);if(!snap.patch)throw new Error(`Publication snapshot ${snap.snapshot.snapshot_id} from ${snap.snapshot.producer.app_id} has no claim to stage for this project.${snap.unresolved.length?` Unresolved: ${snap.unresolved.map(u=>`${u.claim_id} (${u.reason.replace(/_/g,' ')})`).join('; ')}.`:''}`);const out=applyDocumentPatch(project,snap.patch);setPatched({...out,snapshot:snap});setStaged(out.result);}
   else setStaged(parseDocument(raw));setImportError('');}catch(e){setStaged(null);setImportError(errorMessage(e));}};
  const newPatch=()=>{const first=project.nodes[0];setRaw(JSON.stringify(patchTemplate('project',project.id,project.revision,first?{path:`/nodes/@${first.id}/label`,value:first.label}:{path:'/title',value:project.title}),null,2));setPendingSidecar(null);setStaged(null);setImportError('');};

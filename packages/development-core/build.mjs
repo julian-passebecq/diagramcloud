@@ -1,0 +1,11 @@
+import {build} from 'esbuild';
+import {mkdir,copyFile,writeFile} from 'node:fs/promises';
+import {execFileSync} from 'node:child_process';
+await mkdir('dist',{recursive:true});
+for(const entry of ['index','contracts'])await build({entryPoints:[`../../src/development/${entry}.ts`],outfile:`dist/${entry}.mjs`,bundle:true,format:'esm',platform:'neutral',target:'es2022',legalComments:'eof'});
+await build({entryPoints:['../../src/development/index.ts'],outfile:'dist/browser.js',bundle:true,format:'iife',globalName:'DiagramCore',platform:'browser',target:'es2022',minify:true,legalComments:'eof'});
+const {readFile}=await import('node:fs/promises');
+await writeFile('dist/page-entry.mjs',`import {renderDevelopmentHtml as render} from '../../../src/development/page.ts';const engine=${JSON.stringify(await readFile('dist/browser.js','utf8'))};export const renderDevelopmentHtml=input=>render(input,engine);`);
+await build({entryPoints:['dist/page-entry.mjs'],outfile:'dist/page.mjs',bundle:true,format:'esm',platform:'neutral',target:'es2022',minify:true});
+await copyFile('../../LICENSE','LICENSE');
+await writeFile('dist/provenance.json',JSON.stringify({owner:'DiagramCloud',sourceSha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),entries:['src/development/index.ts','src/core/layout.ts','src/export/scene.ts','src/export/design/architecture.ts']},null,2));
