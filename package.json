@@ -1,11 +1,11 @@
 {
-  "name": "diagramcloud", "version": "1.11.0", "private": true, "type": "module", "license": "MIT",
+  "name": "diagramcloud", "version": "1.12.0", "private": true, "type": "module", "license": "MIT",
   "scripts": {
     "dev": "vite --host 0.0.0.0", "build": "tsx scripts/generate.ts && vite build",
     "preview": "vite preview --host 0.0.0.0", "check": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts", "test:e2e": "playwright test",
     "generate": "tsx scripts/generate.ts", "qualify": "tsx scripts/qualify.ts run",
-    "scan": "tsx scripts/scan-repo.ts", "atlas": "tsx scripts/atlas.ts"
+    "scan": "tsx scripts/scan-repo.ts", "atlas": "tsx scripts/atlas.ts", "design": "tsx scripts/design.ts"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.60.0", "@xyflow/react": "^12.4.4",

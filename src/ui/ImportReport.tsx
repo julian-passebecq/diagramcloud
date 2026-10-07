@@ -4,7 +4,9 @@ import {FORMAT_LABEL,type ImportReport} from '../core/interchange';
 export function ImportReportView({report}:{report:ImportReport}){
  const scan=report.format==='repository'||report.format==='atlas';
  return <div className="import-report" data-testid="import-report">
-  {report.format==='atlas'
+  {report.format==='design-brief'
+   ?<p><b>Design brief</b> · {report.fileName} · {report.pages} view(s). Presentation hints only (figure type, focal components, theme, caption) for Diagram Design mode; nothing else in the project changes.</p>
+   :report.format==='atlas'
    ?<p><b>Project atlas</b> · {report.fileName} · {report.groups?`${report.groups} repositories · `:''}{report.pages} views · {report.nodes} components · {report.edges} connections. Each repository keeps its own revision; IDs are stable, so the review shows exactly what changed before you apply.</p>
    :scan
    ?<p><b>Repository scan</b> · {report.fileName} · {report.pages} views · {report.nodes} components · {report.edges} connections{report.groups?` · ${report.groups} containers`:''}. The same repository always gives the same IDs: scanning it again later shows what changed before you apply.</p>

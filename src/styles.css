@@ -54,3 +54,10 @@ button.perspective-chip{cursor:pointer}.perspective-chip.state-available{border-
 .blueprint-mode .node-button>strong{text-transform:uppercase;letter-spacing:.3px}.blueprint-mode .node-summary,.blueprint-mode .provider-name{color:#9ec5ff}.blueprint-mode .node-bottom{border-top-color:#9ec5ff55;color:#ffd166}.blueprint-mode .component-icon{background:transparent;color:#eaf2ff;border:1px solid #9ec5ff;border-radius:2px}
 .blueprint-mode .react-flow__edge-path{stroke:#9ec5ff!important}.blueprint-mode .edge-label{background:#0b2545;color:#eaf2ff}.blueprint-mode .node-workspace{background:#16365c;color:#eaf2ff;border-top-color:#9ec5ff55}
 .atlas-lens ul{margin:4px 0;padding-left:18px}.atlas-lens li{overflow-wrap:anywhere}.atlas-lens>ul>li{margin:6px 0}
+
+/* Diagram Design mode (1.12) */
+.design-preview{display:flex;flex-direction:column;gap:10px;padding:12px 0}
+.design-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.design-figure{display:block;width:100%;height:auto;max-width:1400px;border:1px solid var(--line,#d8dee8);border-radius:8px;background:#f5f5f5}
+.design-open{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13px}
+.design-open .link-button{background:none;border:0;padding:0;color:var(--accent,#2563eb);text-decoration:underline;cursor:pointer;font:inherit}

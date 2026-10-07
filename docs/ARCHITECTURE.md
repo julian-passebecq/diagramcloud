@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.11.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.12.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -318,3 +318,7 @@ A perspective is a property of a view (`view.perspective`, default System), not 
 ## 1.11 additions: Lens projections
 
 Lens owns observed Git and delivery state; DiagramCloud keeps three meanings apart and adds no fourth. `applyLensMinimap` appends a snapshot whose `runtimeRefs` are `lens.<repo>.<kind>[.<n>]` pointers (default-branch-head, ci-state, work-in-progress, request, agent-session), all basis observed with the minimap's `observedAt`. Nodes, edges, views and design status are byte-for-byte unchanged, so nothing observed can be mistaken for Planned or Presented, and `publicDocument` already empties runtime pointers. The revision of a scanned repository is the one its content was read at; `lensHeads(snapshot)` feeds `staleRepositories({current})`, which already explains a moved source. Matching is by repository ID, locator basename or title, guarded by host; ambiguous and unknown entries are reported.
+
+## 1.12 additions: Diagram Design mode
+
+`src/export/design/` is a fourth family of renderers next to standard, blueprint/editorial and the manual. `designContext` builds everything from `publicDocument` and `viewSpec(input)` (so omissions are counted against the full input) and resolves the focal set: `view.design.focal` (at most two, validated as members of the view and filtered by `publicDocument`), else one strictly most-connected component with at least three connections, else none. `kit.ts` holds the tokens (diagram-design's semantic roles, light and dark), node box, rounded elbow path, masked labels, legend strip, header and the accessible SVG wrapper with per-figure marker IDs. Architecture reuses `buildScene` (scaled 0.8) for positions and box-avoiding routes, then fans shared attach points and places labels only where their mask clears every box. Layer stack and the exploded stack share one kind-to-layer table (the MosaicStudio layer cake reading); the exploded stack uses the drilldown chain through the view (the parent kept on top, at most four planes) and falls back to layers. The tree walks drilldowns from the root, first parent wins. The canvas preview shows the SVG as an image, never as injected markup. `designBrief.ts` turns an agent's brief into a reviewed change of `view.design` only, reported like an import.
