@@ -1,4 +1,6 @@
-import {buildScene} from '../scene';
+import {buildScene,NODE_HEIGHT,NODE_WIDTH} from '../scene';
+import {positionFor} from '../../core/operations';
+import type {ProjectView} from '../../core/model';
 import {designContext,eyebrowOf,footerParts,vectorOf,type DesignContext,type DesignOptions} from './context';
 import {elbowPath,f,footerLine,header,KIND_TAG,labelChip,labelText,legendStrip,lines,markers,MONO,nodeBox,overlaps,sansLines,svgDocument,treatmentOf,TREATMENT_LABEL,txt,
  type Box,type LegendItem,type P,type Tokens,type Treatment} from './kit';
@@ -57,12 +59,30 @@ export function summaryCards(c:DesignContext,x:number,y:number,width:number):{sv
   txt(k.toUpperCase(),cx+14,y+22,{size:8,fill:t.accent,font:MONO,tracking:0.14})+lines(sansLines(v,w-28,11,4),cx+14,y+42,15,{size:11,fill:t.ink});}).join('')};
 }
 
+/**
+ * Authored positions closer than one box apart would draw boxes on top of each other. The figure then spreads the whole
+ * layout by the smallest uniform factor that separates every pair by SPREAD_GAP on one axis (identical positions are first
+ * set side by side), so the arrangement the author drew keeps its shape; a view that already fits is left untouched.
+ */
+const SPREAD_GAP=24;
+export function spreadPositions(view:ProjectView):ProjectView{
+ const ids=view.nodeIds,ps=ids.map(id=>({...positionFor(view,id)})),seen=new Map<string,number>();
+ for(const p of ps){const k=`${p.x},${p.y}`,n=seen.get(k)??0;seen.set(k,n+1);p.x+=n*(NODE_WIDTH+SPREAD_GAP);}
+ let s=1;
+ for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const dx=Math.abs(ps[i].x-ps[j].x),dy=Math.abs(ps[i].y-ps[j].y);
+  if(dx>=NODE_WIDTH+SPREAD_GAP||dy>=NODE_HEIGHT+SPREAD_GAP)continue;
+  s=Math.max(s,Math.min(dx?(NODE_WIDTH+SPREAD_GAP)/dx:Infinity,dy?(NODE_HEIGHT+SPREAD_GAP)/dy:Infinity));}
+ if(s===1&&ps.every((p,i)=>p.x===positionFor(view,ids[i]).x))return view;
+ const x0=Math.min(...ps.map(p=>p.x)),y0=Math.min(...ps.map(p=>p.y));
+ return {...view,positions:Object.fromEntries(ids.map((id,i)=>[id,{x:Math.round(x0+(ps[i].x-x0)*s),y:Math.round(y0+(ps[i].y-y0)*s)}]))};
+}
+
 /** A computed placement for the architecture renderer: positions in canvas units and optional lanes drawn behind. */
 export type ArchitectureLayout={type:string;label:string;positions:Record<string,{x:number;y:number}>;lanes?:{id:string;title:string;members:string[]}[];desc?:string};
 
 export function architectureSvg(input:Parameters<typeof designContext>[0],viewId:string,options:DesignOptions={},layout?:(c:DesignContext)=>ArchitectureLayout):string{
  const c0=designContext(input,viewId,'architecture',options),plan=layout?.(c0),c=plan?{...c0,slug:c0.slug.replace(/-architecture$/,`-${plan.type}`)}:c0;
- const {doc,spec,t}=c,view=plan?{...c.view,positions:plan.positions}:c.view,scene=buildScene(doc,view),b=scene.bounds;
+ const {doc,spec,t}=c,view=spreadPositions(plan?{...c.view,positions:plan.positions}:c.view),scene=buildScene(doc,view),b=scene.bounds;
  const byId=new Map(spec.nodes.map(n=>[n.id,n])),edgeById=new Map(spec.edges.map(e=>[e.id,e]));
  const W0=b.width*S,contentW=Math.max(W0,640),hdr=header(eyebrowOf(c,plan?.label??'Architecture'),spec.title,c.purpose,M,M,contentW,t,c.editorial);
  const ox=M+(contentW-W0)/2-b.x*S,oy=M+hdr.height+28-b.y*S,X=(p:P):P=>({x:p.x*S+ox,y:p.y*S+oy});

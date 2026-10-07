@@ -56,8 +56,22 @@ export function layerStackSvg(input:Project,viewId:string,options:DesignOptions=
 }
 
 // ------------------------------------------------------------------------------------------------ exploded stack
-type Plane={key:string;title:string;sub:string;names:string[];nodes:{id:string;label:string;kind:ProjectNode['kind'];basis:string;u:number;v:number}[];edges:[number,number][];focal:boolean;via?:number};
-const PW=340,PD=150,TH=8,GAP=200,TW=40,TD=26,TZ=6,MAX_TILE_LABELS=12;
+type Plane={key:string;title:string;sub:string;names:string[];nodes:{id:string;label:string;kind:ProjectNode['kind'];basis:string;col:number;row:number}[];cols:number;rows:number;edges:[number,number][];focal:boolean;via?:number};
+const PW0=340,PD0=150,TH=8,GAP0=200,TW=40,TD=26,TZ=6,MAX_TILE_LABELS=12,PAD=24,SX=TW+16,SY=TD+40,COLS0=5,ROWS0=2;
+/**
+ * Tile grid of a plane: one row up to five tiles, two rows up to ten, then a grid that keeps the plane's 5:2 proportion and
+ * grows with the count, so every component keeps its own tile and no two tiles ever share a cell.
+ */
+export function planeGrid(n:number):{cols:number;rows:number}{
+ if(n<=COLS0*ROWS0){const rows=n>COLS0?2:1;return {cols:Math.max(1,Math.ceil(n/rows)),rows};}
+ const cols=Math.ceil(Math.sqrt(n*COLS0/ROWS0));return {cols,rows:Math.ceil(n/cols)};
+}
+/** Plane size and level gap for a set of planes: every plane shares the size its largest grid needs; the gap keeps the plane above off the tiles below. */
+export function planeFrame(planes:{cols:number;rows:number}[]){
+ const cols=Math.max(1,...planes.map(p=>p.cols)),rows=Math.max(1,...planes.map(p=>p.rows));
+ const PW=Math.max(PW0,2*PAD+cols*SX-(SX-TW)),PD=Math.max(PD0,2*PAD+rows*SY-(SY-TD));
+ return {PW,PD,GAP:Math.max(GAP0,PD-PAD+TH+TZ+16)};
+}
 
 /** Planes: the drilldown chain through this view (parent kept on top), else the view's layers. */
 export function explodedPlanes(c:DesignContext):{planes:Plane[];basis:'drilldown'|'layers'}{
@@ -67,15 +81,18 @@ export function explodedPlanes(c:DesignContext):{planes:Plane[];basis:'drilldown
  if(chain.length<3){const next=opening(chain[chain.length-1]);if(next?.childViewId&&!chain.includes(next.childViewId))chain.push(next.childViewId);}
  const ids=chain.slice(-4);
  if(ids.length>=2)return {basis:'drilldown',planes:ids.map((id,i)=>{const v=doc.views.find(v=>v.id===id)!,ns=doc.nodes.filter(n=>v.nodeIds.includes(n.id));
-  const xs=ns.map(n=>v.positions[n.id]?.x??0),ys=ns.map(n=>v.positions[n.id]?.y??0),mx=Math.min(...xs),my=Math.min(...ys),rx=Math.max(...xs)-mx||1,ry=Math.max(...ys)-my||1;
-  const index=new Map(ns.map((n,k)=>[n.id,k])),nextId=ids[i+1],via=nextId?ns.findIndex(n=>n.childViewId===nextId):-1;
+  const xs=ns.map(n=>v.positions[n.id]?.x??0),ys=ns.map(n=>v.positions[n.id]?.y??0);
+  const index=new Map(ns.map((n,k)=>[n.id,k])),nextId=ids[i+1],via=nextId?ns.findIndex(n=>n.childViewId===nextId):-1,g=planeGrid(ns.length);
+  // Cells follow the authored reading order: top to bottom in rows of the grid width, left to right within a row.
+  const cell=new Map<number,{col:number;row:number}>(),byY=ns.map((_,k)=>k).sort((a,b)=>ys[a]-ys[b]||xs[a]-xs[b]||a-b);
+  for(let r=0;r*g.cols<byY.length;r++)byY.slice(r*g.cols,(r+1)*g.cols).sort((a,b)=>xs[a]-xs[b]||a-b).forEach((k,col)=>cell.set(k,{col,row:r}));
   return {key:id,title:v.title,sub:`${ns.length} component${ns.length===1?'':'s'}${nextId&&via>=0?` · ${ns[via].label} opens the next level`:''}`,names:ns.slice(0,4).map(n=>n.label),
-   nodes:ns.map((n,k)=>({id:n.id,label:n.label,kind:n.kind,basis:n.basis??'unspecified',u:Math.max(xs.length>1?(xs[k]-mx)/rx:0.5,0),v:ys.length>1?(ys[k]-my)/ry:0.5})),
+   nodes:ns.map((n,k)=>({id:n.id,label:n.label,kind:n.kind,basis:n.basis??'unspecified',...cell.get(k)!})),...g,
    edges:doc.edges.filter(e=>v.edgeIds.includes(e.id)&&index.has(e.source)&&index.has(e.target)).map(e=>[index.get(e.source)!,index.get(e.target)!] as [number,number]),focal:id===spec.viewId,...(via>=0?{via}:{})};})};
  const layers=layersOf(spec.nodes).slice(0,5),focalLayer=layers.findIndex(l=>l.nodes.some(n=>c.focal.has(n.id)));
- return {basis:'layers',planes:layers.map((l,i)=>{const n=l.nodes.length,cols=n>5?Math.ceil(n/2):n,index=new Map(l.nodes.map((x,k)=>[x.id,k]));
+ return {basis:'layers',planes:layers.map((l,i)=>{const g=planeGrid(l.nodes.length),index=new Map(l.nodes.map((x,k)=>[x.id,k]));
   return {key:l.id,title:l.name,sub:basisLine(l.nodes),names:l.nodes.slice(0,4).map(x=>x.label),
-   nodes:l.nodes.map((x,k)=>({id:x.id,label:x.label,kind:x.kind,basis:x.basis??'unspecified',u:cols>1?(k%cols)/(cols-1):0.5,v:n>5?Math.floor(k/cols):0.5})),
+   nodes:l.nodes.map((x,k)=>({id:x.id,label:x.label,kind:x.kind,basis:x.basis??'unspecified',col:k%g.cols,row:Math.floor(k/g.cols)})),...g,
    edges:spec.edges.filter(e=>index.has(e.from)&&index.has(e.to)).map(e=>[index.get(e.from)!,index.get(e.to)!] as [number,number]),focal:i===(focalLayer>=0?focalLayer:-1)};})};
 }
 
@@ -85,18 +102,28 @@ export function explodedPlanes(c:DesignContext):{planes:Plane[];basis:'drilldown
  * horizontal leaders, and dashed trace lines join the component that opens a level to the level below.
  */
 export function explodedSvg(input:Project,viewId:string,options:DesignOptions={}):string{
- const c=designContext(input,viewId,'exploded',options),{spec,t}=c,{planes,basis}=explodedPlanes(c),N=planes.length;
+ const c=designContext(input,viewId,'exploded',options),{spec,t}=c,{planes,basis}=explodedPlanes(c),N=planes.length,{PW,PD,GAP}=planeFrame(planes);
  const labelW=300,stackW=PW+PD,contentW=stackW+60+labelW;
  const hdr=header(eyebrowOf(c,basis==='drilldown'?'Exploded drilldown':'Exploded layers'),spec.title,c.purpose,M,M,contentW,t,c.editorial);
  const zMax=(N-1)*GAP,ox=M+PD,oy=M+hdr.height+40+zMax,iso=(x:number,y:number,z:number):P=>({x:ox+x-y,y:oy+(x+y)/2-z}),pts=(ps:P[])=>ps.map(p=>`${f(p.x)},${f(p.y)}`).join(' ');
- const zOf=(i:number)=>(N-1-i)*GAP,tile=(p:Plane['nodes'][number])=>({x:24+p.u*(PW-48-TW),y:24+p.v*(PD-48-TD)});
+ const zOf=(i:number)=>(N-1-i)*GAP;
+ // A tile's footprint in plane coordinates: the plane's grid, centred on the plane.
+ const cellOf=new Map(planes.flatMap(p=>p.nodes.map(n=>[n,p] as const))),tile=(n:Plane['nodes'][number])=>{const p=cellOf.get(n)!;
+  return {x:(PW-(p.cols*SX-(SX-TW)))/2+n.col*SX,y:(PD-(p.rows*SY-(SY-TD)))/2+n.row*SY};};
  const out:string[]=[],traces:string[]=[],treatments=new Set<Treatment>();
  // Tile labels: at most MAX_TILE_LABELS per plane, placed top plane first and, within a plane, the component that opens the next level, then the
  // focal ones, then document order; a label that would touch one already placed is left out, and the plane's entry counts what stays in tooltips.
+ // A label never sits on another tile: each tile is a prism whose outline only has edges along the two plane axes and the vertical,
+ // so a separating-axis test on those three normals and the label box's two is exact.
+ const prism=(i:number,k:number):P[]=>{const T=tile(planes[i].nodes[k]),z=zOf(i);return [z,z+TZ].flatMap(h=>[iso(T.x,T.y,h),iso(T.x+TW,T.y,h),iso(T.x+TW,T.y+TD,h),iso(T.x,T.y+TD,h)]);};
+ const prisms=planes.flatMap((p,i)=>p.nodes.map((_,k)=>({i,k,pts:prism(i,k)})));
+ const AXES:P[]=[{x:1,y:0},{x:0,y:1},{x:0.5,y:-1},{x:0.5,y:1}];
+ const onTile=(b:Box,pts:P[])=>AXES.every(a=>{const pr=pts.map(q=>q.x*a.x+q.y*a.y),br=[b.x*a.x+b.y*a.y,(b.x+b.w)*a.x+b.y*a.y,b.x*a.x+(b.y+b.h)*a.y,(b.x+b.w)*a.x+(b.y+b.h)*a.y];
+  return Math.min(Math.max(...pr),Math.max(...br))>Math.max(Math.min(...pr),Math.min(...br));});
  const shown=new Map<number,Map<number,string>>();{const placed:Box[]=[];
   planes.forEach((p,i)=>{const z=zOf(i),m=new Map<number,string>(),order=p.nodes.map((n,k)=>({k,rank:p.via===k?0:c.focal.has(n.id)?1:2})).sort((a,b)=>a.rank-b.rank||a.k-b.k);
    for(const {k} of order){if(m.size>=MAX_TILE_LABELS)break;const T=tile(p.nodes[k]),at=iso(T.x+TW/2,T.y+TD,z),label=clipMono(p.nodes[k].label,64,7),w=monoWidth(label,7);
-    const b={x:at.x-w/2-2,y:at.y+11-7*0.75-2,w:w+4,h:7*0.97+4};if(placed.some(q=>overlaps(b,q,0)))continue;placed.push(b);
+    const b={x:at.x-w/2-2,y:at.y+11-7*0.75-2,w:w+4,h:7*0.97+4};if(placed.some(q=>overlaps(b,q,0))||prisms.some(q=>!(q.i===i&&q.k===k)&&onTile(b,q.pts)))continue;placed.push(b);
     m.set(k,txt(label,at.x,at.y+11,{size:7,fill:t.muted,font:MONO,anchor:'middle',extra:` stroke="${p.focal?t.accentTint:t.wash}" stroke-width="3" stroke-linejoin="round" paint-order="stroke"`}));}
    shown.set(i,m);});}
  for(let i=N-1;i>=0;i--){const p=planes[i],z=zOf(i),focal=p.focal;
