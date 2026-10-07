@@ -23,7 +23,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 system-ui,-
 main{max-width:1500px;margin:0 auto;padding:40px 16px}
 header p{color:var(--muted);max-width:70ch}h1{font:400 40px/1.1 'Iowan Old Style',Georgia,serif;margin:0 0 8px}
 .eyebrow{font:600 11px ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
-nav ol{columns:2;padding-left:18px;color:var(--muted)}nav a{color:inherit}
+nav ol{columns:2;list-style:none;padding-left:0;color:var(--muted)}nav a{color:inherit}
 section{margin:48px 0;border-top:1px solid var(--rule);padding-top:24px}h2{font:600 18px system-ui,sans-serif}h2 span{font:600 12px ui-monospace,monospace;color:var(--accent);margin-right:8px}
 section svg{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--rule)}.cap{font:12px ui-monospace,monospace;color:var(--muted)}
 footer{color:var(--muted);font-size:12px;border-top:1px solid var(--rule);padding-top:16px}
