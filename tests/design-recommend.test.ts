@@ -42,6 +42,6 @@ test('recommend: a private component and its table do not influence the result',
 
 test('recommend: drilldowns, providers and story steps are named as facts',()=>{
  const d=contosoForecasting(),r=recommendFigures(d,'overview'),by=(t:string)=>r.find(x=>x.type===t)!;
- assert.match(by('tree').reason,/child views? below this one/);assert.match(by('deployment').reason,/\d+ providers in this view/);
+ assert.match(by('tree').reason,/child views? below this one/);assert.match(by('deployment').reason,/^\d+ providers, mostly one component each$/);assert.ok(by('deployment').score<by('tree').score);
  assert.match(by('timeline').reason,/public story step/);assert.ok(by('tree').score>by('chart').score);
 });

@@ -20,7 +20,7 @@ const n=(k:number,one:string,many=`${one}s`)=>`${k} ${k===1?one:many}`;
 export function recommendFigures(input:Project,viewId:string):FigureRecommendation[]{
  const c=designContext(input,viewId,'recommend'),{doc,spec}=c,ids=new Set(spec.nodes.map(x=>x.id)),edges=spec.edges.filter(e=>ids.has(e.from)&&ids.has(e.to)&&e.from!==e.to);
  const table=chartableTable(c),owner=table&&spec.nodes.find(x=>x.evidenceRefs.includes(table.block.id))?.label;
- const providers=[...new Set(spec.nodes.map(x=>x.provider).filter(p=>p&&p!=='Generic'))],children=spec.children.length,parent=spec.path.length>1;
+ const providers=[...new Set(spec.nodes.map(x=>x.provider).filter(p=>p&&p!=='Generic'))],shared=providers.filter(p=>spec.nodes.filter(x=>x.provider===p).length>=2).length,children=spec.children.length,parent=spec.path.length>1;
  const ranks=flowRanks(spec.nodes,edges),depth=ranks.size?Math.max(...ranks.values())+1:0,deg=new Map(spec.nodes.map(x=>[x.id,0]));
  for(const e of edges){deg.set(e.from,deg.get(e.from)!+1);deg.set(e.to,deg.get(e.to)!+1);}
  const hub=[...deg].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))[0],hubDeg=hub?.[1]??0,hubLabel=hub?spec.nodes.find(x=>x.id===hub[0])!.label:'';
@@ -41,7 +41,7 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
   chart:table?[90,`a numeric table${on}`]:[3,noTable],
   line:table?[rows>=3?82:68,`a numeric table${on} with ${n(rows,'row')}`]:[3,noTable],
   heatmap:table?[numeric>=2?78:60,`a numeric table${on} with ${n(numeric,'numeric column')}`]:[3,noTable],
-  deployment:providers.length>=2?[Math.min(80,58+providers.length*3),`${providers.length} providers in this view`]:[providers.length?18:10,providers.length?'only 1 provider in this view':'no named provider in this view'],
+  deployment:shared>=2?[Math.min(80,58+shared*4),`${shared} providers each running 2 or more components`]:providers.length>=2?[40,`${providers.length} providers, mostly one component each`]:[providers.length?18:10,providers.length?'only 1 provider in this view':'no named provider in this view'],
   matrix:cells>=2?[Math.min(66,48+cells*3),`${cells} distinct basis and confidence pairs`]:[12,'one basis and confidence for every component'],
   hub:hubDeg>=3?[Math.min(74,58+hubDeg*2),`${hubLabel} has ${hubDeg} connections`]:[14,'no component with 3 or more connections'],
   radial:hubDeg>=3&&depth>=3?[Math.min(68,52+hubDeg*2),`${hubLabel} has ${hubDeg} connections on a flow ${depth} steps deep`]:[hubDeg>=3?40:12,hubDeg>=3?`${hubLabel} has ${hubDeg} connections, short reach`:'no component with 3 or more connections'],

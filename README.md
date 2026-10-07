@@ -9,7 +9,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.16.0** (`package.json`; shown in the header) |
+| Product version | **1.17.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -109,6 +109,8 @@ The gallery's **Contoso Forecasting** reference atlas is read by hand from the p
 | Radial reach | rings of components 1, 2 and 3 connection steps from one component | what a change here can reach |
 
 Themes: light, dark and editorial (adds drilldown path, revision vector and provenance cards). One or two **focal** components get the accent; without a hint, the single clearly most-connected component does, and the legend says so. In Edit, **Use for this view** stores the figure and theme on the view (`view.design`), so the **Diagram Design figure (SVG)** export and other people get the same figure. Figures are static, offline SVG with no script, built from `publicDocument`.
+
+**Suggested figures.** Under the figure controls, Diagram Design suggests three figures for the current view, ranked from its public facts, each with its reason ("a numeric table on Input rows", "6 child views below this one", "DiagramCloud has 3 connections"); one click shows it. Table figures are never suggested without a numeric table. `npm run design` also writes `suggestions.json` (`diagramcloud.design-suggestions/1`, top five per view) for an agent writing a design brief. A view without a hint still opens as Architecture.
 
 **Figure book and manual.** **Diagram Design figure book (HTML)** (Export & share) puts every public view on one offline page as its chosen figure, in drilldown order; `npm run design` also writes `book.html`. The **Technical manual** prints a view's Diagram Design figure when the view has a hint (dark prints light), and the numbered editorial figure otherwise.
 

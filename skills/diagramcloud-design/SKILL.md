@@ -62,6 +62,10 @@ Focal is the accent colour: the one or two components the reader must notice (wh
 
 Themes: `light`, `dark`, `editorial` (adds the drilldown path, revision vector and provenance cards). A caption is at most 300 characters, describes the figure, and never claims a measured result. Full example: `docs/design-brief.example.json`.
 
+## 4b. Start from the suggestions
+
+`npm run design -- doc.json --out figures/` writes `figures/suggestions.json`: for every public view, the five best figure types with the fact behind each. Start from it, then choose by the question the figure must answer; keep the reason in the brief's caption when it helps the reader.
+
 ## 5. Render or hand over
 
 - What changed after a rescan: `npm run design -- new.json --delta old.json --out figures/` (Before · Changes · After per view, by stable ID).

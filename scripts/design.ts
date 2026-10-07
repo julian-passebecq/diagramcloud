@@ -1,12 +1,13 @@
 /**
  * Diagram Design CLI: render every public view of a DiagramCloud document as Diagram Design figures.
- *   npm run design -- <diagramcloud.json> [--delta earlier.json] [--brief design-brief.json] [--out folder] [--type auto|architecture|layers|exploded|tree] [--theme light|dark|editorial]
+ *   npm run design -- <diagramcloud.json> [--delta earlier.json] [--brief design-brief.json] [--out folder] [--type <figure type>] [--theme light|dark|editorial]
  * Works on any document: a scan (`npm run scan`), an atlas (`npm run atlas`) or an authored project. A brief (for
  * example written by an AI agent) is applied in memory first and its report printed; the document file is never
  * modified. Output is static, offline SVG built from publicDocument, plus an index.html that lists them.
  */
 import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
 import {join,resolve} from 'node:path';
+import {recommendFigures} from '../src/export/design/recommend';
 import {parseDocument,DESIGN_THEMES,DESIGN_TYPES,type DesignTheme,type DesignType} from '../src/core/model';
 import {publicDocument} from '../src/core/operations';
 import {applyDesignBrief,parseDesignBrief} from '../src/core/designBrief';
@@ -34,5 +35,7 @@ for(const v of publicDocument(doc).views){
  process.stderr.write(`  ${file}\n`);
 }
 writeFileSync(join(out,'index.html'),`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'unsafe-inline'"><title>${xml(doc.title)} · Diagram Design figures</title><style>body{font:15px system-ui,sans-serif;margin:32px;color:#2d3142;background:#f5f5f5}</style></head><body><h1>${xml(doc.title)}</h1><p>Public views drawn in Diagram Design mode (${now.toISOString().slice(0,10)}).</p><ul>${rows.join('')}</ul></body></html>\n`);
+// Suggestions per public view (ranked from public facts, with reasons): input for an agent writing a design brief.
+writeFileSync(join(out,'suggestions.json'),JSON.stringify({format:'diagramcloud.design-suggestions/1',projectId:doc.id,views:publicDocument(doc).views.map(v=>({viewId:v.id,title:v.title,suggested:recommendFigures(doc,v.id).slice(0,5)}))},null,2)+'\n');
 writeFileSync(join(out,'book.html'),designBookHtml(doc,{type,theme,now}));
 process.stderr.write(`${rows.length} figure(s) and book.html in ${out}\n`);

@@ -2,6 +2,11 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.17.0
+
+- **Suggested figures**: all 18 figure types ranked per view from public facts, the top three shown with their reasons in Diagram Design mode, `suggestions.json` from the CLI for agents writing a brief.
+- **Figure quality check**: every figure × theme × sample view (2,556 renders) checked for overlapping and out-of-bounds text and empty figures; long titles now wrap instead of running off the canvas.
+
 ## Shipped in 1.16.0
 
 - Four more Diagram Design figures from the public view spec, built by a second parallel wave: System context, Status board, Lineage, Radial reach.
