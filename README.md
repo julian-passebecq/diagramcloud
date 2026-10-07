@@ -4,6 +4,8 @@
 
 DiagramCloud is a local-first, static web studio for explaining a project: select a component and its child architecture opens underneath while the parent stays visible, continue into a task workspace, and read the evidence (code, tables, metrics, images, sources) behind it. The same document produces a public portfolio, a guided walkthrough and native exports. It is the DataPass/Galaxy product for architecture explanation, realization evidence and publication.
 
+**For AI agents:** start with [docs/AI_GUIDE.md](docs/AI_GUIDE.md) (also indexed by [llms.txt](llms.txt)): commands, the formats an agent writes, choosing a figure, and what never to do.
+
 ## Current state (read this first)
 
 | | |

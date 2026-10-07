@@ -1,6 +1,6 @@
 # DiagramCloud contributor and AI editing rules
 
-Start with README.md, docs/ARCHITECTURE.md, docs/RESEARCH.md and docs/ROADMAP.md. Continue the existing `julian-passebecq/diagramcloud` implementation. Do not create another notebook, diagram or portfolio app in parallel.
+Start with README.md, docs/ARCHITECTURE.md, docs/RESEARCH.md and docs/ROADMAP.md. An agent that uses DiagramCloud (rather than changing it) starts with docs/AI_GUIDE.md; keep that guide true when commands, formats or figure types change (`tests/ai-guide.test.ts` checks it). Continue the existing `julian-passebecq/diagramcloud` implementation. Do not create another notebook, diagram or portfolio app in parallel.
 
 ## Documents
 

@@ -5,6 +5,8 @@ description: Graph any repository or multi-repository project with DiagramCloud 
 
 # DiagramCloud · Diagram Design
 
+The full agent guide (commands, manifest, brief and patch formats, worked flows) is `docs/AI_GUIDE.md`; this skill is the drawing workflow.
+
 DiagramCloud knows **what is true** (components and links read from repositories, each with file:line evidence, a revision per repository, planned vs read-from-source). Diagram Design mode decides **how it looks** (diagram-design's visual grammar, MIT). You, the agent, connect the two with a **design brief**: which figure each view gets, which one or two components are the point, and a one-line caption.
 
 ## 1. Get the facts (never from memory)
@@ -42,7 +44,7 @@ Rules: never add a component, link or repository the scan or manifest did not pr
 | How much moves along each connection | `sankey` | bands sized by connection quantities, provenance printed (needs `quantity` on connections) |
 | Which repositories moved since the last atlas | `atlas` | per-repository revisions, Δ / + / − (atlas documents only) |
 
-Leave `auto` (= architecture) when unsure. Budget: a figure reads well up to about 9 components and 12 connections; above 24, explain with drilldown views instead of one large picture.
+Leave `auto` when unsure: it uses the view's saved hint, else Architecture. Budget: a figure reads well up to about 9 components and 12 connections; above 24, explain with drilldown views instead of one large picture.
 
 ## 3. Choose focal components (0 to 2)
 
