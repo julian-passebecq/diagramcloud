@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.13.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.14.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -326,3 +326,7 @@ Lens owns observed Git and delivery state; DiagramCloud keeps three meanings apa
 ## 1.13 additions: more Diagram Design figures
 
 `flowRanks` gives each component of a view a reading-order rank (longest path from the components nothing points to; a cycle is broken at the earliest component in canvas order). The swimlane is the architecture renderer with a computed layout (`ArchitectureLayout`: positions in canvas units plus lanes), so it keeps the shared box-avoiding routes, fanned ports and label placement; lanes are repositories when a view spans two or more, else layers. The sequence figure orders the same connections by rank and says on the figure that the order is derived, not timed. The story timeline reads `story` from the public document only. The chart picks the first table block of the view's components with a numeric column and prints the block's provenance before the bars.
+
+## 1.14 additions: architecture delta
+
+`compareView(before, after, viewId)` builds both ViewSpecs from the public documents and compares by stable ID: a component's signature is label, kind, provider, summary, basis and design status; a move is a position change above 8 canvas units; a relationship's signature is label, kind and basis, and a rewire is the same ID with other endpoints. `deltaSvg` draws both panels with the shared scene (scaled 0.6, one origin for both so retained components keep their place) and a ledger between them, one entry per (object, change). Different project IDs, or a view that is not public in both versions, are refused with a message.

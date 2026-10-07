@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test';
-import {mkdirSync,readFileSync} from 'node:fs';
+import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
+import {deltaPair} from '../fixtures/deltaPair';
 
 /* 1.12: Diagram Design mode: figure types and themes of the current public view, hints stored on the view, a design brief applied after review. */
 mkdirSync('test-results/design',{recursive:true});
@@ -22,6 +23,16 @@ test('Diagram Design mode: figures, open a level, save a hint, apply a design br
  await preview.getByLabel('Figure theme').selectOption('dark');await expect(figure).toHaveAttribute('data-theme','dark');
  await preview.getByLabel('Figure type').selectOption('exploded');
  await page.screenshot({path:'test-results/design/exploded-dark.png'});
+ // Architecture delta: compare with another version of the same project file (nothing is imported).
+ writeFileSync('test-results/design/other-version.json',JSON.stringify(deltaPair().after));
+ await preview.getByLabel('Compare with another version').setInputFiles('test-results/design/other-version.json');
+ await expect(figure).toHaveAttribute('data-design-type','delta');
+ await expect.poll(()=>figure.evaluate((i:HTMLImageElement)=>i.complete&&i.naturalWidth)).toBeGreaterThan(1000);
+ await page.screenshot({path:'test-results/design/delta.png'});
+ await preview.getByRole('button',{name:'Close comparison'}).click();await expect(figure).not.toHaveAttribute('data-design-type','delta');
+ writeFileSync('test-results/design/other-project.json',JSON.stringify({...deltaPair().after,id:'someone-else'}));
+ await preview.getByLabel('Compare with another version').setInputFiles('test-results/design/other-project.json');
+ await expect(preview.getByRole('alert')).toContainText('not contoso-forecasting');
  // Open a level: the breadcrumb keeps the parent.
  await preview.getByRole('button',{name:/Who may change a forecast/}).click();
  await expect(page.getByLabel('Diagram path').getByRole('button',{name:/Who may change a forecast/})).toBeVisible();

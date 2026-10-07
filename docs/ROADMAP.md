@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.14.0
+
+- **Architecture delta** (diagram-design `type-architecture-delta`): two versions of one project, one view, Before · Changes · After with a change ledger; added / removed / changed / moved / rewired by stable ID with non-colour encodings (badges, dash patterns), `data-snapshot` / `data-object-id` / `data-status` metadata. In the app (Compare with another version…, nothing imported) and the CLI (`--delta`). Pairs naturally with rescans and Lens: a rescan's review shows the change list, the delta shows it as a figure.
+
 ## Shipped in 1.13.0
 
 - **Diagram Design figures, second set:** Swimlane (repositories or layers as lanes, columns in reading order, on the shared routes), Sequence (participants and numbered messages from the view's connections; labelled reading order, not timing), Story timeline (guided story steps; private steps counted) and Chart (bars from a table evidence block, provenance printed on the figure). Still candidates: architecture delta (two atlas snapshots), dependency graph styling for scans, line and heatmap charts, sankey and loop (need edge quantities and a cycle layout).

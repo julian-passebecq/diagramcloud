@@ -158,3 +158,20 @@ test('chart: a table evidence block of the view, its provenance printed on the f
  const ticks=niceTicks(0,780);assert.ok(ticks[ticks.length-1]>=780&&ticks[0]===0);assert.deepEqual(niceTicks(-1000,420000).slice(0,2),[-100000,0]);
  const none=designSvg(contosoForecasting(),'overview',{type:'chart',now:NOW});assert.ok(texts(none).includes('No table evidence with numbers'));assert.equal(attr(none,'data-value').length,0);
 });
+
+test('architecture delta: Before · Changes · After by stable ID, statuses in text and shape, public only',async()=>{
+ const {deltaPair}=await import('./fixtures/deltaPair'),{compareView,deltaSvg}=await import('../src/export/design/delta');
+ const {before,after}=deltaPair(),d=compareView(before,after,'overview',NOW);
+ assert.equal(d.components.get('fabric-app'),'removed');assert.equal(d.components.get('cache'),'added');assert.equal(d.components.get('client'),'changed');assert.equal(d.components.get('planner'),'moved');assert.equal(d.components.get('api'),'unchanged');
+ assert.ok([...d.relationships.values()].includes('rewired'));assert.equal(d.relationships.get('gold-cache'),'added');
+ assert.ok(d.ledger.some(l=>l.startsWith('CHANGED · Rayfin client v2: renamed from')));assert.equal(d.ledger.filter(l=>l.startsWith('REMOVED ·')).length,1);
+ const svg=deltaSvg(before,after,'overview',{now:NOW}),root=find(parseXml(svg),'svg')!;
+ assert.equal(root.attrs['data-diagram'],'architecture-delta');assert.deepEqual(attr(svg,'data-snapshot'),['before','after']);
+ const status=(id:string)=>els(svg).filter(e=>e.attrs['data-object-id']===id).map(e=>e.attrs['data-status']);
+ assert.deepEqual(status('fabric-app'),['removed']);assert.deepEqual(status('cache'),['added']);assert.deepEqual(status('client'),['changed','changed']);
+ assert.equal(designSvg(after,'overview',{now:NOW}).includes('data-diagram'),false);
+ assert.throws(()=>compareView(before,{...after,id:'other'},'overview'),/two different projects/);
+ const hidden=structuredClone(after);hidden.views.find(v=>v.id==='policy')!.visibility='private';
+ assert.throws(()=>compareView(before,validateDocument(hidden),'policy'),/not public in the newer version/);
+ assert.equal(compareView(before,before,'overview').ledger.length,0);
+});

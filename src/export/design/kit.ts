@@ -82,7 +82,7 @@ export const KIND_TAG:Record<ProjectNode['kind'],string>={source:'SRC',process:'
 /** Node box: opaque paper mask, styled box (rx 6), rectangular type tag, name (sans 600) and a mono sublabel. */
 export function nodeBox(n:{id:string;attr?:string;x:number;y:number;w:number;h:number;name:string;sub?:string;tag:string;treatment:Treatment;opens?:boolean;title?:string},t:Tokens):string{
  const s=treatmentStyle(n.treatment,t),cx=n.x+n.w/2,tagW=Math.max(28,Math.ceil(monoWidth(n.tag,7,0.08)+10));
- const name=sansLines(n.name,n.w-20,12,2,true),sub=n.sub?clipMono(n.sub,n.w-16,9):'';
+ const name=sansLines(n.name,n.w-20,12,2,true),sub=n.sub&&!(name.length>1&&n.h<68)?clipMono(n.sub,n.w-16,9):'';
  // The text block is centred in the area under the type tag, so a two-line name never touches the tag.
  const block=name.length*15+(sub?14:0)-4,areaTop=n.y+22,top=areaTop+Math.max(0,(n.y+n.h-6-areaTop-block)/2)+9;
  const tagStroke=n.treatment==='focal'?t.accent:t.soft;
