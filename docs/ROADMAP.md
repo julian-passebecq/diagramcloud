@@ -2,6 +2,10 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Shipped in 1.18.0
+
+- **Atlas revisions figure**: an atlas document's repositories as cards with their own short revision, ref, authority and scan state, changes since the previous snapshot (Δ old → new, +, −) and the declared relationships; the figure states that there is no single project revision. Empty state points to `npm run atlas`.
+
 ## Shipped in 1.17.0
 
 - **Suggested figures**: all 18 figure types ranked per view from public facts, the top three shown with their reasons in Diagram Design mode, `suggestions.json` from the CLI for agents writing a brief.

@@ -1,6 +1,6 @@
 # Architecture decision record
 
-Current for DiagramCloud 1.17.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
+Current for DiagramCloud 1.18.0. The "V1.x" sections record when each decision was taken; they still hold unless a later section amends them.
 
 Date: 2026-09-21. Status: implemented foundation, not a completed enterprise diagram editor.
 
@@ -342,3 +342,7 @@ Four renderers in `src/export/design/` (`systemContext.ts`, `status.ts`, `lineag
 ## 1.17 additions: suggestions and the quality check
 
 `recommendFigures(input, viewId)` scores every figure type (0–100, ties in `DESIGN_TYPES` order) from facts of the public view spec: numeric table evidence (`chartableTable`), providers running two or more components, drilldown children and parent, flow depth (`flowRanks`), the most connected component, story steps, basis and confidence mix, designed statuses, entry points and sinks (`contextRoles`). It never changes `resolveDesignType`: a view without a hint is still Architecture. `tests/design-quality.test.ts` estimates text boxes with the kit's width helpers and checks overlap, viewBox bounds and non-empty output for every figure.
+
+## 1.18 additions: atlas revisions figure
+
+`atlasCards(input, doc)` takes the active snapshot from the public document and the snapshot before it from the authoring document, filtered to repositories reachable in public output (a public card, or marked public when removed), then `compareSnapshots` gives changed / added / removed. `atlasSvg` lays the cards out from the root view, draws the declared relationships dashed and prints revisions at seven characters.

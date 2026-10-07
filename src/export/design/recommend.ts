@@ -27,6 +27,7 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
  const steps=doc.story.filter(s=>doc.views.some(v=>v.id===s.viewId)),here=steps.filter(s=>s.viewId===spec.viewId).length;
  const cells=new Set(spec.nodes.map(x=>`${x.basis}|${x.confidence??'none'}`)).size,statuses=new Set(spec.nodes.map(x=>x.designStatus)).size;
  const roles=[...contextRoles(spec.nodes,edges).values()],entries=roles.filter(r=>r==='entry').length,sinks=roles.filter(r=>r==='sink').length,inner=roles.filter(r=>r==='inner').length;
+ const repos=doc.atlas?.snapshots.find(x=>x.id===doc.atlas!.activeSnapshotId)?.repositories.length??0;
  const layers=layersOf(spec.nodes).length,count=spec.nodes.length,empty=!count;
  const numeric=table?.series.length??0,rows=table?.block.rows.length??0,on=table?` on ${owner??'a component'}`:'',noTable='no numeric table evidence on this view';
  const r:Record<FigureType,[number,string]>={
@@ -47,6 +48,7 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
   radial:hubDeg>=3&&depth>=3?[Math.min(68,52+hubDeg*2),`${hubLabel} has ${hubDeg} connections on a flow ${depth} steps deep`]:[hubDeg>=3?40:12,hubDeg>=3?`${hubLabel} has ${hubDeg} connections, short reach`:'no component with 3 or more connections'],
   context:entries&&sinks&&inner?[60,`${n(entries,'entry point')}, ${n(sinks,'sink')} and ${inner} inside`]:[entries&&sinks?28:10,entries&&sinks?'no component between entry points and sinks':'no clear sources and sinks'],
   status:statuses>1?[Math.min(62,46+statuses*4),`${statuses} distinct designed statuses`]:[10,'one designed status for every component'],
+  atlas:repos>=2?(spec.viewId===doc.rootViewId?[76,`${n(repos,'repository')} at their own revisions in the atlas snapshot`]:[30,`an atlas of ${n(repos,'repository')}; its revisions read best from the root view`]):repos?[24,'an atlas with only 1 repository']:[4,'not an atlas document (npm run atlas)'],
   lineage:count>=5&&depth>=3?[66,`${n(count,'component')} on a flow ${depth} steps deep`]:[count>=3&&depth>=2?28:10,count<5?`only ${n(count,'component')}, no clear flow`:`flow only ${depth} step(s) deep`]};
  return FIGURES.map((type,i)=>({type,score:r[type][0],reason:r[type][1],i})).sort((a,b)=>b.score-a.score||a.i-b.i).map(({type,score,reason})=>({type,score,reason}));
 }
