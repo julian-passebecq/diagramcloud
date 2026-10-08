@@ -65,8 +65,12 @@ export function validateGraphSnapshot(raw:unknown):GraphSnapshot{
  unique(g.removed_assertion_ids??[],'tombstone');
  if(g.removed_assertion_ids?.some(id=>g.assertions.some(a=>a.id===id)))throw new Error('A present assertion cannot also be tombstoned.');
  if(g.predecessor_generation===g.generation_id)throw new Error('A generation cannot be its own predecessor.');
- for(const n of g.nodes){const seen=new Set([n.id]);let parent=n.parent_id;
-  while(parent){if(seen.has(parent))throw new Error('Cyclic GraphSnapshot parent hierarchy.');seen.add(parent);parent=g.nodes.find(x=>x.id===parent)?.parent_id;}}
+ // Validate long hierarchies once without recursion or repeated linear lookup.
+ // A valid 10k-node selected file must not monopolize the browser on a chain.
+ const parents=new Map(g.nodes.map(n=>[n.id,n.parent_id])),finished=new Set<string>();
+ for(const n of g.nodes){if(finished.has(n.id))continue;const trail=new Set<string>();let id:string|undefined|null=n.id;
+  while(id&&!finished.has(id)){if(trail.has(id))throw new Error('Cyclic GraphSnapshot parent hierarchy.');trail.add(id);id=parents.get(id);}
+  for(const id of trail)finished.add(id);}
  // The source scope is the upper bound; imported group and node data never expand grants.
  if(g.nodes.some(n=>!orgs.has(n.organization_id)||!domains.has(n.privacy_domain_id))||
     g.source_refs.some(s=>!domains.has(s.privacy_domain_id)))
@@ -77,7 +81,8 @@ export function validateGraphSnapshot(raw:unknown):GraphSnapshot{
       a.source_ref_ids.some(id=>!refs.has(id)))||
     g.groups.some(x=>x.node_ids.some(id=>!nodes.has(id))))
   throw new Error('GraphSnapshot has unresolved node or source references; import refused without mutation.');
- if(g.source_refs.some(s=>!g.source_vector.some(v=>v.repo_id===s.repo_id&&v.revision===s.revision)))
+ const revisions=new Map(g.source_vector.map(v=>[v.repo_id,v.revision]));
+ if(g.source_refs.some(s=>revisions.get(s.repo_id)!==s.revision))
   throw new Error('GraphSnapshot source references are inconsistent with the revision vector.');
  return g;
 }

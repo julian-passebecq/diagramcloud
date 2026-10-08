@@ -60,3 +60,8 @@ test('reimport keeps authored evidence metadata even when generated code was not
  const incoming=fixture();incoming.generation_id='next';incoming.assertions[0].predicate='producer changes';
  assert.equal(previewGraphReimport(doc,incoming,0).document.blocks.find(x=>x.id===b.id)!.title,b.title);
 });
+
+test('deep selected-file hierarchy validates iteratively and still rejects a distant cycle',()=>{
+ const g=fixture();g.nodes=Array.from({length:9000},(_,i)=>({...g.nodes[1],id:'deep-'+i,label:'Synthetic depth',parent_id:i?'deep-'+(i-1):null}));g.assertions=[];g.groups=[];
+ assert.equal(validateGraphSnapshot(g).nodes.length,9000);g.nodes[0].parent_id='deep-8999';assert.throws(()=>validateGraphSnapshot(g),/Cyclic/);
+});
