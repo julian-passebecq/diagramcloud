@@ -1,0 +1,35 @@
+id,analyzer,inputs,state,basis,outputs,target,priority,notes
+S001,npm/package manifests,package.json/lockfiles,SHIPPED,static-source,technology/dependencies/containers,keep,P0,Current
+S002,Python manifests,requirements/pyproject,SHIPPED,static-source,technology/dependencies,keep,P0,Current
+S003,Go modules,go.mod,SHIPPED_PARTIAL,static-source,technology/dependencies,keep,P1,No deep Go imports yet
+S004,Docker,Dockerfile/docker-compose,SHIPPED,static-source,containers/services/dependencies,keep,P0,Current
+S005,Kubernetes,workloads/services/ingress,SHIPPED,static-source,deployment/network relations,keep,P0,Current
+S006,Terraform,*.tf,SHIPPED_PATTERN,static-source,resources/references/providers,keep,P0,No HCL evaluation
+S007,GitHub Actions,.github/workflows,SHIPPED,static-source,build/deploy declarations,keep,P0,Run status belongs Lens/observations
+S008,SQL,*.sql,SHIPPED,static-source,tables/lineage/FK,keep,P0,Pattern parser
+S009,dbt source parsing,models/ref/source,SHIPPED,static-source,lineage,keep,P0,Prefer manifest when available
+S010,Prisma,schema.prisma,SHIPPED,static-source,models/relations,keep,P1,Current
+S011,TS/JS imports,source files,SHIPPED,static-source,modules/files/imports,keep,P0,Current
+S012,Python imports,source files,SHIPPED,static-source,modules/files/imports,keep,P0,Current
+S013,Docs/Markdown/ADR,md/mdx,MISSING,static-source,document hierarchy/links/decisions,1.24,P0,Deterministic explicit refs first
+S014,CSV knowledge,csv,MISSING,static-source,schema/IDs/explicit refs/source URLs,1.24,P0,Useful for Galaxy Knowledge
+S015,dbt manifest artifact,target/manifest.json,MISSING,static-source,nodes/sources/tests/exposures/groups/parent_map,1.24,P1,Structured artifact preferred
+S016,Databricks bundles,databricks.yml + includes,MISSING,static-source,jobs/tasks/pipelines/notebooks/targets,1.24,P1,Current official format
+S017,Fabric/PBIP, .platform/PBIR/PBIP/TMDL,MISSING,static-source,items/logical IDs/models/reports,1.24.x,P1,Source control metadata
+S018,OpenAPI,openapi.yaml/json,MISSING,static-source,services/routes/contracts,1.24,P1,Enables cross-repo joins
+S019,.NET,sln/csproj/C#,MISSING,static-source,projects/references/endpoints/EF,1.25,P1,High value for user ecosystem
+S020,Azure IaC,Bicep/ARM/azd,MISSING,static-source,resources/deployment,1.25,P2,Do not query Azure
+S021,Helm/Kustomize,charts/overlays,MISSING,static-source,K8s composition,later,P2,Bounded
+S022,Tree-sitter deep,multiple languages,MISSING,static-source,symbols/calls,later,P2,Deep profile only
+S023,OpenLineage adapter,events/static design lineage,MISSING,static-source/observed,jobs/datasets/runs,later,P2,Keep JobEvent vs RunEvent distinct
+S024,OpenTelemetry adapter,service/traces,MISSING,observed,services/spans/runtime relations,later,P2,Observation only
+S025,Git revision / rename matcher,git refs diff metadata,PARTIAL_HEAD_ONLY,static-source,temporal identity and candidate rename,1.25,P1,Use provider-native Git engine when available; never assume live
+S026,GitLab CI / Azure pipelines,pipeline YAML and provider metadata,MISSING,static-source,build job stages deployment targets,1.25,P2,No secret values; real outcomes via receipt separately
+S027,Environment declaration extractor,"CI env, Databricks targets, IaC overlays",MISSING,static-source,EnvironmentRef source-backed candidates,1.24.x,P1,Not proof target is deployed
+S028,Build/release evidence adapter,"build artifact manifest, release metadata",MISSING,static-source/observed,source artifact release references,1.25,P1,"Exact artifact ID/hash, provider scope"
+S029,Deployment runtime reader,authorized provider deployment records,MISSING,observed,timestamped deployment instance evidence,1.26,P2,Outside static scanner; no credentials in client
+S030,Nonsecret config/flag source detector,"appsettings, config maps, feature flag schema",MISSING,static-source,configuration scope metadata,1.26,P2,No env contents/tokens/secrets
+S031,Identity/owner/codeowners,CODEOWNERS and explicitly stated team contacts,MISSING,declared/static-source,ownership candidates,1.25,P2,Business vs code vs operations roles remain distinct
+S032,Git submodule/subtree metadata,"gitmodules, worktree metadata",PARTIAL_SKIPPED,static-source,nested repo identity/links,1.25,P2,Do not recursively mix nested .git
+S033,Generated/vendor file classification,generated markers vendored manifests lockfiles,PARTIAL_IGNORE,static-source,scan omissions/by origin,1.24.x,P1,Skipped does not imply absent
+S034,SBOM/lockfile metadata,SPDX CycloneDX lockfiles,MISSING,static-source,dependency relation and license hints,later,P2,Not vulnerability audit certification

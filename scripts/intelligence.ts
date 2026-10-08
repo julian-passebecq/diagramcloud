@@ -9,6 +9,7 @@ import {secretInText} from '../src/core/secrets';
 import {projectReadiness} from '../src/intelligence/readiness';
 import {planAssets, assetChecklistCsv} from '../src/intelligence/assets';
 import {parseProjectBrief, compileProjectBrief} from '../src/intelligence/brief';
+import {compileGraphSnapshot, GRAPH_SNAPSHOT_MAX_BYTES} from '../src/intelligence/graphSnapshot';
 import {mapDocuments, DOCUMENT_LIMITS} from '../src/intelligence/documents';
 import type {DocumentInput, Purpose} from '../src/intelligence/types';
 
@@ -16,10 +17,10 @@ const args = process.argv.slice(2), mode = args.shift();
 const value = (flag: string) => {const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : undefined;};
 const fail = (message: string): never => {throw new Error(message);};
 try {
-  if (!mode || !['inspect', 'brief', 'docs'].includes(mode)) fail('Usage: npm run intelligence -- inspect|brief|docs --input <file.json> --out <new-directory> [--purpose understand|project|portfolio|presentation|audit]');
+  if (!mode || !['inspect', 'brief', 'docs', 'graph'].includes(mode)) fail('Usage: npm run intelligence -- inspect|brief|docs|graph --input <file.json> --out <new-directory> [--purpose understand|project|portfolio|presentation|audit]');
   const path = value('--input') || fail('--input is required');
   const directory = value('--out') || fail('--out is required (use a new directory)');
-  const limit = mode === 'brief' ? 512 * 1024 : mode === 'docs' ? DOCUMENT_LIMITS.totalBytes * 2 : 12 * 1024 * 1024;
+  const limit = mode === 'brief' ? 512 * 1024 : mode === 'graph' ? GRAPH_SNAPSHOT_MAX_BYTES : mode === 'docs' ? DOCUMENT_LIMITS.totalBytes * 2 : 12 * 1024 * 1024;
   if (statSync(path).size > limit) fail('Input exceeds the supported byte budget');
   const raw = readFileSync(path, 'utf8');
   const output: Record<string, string> = {};
@@ -28,11 +29,11 @@ try {
     if (!Array.isArray(input) || input.length > DOCUMENT_LIMITS.files || !input.every(row => row && typeof row === 'object' && typeof row.path === 'string' && typeof row.text === 'string')) fail('docs input must be a bounded JSON array of {path,text}; only explicitly selected files');
     output['document-map.json'] = JSON.stringify(mapDocuments(input as DocumentInput[], text => !secretInText(text)), null, 2);
   } else {
-    const candidate = mode === 'brief' ? compileProjectBrief(parseProjectBrief(raw)) : null;
+    const candidate = mode === 'brief' ? compileProjectBrief(parseProjectBrief(raw)) : mode === 'graph' ? compileGraphSnapshot(JSON.parse(raw)) : null;
     const project = candidate?.document || parseDocument(raw);
     if (candidate) {
       output['project.candidate.json'] = JSON.stringify(project, null, 2);
-      if (candidate.manifest) output['project-manifest.private.json'] = JSON.stringify(candidate.manifest, null, 2);
+      if ('manifest' in candidate && candidate.manifest) output['project-manifest.private.json'] = JSON.stringify(candidate.manifest, null, 2);
       output['warnings.txt'] = candidate.warnings.join('\n');
     }
     const report = projectReadiness(project, {purpose: (value('--purpose') || 'understand') as Purpose});

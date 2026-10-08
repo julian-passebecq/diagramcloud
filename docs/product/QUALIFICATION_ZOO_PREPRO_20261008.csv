@@ -1,0 +1,26 @@
+fixture_id,fictional_client,shape,technologies,positive_assertion,forbidden_assertion,special_case,phase,oracle_file
+Z001,PocketCLI,single-repo tiny,Python CLI,modules and files with test,no microservices / PROD invented,tiny no external deps,1.24,truth/pocketcli.truth.json
+Z002,ZeroRepo,single-repo empty,unknown,overview and gaps,empty canvas must not fail,empty data,1.24,truth/zerorepo.truth.json
+Z003,Lighthouse Shop,single fullstack,React API Postgres GitHub Actions,system containers dependencies CI,no invented runtime traffic,classic web,1.24,truth/lighthouse-shop.truth.json
+Z004,Acme Commerce,multi-repo,web API data infra BI,exact interrepo contract based on source,no joins by name alone,ProjectBrief vs Git,1.24,truth/acme-commerce.truth.json
+Z005,Reference Library,docs-only,Markdown ADR CSV JSON YAML,source row and section links,no fabricated deployments,Galaxy Knowledge analogue,1.24,truth/reference-library.truth.json
+Z006,Storehouse Warehouse,single-repo,dbt manifest SQL,tests exposures model DAG,no runtime assertion,dbt structured artifact,1.24.x,truth/storehouse.truth.json
+Z007,Summit Forecast,single-repo,Databricks bundle notebooks jobs pipelines,job DAG and dev/prod targets,no actual PROD success,DAB bundle,1.24.x,truth/summit-forecast.truth.json
+Z008,Northwind BI,single-repo,Fabric PBIR TMDL,model/report relation,no remote workspace claim,Fabric item identities,1.24.x,truth/northwind-bi.truth.json
+Z009,Fabrikam Orders,single-repo,.NET Bicep Azure,project refs and service topology,no known runtime,C# analyzer gap,1.25,truth/fabrikam-orders.truth.json
+Z010,Pulse Bus,multi-component,event queue worker,pub/sub and DLQ supported,no packet trace without events,event architecture,1.25,truth/pulsebus.truth.json
+Z011,ModelLab,ML project,MLflow pipeline serving,train/serve distinct,training test not proof serving PROD,ML environment,1.25,truth/modellab.truth.json
+Z012,CloudShift,multi-cloud migration,Oracle Fabric Azure Databricks,old/transitional/target labelled,planned Fabric != deployed,migration and staged rollout,1.25,truth/cloudshift.truth.json
+Z013,TwoWorlds,multi-repo enterprise,Azure AWS GCP Kubernetes,provider boundaries and regions,no cross-repo joins by same name,multi-region tenant,1.25,truth/twoworlds.truth.json
+Z014,MirrorDoc,single-repo conflicting,README PostgreSQL SQLite code,conflict notice and refs,no silent choose README,stale docs,1.24,truth/mirrordoc.truth.json
+Z015,TwoDrivers,single-repo ambiguous,Postgres + SQL Server packages,unknown/possible evidence,not both confirmed stores,ambiguous tech,1.24,truth/twodrivers.truth.json
+Z016,SecretGarden,single-repo adversarial,env creds certs tfvars,ignore/report sensitive files,no secret in output,privacy,1.24,truth/secretgarden.truth.json
+Z017,SameName,multi-repo collision,two api modules named core,independent identities,no name-based false link,identity,1.24,truth/samename.truth.json
+Z018,GeneratedOcean,single-repo large,generated and vendor source,skip/count report and bounded scan,no fabricated absence,scale,1.24.x,truth/generatedocean.truth.json
+Z019,BranchWorks,temp git history,git init branches renames worktree,stable time identity,no tracked .git in fixtures,Git metadata,1.24.x,truth/branchworks.truth.json
+Z020,StagedCloud,project environments,Dev Test Stage Prod flags,custom names and per-env refs,no green PROD from YAML,environments,1.25,truth/stagedcloud.truth.json
+Z021,TwinSnapshots,snapshot pair,same repo at t0/t1,accurate additions/removals,no fake move or parser drift,evolution,1.25,truth/twinsnapshots.truth.json
+Z022,BrokenSnapshot,partial scan pair,missing permissions at t1,uncertainty about absent source,no false removal,time incompleteness,1.25,truth/brokensnapshot.truth.json
+Z023,StaticOnlyProd,single-repo declared prod,GitHub Actions environment production,prod deployment unknown,no observed deployment,static/runtime distinction,1.24.x,truth/staticonlyprod.truth.json
+Z024,MissingLogo,single-repo cloud,Azure function not in registry,generic icon fallback,no generated vendor logo,asset plan,1.24.x,truth/missinglogo.truth.json
+Z025,AtlasPrivate,local read-only real,Markdown CSV multi-repo,pinned source refs and no writes,no private data committed,real optional,1.24,truth/atlasprivate.truth.json
