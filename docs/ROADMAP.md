@@ -2,6 +2,14 @@
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
 
+## Current product and NIGHT4 source linkage (2026-10-08)
+
+- **Shipped product:** 1.24.0 Project Intelligence, [release evidence](release-1.24/RELEASE_NOTES.md), [tag](https://github.com/julian-passebecq/diagramcloud/releases/tag/v1.24.0). The historical **Shipped in 1.23.0** section below remains version history, not the current version.
+- **Recovered complete historical feature catalogue (F001–F115), UX/preset/render/scanner matrices, architectural decisions and post-1.24 Tech Lead audit:** [product source index](product/README.md). Preserve original row IDs; original pre-1.24 statuses are not current shipped status.
+- **Selected new delivery:** 17 NIGHT4 criteria (DG-001..DG-017). See the [read-only F↔DG crosswalk](product/NIGHT4_CROSSWALK.md) and the externally owned [NIGHT4 acceptance source](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/92d256f75e334b685fb327ab552e718fbb51f001/workstreams/COCKPIT-20261008-NIGHT4/features.csv). Selected does not mean implemented. Do not import all 115 historical ideas as NIGHT4 tasks.
+- **Preserve independent DiagramCloud:** six 1.24 journeys, all existing authoring/presentation/export paths; Galaxy GraphSnapshot is a private reviewed input, never a required service or new canonical graph. Future environment evolution, visual modes and R2 remain product roadmap items outside NIGHT4 unless explicitly selected.
+
+
 ## Shipped in 1.23.0
 
 - **Labels never under cards**: canvas connection labels are placed along or beside the route where no card is (`src/ui/labelPlace.ts`), shortened with … and a tooltip when a gap is too short.
