@@ -1,0 +1,76 @@
+{
+  "format": "diagramcloud.project-brief",
+  "version": 1,
+  "project": {
+    "id": "demo-forecast",
+    "title": "Demo Forecast Platform",
+    "summary": "Synthetic training project: explain how forecasts move from inputs to a business report."
+  },
+  "scope": [
+    {
+      "id": "data",
+      "title": "Data preparation",
+      "kind": "workstream"
+    },
+    {
+      "id": "ingest",
+      "title": "Import demand",
+      "kind": "task",
+      "parentId": "data"
+    },
+    {
+      "id": "forecast",
+      "title": "Forecast service",
+      "kind": "system"
+    },
+    {
+      "id": "report",
+      "title": "Decision report",
+      "kind": "component"
+    }
+  ],
+  "relationships": [
+    {
+      "from": "ingest",
+      "to": "forecast",
+      "label": "prepared demand",
+      "kind": "batch",
+      "id": "flow-1"
+    },
+    {
+      "from": "forecast",
+      "to": "report",
+      "label": "forecast outputs",
+      "kind": "query",
+      "id": "flow-2"
+    }
+  ],
+  "teams": [
+    {
+      "id": "analytics",
+      "title": "Demo analytics team"
+    }
+  ],
+  "ownership": [
+    {
+      "scopeId": "report",
+      "teamId": "analytics",
+      "role": "business"
+    }
+  ],
+  "environments": [
+    {
+      "id": "dev",
+      "title": "Development",
+      "kind": "development"
+    },
+    {
+      "id": "prod",
+      "title": "Production target",
+      "kind": "production"
+    }
+  ],
+  "questions": [
+    "What is declared, and what has actually been inspected?"
+  ]
+}
