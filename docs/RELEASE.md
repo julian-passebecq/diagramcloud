@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.23.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.24.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,6 +44,7 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
+| 1.24.0 | tag `v1.24.0`; exact commit in release receipt | [PR #56](https://github.com/julian-passebecq/diagramcloud/pull/56) and release artifact | exact-head receipt | Vercel production from `main`; state/smoke recorded separately | [Project Intelligence journeys and limits](release-1.24/RELEASE_NOTES.md); Chromium only |
 | 1.23.0 | head of the wave 8 PR (`feat/wave8`) | linked from the PR | E2E_VERIFIED (automated) | Vercel production from `main` | Label placement, crossing-free auto layout; Chromium only |
 | 1.22.0 | `d1afe47` (tag `v1.22.0`) | 37573627433 | E2E_VERIFIED (automated) | Vercel production from `main` | Routed canvas connections, layout wrap; Chromium only |
 | 1.21.0 | `c645f62` (tag `v1.21.0`) | 37570701431 | E2E_VERIFIED (automated) | Vercel production from `main` | Auto layout, component-shape quality check; Chromium only |

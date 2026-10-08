@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {Button} from '@fluentui/react-components';
 import {errorMessage,type Project} from '../core/model';
 import {SIDECAR_PATH,readManifestIdentity,readSidecar,sidecarNotes,type ManifestIdentity,type SidecarFolder,type SidecarLink} from '../bridge/sidecar';
+import {ProjectReadiness} from './ProjectReadiness';
 
 type PickerWindow=Window&{showDirectoryPicker?:(options?:{id?:string;mode?:'read'|'readwrite'})=>Promise<SidecarFolder>};
 export type FoundSidecar={folder:SidecarFolder;text:string;hash:string;manifest:ManifestIdentity|null};
@@ -34,5 +35,6 @@ export function RepositoryBridge(p:Props){
   {linked&&<p className="micro">Linked to <b>{p.link!.folder.name}/{SIDECAR_PATH}</b>{p.link!.baseRevision===p.project.revision?' · in sync':' · changes not yet saved to the repository'}</p>}
   {missing&&<div className="note-card" role="status"><strong>No {SIDECAR_PATH} in {missing.folder.name}</strong>{missing.manifest&&<> · DataPass project “{missing.manifest.title}”</>}<p>Create it from the open project “{p.project.title}”? The file is the full authoring document, so review it before you commit it.</p><Button appearance="primary" disabled={busy} onClick={()=>run(async()=>{if(await p.onCreate(missing.folder))setMissing(null);})}>Create repository file</Button></div>}
   {notes.map(note=><p key={note} className="micro repo-note">{note}</p>)}
+  <ProjectReadiness project={p.project}/>
  </section>;
 }

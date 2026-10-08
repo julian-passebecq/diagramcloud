@@ -8,6 +8,7 @@ import {svgDiagram} from '../src/export/diagram';
 import {generateNotices} from './notices';
 import {checkIcons,fileIcons} from './icons';
 import {patchSchema} from '../src/core/patch';
+import {projectBriefSchema} from '../src/intelligence/brief';
 import {packSchema} from '../src/experience/model';
 import {examplePack} from '../src/experience/sample';
 import {workspaceHtml} from '../src/experience/render';
@@ -27,6 +28,7 @@ checkIcons();
 const icons=fileIcons();
 
 mkdirSync('public/examples',{recursive:true});
+writeFileSync('public/diagramcloud.project-brief.schema.json',JSON.stringify({...zodToJsonSchema(projectBriefSchema,{name:'DiagramCloudProjectBrief',target:'jsonSchema7'}),description:'Author declarations. Must pass validateProjectBrief, compile, then the candidate review before applying. Not observed runtime evidence.'},null,2)+'\n');
 const schema=zodToJsonSchema(documentSchema,{name:'DiagramCloudDocument',target:'jsonSchema7'});
 writeFileSync('public/diagramcloud.schema.json',JSON.stringify({...schema,$id:'https://diagramcloud.local/schema/v1',description:'Structural schema. Imports must ALSO pass validateDocument for relational references, view membership and drilldown-cycle checks.'},null,2)+'\n');
 writeFileSync('public/diagramcloud.patch.schema.json',JSON.stringify({...zodToJsonSchema(patchSchema,{name:'DiagramCloudPatch',target:'jsonSchema7'}),$id:'https://diagramcloud.local/schema/patch/v1',description:'RFC 6902 JSON Patch envelope. Path segments may be @<id> to address an array item by stable ID. The patch is refused if targetId or baseRevision do not match the open project or pack, if it changes any id, or if the result fails validateDocument / validatePack.'},null,2)+'\n');
