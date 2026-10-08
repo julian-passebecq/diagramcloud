@@ -20,6 +20,7 @@ for(const c of evidence.checks)for(const ref of c.evidenceRefs)if(!/^https:/.tes
 if(!existsSync('dist/index.html'))throw new Error('Build the application first');
 mkdirSync(dirname(out),{recursive:true});mkdirSync(out);mkdirSync(join(out,'cli'));
 await build({entryPoints:['scripts/intelligence.ts','scripts/intelligence-mcp.ts'],outdir:join(out,'cli'),bundle:true,platform:'node',format:'esm',target:'node22',outExtension:{'.js':'.mjs'},banner:{js:'import {createRequire} from "node:module";const require=createRequire(import.meta.url);'}});
+for(const [source,target] of [['LICENSE','LICENSE'],['THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md'],['public/third-party-licenses.txt','dependency-licenses.txt']])copyFileSync(source,join(out,'cli',target));
 const tracked=execFileSync('git',['ls-files','-z'],{encoding:'utf8'}).split('\0').filter(Boolean);
 if(tracked.some(p=>/^(?:\.git|\.local|node_modules|release|test-results)(?:\/|$)/.test(p)||/\.(?:woff2?|ttf|otf)$/i.test(p)||/[\r\n]/.test(p)||p.startsWith('-')))throw new Error('Unsafe source package membership');
 const generated=['public/diagramcloud.schema.json','public/diagramcloud.patch.schema.json','public/diagramcloud.project-brief.schema.json','public/examples','public/experience','public/galaxy','public/third-party-licenses.txt'].filter(existsSync);
