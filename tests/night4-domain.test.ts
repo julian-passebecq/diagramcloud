@@ -4,7 +4,7 @@ import {validateDocument,documentSchema} from '../src/core/model';
 import {analyzeDomainFiles,extendWithDomainFacts} from '../src/intelligence/domainAdapters';
 
 const blank=()=>documentSchema.parse({schemaVersion:1,id:'synthetic-project',title:'Synthetic',rootViewId:'root',
- nodes:[{id:'root-node',label:'Project'}],views:[{id:'root',title:'Project',nodeIds:['root-node']}]});
+ nodes:[{id:'root-node',label:'Project'}],edges:[],views:[{id:'root',title:'Project',nodeIds:['root-node']}]});
 test('NIGHT4 native dbt manifest uses unique IDs and explicit dependency lineage',()=>{
  const selected=[{path:'target/manifest.json',text:JSON.stringify({metadata:{dbt_schema_version:'https://schemas.getdbt.com/dbt/manifest/v12.json'},
   nodes:{'model.shop.orders':{name:'orders',depends_on:{nodes:['source.shop.raw']}},
