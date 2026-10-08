@@ -49,10 +49,11 @@ export function nestedRepositoryPrefixes(paths:string[]):string[]{
 export function outsideNestedRepositories<T extends {path:string}>(items:T[]):T[]{const nested=nestedRepositoryPrefixes(items.map(i=>i.path));return items.filter(i=>!nested.some(n=>i.path===n||i.path.startsWith(`${n}/`)));}
 export function wantedFile(path:string):boolean{
  if(GIT_FILES.test(path))return true;
- if(IGNORED_DIR.test(path)||SECRET_FILE.test(path))return false;
+ if((IGNORED_DIR.test(path)&&!/(^|\/)target\/manifest\.json$/i.test(path))||SECRET_FILE.test(path))return false;
  const name=baseOf(path).toLowerCase();
  return name==='package.json'||/^requirements[\w.-]*\.txt$/.test(name)||name==='pyproject.toml'||name==='go.mod'||/^dockerfile/.test(name)||/\.dockerfile$/.test(name)
-  ||/\.(ya?ml)$/.test(name)||/\.tf$/.test(name)||name==='schema.prisma'||/\.sql$/.test(name)||/^\.env\.(example|sample|template|dist)$/.test(name)||SOURCE.test(name);
+  ||/\.(ya?ml)$/.test(name)||/\.tf$/.test(name)||name==='schema.prisma'||/\.sql$/.test(name)
+  ||/\.(pbir|pbip|tmdl|csproj|sln|slnx)$/.test(name)||name==='manifest.json'||name==='openapi.json'||name==='swagger.json'||name==='.platform'||/^\.env\.(example|sample|template|dist)$/.test(name)||SOURCE.test(name);
 }
 export const MAX_FILE_BYTES=512*1024,MAX_FILES=6000;
 
