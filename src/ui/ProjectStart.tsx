@@ -12,10 +12,14 @@ export function ProjectStart({onRepository, onBrief, onClose, busy, error}: Proj
   const [source, setSource] = useState<AnalysisSource>('repository');
   const [options, setOptions] = useState<AnalysisOptions>({...DEFAULT_OPTIONS});
   const [raw, setRaw] = useState(''), [title, setTitle] = useState(''), [summary, setSummary] = useState('');
+  const [explicitId, setExplicitId] = useState<string>();
   const [steps, setSteps] = useState(''), [localError, setLocalError] = useState('');
+  const slug = title.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const projectId = explicitId ?? (slug ? (/^[a-z]/.test(slug) ? slug : `project-${slug}`).slice(0, 40).replace(/-+$/g, '') : '');
+  const validId = /^[a-z][a-z0-9-]{0,39}$/.test(projectId);
   const submit = () => {
     const input = raw.trim() || JSON.stringify({format: 'diagramcloud.project-brief', version: 1,
-      project: {id: 'guided-project', title: title.trim(), summary},
+      project: {id: projectId, title: title.trim(), summary},
       scope: steps.split('\n').map(s => s.trim()).filter(Boolean).map((label, i) => ({id: `step-${i + 1}`, title: label, kind: 'workstream'}))});
     void onBrief(input, options, source === 'hybrid' ? 'hybrid' : 'guided');
   };
@@ -28,11 +32,11 @@ export function ProjectStart({onRepository, onBrief, onClose, busy, error}: Proj
     {source === 'repository' ? <label className="pi-file">Select repository folder<input aria-label="Analysis repository folder" type="file" multiple {...{webkitdirectory: '', directory: ''}} disabled={busy} onChange={e => {if(e.target.files) void onRepository(e.target.files, options); e.target.value = '';}}/></label> : <>
       <label>{source === 'hybrid' ? 'ProjectBrief or project manifest JSON' : 'ProjectBrief JSON'}<textarea aria-label="Project brief JSON" value={raw} onChange={e => setRaw(e.target.value)} rows={7} placeholder='{"format":"diagramcloud.project-brief","version":1,…}'/></label>
       <label className="pi-file">Import brief file<input aria-label="Project brief file" type="file" accept=".json,application/json" disabled={busy} onChange={async e => {const file = e.target.files?.[0]; if(!file) return; if(file.size > 512 * 1024) {setLocalError('Brief exceeds 512 KiB'); return;} setRaw(await file.text()); setLocalError('');}}/></label>
-      {source === 'guided' && <details open={!raw}><summary>Or enter a small project</summary><div className="pi-form"><label>Project title<input aria-label="Guided project title" value={title} onChange={e => setTitle(e.target.value)} maxLength={160}/></label><label>Purpose and scope<textarea aria-label="Guided project summary" value={summary} onChange={e => setSummary(e.target.value)} maxLength={3000}/></label><label>Workstreams / steps (one per line)<textarea aria-label="Guided project steps" value={steps} onChange={e => setSteps(e.target.value)} rows={4}/></label></div></details>}
+      {source === 'guided' && <details open={!raw}><summary>Or enter a small project</summary><div className="pi-form"><label>Project title<input aria-label="Guided project title" value={title} onChange={e => setTitle(e.target.value)} maxLength={160}/></label><label>Project ID<input aria-label="Guided project ID" aria-describedby="guided-id-help" aria-invalid={projectId.length > 0 && !validId} value={projectId} onChange={e => setExplicitId(e.target.value)} maxLength={40} pattern="[a-z][a-z0-9-]{0,39}"/></label><p className="micro" id="guided-id-help">Stable identity: a lowercase letter followed by letters, digits or hyphens, at most 40 characters. Keep an existing project's ID when updating its brief.</p><label>Purpose and scope<textarea aria-label="Guided project summary" value={summary} onChange={e => setSummary(e.target.value)} maxLength={3000}/></label><label>Workstreams / steps (one per line)<textarea aria-label="Guided project steps" value={steps} onChange={e => setSteps(e.target.value)} rows={4}/></label></div></details>}
       {source === 'hybrid' && <p className="micro">Membership and cross-repository relations must be explicit. Each repository keeps its own revision; unavailable members remain unscanned.</p>}
-      <button type="button" disabled={busy || (!raw.trim() && (source === 'hybrid' || !title.trim()))} onClick={submit}>Preview project</button>
+      <button type="button" disabled={busy || (!raw.trim() && (source === 'hybrid' || !title.trim() || !validId))} onClick={submit}>Preview project</button>
     </>}
-    <details><summary>Advanced · manual assistance</summary><p>Analysis works without a model. After opening a project, Copy context in Evidence and import a reviewed proposal through JSON / AI.</p><label><input type="checkbox" checked={options.includeInferred} onChange={e => setOptions({...options, includeInferred: e.target.checked})}/> Include labelled inferred relationships</label></details>
+    <details><summary>Advanced · manual assistance</summary><p>Analysis works without a model. After opening a project, Copy context in Evidence and import a reviewed proposal through JSON / AI.</p></details>
     {busy && <p role="status">Preparing bounded analysis…</p>}{(error || localError) && <p role="alert">{error || localError}</p>}
   </section>;
 }
