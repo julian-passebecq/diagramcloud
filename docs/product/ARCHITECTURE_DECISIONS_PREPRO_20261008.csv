@@ -1,0 +1,39 @@
+id,decision,status,why,consequence
+D001,Canonical authoring remains Project,ACCEPT,Avoid second source of truth,Project is bounded authoring/publication model; generated analysis is separate
+D002,Add AnalysisBundle,PROPOSED_1_24,Avoid Project limit explosion,Detailed source graph is rebuildable and bounded at projection time
+D003,Standalone-first,ACCEPT,Any Git repo must work,DataPass/Galaxy enrich but never required
+D004,Three orthogonal axes,PROPOSED_1_24,Avoid mode explosion,Source / Purpose / AI separate from Explore/Edit/Portfolio/Present
+D005,Capability fingerprint multi-label,PROPOSED_1_24,Projects span domains,"Recipes selected from capabilities, not one type"
+D006,Minimum View Contract,PROPOSED_1_24,Every repo must yield value,Baseline overview/structure/relations/gaps
+D007,Recipe library as validated data,PROPOSED_1_24,Avoid giant conditional UI,Question+requirements+projection+render config
+D008,Logical and physical trees separate,PROPOSED_1_24,A repo is not a project/task hierarchy,Map between ProjectBrief scope and Git entities
+D009,Docs graph deterministic first,PROPOSED_1_24,Trust/provenance,Agent prose extraction remains candidate
+D010,Multi-repo uses revision vector,ACCEPT,No single project SHA,Reuse Atlas model
+D011,Cross-repo joins require strong keys,PROPOSED_1_24,Reduce false architecture,No same-tech/name-only relation
+D012,Visual dimensions separated,PROPOSED_1_24,Avoid 100 diagram types,Projection/layout/profile/motion/output distinct
+D013,Business renderers are fixed-purpose,PROPOSED_1_24,Keep scope useful,No general Canva clone
+D014,IsoSVG only for semantic depth,PROPOSED_1_25,Avoid decorative 3D,"Pure SVG 2.5D, no WebGL"
+D015,Mosaic owns real spatial 3D,ACCEPT,Avoid duplicate runtime,ConceptSpec bridge remains
+D016,Hop stays DataPass-owned,ACCEPT,Avoid duplicate IDE UX,DiagramCloud may consume/link understanding
+D017,Gap Report first-class,PROPOSED_1_24,Honest Auto/Agentic UX,Mandatory vs optional missing info explicit
+D018,Agent proposals never self-approve,ACCEPT,Truth/evidence safety,Revision/human gates preserved
+D019,Verification outside renderer,PROPOSED_1_26,No arbitrary shell in DiagramCloud,Provider-native runner returns receipt
+D020,Neo4j optional only,PROPOSED,Keep local-first,Borrow document-graph pattern; no mandatory graph DB
+D021,Current custom layout remains default,PROPOSED,1.23 quality is strong,Benchmark ELK/TALA before dependency/change
+D022,App shell refactor before feature growth,PROPOSED_1_24,App.tsx complexity,Behavior-preserving PR0
+D023,"Evolution is generic, not Galaxy-only",ACCEPT_DIRECTION,Any project changes over time,Snapshot/Delta/EvolutionProjection with source revisions and clocks
+D024,"ChatGPT is on-demand, not local always-live observer",ACCEPT_DIRECTION,Avoid wrong source authority,Point-in-time analysis; explicit host live event/feed semantics
+D025,Environments distinct from data zones,ACCEPT_DIRECTION,Bronze/Silver/Gold are not dev/stage/prod,"EnvironmentRef + deployment instances, no cloned logical components"
+D026,Release and deployment distinct from Git commit,PROPOSED_REVIEW,Accurate production state and drift,Model source->artifact->release->environment instance
+D027,All dimensions optional by recipe/context,ACCEPT_DIRECTION,Useful for tiny CLI and large enterprise,Conditional applicability + no mandatory everything
+D028,Presets are multi-label and advanced parameters hidden,ACCEPT_DIRECTION,Avoid 25-checkbox onboarding,Simple source/purpose/AI; Quick/Standard/Deep on demand
+D029,Three libraries stay distinct,PROPOSED_REVIEW,Avoid pattern hallucination,Pattern examples vs recipes vs qualification zoo
+D030,Synthetic client zoo as release qualification,ACCEPT_DIRECTION,Detect blind spots and false facts,Truth manifests; adversarial fixtures and temp .git history
+D031,Do not commit nested .git repos into DiagramCloud,ACCEPT_DIRECTION,Scanner and CI isolation,Use plain fixture roots; temp git init for history scenarios
+D032,AssetPlan distinct from GapReport,ACCEPT_DIRECTION,Missing icon cannot block semantic analysis,Registry->generic fallback->optional generation
+D033,Cloudflare R2 only optional private asset vault,ACCEPT_DIRECTION,Local-first and private publication,Bucket exists; adapter future; no public export dependency
+D034,R2 vendor images rights still independently reviewed,ACCEPT_DIRECTION,Cloud object location does not change trademark rules,Never synthesize fake provider logos
+D035,Limit 1.24 by shippable vertical slices,PROPOSED_REVIEW,Original PR plan may be too wide,Hard scope vs 1.24.x/1.25/1.26 after Tech Lead
+D036,Source semantics separate from visual profile,ACCEPT_DIRECTION,Multiple output styles without factual drift,"AI image gen only optional assets, no raster diagram truth"
+D037,Provider/cockpit fact ownership is layered,ACCEPT_DIRECTION,Lens/PM/Agent/T3/DiagramCloud separation,"No duplicate Git engine, runtime controller, or agent harness"
+D038,Unknown or not applicable must be explicit,ACCEPT_DIRECTION,Avoid bogus completeness requirements,Gap per selected recipe and scope; no global checklists everywhere
