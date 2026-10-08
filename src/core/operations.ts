@@ -7,6 +7,11 @@ export function removeNode(input:Project,nodeId:string):Project{const d=clone(in
 /** Remove private and unreachable content, rather than hiding it with CSS. */
 export function publicDocument(input:Project):Project{
  const d=clone(input);delete d.privateNotes;delete d.portfolio;
+ // A public component does not publish the text of a still-private cited source.
+ // Authors can explicitly detach the citation when approving their own caption.
+ const privateSources=new Set(input.sources.filter(s=>s.visibility!=='public').map(s=>s.id));
+ for(const n of d.nodes)if(n.sourceIds.some(id=>privateSources.has(id))){n.summary='';n.role='';}
+ for(const b of d.blocks)if(b.sourceIds.some(id=>privateSources.has(id)))b.visibility='private';
  if(d.experience){try{d.experience=publicPack(d.experience);}catch{delete d.experience;}}
  for(const node of d.nodes)if(node.experienceWorkspaceId&&!d.experience?.workspaces.some(w=>w.id===node.experienceWorkspaceId))delete node.experienceWorkspaceId;
  const publicViews=new Set(d.views.filter(v=>v.visibility==='public').map(v=>v.id)),keptViews=new Set<string>(),keptNodes=new Set<string>();

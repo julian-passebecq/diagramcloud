@@ -1,6 +1,6 @@
 # DiagramCloud 1.24 - Code Lead decision and execution entrypoint
 
-Status: implementation foundation, not a completed 1.24 release.
+Status: six journeys implemented in the release candidate. Qualification and delivery evidence: RELEASE_NOTES.md and the exact-head release receipt. The foundation description below is the original execution handoff.
 Baseline: `2558758e06d48010fbaf7bdb9594d32f36900f09` (1.23.0).
 Continue branch `codex/project-intelligence-1-24`; do not start a second application.
 

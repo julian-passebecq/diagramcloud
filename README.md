@@ -11,7 +11,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.23.0** (`package.json`; shown in the header) |
+| Product version | **1.24.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -21,6 +21,14 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 **What it is:** React + TypeScript + Fluent UI + React Flow, Vite build, IndexedDB storage, no server, no account, no database. Optional integrations (Google Drive asset vault, DataPass repository folder bridge) stay optional.
 
 **What it is not:** a cloud runtime, an IDE, a notebook kernel, a SQL/Python/DAX/Spark engine, a Git or task authority, a MongoDB UI, live infrastructure monitoring, or a replacement for DataPass VS Code, Studio or Galaxy. Code and rows are displayed, never executed.
+
+## Project Intelligence (1.24.0)
+
+**New analysis** offers Repository, Guided (without Git), or Hybrid with explicitly declared repositories. Choose a purpose and Quick/Standard depth, review the validated candidate, then apply. The toolbar opens Business overview, Structure, Relationships and Evidence / gaps. **Navigate** switches one filtered Project / Repositories / Views tree at a time; **Details panel** opens optional Evidence / Gaps / Assets.
+
+A selected unknown/docs-only folder returns a bounded inventory and exact Markdown/CSV provenance links, with honest missing-relationship and unsupported states. Guided ProjectBrief tasks reuse evidence workspaces. Hybrid uses the existing Atlas and individual rescans; unavailable members remain declared and each repository keeps its own revision. Acquired files and reports are private until author publication review. Business overview exports semantic public HTML offline; asset plans use the icon registry and generic fallbacks. No model, Git setup, server, token or cloud service is needed.
+
+Quick: 200 files / 64 KiB each / 4 MiB total. Standard: 1,500 / 256 KiB / 16 MiB; Markdown/CSV keep tighter limits. Content digest, readable HEAD hint and unknown dirty state remain separate. Reimport preserves existing authored text and positions; it adds stable IDs instead of deleting unmatched work. Browser folder-name identity is bounded: use explicit Hybrid IDs for similarly named independent roots. See [release notes and limits](docs/release-1.24/RELEASE_NOTES.md).
 
 ## The grammar
 
