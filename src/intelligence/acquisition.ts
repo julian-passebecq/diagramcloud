@@ -4,6 +4,7 @@ import {secretInText} from '../core/secrets';
 import {mapDocuments, wantedDocument, DOCUMENT_LIMITS} from './documents';
 import type {DocumentMap, Purpose} from './types';
 import {materializeAnalysis} from './materialize';
+import {analyzeDomainFiles,extendWithDomainFacts} from './domainAdapters';
 
 export const ACQUISITION_PROFILES = {
   quick: {files:200, fileBytes:64*1024, totalBytes:4*1024*1024},
@@ -37,7 +38,7 @@ export async function analyzePickedFolder(list:ArrayLike<File>,options:{depth:'q
   const add=(entry:InventoryEntry)=>{if(entries.length<2000)entries.push(entry);else omittedEntries++;};
   for(const item of raw){
     const {path,f}=item;
-    if(!validPath(path)||secretInText(path)||seen.has(path)||!outside.has(item)||SECRET_FILE.test(path)||(IGNORED_DIR.test(path)&&!/^\.git\/(HEAD|packed-refs|refs\/heads\/.+)$/.test(path))){ignored++;continue;}
+    if(!validPath(path)||secretInText(path)||seen.has(path)||!outside.has(item)||SECRET_FILE.test(path)||(IGNORED_DIR.test(path)&&!/(^|\/)target\/manifest\.json$/i.test(path)&&!/^\.git\/(HEAD|packed-refs|refs\/heads\/.+)$/.test(path))){ignored++;continue;}
     seen.add(path);
     const doc=wantedDocument(path),code=wantedFile(path);
     if(!doc&&!code){unsupported++;add({path,bytes:f.size,state:'unsupported'});continue;}
@@ -62,6 +63,7 @@ export async function analyzePickedFolder(list:ArrayLike<File>,options:{depth:'q
   const model=scanRepository(files,{name:selectedRoot});
   const result=documentFromScan(model,{fileName:selectedRoot});
   const documentMap=mapDocuments(documents,text=>!secretInText(text));
+  const domain=analyzeDomainFiles(files);
   // Persist a bounded map rather than allowing hundreds of long heading/record lists
   // to exceed the authoring document's size budget.
   let mapBytes=0;
@@ -72,10 +74,12 @@ export async function analyzePickedFolder(list:ArrayLike<File>,options:{depth:'q
   documentMap.diagnostics=documentMap.diagnostics.filter(item=>{const size=JSON.stringify(item).length;if(diagnosticBytes+size>100000){documentMap.omitted.diagnostics++;return false;}diagnosticBytes+=size;return true;});
   const analysis:AcquisitionAnalysis={inventory:{entries:entries.sort((a,b)=>compare(a.path,b.path)),selectedFiles:all.length,readFiles,readBytes,omittedEntries,unsupported,ignored,limited},
     sourceIdentity:{selectedRoot,sourceRevision:model.commit??null,contentDigest:`sha256:${await digest(new TextEncoder().encode(hashes.join('\n')))}`,scopeComplete:!limited&&!ignored&&!unsupported&&!omittedEntries&&!documentMap.omitted.documents&&!documentMap.omitted.links&&!documentMap.omitted.diagnostics,observedAt:new Date().toISOString(),dirtyState:'unknown',profile:options.depth,analyzerVersion:'diagramcloud-acquisition/1'},
-    documentMap,technologies:[...model.detectors.keys()]};
+    documentMap,technologies:[...new Set([...model.detectors.keys(),...domain.capabilities.map(c=>'specialist:'+c)])]};
   abort(signal);
-  const document=materializeAnalysis(result.document,analysis);
+  const document=materializeAnalysis(extendWithDomainFacts(result.document,domain),analysis);
   result.report.kept.push(`Inspected ${readFiles} of ${all.length} selected files (${options.depth}); ${documents.length} Markdown/CSV documents mapped. Content digest identifies inspected bytes; HEAD and dirty state are separate.`);
+  if(domain.facts.length)result.report.kept.push(`Static specialist artifacts: ${domain.facts.length} facts, ${domain.links.length} explicitly declared relations, ${domain.capabilities.join(', ')}. Nothing executed.`);
+  if(domain.diagnostics.length)result.report.lost.push(`Specialist limitations: ${domain.diagnostics.slice(0,12).join(' | ')}`);
   result.report.lost.push(`${unsupported} unsupported, ${ignored} excluded/unsafe, ${limited} budget-limited files. Revision ${model.commit?'is a HEAD hint only':'unknown'}; dirty state unknown. No runtime claims established.`);
   return {document,report:result.report,analysis,read:readFiles,model};
 }
