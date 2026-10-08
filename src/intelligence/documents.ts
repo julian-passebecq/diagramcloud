@@ -1,4 +1,11 @@
 import type {DocumentInput, DocumentMap, DocumentDiagnostic, DocumentLink} from './types';
+import {secretInText} from '../core/secrets';
+
+/** Application boundary for already-authorized inventory text. Filtering remains
+ * mandatory even when metadata was accepted; document instructions stay inert. */
+export function mapAuthorizedDocuments(input: readonly DocumentInput[]): DocumentMap {
+  return mapDocuments(input, text => secretInText(text) === null);
+}
 
 export const DOCUMENT_LIMITS = {files: 200, fileBytes: 128 * 1024, totalBytes: 8 * 1024 * 1024, rows: 2000, columns: 40, links: 4000, diagnostics: 1000} as const;
 const compare = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0;

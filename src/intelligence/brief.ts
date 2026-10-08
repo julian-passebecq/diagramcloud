@@ -2,6 +2,7 @@ import {z} from 'zod';
 import {documentSchema, validateDocument, type Project} from '../core/model';
 import {manifestRepositorySchema, validateManifest, type ProjectManifest} from '../core/atlas/manifest';
 import {secretFindings} from '../core/secrets';
+import {validatePack} from '../experience/model';
 
 const id = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/);
 const title = z.string().min(1).max(160);
@@ -136,6 +137,28 @@ export function compileProjectBrief(input: unknown): {document: Project; manifes
     document.views[0].nodeIds.push('brief-project-card');
   }
   document.views[0].positions = Object.fromEntries(document.views[0].nodeIds.map((id, i) => [id, {x: (i % 3) * 300, y: Math.floor(i / 3) * 180}]));
+  // Logical navigation and task workspaces reuse the existing experience grammar.
+  // All declarations stay private and draft; compiling never grants publication approval.
+  const rootId = 'brief-project';
+  document.experience = validatePack({format: 'diagramcloud.experience', schemaVersion: 1,
+    id: `brief-experience-${b.project.id}`, title: b.project.title, rootId,
+    sources: [{id: 'project-brief-source', title: 'Author-supplied ProjectBrief', kind: 'manual',
+      locator: 'Declared project context', visibility: 'private'}],
+    entities: [{id: rootId, label: b.project.title, type: 'project', summary: b.project.summary.slice(0, 2000),
+      children: b.scope.filter(s => !s.parentId).map(s => nodeId(s.id)), workspaceIds: [], sourceIds, visibility: 'private', assertion: 'declared'},
+      ...b.scope.map(s => ({id: nodeId(s.id), label: s.title, type: s.kind === 'system' ? 'subsystem' : s.kind,
+        summary: s.summary, children: b.scope.filter(c => c.parentId === s.id).map(c => nodeId(c.id)),
+        workspaceIds: s.kind === 'task' ? [`brief-workspace-${s.id}`] : [], sourceIds, visibility: 'private', assertion: 'declared'}))],
+    relations: [],
+    items: b.scope.filter(s => s.kind === 'task').map(s => ({id: `brief-task-note-${s.id}`, title: s.title,
+      type: 'note', entityId: nodeId(s.id), sourceIds, visibility: 'private', provenance: 'author', approval: 'draft',
+      text: [s.summary || 'Task declared by the author. Implementation and outcomes are not established.',
+        s.repositoryIds.length ? `Declared repository bindings: ${s.repositoryIds.join(', ')}` : 'No repository binding supplied.'].join('\n')})),
+    workspaces: b.scope.filter(s => s.kind === 'task').map(s => ({id: `brief-workspace-${s.id}`, title: s.title,
+      entityId: nodeId(s.id), description: 'Author-declared task. Evidence is displayed, never executed.', visibility: 'private',
+      placements: [{id: `brief-task-placement-${s.id}`, itemId: `brief-task-note-${s.id}`, x: 0, y: 0, w: 12, h: 4}]})),
+  });
+  for (const s of b.scope.filter(s => s.kind === 'task')) document.nodes.find(n => n.id === nodeId(s.id))!.experienceWorkspaceId = `brief-workspace-${s.id}`;
   return {document: validateDocument(document), manifest: briefManifest(b), warnings: [
     'Candidate only. Apply through the existing review flow; do not overwrite an edited project.',
     'Generated nodes, evidence and child views are private. Publication requires an explicit visibility/source review.',
