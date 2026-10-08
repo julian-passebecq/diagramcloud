@@ -2,6 +2,7 @@ import type {Project} from '../core/model';
 import {publicDocument} from '../core/operations';
 import {readAcquisitionAnalysis} from '../intelligence/materialize';
 import {NodeEvidence} from './Evidence';
+import {repositoryOutputFacts} from '../intelligence/recipes';
 
 /** A bounded source sheet, separate from the logical component graph. */
 export function AnalysisOutputs({project, publicMode, output, onView, repositoryId}: {
@@ -9,15 +10,16 @@ export function AnalysisOutputs({project, publicMode, output, onView, repository
 }) {
   const doc = publicMode ? publicDocument(project) : project;
   const analysis = publicMode ? null : readAcquisitionAnalysis(doc,repositoryId);
+  const scoped=repositoryOutputFacts(doc,repositoryId),relationships=scoped.views.filter(v=>v.edgeIds.length);
   if (output === 'relationships') return <section className="analysis-sheet" aria-label="Relationships output">
     <h2>Relationships</h2><p>Declared and static source connections describe different meanings. They do not establish runtime traffic or timing.</p>
-    {doc.edges.length ? doc.views.filter(v=>v.edgeIds.length).slice(0,7).map(v=><button key={v.id} onClick={()=>onView(v.id)}>{v.title} · {v.edgeIds.length} connections</button>) : <p>No relationship was established in this selection. No arrows have been invented.</p>}
+    {relationships.length ? relationships.slice(0,7).map(v=><button key={v.id} onClick={()=>onView(v.id)}>{v.title} · {v.edgeIds.length} connections</button>) : <p>No relationship was established in this selection. No arrows have been invented.</p>}
   </section>;
   if (output === 'evidence') return <section className="analysis-sheet" aria-label="Evidence output"><h2>Evidence and source gaps</h2>
     <p>{doc.provenance || 'No source provenance supplied.'}</p>
     {analysis && <p>Content digest: <code>{analysis.sourceIdentity.contentDigest}</code><br/>Revision hint: {analysis.sourceIdentity.sourceRevision || 'unknown'} · worktree state unknown · {analysis.sourceIdentity.scopeComplete?'selected scope admitted':'partial scope'}. This is static source, never observed runtime.</p>}
-    {doc.nodes.filter(n=>n.blockIds.length).slice(0,20).map(n=><NodeEvidence key={n.id} doc={doc} node={{...n,blockIds:n.blockIds.filter(id=>!/^analysis-(?:context-|repo-.*-context-)/.test(id))}}/>)}
-    {!doc.blocks.length && <p>No evidence attached. Use the optional Gaps panel for questions appropriate to your purpose.</p>}
+    {scoped.nodes.filter(n=>n.blockIds.length).slice(0,20).map(n=><NodeEvidence key={n.id} doc={doc} node={{...n,blockIds:n.blockIds.filter(id=>!/^analysis-(?:context-|repo-.*-context-)/.test(id))}}/>)}
+    {!scoped.nodes.some(n=>n.blockIds.some(id=>!/^analysis-(?:context-|repo-.*-context-)/.test(id))) && <p>No evidence attached. Use the optional Gaps panel for questions appropriate to your purpose.</p>}
   </section>;
   return <section className="analysis-sheet" aria-label="Structure output"><h2>Structure and selected documentation</h2>
     {analysis ? <><p>{analysis.inventory.readFiles} files read from {analysis.inventory.selectedFiles} selected entries. {analysis.inventory.limited} limited, {analysis.inventory.ignored} ignored, {analysis.inventory.unsupported} unsupported. Inventory paths are source locations, not business tasks.</p>

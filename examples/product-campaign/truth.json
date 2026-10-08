@@ -1,0 +1,26 @@
+{
+  "format": "diagramcloud.synthetic-truth/1",
+  "domains": [
+    "azure",
+    "databricks",
+    "dbt",
+    "dotnet",
+    "fabric"
+  ],
+  "requiredRelations": [
+    "PBIR declared datasetReference",
+    "dbt declared depends_on",
+    "declared depends_on",
+    "solution member",
+    "PackageReference 1.0.0",
+    "operation schema $ref"
+  ],
+  "forbiddenClaims": [
+    "live deployment",
+    "production healthy",
+    "executed DAX",
+    "C# call graph",
+    "measured employer result"
+  ],
+  "provenance": "synthetic"
+}

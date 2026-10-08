@@ -1,0 +1,38 @@
+[
+  {
+    "path": "Retail.Report/definition.pbir",
+    "text": "{\"version\":\"4.0\",\"datasetReference\":{\"byPath\":{\"path\":\"../Retail.SemanticModel\"}}}"
+  },
+  {
+    "path": "Retail.SemanticModel/definition.pbism",
+    "text": "{\"version\":\"4.0\"}"
+  },
+  {
+    "path": "Retail.SemanticModel/definition/tables/Sales.tmdl",
+    "text": "table Sales\n  measure Revenue"
+  },
+  {
+    "path": "target/manifest.json",
+    "text": "{\"metadata\":{\"dbt_schema_version\":\"https://schemas.getdbt.com/dbt/manifest/v12.json\"},\"nodes\":{\"model.synthetic.orders\":{\"name\":\"orders\",\"depends_on\":{\"nodes\":[\"source.synthetic.raw\"]}}},\"sources\":{\"source.synthetic.raw\":{\"name\":\"raw\"}},\"exposures\":{\"exposure.synthetic.report\":{\"name\":\"report\",\"depends_on\":{\"nodes\":[\"model.synthetic.orders\"]}}}}"
+  },
+  {
+    "path": "pipeline.job.json",
+    "text": "{\"name\":\"Synthetic pipeline\",\"tasks\":[{\"task_key\":\"load\"},{\"task_key\":\"publish\",\"depends_on\":[{\"task_key\":\"load\"}]}]}"
+  },
+  {
+    "path": "Example.sln",
+    "text": "Project(\"type\") = \"Api\", \"Api/Api.csproj\", \"id\""
+  },
+  {
+    "path": "Api/Api.csproj",
+    "text": "<Project><PackageReference Include=\"Synthetic.Library\" Version=\"1.0.0\" /></Project>"
+  },
+  {
+    "path": "openapi.json",
+    "text": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"Synthetic API\"},\"paths\":{\"/items\":{\"get\":{\"responses\":{\"200\":{\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/Item\"}}}}}}}},\"components\":{\"schemas\":{\"Item\":{\"type\":\"object\"}}}}"
+  },
+  {
+    "path": "main.bicep",
+    "text": "resource web 'Microsoft.Web/sites@2024-04-01' = {}"
+  }
+]

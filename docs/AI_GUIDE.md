@@ -121,7 +121,7 @@ Run `npm run design -- doc.json --out figures/` and read `figures/suggestions.js
 | What is the path of one request? | `sequence` | connections (order from connections, not timing) |
 | What is the walkthrough? | `timeline` | story steps |
 | What are the numbers? | `chart` / `line` / `heatmap` | a numeric table evidence block |
-| Where does it run? | `deployment` | providers running 2+ components |
+| Where does it run? | `deployment` | declared delivery instances or provider fields |
 | How much is backed by source? | `matrix` | basis and confidence |
 | What touches this part? | `hub` / `radial` | a component with 3+ connections |
 | What enters and leaves? | `context` | entry points and sinks |
@@ -160,6 +160,25 @@ Write a `diagramcloud.patch` against the current `revision`, include `test` oper
 - Use `eval`, raw HTML from imported JSON, or network fetches in exports.
 
 ## 8. Where to look in the code
+
+### Candidate offline intelligence client
+
+The unmerged full-product candidate extends `npm run intelligence` (a new output directory is required):
+
+```sh
+npm run intelligence -- graph --input examples/product-campaign/graph-1.json --out .local/graph-one
+npm run intelligence -- graph --input examples/product-campaign/graph-2.json --current .local/graph-one/project.candidate.json --out .local/graph-two
+npm run intelligence -- analyze --input examples/product-campaign/native-artifacts.json --out .local/native
+npm run intelligence -- brief --input examples/product-campaign/project-brief.json --out .local/guided
+npm run intelligence -- delivery --input examples/product-campaign/delivery-brief.json --current .local/guided/project.candidate.json --out .local/delivery
+npm run intelligence -- evolution --input .local/guided/project.candidate.json --current .local/delivery/project.candidate.json --out .local/evolution
+npm run intelligence -- query --input .local/delivery/project.candidate.json --out .local/public-context
+npm run intelligence:mcp -- .local/delivery/project.candidate.json
+```
+
+Graph imports and reimports are private proposals; review `proposal.patch.json` in JSON / AI. Generation comparison does not execute tombstones. The browser can browse a large selected file and create a bounded partial selection; the CLI requires a scoped input within Project limits. Declared environments, artifacts and instances are separate from source branches. A `diagramcloud.delivery-brief/1` cannot create or review observations. Use the versioned examples rather than writing observed claims. The `deployment` figure groups declared instances by environment when those facts exist; its runtime remains unknown.
+
+Project Evolution in Edit compares a selected previous authoring backup locally; it does not import it. Comparison JSON is private. MCP stdout is JSON-RPC over stdio (protocol 2025-06-18); the process reads one selected document at startup and exposes only public query/render and reviewable design/NOT_RUN verification proposals. It cannot read arbitrary files or execute checks. MCP clients must initialize before calling tools. See `docs/product/CAMPAIGN_CLIENT.md` for supported source versions, limits and missing capabilities.
 
 | Need | File |
 |---|---|

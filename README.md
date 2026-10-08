@@ -24,6 +24,8 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 
 ## Project Intelligence (1.24.0)
 
+The full-product campaign on `codex/full-product-campaign-20261009` is an **unmerged candidate**, based on PR #57. It adds the private graph explorer/reimport, specialist native-artifact adapters, declaration-only environments and delivery, local evolution comparisons, bounded impact queries, public reports and optional selected-file MCP. Package version remains the shipped 1.24.0; no release or production promotion is implied. See [campaign interfaces and limits](docs/product/CAMPAIGN_CLIENT.md), [SHIP-REPORT.md](SHIP-REPORT.md), [outcome.json](outcome.json) and the [canonical roadmap](docs/ROADMAP.md).
+
 **New analysis** offers Repository, Guided (without Git), or Hybrid with explicitly declared repositories. Choose a purpose and Quick/Standard depth, review the validated candidate, then apply. The toolbar opens Business overview, Structure, Relationships and Evidence / gaps. **Navigate** switches one filtered Project / Repositories / Views tree at a time; **Details panel** opens optional Evidence / Gaps / Assets.
 
 A selected unknown/docs-only folder returns a bounded inventory and exact Markdown/CSV provenance links, with honest missing-relationship and unsupported states. Guided ProjectBrief tasks reuse evidence workspaces. Hybrid uses the existing Atlas and individual rescans; unavailable members remain declared and each repository keeps its own revision. Acquired files and reports are private until author publication review. Business overview exports semantic public HTML offline; asset plans use the icon registry and generic fallbacks. No model, Git setup, server, token or cloud service is needed.

@@ -1,0 +1,1904 @@
+{
+  "format": "diagramcloud.campaign-outcome/1",
+  "date": "2026-10-09",
+  "sourceBranch": "codex/full-product-campaign-20261009",
+  "basedOn": "091947452683102849eb225d67ef870fc6e2f1d0",
+  "shippedBaseline": "309099ef8b4fcaa8e6f836f2b40a39b148b5a6c1",
+  "merged": false,
+  "deployed": false,
+  "ownerVerified": false,
+  "scopeRule": "Statuses describe code against original feature scope, not release certification. Horizons guide the sole roadmap in docs/ROADMAP.md. Exact packaged source SHA/checks are generated in delivery-receipt.json and READY.json.",
+  "catalogue": "docs/product/FEATURES_PREPRO_20261008.csv",
+  "dg": [
+    {
+      "id": "DG-001",
+      "name": "Safe GraphSnapshot importer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F007",
+        "F019",
+        "F053"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-002",
+      "name": "Stable mapping and non-destructive reimport",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F032",
+        "F074"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-003",
+      "name": "Organization-aware snapshot client",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F014",
+        "F034",
+        "F090"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-004",
+      "name": "Seven useful graph perspectives",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F016",
+        "F020",
+        "F112"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-005",
+      "name": "Parent-retaining graph navigation",
+      "status": "PARTIAL",
+      "horizon": "V1",
+      "featureIds": [
+        "F014",
+        "F016",
+        "F018",
+        "F049"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Parent-retaining views, table filters, explicit hierarchy and keyboard collapse exist; canvas family filters/grouped projection remain."
+    },
+    {
+      "id": "DG-006",
+      "name": "Feature to evidence drilldown",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F058",
+        "F062",
+        "F067"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-007",
+      "name": "Scope-aware temporal comparison",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F074",
+        "F075",
+        "F076"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-008",
+      "name": "Private-first export boundary",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F070",
+        "F107"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-009",
+      "name": "Safe source and artifact navigation",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F035",
+        "F105"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-010",
+      "name": "CLI and offline file client",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F053",
+        "F064",
+        "F106"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-011",
+      "name": "Fabric static project analyzer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F025"
+      ],
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Supported selected source formats only; detailed native format limits are in CAMPAIGN_CLIENT.md."
+    },
+    {
+      "id": "DG-012",
+      "name": "Databricks static project analyzer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F024"
+      ],
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Supported selected source formats only; detailed native format limits are in CAMPAIGN_CLIENT.md."
+    },
+    {
+      "id": "DG-013",
+      "name": "dbt artifact lineage analyzer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F023"
+      ],
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Supported selected source formats only; detailed native format limits are in CAMPAIGN_CLIENT.md."
+    },
+    {
+      "id": "DG-014",
+      "name": "DotNET and OpenAPI static analyzer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F026",
+        "F027"
+      ],
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Supported selected source formats only; detailed native format limits are in CAMPAIGN_CLIENT.md."
+    },
+    {
+      "id": "DG-015",
+      "name": "Capability-driven recipes and symbols",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F009",
+        "F011",
+        "F088",
+        "F098",
+        "F099"
+      ],
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/core/icons.ts",
+        "src/ui/IntelligenceInsights.tsx"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-016",
+      "name": "Reopen and real client journey",
+      "status": "PARTIAL",
+      "horizon": "V1",
+      "featureIds": [
+        "F093",
+        "F094",
+        "F096",
+        "F097"
+      ],
+      "evidence": [
+        "tests/e2e/graph-client.spec.ts",
+        "RESUME.md"
+      ],
+      "limitation": "Synthetic full client journey passed; real authorized private Brain snapshot has not been supplied."
+    },
+    {
+      "id": "DG-017",
+      "name": "Packaged client and preserved product",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F068",
+        "F115"
+      ],
+      "evidence": [
+        "SHIP-REPORT.md",
+        "scripts/package-campaign.ts"
+      ],
+      "limitation": "Package is a candidate; no merge/deployment/owner verification. Exact source SHA and checksums are in the generated delivery receipt."
+    }
+  ],
+  "features": [
+    {
+      "id": "F001",
+      "name": "App shell extraction",
+      "originalAcceptance": "All current tests/e2e green; no UI behavior regression",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/App.tsx",
+        "src/ui/ProjectStart.tsx"
+      ],
+      "limitation": "UI seams extracted; App remains an orchestrator, not a complete shell/controller extraction.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F002",
+      "name": "Source mode axis",
+      "originalAcceptance": "Mode visible in start flow and retained for session",
+      "status": "PARTIAL",
+      "horizon": "V1",
+      "evidence": [
+        "src/ui/ProjectStart.tsx",
+        "tests/e2e/project-intelligence.spec.ts"
+      ],
+      "limitation": "Repository/Guided/Hybrid/Graph and real purpose/depth work; no autonomous AI axis or full preset wizard.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F003",
+      "name": "Purpose axis",
+      "originalAcceptance": "Purpose selects recipes/presets without changing truth",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/types.ts",
+        "src/ui/ProjectStart.tsx",
+        "src/ui/IntelligenceInsights.tsx"
+      ],
+      "limitation": "Five purposes and Quick/Standard affect acquisition, ranking, preview and impact budgets; Deep/Custom, education/work-review and all advanced axes remain future work.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F004",
+      "name": "AI autonomy axis",
+      "originalAcceptance": "Off has no LLM dependency; gates clear",
+      "status": "PARTIAL",
+      "horizon": "V4",
+      "evidence": [
+        "src/ui/ProjectStart.tsx",
+        "src/core/patch.ts"
+      ],
+      "limitation": "AI Off and manual Assist proposals work; DiagramCloud-owned autonomous execution is parked by ownership/safety boundary.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F005",
+      "name": "ProjectBrief v1",
+      "originalAcceptance": "Schema, examples, validation, preview/import",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/brief.ts",
+        "src/intelligence/bridge.ts",
+        "tests/intelligence-brief.test.ts",
+        "tests/e2e/project-intelligence.spec.ts"
+      ],
+      "limitation": "Strict ProjectBrief and private candidate compiler; explicit bindings and human import review, no runtime claims.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F006",
+      "name": "AnalysisProfile v1",
+      "originalAcceptance": "Deterministic validated profile",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/types.ts",
+        "src/ui/ProjectStart.tsx",
+        "src/ui/IntelligenceInsights.tsx"
+      ],
+      "limitation": "Five purposes and Quick/Standard affect acquisition, ranking, preview and impact budgets; Deep/Custom, education/work-review and all advanced axes remain future work.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F007",
+      "name": "AnalysisBundle v1",
+      "originalAcceptance": "Rebuildable; stable source refs; no Project limit inflation",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/materialize.ts",
+        "src/intelligence/graphSnapshot.ts",
+        "tests/acquisition.test.ts"
+      ],
+      "limitation": "Bounded generated analysis, source digest/profile identity and private receipts exist; no persistent general AnalysisBundle/cache database.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F008",
+      "name": "Analysis cache key",
+      "originalAcceptance": "Same inputs produce same key/result",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/materialize.ts",
+        "src/intelligence/graphSnapshot.ts",
+        "tests/acquisition.test.ts"
+      ],
+      "limitation": "Bounded generated analysis, source digest/profile identity and private receipts exist; no persistent general AnalysisBundle/cache database.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F009",
+      "name": "Capability fingerprint",
+      "originalAcceptance": "No forced single project archetype",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/readiness.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts",
+        "tests/intelligence.test.ts"
+      ],
+      "limitation": "Evidence-based multi-capability signals and purpose-relative gaps; unavailable facts reported rather than probabilistic classification.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F010",
+      "name": "GapReport v1",
+      "originalAcceptance": "Every gap explains impact and resolution",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/readiness.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts",
+        "tests/intelligence.test.ts"
+      ],
+      "limitation": "Evidence-based multi-capability signals and purpose-relative gaps; unavailable facts reported rather than probabilistic classification.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F011",
+      "name": "View Recipe registry",
+      "originalAcceptance": "Validated registry; data/config driven",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Seven capability/purpose-ranked recipes with reason and availability open actual views; not the full historical versioned recipe/availability vocabulary.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F012",
+      "name": "Minimum View Contract",
+      "originalAcceptance": "Unknown/sparse repo still produces 4 useful outputs",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/ProjectOverview.tsx",
+        "tests/e2e/project-intelligence.spec.ts"
+      ],
+      "limitation": "Four usable baseline outputs for unknown/document-only/guided repositories, including honest empty-state.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F013",
+      "name": "Start Wizard",
+      "originalAcceptance": "Keyboard accessible; no advanced clutter",
+      "status": "PARTIAL",
+      "horizon": "V1",
+      "evidence": [
+        "src/ui/ProjectStart.tsx",
+        "tests/e2e/project-intelligence.spec.ts"
+      ],
+      "limitation": "Repository/Guided/Hybrid/Graph and real purpose/depth work; no autonomous AI axis or full preset wizard.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F014",
+      "name": "Project navigator",
+      "originalAcceptance": "Navigate scope IDs and mappings",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx"
+      ],
+      "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F015",
+      "name": "Repository navigator",
+      "originalAcceptance": "Atlas repos then bounded structural drilldown",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx"
+      ],
+      "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F016",
+      "name": "Views navigator",
+      "originalAcceptance": "Search and navigate views",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx"
+      ],
+      "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F017",
+      "name": "Context panel",
+      "originalAcceptance": "Collapsible; selection synchronized",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx"
+      ],
+      "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F018",
+      "name": "Logical-physical combined view",
+      "originalAcceptance": "Origin of mappings visible",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx"
+      ],
+      "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F019",
+      "name": "Existing Project model",
+      "originalAcceptance": "No second authoring truth",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/model.ts",
+        "tests/core.test.ts"
+      ],
+      "limitation": "Canonical bounded Project schema 1 retained; optional delivery is additive and validated.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F020",
+      "name": "Existing ViewSpec",
+      "originalAcceptance": "Stable IDs/evidence/path preserved",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/viewspec.ts",
+        "tests/viewspec.test.ts"
+      ],
+      "limitation": "Existing renderer-neutral public projection retained; no facts added by a renderer.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F021",
+      "name": "Existing repository scanner",
+      "originalAcceptance": "No regressions",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "tests/scan.test.ts"
+      ],
+      "limitation": "Existing deterministic scanner retained, with additional selected native artifact paths.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F022",
+      "name": "Docs/knowledge v1",
+      "originalAcceptance": "Exact file/section/row evidence; no LLM required",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/documents.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/acquisition.test.ts"
+      ],
+      "limitation": "Markdown/CSV source sections/records and exact links work; no generalized JSON/YAML/PDF/ADR requirement-to-test semantics.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F023",
+      "name": "dbt manifest adapter",
+      "originalAcceptance": "Artifact preferred over heuristic when available",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts",
+        "tests/night4-domain.test.ts"
+      ],
+      "limitation": "dbt manifest v4-v12 native IDs, resources and exact dependencies preferred over heuristic text; no SQL execution.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F024",
+      "name": "Databricks bundle adapter",
+      "originalAcceptance": "Static-source only; included files resolved safely",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Bundle/resource YAML/JSON and Jobs task dependencies work; include resolution, targets and pipeline semantics incomplete.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F025",
+      "name": "Fabric/PBIP/TMDL adapter",
+      "originalAcceptance": "No Fabric runtime claims",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Supported PBIP/PBIR, selected semantic model and TMDL declarations/explicit references; not all platform/DAX/type semantics.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F026",
+      "name": "OpenAPI adapter",
+      "originalAcceptance": "Explicit contracts/evidence",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Solution/project/NuGet and OpenAPI operations/schemas/local refs work; no general cross-repo resolver, ASP.NET/EF/deep C# call graph.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F027",
+      "name": ".NET analyzer",
+      "originalAcceptance": "Structured references first",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Solution/project/NuGet and OpenAPI operations/schemas/local refs work; no general cross-repo resolver, ASP.NET/EF/deep C# call graph.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F028",
+      "name": "Azure analyzer",
+      "originalAcceptance": "Static config only",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Bicep resource type/API-version declarations only; ARM/azd/Functions/Container Apps resolution remains.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F029",
+      "name": "Helm/Kustomize",
+      "originalAcceptance": "Bounded config resolution",
+      "status": "NOT_STARTED",
+      "horizon": "V2",
+      "evidence": [
+        "docs/product/CAMPAIGN_CLIENT.md"
+      ],
+      "limitation": "Existing K8s scanning does not implement bounded Helm/Kustomize packaging/overlay resolution.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F030",
+      "name": "Tree-sitter deep graph",
+      "originalAcceptance": "Deep profile only, explicit budgets",
+      "status": "NOT_STARTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/scan/scanner.ts"
+      ],
+      "limitation": "No Tree-sitter symbol/call engine; existing textual imports are not a deep language graph.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F031",
+      "name": "Existing Project Atlas",
+      "originalAcceptance": "No single project SHA",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/atlas/compose.ts",
+        "tests/atlas.test.ts",
+        "tests/e2e/atlas.spec.ts"
+      ],
+      "limitation": "Explicit Atlas membership, per-repository revisions and preserved rescans.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F032",
+      "name": "Hybrid reconciliation",
+      "originalAcceptance": "Never overwrite conflicting evidence",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/bridge.ts",
+        "src/intelligence/refresh.ts",
+        "tests/intelligence-refresh.test.ts"
+      ],
+      "limitation": "Hybrid bindings and authored retention/conflicts work; no general semantic reconciliation engine.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F033",
+      "name": "Cross-repo resolver",
+      "originalAcceptance": "No same-tech/name-only joins",
+      "status": "NOT_STARTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/bridge.ts"
+      ],
+      "limitation": "Cross-repository links are explicit declarations; no strong-key candidate resolver is shipped.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F034",
+      "name": "Collection v1",
+      "originalAcceptance": "Independent project revision vectors",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/App.tsx"
+      ],
+      "limitation": "Independent gallery projects and pure projectCollection summary; no integrated organization landscape collection workflow.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F035",
+      "name": "Document lexical/source layer",
+      "originalAcceptance": "All extracted relations link to sources",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/documents.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/acquisition.test.ts"
+      ],
+      "limitation": "Markdown/CSV source sections/records and exact links work; no generalized JSON/YAML/PDF/ADR requirement-to-test semantics.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F036",
+      "name": "Agent entity extraction",
+      "originalAcceptance": "Candidate only; review required",
+      "status": "NOT_STARTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/documents.ts"
+      ],
+      "limitation": "Lexical source links only; no agent prose entity extraction.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F037",
+      "name": "Classic engineering profile",
+      "originalAcceptance": "Formalize profile, preserve canvas/export",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/Canvas.tsx",
+        "src/export/scene.ts"
+      ],
+      "limitation": "Existing technical canvas and export fidelity preserved; profile contract formalization remains.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F038",
+      "name": "Editorial profile",
+      "originalAcceptance": "Selective future type adoption",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/export/styled.ts",
+        "src/export/design/index.ts",
+        "tests/styled.test.ts"
+      ],
+      "limitation": "Existing Editorial/Blueprint/Diagram Design renderings and static offline public boundary retained.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F039",
+      "name": "Blueprint profile",
+      "originalAcceptance": "Preserve",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/export/styled.ts",
+        "src/export/design/index.ts",
+        "tests/styled.test.ts"
+      ],
+      "limitation": "Existing Editorial/Blueprint/Diagram Design renderings and static offline public boundary retained.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F040",
+      "name": "Business profile",
+      "originalAcceptance": "Not a general canvas",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/projectOverview.ts",
+        "src/export/intelligenceReport.ts",
+        "src/ui/ProjectOverview.tsx",
+        "tests/intelligence-overview.test.ts"
+      ],
+      "limitation": "Useful public overview, authored how-it-works story, delivery/evidence/verification gaps report; not all fixed historical business-sheet contracts.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F041",
+      "name": "Project Overview sheet",
+      "originalAcceptance": "Graceful gaps if context missing",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/projectOverview.ts",
+        "src/export/intelligenceReport.ts",
+        "src/ui/ProjectOverview.tsx",
+        "tests/intelligence-overview.test.ts"
+      ],
+      "limitation": "Useful public overview, authored how-it-works story, delivery/evidence/verification gaps report; not all fixed historical business-sheet contracts.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F042",
+      "name": "How It Works sheet",
+      "originalAcceptance": "Derived from path/story, source labels retained",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/projectOverview.ts",
+        "src/export/intelligenceReport.ts",
+        "src/ui/ProjectOverview.tsx",
+        "tests/intelligence-overview.test.ts"
+      ],
+      "limitation": "Useful public overview, authored how-it-works story, delivery/evidence/verification gaps report; not all fixed historical business-sheet contracts.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F043",
+      "name": "Work/Verification Brief",
+      "originalAcceptance": "No PASS without receipt",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/projectOverview.ts",
+        "src/export/intelligenceReport.ts",
+        "src/ui/ProjectOverview.tsx",
+        "tests/intelligence-overview.test.ts"
+      ],
+      "limitation": "Useful public overview, authored how-it-works story, delivery/evidence/verification gaps report; not all fixed historical business-sheet contracts.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F044",
+      "name": "IsoSVG profile",
+      "originalAcceptance": "No WebGL; fixed camera; static fallback",
+      "status": "NOT_STARTED",
+      "horizon": "R&D",
+      "evidence": [
+        "src/export/design/layers.ts"
+      ],
+      "limitation": "Existing Exploded static figure preserved; not a new IsoSVG fixed-camera profile or scenario animation/Trace.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F045",
+      "name": "Trace profile",
+      "originalAcceptance": "Illustrative vs observed explicit",
+      "status": "NOT_STARTED",
+      "horizon": "R&D",
+      "evidence": [
+        "src/export/design/layers.ts"
+      ],
+      "limitation": "Existing Exploded static figure preserved; not a new IsoSVG fixed-camera profile or scenario animation/Trace.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F046",
+      "name": "Mosaic external 3D",
+      "originalAcceptance": "Do not duplicate Three.js",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/export/concept.ts",
+        "tests/concept.test.ts"
+      ],
+      "limitation": "Existing owner-validated Mosaic concept adapter retained; no duplicated spatial engine.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F047",
+      "name": "PublicationBrief v1",
+      "originalAcceptance": "Presentation-only settings",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/designBrief.ts",
+        "src/core/viewspec.ts",
+        "src/ui/LargeGraphPreview.tsx",
+        "src/intelligence/recipes.ts"
+      ],
+      "limitation": "Presentation-only brief, omission/fidelity reporting and bounded projection/preview exist; no complete publication contract or automatic dense-figure splitting for every recipe.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F048",
+      "name": "Fidelity ledger",
+      "originalAcceptance": "Visible in preview/export QA",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/designBrief.ts",
+        "src/core/viewspec.ts",
+        "src/ui/LargeGraphPreview.tsx",
+        "src/intelligence/recipes.ts"
+      ],
+      "limitation": "Presentation-only brief, omission/fidelity reporting and bounded projection/preview exist; no complete publication contract or automatic dense-figure splitting for every recipe.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F049",
+      "name": "Complexity budgets",
+      "originalAcceptance": "Split overview/detail instead of tiny graphs",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/designBrief.ts",
+        "src/core/viewspec.ts",
+        "src/ui/LargeGraphPreview.tsx",
+        "src/intelligence/recipes.ts"
+      ],
+      "limitation": "Presentation-only brief, omission/fidelity reporting and bounded projection/preview exist; no complete publication contract or automatic dense-figure splitting for every recipe.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F050",
+      "name": "Geometric QA",
+      "originalAcceptance": "Extend, do not replace",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "tests/design-quality.test.ts",
+        "tests/helpers/designGeometry.ts",
+        "src/export/scene.ts"
+      ],
+      "limitation": "Unweakened geometric gates and measured scene routes preserved, including real local atlas qualification.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F051",
+      "name": "Semantic visual QA",
+      "originalAcceptance": "Sankey/treemap/waterfall/etc rules",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/design/recommend.ts",
+        "tests/design-quality.test.ts"
+      ],
+      "limitation": "Existing semantic figure requirements/reasons and geometry checks; no general quantitative A/B/C candidate scoring ledger.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F052",
+      "name": "Candidate comparison",
+      "originalAcceptance": "Scores expose reasons/metrics",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/design/recommend.ts",
+        "tests/design-quality.test.ts"
+      ],
+      "limitation": "Existing semantic figure requirements/reasons and geometry checks; no general quantitative A/B/C candidate scoring ledger.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F053",
+      "name": "Existing AI guide/design brief/patch",
+      "originalAcceptance": "Preserve human gate",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "docs/AI_GUIDE.md",
+        "src/core/patch.ts",
+        "src/core/designBrief.ts",
+        "tests/ai-guide.test.ts"
+      ],
+      "limitation": "Reviewed design/patch workflow and validated guide remain true; observations stay human-reviewed.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F054",
+      "name": "Thin MCP read/query",
+      "originalAcceptance": "Bounded outputs, no arbitrary FS",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "scripts/intelligence-mcp.ts",
+        "src/intelligence/context.ts",
+        "tests/mcp-client.test.ts"
+      ],
+      "limitation": "Bounded selected-file public-only stdio query for summary/components/evidence/views/impact/verification gaps; no arbitrary filesystem path or mutation.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F055",
+      "name": "Thin MCP render",
+      "originalAcceptance": "No semantic mutation",
+      "status": "PARTIAL",
+      "horizon": "V3",
+      "evidence": [
+        "scripts/intelligence-mcp.ts",
+        "src/intelligence/context.ts",
+        "tests/mcp-client.test.ts"
+      ],
+      "limitation": "Working public SVG render and design/NOT_RUN verification proposals; not every quality/delta/book/project/publication tool.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F056",
+      "name": "Thin MCP proposal",
+      "originalAcceptance": "Proposal-only",
+      "status": "PARTIAL",
+      "horizon": "V3",
+      "evidence": [
+        "scripts/intelligence-mcp.ts",
+        "src/intelligence/context.ts",
+        "tests/mcp-client.test.ts"
+      ],
+      "limitation": "Working public SVG render and design/NOT_RUN verification proposals; not every quality/delta/book/project/publication tool.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F057",
+      "name": "VerificationSpec v1",
+      "originalAcceptance": "Spec is not result",
+      "status": "PARTIAL",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/context.ts",
+        "src/core/realization.ts",
+        "src/core/galaxy.ts",
+        "tests/realization.test.ts"
+      ],
+      "limitation": "NOT_RUN proposal and existing reviewed external claims/verification receipts; full external VerificationSpec and receipt ingestion owner contract remains.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F058",
+      "name": "Verification receipt ingestion",
+      "originalAcceptance": "Exact revision/outcome/runner/evidence",
+      "status": "PARTIAL",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/context.ts",
+        "src/core/realization.ts",
+        "src/core/galaxy.ts",
+        "tests/realization.test.ts"
+      ],
+      "limitation": "NOT_RUN proposal and existing reviewed external claims/verification receipts; full external VerificationSpec and receipt ingestion owner contract remains.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F059",
+      "name": "Impact query",
+      "originalAcceptance": "Bounded traversal with evidence",
+      "status": "PARTIAL",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Bounded supplied-edge impact and missing reviewed-check gaps; no requirement/test-link inference or coverage percentage.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F060",
+      "name": "Test coverage gaps",
+      "originalAcceptance": "No fake coverage percentage",
+      "status": "PARTIAL",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Bounded supplied-edge impact and missing reviewed-check gaps; no requirement/test-link inference or coverage percentage.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F061",
+      "name": "DataPass Hop link",
+      "originalAcceptance": "Hop remains DataPass-owned",
+      "status": "PARTIAL",
+      "horizon": "V4",
+      "evidence": [
+        "src/core/atlas/lens.ts"
+      ],
+      "limitation": "Existing optional external pointers; Hop-specific owned contract unavailable here, no reimplementation.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F062",
+      "name": "Lens pointers",
+      "originalAcceptance": "Keep distinct from canvas minimap",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/atlas/lens.ts",
+        "tests/atlas.test.ts"
+      ],
+      "limitation": "Existing optional tolerant Lens runtime pointers retained; not copied into architecture facts.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F063",
+      "name": "DataPass sidecar bridge",
+      "originalAcceptance": "No contract regression",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/bridge/sidecar.ts",
+        "tests/bridge.test.ts"
+      ],
+      "limitation": "Existing reviewed DataPass sidecar bridge retained.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F064",
+      "name": "ProjectBrief compiler",
+      "originalAcceptance": "Avoid two truths; explicit precedence",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/brief.ts",
+        "src/intelligence/bridge.ts",
+        "tests/intelligence-brief.test.ts",
+        "tests/e2e/project-intelligence.spec.ts"
+      ],
+      "limitation": "Strict ProjectBrief and private candidate compiler; explicit bindings and human import review, no runtime claims.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F065",
+      "name": "Repository learning path",
+      "originalAcceptance": "Works AI Off",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/readiness.ts",
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx"
+      ],
+      "limitation": "Purpose-driven source/gap/recipe guidance and evidence gaps; not complete progressive education or stale-source audit preset.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F066",
+      "name": "Architecture/evidence audit preset",
+      "originalAcceptance": "Missing is reported, not guessed",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/readiness.ts",
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx"
+      ],
+      "limitation": "Purpose-driven source/gap/recipe guidance and evidence gaps; not complete progressive education or stale-source audit preset.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F067",
+      "name": "Original project->task->workspace flow",
+      "originalAcceptance": "Do not lose historical root",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/experience/model.ts",
+        "tests/e2e/experience.spec.ts"
+      ],
+      "limitation": "Original project-to-task-to-workspace evidence path retained.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F068",
+      "name": "Roadmap/readme truth cleanup",
+      "originalAcceptance": "Docs match 1.23 behavior",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "README.md",
+        "docs/ROADMAP.md",
+        "docs/AI_GUIDE.md",
+        "docs/product/CAMPAIGN_CLIENT.md"
+      ],
+      "limitation": "Release, candidate and future distinctions updated; recovered historical inputs unchanged.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F069",
+      "name": "Analysis budgets",
+      "originalAcceptance": "No unbounded deep scan",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts",
+        "src/ui/LargeGraphPreview.tsx"
+      ],
+      "limitation": "Real file/text/fact/relation/table budgets and omission receipts; no measured worker/time budget system for all analysis.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F070",
+      "name": "Source safety/redaction",
+      "originalAcceptance": "New analyzers respect existing rules",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/operations.ts",
+        "src/core/secrets.ts",
+        "tests/public-source-filter.test.ts",
+        "tests/graph-client.test.ts"
+      ],
+      "limitation": "Existing source safety and publicDocument retained and extended to internal receipts/delivery closure.",
+      "origin": "preserved-baseline"
+    },
+    {
+      "id": "F071",
+      "name": "Structurizr/LikeC4 export/import review",
+      "originalAcceptance": "Only if concrete workflow justifies",
+      "status": "NOT_STARTED",
+      "horizon": "V4",
+      "evidence": [
+        "src/core/interchange/index.ts"
+      ],
+      "limitation": "Existing draw.io/Mermaid/Visio adapters preserved; Structurizr/LikeC4 is research, not implementation.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F072",
+      "name": "Layout engine abstraction",
+      "originalAcceptance": "Do not destabilize current quality without benchmark",
+      "status": "PARTIAL",
+      "horizon": "V4",
+      "evidence": [
+        "src/core/layout.ts",
+        "tests/layout.test.ts"
+      ],
+      "limitation": "Current deterministic guarded layered layout retained; ELK/TALA evaluation parked without a concrete benchmark need.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F073",
+      "name": "Reference Architecture Cookbook",
+      "originalAcceptance": "Each core archetype has one synthetic reference fixture and expected views; generated outputs stay current in CI",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "examples/product-campaign/README.md",
+        "examples/product-campaign/truth.json",
+        "src/intelligence/recipes.ts",
+        "src/export/design/recommend.ts"
+      ],
+      "limitation": "Versioned synthetic domains and reasoned recipes plus existing samples; not full generated pattern classifier/cookbook or automatic archetype assertions.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F074",
+      "name": "Snapshot header and revision vector",
+      "originalAcceptance": "Cannot claim live or infer rollout from Git ref; two comparable snapshots have source refs",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F075",
+      "name": "Semantic delta matching",
+      "originalAcceptance": "No false removed on incomplete scans; deterministic semantic delta",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F076",
+      "name": "Project Evolution recipes",
+      "originalAcceptance": "Every claimed transition references source or says planned/unknown",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F077",
+      "name": "Verification and confidence evolution",
+      "originalAcceptance": "Tested only for exact receipt; stale evidence visible",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F078",
+      "name": "Current-transition-target migration map",
+      "originalAcceptance": "Planned target never labelled deployed",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F079",
+      "name": "Environment analysis identity",
+      "originalAcceptance": "Bronze/Silver/Gold separate; dynamic names; no secrets or forged runtime",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/model.ts",
+        "src/intelligence/delivery.ts"
+      ],
+      "limitation": "Typed custom environment identity/source refs separate from repository/branch; ephemeral/persistent role and complete binding facets remain.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F080",
+      "name": "Deployment instance facts",
+      "originalAcceptance": "One logical component across environments; source declaration not observed runtime",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/model.ts",
+        "src/intelligence/delivery.ts",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Distinct logical component/instance/environment/artifact identity and source declaration, with existing reviewed observation on instance only.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F081",
+      "name": "Build artifact and release chain",
+      "originalAcceptance": "No assume commit SHA is deployed artifact; preserve independent identities",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F082",
+      "name": "Promotion topology and gates",
+      "originalAcceptance": "Views include only source-backed environments and actual/declared distinction",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F083",
+      "name": "Environment matrix",
+      "originalAcceptance": "No green checks for unknown; sparse and multi-cloud readable",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F084",
+      "name": "Environment drift comparison",
+      "originalAcceptance": "No drift verdict from source YAML alone; timestamped evidence",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F085",
+      "name": "Feature flags and nonsecret config views",
+      "originalAcceptance": "No secrets in facts/exports; same code different configs can be expressed",
+      "status": "NOT_STARTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/model.ts"
+      ],
+      "limitation": "No typed feature/config/region/tenant/residency/DR facets; do not invent optional claims.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F086",
+      "name": "Region, tenancy, residency and DR facets",
+      "originalAcceptance": "Extensible typed facet without 80 optional Project fields",
+      "status": "NOT_STARTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/model.ts"
+      ],
+      "limitation": "No typed feature/config/region/tenant/residency/DR facets; do not invent optional claims.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F087",
+      "name": "User analysis profile preset",
+      "originalAcceptance": "Normal user sees few controls and can inspect why a view is recommended",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/types.ts",
+        "src/ui/ProjectStart.tsx",
+        "src/ui/IntelligenceInsights.tsx"
+      ],
+      "limitation": "Five purposes and Quick/Standard affect acquisition, ranking, preview and impact budgets; Deep/Custom, education/work-review and all advanced axes remain future work.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F088",
+      "name": "Contextual view availability",
+      "originalAcceptance": "Optional enterprise facts never block basic repo overview",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Seven capability/purpose-ranked recipes with reason and availability open actual views; not the full historical versioned recipe/availability vocabulary.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F089",
+      "name": "Advanced parameter panel",
+      "originalAcceptance": "Advanced settings collapsed by default and never mutate semantic facts",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/types.ts",
+        "src/ui/ProjectStart.tsx",
+        "src/ui/IntelligenceInsights.tsx"
+      ],
+      "limitation": "Five purposes and Quick/Standard affect acquisition, ranking, preview and impact budgets; Deep/Custom, education/work-review and all advanced axes remain future work.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F090",
+      "name": "Navigation combined lens",
+      "originalAcceptance": "Project hierarchy and physical Git hierarchy not conflated",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx"
+      ],
+      "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F091",
+      "name": "Pattern library classifier",
+      "originalAcceptance": "Bronze Silver Gold names not proof of deployed medallion pipeline",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "examples/product-campaign/README.md",
+        "examples/product-campaign/truth.json",
+        "src/intelligence/recipes.ts",
+        "src/export/design/recommend.ts"
+      ],
+      "limitation": "Versioned synthetic domains and reasoned recipes plus existing samples; not full generated pattern classifier/cookbook or automatic archetype assertions.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F092",
+      "name": "Architecture pattern catalog",
+      "originalAcceptance": "Pattern templates labelled illustrative with explicit evidence requirements",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "examples/product-campaign/README.md",
+        "examples/product-campaign/truth.json",
+        "src/intelligence/recipes.ts",
+        "src/export/design/recommend.ts"
+      ],
+      "limitation": "Versioned synthetic domains and reasoned recipes plus existing samples; not full generated pattern classifier/cookbook or automatic archetype assertions.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F093",
+      "name": "Synthetic client zoo baseline",
+      "originalAcceptance": "Tiny, multi-repo, docs, ambiguous, secrets and conflict fixtures pass",
+      "status": "PARTIAL",
+      "horizon": "V1",
+      "evidence": [
+        "examples/product-campaign/truth.json",
+        "tests/campaign-examples.test.ts",
+        "tests/graph-client.test.ts",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Versioned cross-domain synthetic fixtures and independent positive/negative privacy truth; not the full 25-project zoo matrix.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F094",
+      "name": "Negative fixture assertions",
+      "originalAcceptance": "Missing data never converted to unsupported fact; privacy fail=release block",
+      "status": "PARTIAL",
+      "horizon": "V1",
+      "evidence": [
+        "examples/product-campaign/truth.json",
+        "tests/campaign-examples.test.ts",
+        "tests/graph-client.test.ts",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Versioned cross-domain synthetic fixtures and independent positive/negative privacy truth; not the full 25-project zoo matrix.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F095",
+      "name": "Temporary Git history factory",
+      "originalAcceptance": "No nested tracked .git; stable fixtures across platforms",
+      "status": "NOT_STARTED",
+      "horizon": "V2",
+      "evidence": [
+        "tests/fixtures/atlas/shop.manifest.json"
+      ],
+      "limitation": "Existing fixture Git hints are not a deterministic isolated Git-history factory.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F096",
+      "name": "Truth manifests and oracle",
+      "originalAcceptance": "Assertions independent of model output; no blind pixel-only goldens",
+      "status": "PARTIAL",
+      "horizon": "V1",
+      "evidence": [
+        "examples/product-campaign/truth.json",
+        "tests/campaign-examples.test.ts",
+        "tests/graph-client.test.ts",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "Versioned cross-domain synthetic fixtures and independent positive/negative privacy truth; not the full 25-project zoo matrix.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F097",
+      "name": "Real read-only qualification stage",
+      "originalAcceptance": "Qualified claims list source SHA and tests, no private committed contents",
+      "status": "PARTIAL",
+      "horizon": "V1",
+      "evidence": [
+        "tests/design-quality.test.ts",
+        "SHIP-REPORT.md"
+      ],
+      "limitation": "Real local atlas quality is run without publication; real Brain/specialist installed-project qualification still unavailable.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F098",
+      "name": "Generic Core icon catalog",
+      "originalAcceptance": "Offline, deterministic, theme-safe fallback and attribution",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/icons.ts",
+        "src/intelligence/assets.ts",
+        "tests/icons.test.ts"
+      ],
+      "limitation": "Original semantic kind registry entries and attributed safe asset plan/fallback; not every historical icon or per-recipe asset derivation.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F099",
+      "name": "Asset requirement derivation",
+      "originalAcceptance": "Never blocks correct diagram; source/icon provenance explicit",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/icons.ts",
+        "src/intelligence/assets.ts",
+        "tests/icons.test.ts"
+      ],
+      "limitation": "Original semantic kind registry entries and attributed safe asset plan/fallback; not every historical icon or per-recipe asset derivation.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F100",
+      "name": "Optional Cloudflare R2 source",
+      "originalAcceptance": "No browser account token, no public bucket/default fetch during export",
+      "status": "NOT_STARTED",
+      "horizon": "R&D",
+      "evidence": [
+        "src/intelligence/assets.ts"
+      ],
+      "limitation": "No R2 or generation provider adapter; optional cloud/generation remains separate R&D and no paid installation authorized.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F101",
+      "name": "Project-specific custom icon reference",
+      "originalAcceptance": "Backwards compatible existing icon ID and exports",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/model.ts",
+        "src/core/icons.ts"
+      ],
+      "limitation": "Existing project asset/image rights and icon IDs; no new scoped custom IconRef catalog adapter.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F102",
+      "name": "External image provider adapter",
+      "originalAcceptance": "Never fabricates official provider logo or diagrams; candidate only",
+      "status": "NOT_STARTED",
+      "horizon": "R&D",
+      "evidence": [
+        "src/intelligence/assets.ts"
+      ],
+      "limitation": "No R2 or generation provider adapter; optional cloud/generation remains separate R&D and no paid installation authorized.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F103",
+      "name": "Submodules, subtrees, worktrees metadata",
+      "originalAcceptance": "Nested boundaries typed and not accidentally scanned as one repository",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts"
+      ],
+      "limitation": "Nested/worktree/vendor/secret exclusions and bounded omission diagnostics preserved; no full Git metadata/noise taxonomy or cancellation worker.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F104",
+      "name": "Authored/generated/vendor noise partition",
+      "originalAcceptance": "Skip reason counts never treated as absent implementation",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts"
+      ],
+      "limitation": "Nested/worktree/vendor/secret exclusions and bounded omission diagnostics preserved; no full Git metadata/noise taxonomy or cancellation worker.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F105",
+      "name": "Secret-safe source inventory",
+      "originalAcceptance": "No secret tokens in facts and failed files tracked explicitly",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts"
+      ],
+      "limitation": "Nested/worktree/vendor/secret exclusions and bounded omission diagnostics preserved; no full Git metadata/noise taxonomy or cancellation worker.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F106",
+      "name": "No AI offline qualification",
+      "originalAcceptance": "No API required; useful safe fallback on unsupported repo",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "tests/e2e/project-intelligence.spec.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Unknown/local, Guided, Hybrid, graph and private/public offline report journeys need no model/service.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F107",
+      "name": "Publication and read-permission matrix",
+      "originalAcceptance": "All formats filter data before render, no metadata leak",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/operations.ts",
+        "tests/graph-client.test.ts",
+        "tests/delivery-intelligence.test.ts"
+      ],
+      "limitation": "All existing public export boundary and delivery/receipt negative privacy checks; not a general independent host authorization policy engine.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F108",
+      "name": "Cancelable bounded analysis workers",
+      "originalAcceptance": "Large fixture does not freeze UI or silently drop sources",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/acquisition.ts",
+        "src/ui/LargeGraphPreview.tsx"
+      ],
+      "limitation": "Bounded reading and selected-file paging exist; no background worker queue/cancellation for all large parsing/rendering.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F109",
+      "name": "Environment and promotion visual profiles",
+      "originalAcceptance": "Readable flat 2D preferred, no 3D ornament",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F110",
+      "name": "Evolution navigation and diff rail",
+      "originalAcceptance": "Comparison recovers selection; does not rewrite original Project",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/EvolutionPanel.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Working graph timeline and previous-backup diff rail/current-component navigation; no combined immutable source snapshot selector.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F111",
+      "name": "Source-backed project handbook/library",
+      "originalAcceptance": "No duplicate semantic truth; per-release immutable output snapshots",
+      "status": "PARTIAL",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/manual.ts",
+        "src/export/design/book.ts",
+        "src/export/intelligenceReport.ts"
+      ],
+      "limitation": "Existing public manual/figure book and new evidence/delivery report; no versioned immutable collection publication library.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F112",
+      "name": "Observed cockpit snapshot adapter",
+      "originalAcceptance": "ChatGPT not assumed always live; timestamps and permissions enforced",
+      "status": "PARTIAL",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/core/atlas/lens.ts"
+      ],
+      "limitation": "Offline scoped GraphSnapshot and optional existing runtime refs; no live observed-cockpit host adapter or supplied real Brain acceptance.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F113",
+      "name": "Optional observability source links",
+      "originalAcceptance": "Link is source/observed scoped; no fabricated health",
+      "status": "NOT_STARTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/scan/scanner.ts"
+      ],
+      "limitation": "Generic selected source references/IaC scanning preserved; no typed observability mapping or IAM/trust-boundary analyzer and no security certification.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F114",
+      "name": "Trust/IAM boundary view hooks",
+      "originalAcceptance": "Can say unknown; never a security certification",
+      "status": "NOT_STARTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/scan/scanner.ts"
+      ],
+      "limitation": "Generic selected source references/IaC scanning preserved; no typed observability mapping or IAM/trust-boundary analyzer and no security certification.",
+      "origin": "candidate-or-partial-baseline"
+    },
+    {
+      "id": "F115",
+      "name": "Compatibility and migration gates",
+      "originalAcceptance": "Original project/documents reopen unchanged and public projection preserved",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/model.ts",
+        "tests/bridge.test.ts",
+        "tests/atlas.test.ts",
+        "tests/campaign-examples.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Schema-1/sidecar/Atlas/export contracts and original browser flows qualified on candidate; older clients may drop optional new delivery fields, retain backup.",
+      "origin": "candidate-or-partial-baseline"
+    }
+  ]
+}

@@ -9,7 +9,10 @@ import {xml} from '../diagram';
 const M=48,NW=168,NH=64,CG=32,RG=28,PAD=20,TOP=36,ZG=56,ZRG=56,UNASSIGNED='Unassigned';
 export type DeploymentZone={id:string;provider:string;nodes:SpecNode[]};
 /** Zones of a view: one per provider as declared on its components ("Generic" or empty go to Unassigned), ordered by where their members sit. */
-export function deploymentZones(nodes:SpecNode[]):DeploymentZone[]{
+export function deploymentZones(nodes:SpecNode[],doc?:Project):DeploymentZone[]{
+ if(doc?.delivery){const instances=doc.delivery.instances.filter(i=>nodes.some(n=>n.id===i.nodeId)),used=new Set(instances.map(i=>i.nodeId));
+  if(instances.length)return [...doc.delivery.environments.map(e=>({id:e.id,provider:e.label,nodes:nodes.filter(n=>instances.some(i=>i.nodeId===n.id&&i.environmentId===e.id))})).filter(z=>z.nodes.length),
+   ...(nodes.some(n=>!used.has(n.id))?[{id:'unassigned',provider:UNASSIGNED,nodes:nodes.filter(n=>!used.has(n.id))}]:[])];}
  const by=new Map<string,SpecNode[]>();for(const n of nodes){const p=n.provider&&n.provider.trim()&&n.provider!=='Generic'?n.provider.trim():UNASSIGNED;by.set(p,[...(by.get(p)??[]),n]);}
  const mean=(ns:SpecNode[])=>ns.reduce((s,n)=>s+n.position.x,0)/ns.length;
  return [...by].map(([provider,ns])=>({id:provider===UNASSIGNED?'unassigned':`provider-${provider.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}`,provider,
@@ -40,7 +43,8 @@ export function routeBetween(s:Box,t:Box,boxes:Box[],taken:P[][]=[]):P[]{
 /** Deployment: one zone per provider declared on the view's public components, components in a grid inside, connections as rounded orthogonal connectors. */
 export function deploymentSvg(input:Project,viewId:string,options:DesignOptions={}):string{
  const c0=designContext(input,viewId,'deployment',options),c={...c0,focal:new Set([...c0.focal].slice(0,2))},{spec,t}=c,contentW=880;
- const hdr=header(eyebrowOf(c,'Deployment'),spec.title,c.purpose,M,M,contentW,t,c.editorial),zones=deploymentZones(spec.nodes);
+ const zones=deploymentZones(spec.nodes,c.doc),typed=!!c.doc.delivery?.instances.some(i=>spec.nodes.some(n=>n.id===i.nodeId));
+ const hdr=header(eyebrowOf(c,typed?'Declared environments':'Deployment'),spec.title,c.purpose,M,M,contentW,t,c.editorial);
  // Zone sizes, then rows packed left to right; zones of one row share its height.
  const sized=zones.map(z=>{const cols=Math.min(z.nodes.length<=2?z.nodes.length:z.nodes.length<=4?2:3,Math.max(1,Math.floor((contentW-2*PAD+CG)/(NW+CG)))),rows=Math.ceil(z.nodes.length/cols);
   const label=`${z.provider.toUpperCase()} · ${z.nodes.length}`,w=Math.max(cols*NW+(cols-1)*CG+2*PAD,Math.ceil(monoWidth(clipMono(label,contentW-40,8,0.14),8,0.14))+40);
@@ -67,14 +71,14 @@ export function deploymentSvg(input:Project,viewId:string,options:DesignOptions=
  const placed:Box[]=[],labels=edges.map((s,k)=>{if(!s.label)return '';const chip=placeLabel(labelText(s.label.replace(/\s*\((inferred|possible)\)$/,'')),routes[k],[...boxes,...zoneLabels],placed,t);if(!chip)return '';placed.push(chip.box);return chip.svg;}).join('');
  const empty=spec.nodes.length?'':txt('No public components in this view.',M,top+16,{size:12,fill:t.muted});
  const assigned=zones.filter(z=>z.provider!==UNASSIGNED).length,order:Treatment[]=['focal','backend','store','external','input','optional'];
- const items:LegendItem[]=[{kind:'swatch',fill:t.wash,label:`${assigned} provider${assigned===1?'':'s'}${zones.length>assigned?' + unassigned':''}`},
+ const items:LegendItem[]=[{kind:'swatch',fill:t.wash,label:`${assigned} ${typed?'declared environment':'provider'}${assigned===1?'':'s'}${zones.length>assigned?' + unassigned':''}`},
   ...order.filter(x=>treatments.has(x)).map(x=>({kind:'box' as const,treatment:x,label:x==='focal'&&c.focalReason==='auto'?'Focal · most connected':TREATMENT_LABEL[x]})),
   ...(lineKinds.has('muted')?[{kind:'line' as const,stroke:'muted' as const,label:'Flow'}]:[]),...(lineKinds.has('link')?[{kind:'line' as const,stroke:'link' as const,label:'Request / API'}]:[]),
   ...(accentEdges?[{kind:'line' as const,stroke:'accent' as const,label:'Focal path'}]:[]),...(lineKinds.has('dashed')?[{kind:'line' as const,stroke:'muted' as const,dashed:true,label:'Control / dependency'}]:[])];
  const legend=legendStrip(items,M,areaBottom+32,contentW,t);
  let yy=areaBottom+32+legend.height+12;const cards=c.editorial?summaryCards(c,M,yy+8,contentW):undefined;if(cards)yy+=cards.height+24;
- const foot=footerLine(footerParts(c),M,yy+12,contentW,t);
+ const foot=footerLine([...(typed?['Runtime UNKNOWN · declared instances only']:[]),...footerParts(c)],M,yy+12,contentW,t);
  return svgDocument({slug:c.slug,width:contentW+2*M,height:yy+M,title:`${spec.title} · ${spec.projectTitle}`,
-  desc:`Deployment of the public view ${spec.viewId}: ${spec.nodes.length} components in ${zones.length} zones by declared provider (${zones.map(z=>`${z.provider} ${z.nodes.length}`).join(', ')||'none'}) and ${edges.length} connections. No hosts or regions are inferred.${spec.omissions.length?` ${spec.omissions.join(' ')}`:''}`,
+  desc:`Deployment of the public view ${spec.viewId}: ${spec.nodes.length} components in ${zones.length} zones by declared ${typed?'environment':'provider'} (${zones.map(z=>`${z.provider} ${z.nodes.length}`).join(', ')||'none'}) and ${edges.length} connections. No hosts, runtime health or promotion outcomes are inferred.${spec.omissions.length?` ${spec.omissions.join(' ')}`:''}`,
   t,theme:c.theme,type:'deployment',viewId:spec.viewId,defs:markers(c.slug,t),body:hdr.svg+zoneSvg.join('')+arrows+nodes+labels+empty+legend.svg+(cards?.svg??'')+foot});
 }

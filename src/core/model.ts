@@ -72,7 +72,17 @@ export const atlasSchema=z.object({snapshots:z.array(snapshotSchema).min(1).max(
 export type ProjectSnapshot=z.infer<typeof snapshotSchema>;
 export type SnapshotRepository=z.infer<typeof snapshotRepositorySchema>;
 export type ProjectAtlas=z.infer<typeof atlasSchema>;
-export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([]),observations:z.array(observationSchema).max(500).default([]),portfolio:portfolioSchema.optional(),experience:packSchema.optional(),atlas:atlasSchema.optional()}).strict();
+/** Deployment declarations are independent of branches/repository identities.
+ * Runtime claims remain reviewed observations targeting an instance's node. */
+const deliveryBase={id,sourceIds:refs,visibility};
+export const deliverySchema=z.object({
+ environments:z.array(z.object({...deliveryBase,label:short,description:z.string().max(500).default('')}).strict()).max(30),
+ artifacts:z.array(z.object({...deliveryBase,label:short,version:short,digest:z.string().regex(/^sha256:[a-f0-9]{64}$/).optional()}).strict()).max(100),
+ instances:z.array(z.object({...deliveryBase,nodeId:id,componentId:id,environmentId:id,artifactId:id.optional(),declaredRevision:z.string().max(120).optional()}).strict()).max(150),
+ promotions:z.array(z.object({...deliveryBase,fromEnvironmentId:id,toEnvironmentId:id,artifactId:id.optional(),gates:z.array(z.object({id,label:short,observationId:id.optional()}).strict()).max(20).default([])}).strict()).max(100)
+}).strict();
+export type ProjectDelivery=z.infer<typeof deliverySchema>;
+export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([]),observations:z.array(observationSchema).max(500).default([]),portfolio:portfolioSchema.optional(),experience:packSchema.optional(),atlas:atlasSchema.optional(),delivery:deliverySchema.optional()}).strict();
 export type Project=z.infer<typeof documentSchema>;
 export type ProjectNode=z.infer<typeof nodeSchema>;
 export type ProjectEdge=z.infer<typeof edgeSchema>;
@@ -101,6 +111,14 @@ export function validateDocument(input:unknown):Project {
   for(const b of d.blocks.filter(b=>o.blockIds.includes(b.id)&&b.provenance==='synthetic'))errors.push(`${o.id}: synthetic block ${b.id} cannot back an observation; synthetic figures are never measured results`);
   if(o.shareable&&!(o.reviewedAt&&o.visibility==='public'))errors.push(`${o.id}: only a reviewed, public observation can be marked shareable`);});
  if(d.portfolio)for(const f of secretFindings(d.portfolio,'portfolio'))errors.push(`Refused ${f}`);
+ if(d.delivery){const envs=ids(d.delivery.environments,'environment'),artifacts=ids(d.delivery.artifacts,'artifact');ids(d.delivery.instances,'deployment instance');ids(d.delivery.promotions,'promotion');
+  for(const row of [...d.delivery.environments,...d.delivery.artifacts,...d.delivery.instances,...d.delivery.promotions])row.sourceIds.forEach(r=>check(r,sources,row.id));
+  for(const i of d.delivery.instances){check(i.nodeId,nodes,i.id);check(i.componentId,nodes,i.id);check(i.environmentId,envs,i.id);if(i.artifactId)check(i.artifactId,artifacts,i.id);}
+  const instanceNodes=d.delivery.instances.map(i=>i.nodeId);if(new Set(instanceNodes).size!==instanceNodes.length)errors.push('Deployment instance nodes must be distinct');
+  if(d.delivery.instances.some(i=>instanceNodes.includes(i.componentId)))errors.push('Logical components must be distinct from deployment instance nodes');
+  for(const p of d.delivery.promotions){check(p.fromEnvironmentId,envs,p.id);check(p.toEnvironmentId,envs,p.id);if(p.artifactId)check(p.artifactId,artifacts,p.id);ids(p.gates,'gate in '+p.id);for(const g of p.gates)if(g.observationId)check(g.observationId,observations,g.id);}
+  for(const f of secretFindings(d.delivery,'delivery'))errors.push(`Refused ${f}`);
+ }
  if(d.atlas){const snaps=ids(d.atlas.snapshots,'snapshot');check(d.atlas.activeSnapshotId,snaps,'atlas');
   for(const s of d.atlas.snapshots){ids(s.repositories,`repository in ${s.id}`);for(const r of s.repositories){if(r.nodeId)check(r.nodeId,nodes,`${s.id}/${r.id}`);if(r.scanStatus==='scanned'&&!r.scannedAt)errors.push(`${s.id}/${r.id}: a scanned repository records when it was scanned`);}
    for(const f of secretFindings(s,`atlas.${s.id}`))errors.push(`Refused ${f}`);}}

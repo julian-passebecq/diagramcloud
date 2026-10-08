@@ -53,7 +53,7 @@ export function wantedFile(path:string):boolean{
  const name=baseOf(path).toLowerCase();
  return name==='package.json'||/^requirements[\w.-]*\.txt$/.test(name)||name==='pyproject.toml'||name==='go.mod'||/^dockerfile/.test(name)||/\.dockerfile$/.test(name)
   ||/\.(ya?ml)$/.test(name)||/\.tf$/.test(name)||name==='schema.prisma'||/\.sql$/.test(name)
-  ||/\.(pbir|pbip|tmdl|csproj|sln|slnx)$/.test(name)||name==='manifest.json'||name==='openapi.json'||name==='swagger.json'||name==='.platform'||/^\.env\.(example|sample|template|dist)$/.test(name)||SOURCE.test(name);
+  ||/\.(pbir|pbip|tmdl|bicep|csproj|sln|slnx)$/.test(name)||name==='manifest.json'||name==='definition.pbism'||name==='openapi.json'||name==='swagger.json'||name==='.platform'||name==='databricks.json'||/\.job\.json$/.test(name)||/^\.env\.(example|sample|template|dist)$/.test(name)||SOURCE.test(name);
 }
 export const MAX_FILE_BYTES=512*1024,MAX_FILES=6000;
 

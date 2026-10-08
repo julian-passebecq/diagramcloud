@@ -1,0 +1,322 @@
+{
+  "schema": "datapass.graph/1",
+  "schema_minor": 0,
+  "graph_id": "synthetic-campaign",
+  "generation_id": "synthetic-2",
+  "captured_at": "2026-10-09T00:00:00Z",
+  "synthetic": true,
+  "scope": {
+    "organization_ids": [
+      "demo-org"
+    ],
+    "privacy_domain_ids": [
+      "demo-private"
+    ],
+    "project_ids": [
+      "demo-project"
+    ],
+    "scope_policy_hash": "synthetic-no-grant"
+  },
+  "source_vector": [
+    {
+      "repo_id": "example/demo",
+      "revision": "fixture-v1"
+    }
+  ],
+  "source_refs": [
+    {
+      "id": "src-fixture",
+      "repo_id": "example/demo",
+      "revision": "fixture-v1",
+      "path": "fixtures/declared-1.json",
+      "selector": "$",
+      "content_sha256": "b1f5ee4916862d43a8d0ea3f4b5496eda7fb56f68f4a6f170f71f5d7f40f6682",
+      "role": "synthetic_fixture",
+      "privacy_domain_id": "demo-private"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "org",
+      "kind": "organization",
+      "label": "Demo organization",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": null
+    },
+    {
+      "id": "project",
+      "kind": "project",
+      "label": "Demo project",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": null
+    },
+    {
+      "id": "feature",
+      "kind": "feature",
+      "label": "Updated synthetic source caption",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "PLANNED",
+      "parent_id": "project"
+    },
+    {
+      "id": "prompt",
+      "kind": "prompt",
+      "label": "Example handoff",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "PLANNED",
+      "parent_id": "feature"
+    },
+    {
+      "id": "session",
+      "kind": "native_session",
+      "label": "Example session (not live)",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "UNKNOWN"
+    },
+    {
+      "id": "commit",
+      "kind": "revision",
+      "label": "Example candidate revision",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "UNVERIFIED"
+    },
+    {
+      "id": "ci",
+      "kind": "check_result",
+      "label": "Example CI observation",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "NOT_RUN"
+    },
+    {
+      "id": "decision",
+      "kind": "decision",
+      "label": "Example accepted design",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "ASSERTED"
+    },
+    {
+      "id": "context",
+      "kind": "source",
+      "label": "Example context pack",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "SYNTHETIC"
+    },
+    {
+      "id": "experiment",
+      "kind": "experiment",
+      "label": "Example comparison",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "PREPARED"
+    },
+    {
+      "id": "dataset",
+      "kind": "dataset",
+      "label": "Example source table",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "SYNTHETIC"
+    },
+    {
+      "id": "output",
+      "kind": "dataset",
+      "label": "Example derived table",
+      "organization_id": "demo-org",
+      "privacy_domain_id": "demo-private",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "state": "SYNTHETIC"
+    }
+  ],
+  "assertions": [
+    {
+      "id": "demo-assertion-1",
+      "from": "project",
+      "predicate": "belongs_to",
+      "to": "org",
+      "family": "knowledge",
+      "evidence_kind": "ASSERTED",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "observed_at": null,
+      "confidence_basis": "Synthetic illustration only; no runtime claim."
+    },
+    {
+      "id": "demo-assertion-2",
+      "from": "feature",
+      "predicate": "belongs_to",
+      "to": "project",
+      "family": "task",
+      "evidence_kind": "ASSERTED",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "observed_at": null,
+      "confidence_basis": "Synthetic illustration only; no runtime claim."
+    },
+    {
+      "id": "demo-assertion-3",
+      "from": "prompt",
+      "predicate": "references",
+      "to": "feature",
+      "family": "task",
+      "evidence_kind": "ASSERTED",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "observed_at": null,
+      "confidence_basis": "Synthetic illustration only; no runtime claim."
+    },
+    {
+      "id": "demo-assertion-4",
+      "from": "session",
+      "predicate": "associated_with",
+      "to": "prompt",
+      "family": "agent",
+      "evidence_kind": "ASSERTED",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "observed_at": null,
+      "confidence_basis": "Synthetic illustration only; no runtime claim."
+    },
+    {
+      "id": "demo-assertion-5",
+      "from": "session",
+      "predicate": "references",
+      "to": "context",
+      "family": "knowledge",
+      "evidence_kind": "ASSERTED",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "observed_at": null,
+      "confidence_basis": "Synthetic illustration only; no runtime claim."
+    },
+    {
+      "id": "demo-assertion-6",
+      "from": "commit",
+      "predicate": "references",
+      "to": "feature",
+      "family": "task",
+      "evidence_kind": "ASSERTED",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "observed_at": null,
+      "confidence_basis": "Synthetic illustration only; no runtime claim."
+    },
+    {
+      "id": "demo-assertion-7",
+      "from": "ci",
+      "predicate": "references",
+      "to": "commit",
+      "family": "evaluation",
+      "evidence_kind": "ASSERTED",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "observed_at": null,
+      "confidence_basis": "Synthetic illustration only; no runtime claim."
+    },
+    {
+      "id": "demo-assertion-9",
+      "from": "experiment",
+      "predicate": "references",
+      "to": "context",
+      "family": "evaluation",
+      "evidence_kind": "ASSERTED",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "observed_at": null,
+      "confidence_basis": "Synthetic illustration only; no runtime claim."
+    },
+    {
+      "id": "demo-assertion-10",
+      "from": "output",
+      "predicate": "derived_from",
+      "to": "dataset",
+      "family": "lineage",
+      "evidence_kind": "ASSERTED",
+      "source_ref_ids": [
+        "src-fixture"
+      ],
+      "observed_at": null,
+      "confidence_basis": "Synthetic illustration only; no runtime claim."
+    }
+  ],
+  "groups": [
+    {
+      "id": "demo-group",
+      "label": "Demo project",
+      "node_ids": [
+        "project",
+        "feature",
+        "prompt",
+        "session",
+        "commit",
+        "ci",
+        "decision",
+        "context",
+        "experiment",
+        "dataset",
+        "output"
+      ]
+    }
+  ],
+  "complete_scope": true,
+  "omitted": [],
+  "layout_hints": {
+    "orientation": "LR",
+    "group_by": "project"
+  },
+  "predecessor_generation": "synthetic-1",
+  "removed_assertion_ids": [
+    "demo-assertion-8"
+  ]
+}

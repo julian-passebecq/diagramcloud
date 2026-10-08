@@ -1,0 +1,16 @@
+{
+  "format": "diagramcloud.project-brief",
+  "version": 1,
+  "project": {
+    "id": "synthetic-delivery",
+    "title": "Synthetic delivery example",
+    "summary": "Fictional declared delivery topology, never an operational claim."
+  },
+  "scope": [
+    {
+      "id": "api",
+      "title": "Synthetic API",
+      "kind": "system"
+    }
+  ]
+}
