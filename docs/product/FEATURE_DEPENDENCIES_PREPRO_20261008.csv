@@ -1,0 +1,57 @@
+feature,depends_on,relation,rationale
+F007,F006,requires,Analysis must honor a validated profile
+F009,F007,requires,Capabilities are derived from analysis evidence
+F010,F009,uses,Gaps depend on what capabilities/facts exist
+F011,F009,selects_by,Recipes selected by capability fingerprint
+F011,F010,declares_requirements_for,Recipes define required/optional facts evaluated as gaps
+F012,F011,implemented_by,Minimum view contract is a baseline recipe set
+F013,F002,exposes,Wizard chooses source mode
+F013,F003,exposes,Wizard chooses purpose
+F013,F004,exposes,Wizard chooses AI autonomy
+F014,F005,renders,Project tree comes from ProjectBrief
+F015,F007,renders,Repository tree comes from AnalysisBundle
+F017,F010,shows,Context panel surfaces gaps
+F017,F007,shows,Context panel surfaces source evidence
+F018,F005,maps,Logical side comes from ProjectBrief
+F018,F007,maps,Physical side comes from AnalysisBundle
+F022,F007,emits,Docs analyzer emits Analysis facts/entities
+F032,F005,compares,Declared project context
+F032,F007,compares,Static source analysis
+F033,F032,extends,Cross-repo resolver feeds reconciliation
+F040,F005,uses,Business sheets use human context when available
+F040,F011,uses,Business outputs selected by recipes
+F047,F011,requests,Publication settings choose output from recipe/projection
+F048,F047,reports_on,Fidelity report is attached to render/publication request
+F049,F011,constrains,Recipe complexity budgets
+F052,F048,compares,Candidates need fidelity ledgers
+F052,F050,scores,Candidates use geometric QA
+F054,F007,queries,MCP reads analysis graph
+F054,F010,queries,MCP exposes gaps
+F057,F054,proposed_via,Agent can propose specs through MCP
+F058,F057,fulfills,Receipts fulfill specific checks
+F059,F007,traverses,Impact query runs over AnalysisGraph
+F064,F005,compiles,ProjectBrief compiler consumes brief
+F064,F031,feeds,Compiler can initialize/enrich Atlas membership
+F075,F074,requires,Evolution delta needs immutable comparable snapshot identities
+F076,F075,requires,Visualization consumes semantic delta
+F079,F007,requires,"Environment declarations generated in analysis, not every Project node"
+F080,F079,requires,Instance references environment scope
+F081,F080,requires,Release must map to deployable instance
+F082,F081,requires,Promotion needs build/release provenance
+F083,F079,requires,Environment matrix needs environment identity
+F084,F080,requires,Actual drift needs evidenced deployment instances
+F087,F009,requires,"Preset needs detected capabilities, not exclusive archetype"
+F088,F010,requires,Availability based on contextual gap reasoning
+F093,F021,requires,ZOO exercises scanner and expected baseline
+F096,F093,requires,Oracle belongs to fixture
+F097,F093,expands,Real projects reveal out-of-fixture defects
+F099,F011,requires,Asset requirements result from selected recipes
+F100,F099,requires,"Vault stores selected/approved assets, no semantic truth"
+F103,F021,expands,Nested repo metadata remains separate from traversal
+F106,F012,verifies,No-AI offline baseline
+F109,F083,requires,Environment render consumes matrix
+F110,F075,requires,Evolution UI needs delta
+F112,F058,requires,Host event must be eligible for receipt/evidence review
+F115,F019,verifies,Preserve canonical Project v1
+F115,F063,verifies,Preserve existing DataPass sidecar bridge
+F102,F099,requires,Generation scoped by AssetPlan policy
