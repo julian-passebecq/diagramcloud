@@ -74,7 +74,10 @@ export function previewCandidateReimport(current: Project, incoming: Project, ba
     return [...old.map(v => byId.has(v.id) ? update(v, byId.get(v.id)!) : v), ...fresh.filter(v => !old.some(a => a.id === v.id))];
   };
   merged.nodes = merge(merged.nodes, incoming.nodes, (a, b) => {
-    if (b.sourceIds.includes('project-brief-source') && !a.sourceIds.includes('project-brief-source')) throw new Error(`Ambiguous authored node identity: ${a.id}`);
+    const metaId = a.id.startsWith('brief-scope-') ? `brief-meta-${a.id.slice('brief-scope-'.length)}` : undefined;
+    const hasBriefEvidence = metaId && a.blockIds.includes(metaId) && current.blocks.some(block => block.id === metaId && block.sourceIds.includes('project-brief-source'));
+    const hasBriefEntity = current.experience?.entities.some(entity => entity.id === a.id && entity.sourceIds.includes('project-brief-source'));
+    if (b.sourceIds.includes('project-brief-source') && !a.sourceIds.includes('project-brief-source') && !hasBriefEvidence && !hasBriefEntity) throw new Error(`Ambiguous authored node identity: ${a.id}`);
     if (a.childViewId && b.childViewId && a.childViewId !== b.childViewId) throw new Error(`Conflicting child view: ${a.id}`);
     return {...a, blockIds: union(a.blockIds, b.blockIds),
       childViewId: a.childViewId ?? b.childViewId, experienceWorkspaceId: a.experienceWorkspaceId ?? b.experienceWorkspaceId};

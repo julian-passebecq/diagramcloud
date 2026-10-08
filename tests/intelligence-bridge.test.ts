@@ -50,6 +50,8 @@ test('brief reimport adds stable IDs while preserving authored work and enforcin
   current.revision = 7;
   current.nodes[0].label = 'Manual title';
   current.nodes[0].summary = 'Manual summary';
+  // Human publication review may detach private references from a public node.
+  current.nodes[0].sourceIds = []; current.nodes[0].visibility = 'public';
   current.views[0].positions[current.nodes[0].id] = {x: 913, y: 415};
   assert.equal(current.blocks[0].type, 'text');
   if (current.blocks[0].type === 'text') current.blocks[0].text = 'Manual private evidence';
@@ -60,6 +62,8 @@ test('brief reimport adds stable IDs while preserving authored work and enforcin
   assert.equal(JSON.stringify(current), before);
   assert.equal(preview.document.nodes[0].label, 'Manual title');
   assert.equal(preview.document.nodes[0].summary, 'Manual summary');
+  assert.equal(preview.document.nodes[0].visibility, 'public');
+  assert.deepEqual(preview.document.nodes[0].sourceIds, []);
   assert.deepEqual(preview.document.views[0].positions[current.nodes[0].id], {x: 913, y: 415});
   assert.deepEqual(preview.document.blocks[0], current.blocks[0]);
   assert.deepEqual(preview.document.story, current.story);
