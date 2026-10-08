@@ -37,7 +37,7 @@ export function previewDeliveryBrief(current:Project,input:unknown){
 }
 export function environmentMatrix(doc:Project){
  const d=doc.delivery;if(!d)return [];
- return d.instances.map(i=>{const observation=doc.observations.filter(o=>o.nodeId===i.nodeId&&o.reviewedAt).sort((a,b)=>a.observedAt.localeCompare(b.observedAt)).at(-1);
+ return d.instances.map(i=>{const observation=doc.observations.filter(o=>o.nodeId===i.nodeId&&o.reviewedAt).sort((a,b)=>Date.parse(a.observedAt)-Date.parse(b.observedAt)||a.id.localeCompare(b.id)).at(-1);
   return {id:i.id,nodeId:i.nodeId,component:doc.nodes.find(n=>n.id===i.componentId)?.label??i.componentId,
    environment:d.environments.find(e=>e.id===i.environmentId)?.label??i.environmentId,
    artifact:d.artifacts.find(a=>a.id===i.artifactId),declaredRevision:i.declaredRevision??'UNKNOWN',

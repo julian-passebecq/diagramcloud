@@ -42,6 +42,13 @@ test('public delivery strips private environment/artifact/gate references and re
  d.sources.push({id:'public-declaration',title:'Author declaration',location:'Synthetic declaration',visibility:'public'});d.delivery!.instances[0].sourceIds=['public-declaration'];d.views[0].nodeIds.push('api-dev-instance');
  const safe=publicDocument(d);assert.equal(safe.delivery?.instances.length,1);assert.equal(safe.delivery?.instances[0].artifactId,undefined);assert.equal(safe.delivery?.promotions.length,0);assert.ok(safe.sources.some(s=>s.id==='public-declaration'));assert.doesNotThrow(()=>validateDocument(safe));
 });
+
+test('instance comparison chooses actual capture time across supported timezone offsets',()=>{
+ const doc=previewDeliveryBrief(project(),brief()).document;
+ const base={nodeId:'api-dev-instance',sourceApp:'external',authority:'Synthetic timezone fixture',claim:'observed' as const,summary:'Synthetic fixture only',blockIds:[],caveat:'No actual deployment',visibility:'private' as const,shareable:false,reviewedAt:'2026-10-09T00:00:00Z'};
+ doc.observations=[{...base,id:'earlier',observedAt:'2026-10-09T17:00:00+02:00',sourceRevision:'bbbbbbb'},{...base,id:'later',observedAt:'2026-10-09T16:00:00Z',sourceRevision:'aaaaaaa'}];
+ validateDocument(doc);assert.equal(environmentMatrix(doc)[0].drift,'same-revision');assert.equal(environmentMatrix(doc)[0].observed?.capturedAt,'2026-10-09T16:00:00Z');
+});
 test('bounded source impact, capability recipes and public context do not expose private components',()=>{
  const p=project();assert.equal(impactFacts(p,'api',{direction:'downstream',includeInferred:false}).nodes.length,2);assert.equal(impactFacts(p,'api',{direction:'upstream',includeInferred:false}).nodes.length,1);
  assert.equal(recommendRecipes(p,DEFAULT_OPTIONS).find(r=>r.id==='data')?.availability,'unknown');assert.equal(projectCollection([p])[0].source,'independent-project');
