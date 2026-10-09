@@ -1,0 +1,20 @@
+import {useMemo,useState} from 'react';
+import type {Project} from '../core/model';
+import {impactFacts,knowledgeFacts} from '../intelligence/recipes';
+import {DeliveryPanel} from './DeliveryPanel';
+import {RecipeWorkbench} from './RecipeWorkbench';
+import {WorkVerificationPanel} from './WorkVerificationPanel';
+import {FigureQualityPanel} from './FigureQualityPanel';
+import {SourceBundlePanel} from './SourceBundlePanel';
+import type {Purpose} from '../intelligence/types';
+export function IntelligenceInsights({project,onOpen,onDelivery,onPatch,initialPurpose}:{project:Project;onOpen:(view:string,node?:string)=>void;onDelivery?:(input:unknown)=>void;onPatch?:(input:unknown)=>void;initialPurpose?:Purpose}){
+ const [subject,setSubject]=useState(''),[direction,setDirection]=useState<'upstream'|'downstream'>('downstream'),[includeInferred,setIncludeInferred]=useState(true),[limit,setLimit]=useState(60);
+ const knowledge=useMemo(()=>knowledgeFacts(project),[project]);
+ const impact=useMemo(()=>subject&&project.nodes.some(n=>n.id===subject)?impactFacts(project,subject,{direction,includeInferred,limit}):null,[project,subject,direction,includeInferred,limit]);
+ return <section className="project-overview intelligence-insights" aria-label="Project intelligence workbench"><h2>Useful views and source questions</h2><RecipeWorkbench key={`${project.id}:${initialPurpose??'understand'}`} project={project} initialPurpose={initialPurpose} onOpen={onOpen}/>
+ <details><summary>Source-backed impact and check gaps</summary><div className="pi-controls"><label>Impact component<select aria-label="Impact component" value={subject} onChange={e=>setSubject(e.target.value)}><option value="">Select a component</option>{project.nodes.map(n=><option key={n.id} value={n.id}>{n.label}</option>)}</select></label><label>Direction<select aria-label="Impact direction" value={direction} onChange={e=>setDirection(e.target.value as typeof direction)}><option value="downstream">Downstream</option><option value="upstream">Upstream</option></select></label><label><input type="checkbox" checked={includeInferred} onChange={e=>setIncludeInferred(e.target.checked)}/> Include unknown basis</label><label>Impact component limit<input aria-label="Impact component limit" type="number" min={1} max={100} value={limit} onChange={e=>setLimit(Math.max(1,Math.min(100,Number(e.target.value)||1)))}/></label></div>
+ {impact&&<><p>{impact.nodes.length} reachable components · {impact.edges.length} supplied connections{impact.limited?' · bounded at '+limit+' components':''}. Reachability is not causal impact or a coverage percentage.</p><ul>{impact.nodes.map(n=><li key={n.id}>{n.label} · {n.basis??'unknown'}</li>)}</ul><h4>Affected existing views</h4><ul>{impact.views.map(v=><li key={v.id}><button onClick={()=>onOpen(v.id)}>{v.title}</button></li>)}</ul><h4>Connection source context</h4><ul>{impact.relationships.map(e=><li key={e.edgeId}>{e.edgeId}: {e.basis}; citations {e.sourceIds.join(', ')||'not attached'}. {e.note}</li>)}</ul><h4>Check evidence gaps</h4><ul>{impact.gaps.map(g=><li key={g.nodeId}>{project.nodes.find(n=>n.id===g.nodeId)?.label}: {g.reason}</li>)}</ul></>}
+ </details>
+ <details><summary>Knowledge and source library</summary><ul>{knowledge.documents.map(d=><li key={d.path}><code>{d.path}</code><ul>{d.headings.slice(0,20).map((h,i)=><li key={i}>line {h.line}: {h.title}</li>)}</ul></li>)}</ul><ul>{knowledge.links.map((l,i)=><li key={i}>{l.fromPath}:{l.fromLine} → {l.toPath}{l.toLine?':'+l.toLine:''} · explicit {l.kind}</li>)}</ul>{!knowledge.documents.length&&<p>No supported selected document map is attached in this projection.</p>}<p>{knowledge.limitations.join(' ')}</p></details>
+ <SourceBundlePanel key={`${project.id}:${project.revision}`} project={project} onPatch={onPatch} initialPurpose={initialPurpose}/><WorkVerificationPanel project={project} onPatch={onPatch}/><FigureQualityPanel key={`${project.id}:${project.revision}`} project={project}/><DeliveryPanel project={project} onDelivery={onDelivery} onOpen={onOpen} onPatch={onPatch}/></section>;
+}

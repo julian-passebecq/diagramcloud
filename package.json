@@ -16,18 +16,22 @@
     "scan": "tsx scripts/scan-repo.ts",
     "atlas": "tsx scripts/atlas.ts",
     "design": "tsx scripts/design.ts",
-    "intelligence": "tsx scripts/intelligence.ts"
+    "intelligence": "tsx scripts/intelligence.ts",
+    "intelligence:mcp": "tsx scripts/intelligence-mcp.ts",
+    "package:candidate": "tsx scripts/package-campaign.ts"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.60.0",
+    "@vscode/tree-sitter-wasm": "0.3.1",
     "@xyflow/react": "^12.4.4",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "zod": "3.25.76",
-    "zod-to-json-schema": "^3.24.6",
     "dompurify": "^3.2.7",
     "pptxgenjs": "^4.0.1",
-    "yaml": "^2.9.1"
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "web-tree-sitter": "0.25.10",
+    "yaml": "^2.9.1",
+    "zod": "3.25.76",
+    "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
@@ -36,6 +40,7 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.7.0",
     "ajv": "^8.20.0",
+    "esbuild": "0.28.2",
     "tsx": "^4.19.3",
     "typescript": "^5.9.2",
     "vite": "^6.3.6"

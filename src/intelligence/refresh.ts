@@ -4,13 +4,14 @@ import type {ImportResult} from '../core/interchange/graph';
 import type {ScanModel} from '../core/scan/scanner';
 import type {AcquisitionAnalysis} from './acquisition';
 import {attachAcquisitionContext} from './materialize';
+import type {DomainResult} from './domainAdapters';
 
 const union = (a: string[], b: string[]) => [...new Set([...a, ...b])];
 /** Repository refresh proposal, never an in-place edit. Refresh the scanner's
  * source evidence and revision vector while retaining authored presentation and
  * attachments. Absent old IDs remain uncertainty, never an assertion of removal. */
 export function previewRepositoryRescan(current: Project, repositoryId: string, model: ScanModel,
-  analysis?: AcquisitionAnalysis, now = new Date()): ImportResult {
+  analysis?: AcquisitionAnalysis, now = new Date(),domain?:DomainResult): ImportResult {
   validateDocument(current);
   const snapshot = activeSnapshot(current);
   if (!snapshot.repositories.some(r => r.id === repositoryId)) throw new Error(`Repository ${repositoryId} is not part of this atlas.`);
@@ -32,7 +33,7 @@ export function previewRepositoryRescan(current: Project, repositoryId: string, 
   seed.views = [{id: ATLAS_ROOT, title: 'Repository refresh context', description: 'Temporary scanner input.',
     visibility: 'public', perspective: 'system', nodeIds: seed.nodes.map(n => n.id), edgeIds: seed.edges.map(e => e.id), positions: {}}];
   seed.story = []; seed.observations = []; delete seed.experience;
-  const scanned = rescanRepository(validateDocument(seed), repositoryId, model, now);
+  const scanned = rescanRepository(validateDocument(seed), repositoryId, model, now,domain);
   const fresh = scanned.document, merged = structuredClone(current);
   const freshIds = new Set(fresh.nodes.map(n => n.id));
   const retained = current.nodes.filter(n => owned(n.id) && !freshIds.has(n.id));

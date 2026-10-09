@@ -1,3 +1,4 @@
+import {sourceConflictCandidates} from './sourceConflicts';
 import {scanRepository, documentFromScan} from '../core/scan';
 import {IGNORED_DIR, SECRET_FILE, outsideNestedRepositories, wantedFile, type ScanFile} from '../core/scan/scanner';
 import {secretInText} from '../core/secrets';
@@ -10,7 +11,7 @@ export const ACQUISITION_PROFILES = {
   quick: {files:200, fileBytes:64*1024, totalBytes:4*1024*1024},
   standard: {files:1500, fileBytes:256*1024, totalBytes:16*1024*1024},
 } as const;
-export type InventoryEntry = {path:string; bytes:number; state:'scanned'|'document'|'unsupported'|'ignored'|'limited'|'unsafe'};
+export type InventoryEntry = {path:string; bytes:number; state:'scanned'|'document'|'unsupported'|'ignored'|'limited'|'unsafe'|'failed'};
 export type AcquisitionAnalysis = {
   inventory:{entries:InventoryEntry[];selectedFiles:number;readFiles:number;readBytes:number;omittedEntries:number;unsupported:number;ignored:number;limited:number};
   sourceIdentity:{selectedRoot:string;sourceRevision:string|null;contentDigest:string;scopeComplete:boolean;observedAt:string;dirtyState:'unknown';profile:'quick'|'standard';analyzerVersion:string};
@@ -46,23 +47,26 @@ export async function analyzePickedFolder(list:ArrayLike<File>,options:{depth:'q
     if(!Number.isSafeInteger(f.size)||f.size<0||f.size>fileCap||reservedFiles>=budget.files||reservedBytes+f.size>budget.totalBytes||(doc&&(docFiles>=DOCUMENT_LIMITS.files||docBytes+f.size>DOCUMENT_LIMITS.totalBytes))){limited++;add({path,bytes:Math.max(0,f.size||0),state:'limited'});continue;}
     reservedFiles++;reservedBytes+=f.size;if(doc){docFiles++;docBytes+=f.size;}picked.push(item);
   }
-  const files:ScanFile[]=[],documents:ScanFile[]=[],hashes:string[]=[];let readBytes=0,readFiles=0;
+  const files:ScanFile[]=[],documents:ScanFile[]=[],hashes:string[]=[],failedPaths:string[]=[];let readBytes=0,readFiles=0;
   for(const {f,path} of picked){
     abort(signal);await yieldTurn();abort(signal);
-    const bytes=new Uint8Array(await f.arrayBuffer());abort(signal);
+    let buffer:ArrayBuffer;
+    try{buffer=await f.arrayBuffer();}catch(error){abort(signal);if(error instanceof Error&&error.name==='AbortError')throw error;ignored++;failedPaths.push(path);add({path,bytes:f.size,state:'failed'});continue;}
+    const bytes=new Uint8Array(buffer);abort(signal);
     if(bytes.byteLength!==f.size){throw new Error('Selected file changed during analysis; select the folder again.');}
     readBytes+=bytes.byteLength;readFiles++;
     hashes.push(`${path}\0${bytes.byteLength}\0${await digest(bytes)}`);
     const text=new TextDecoder().decode(bytes);
     if(secretInText(text)){ignored++;add({path,bytes:f.size,state:'unsafe'});}
-    else if(wantedDocument(path)){documents.push({path,text});add({path,bytes:f.size,state:'document'});}
-    else {files.push({path,text});add({path,bytes:f.size,state:'scanned'});}
+    else {const doc=wantedDocument(path),code=wantedFile(path);if(doc)documents.push({path,text});if(code)files.push({path,text});add({path,bytes:f.size,state:code?'scanned':'document'});}
     onProgress?.({read:readFiles,total:picked.length,path});
   }
   await yieldTurn();abort(signal);
-  const model=scanRepository(files,{name:selectedRoot});
+  const model=scanRepository(files,{name:selectedRoot,boundaryPaths:raw.map(f=>f.path),preferDbtManifest:true});
   const result=documentFromScan(model,{fileName:selectedRoot});
   const documentMap=mapDocuments(documents,text=>!secretInText(text));
+  documentMap.diagnostics.push(...sourceConflictCandidates(documents,files));
+  documentMap.diagnostics.push(...failedPaths.map(path=>({path,code:'unsupported' as const,message:'Selected file read failed; contents unavailable and absence does not establish removal. Read error text is omitted.'})));
   const domain=analyzeDomainFiles(files);
   // Persist a bounded map rather than allowing hundreds of long heading/record lists
   // to exceed the authoring document's size budget.
@@ -77,9 +81,10 @@ export async function analyzePickedFolder(list:ArrayLike<File>,options:{depth:'q
     documentMap,technologies:[...new Set([...model.detectors.keys(),...domain.capabilities.map(c=>'specialist:'+c)])]};
   abort(signal);
   const document=materializeAnalysis(extendWithDomainFacts(result.document,domain),analysis);
-  result.report.kept.push(`Inspected ${readFiles} of ${all.length} selected files (${options.depth}); ${documents.length} Markdown/CSV documents mapped. Content digest identifies inspected bytes; HEAD and dirty state are separate.`);
+  result.report.kept.push(`Inspected ${readFiles} of ${all.length} selected files (${options.depth}); ${documents.length} lexical documents mapped. Content digest identifies inspected bytes; HEAD and dirty state are separate.`);
   if(domain.facts.length)result.report.kept.push(`Static specialist artifacts: ${domain.facts.length} facts, ${domain.links.length} explicitly declared relations, ${domain.capabilities.join(', ')}. Nothing executed.`);
   if(domain.diagnostics.length)result.report.lost.push(`Specialist limitations: ${domain.diagnostics.slice(0,12).join(' | ')}`);
+  if(failedPaths.length)result.report.lost.push(`${failedPaths.length} selected files could not be read; each is recorded privately as failed and the source scope is partial.`);
   result.report.lost.push(`${unsupported} unsupported, ${ignored} excluded/unsafe, ${limited} budget-limited files. Revision ${model.commit?'is a HEAD hint only':'unknown'}; dirty state unknown. No runtime claims established.`);
-  return {document,report:result.report,analysis,read:readFiles,model};
+  return {document,report:result.report,analysis,read:readFiles,model,domain};
 }

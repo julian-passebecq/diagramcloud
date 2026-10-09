@@ -29,6 +29,10 @@ jobs:
       - name: Unit tests
         id: unit
         run: npm test
+      - name: Standalone CLI and MCP bundles
+        run: |
+          mkdir -p release
+          npx tsx scripts/qualify-clients.ts --out release/bundled-client-qualification
       - name: Build
         id: build
         run: npm run build

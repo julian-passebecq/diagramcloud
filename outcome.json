@@ -1,0 +1,4261 @@
+{
+  "format": "diagramcloud.campaign-outcome/1",
+  "date": "2026-10-09",
+  "sourceBranch": "codex/full-product-campaign-20261009",
+  "basedOn": "091947452683102849eb225d67ef870fc6e2f1d0",
+  "shippedBaseline": "309099ef8b4fcaa8e6f836f2b40a39b148b5a6c1",
+  "merged": false,
+  "deployed": false,
+  "ownerVerified": false,
+  "scopeRule": "Statuses describe code against original feature scope, not release certification. Horizons guide the sole roadmap in docs/ROADMAP.md. Exact packaged source SHA/checks are generated in delivery-receipt.json and READY.json.",
+  "catalogue": "docs/product/FEATURES_PREPRO_20261008.csv",
+  "dg": [
+    {
+      "id": "DG-001",
+      "name": "Safe GraphSnapshot importer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F007",
+        "F019",
+        "F053"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-002",
+      "name": "Stable mapping and non-destructive reimport",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F032",
+        "F074"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-003",
+      "name": "Organization-aware snapshot client",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F014",
+        "F034",
+        "F090"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-004",
+      "name": "Seven useful graph perspectives",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F016",
+        "F020",
+        "F112"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-005",
+      "name": "Parent-retaining graph navigation",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F014",
+        "F016",
+        "F018",
+        "F049"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts",
+        "src/intelligence/graphProjection.ts",
+        "src/ui/GraphFilters.tsx",
+        "tests/graph-projection.test.ts",
+        "tests/e2e/graph-canvas-library.spec.ts"
+      ],
+      "limitation": "Actual canvas family/project filters and transient grouped collapse retain canonical IDs, parent view and authored positions. No new authoring model.",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "status": "PARTIAL",
+          "limitation": "Parent-retaining views, table filters, explicit hierarchy and keyboard collapse exist; canvas family filters/grouped projection remain.",
+          "evidence": [
+            "src/intelligence/graphSnapshot.ts",
+            "src/ui/GraphExplorer.tsx",
+            "tests/graph-client.test.ts",
+            "tests/e2e/graph-client.spec.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DG-006",
+      "name": "Feature to evidence drilldown",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F058",
+        "F062",
+        "F067"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-007",
+      "name": "Scope-aware temporal comparison",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F074",
+        "F075",
+        "F076"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-008",
+      "name": "Private-first export boundary",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F070",
+        "F107"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-009",
+      "name": "Safe source and artifact navigation",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F035",
+        "F105"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-010",
+      "name": "CLI and offline file client",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F053",
+        "F064",
+        "F106"
+      ],
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/ui/GraphExplorer.tsx",
+        "tests/graph-client.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-011",
+      "name": "Fabric static project analyzer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F025"
+      ],
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Supported selected source formats only; detailed native format limits are in CAMPAIGN_CLIENT.md."
+    },
+    {
+      "id": "DG-012",
+      "name": "Databricks static project analyzer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F024"
+      ],
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Supported selected source formats only; detailed native format limits are in CAMPAIGN_CLIENT.md."
+    },
+    {
+      "id": "DG-013",
+      "name": "dbt artifact lineage analyzer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F023"
+      ],
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Supported selected source formats only; detailed native format limits are in CAMPAIGN_CLIENT.md."
+    },
+    {
+      "id": "DG-014",
+      "name": "DotNET and OpenAPI static analyzer",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F026",
+        "F027"
+      ],
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts"
+      ],
+      "limitation": "Supported selected source formats only; detailed native format limits are in CAMPAIGN_CLIENT.md."
+    },
+    {
+      "id": "DG-015",
+      "name": "Capability-driven recipes and symbols",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F009",
+        "F011",
+        "F088",
+        "F098",
+        "F099"
+      ],
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/core/icons.ts",
+        "src/ui/IntelligenceInsights.tsx"
+      ],
+      "limitation": "Selected-file, offline, private/reviewed boundaries apply; no live or automatic authority."
+    },
+    {
+      "id": "DG-016",
+      "name": "Reopen and real client journey",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F093",
+        "F094",
+        "F096",
+        "F097"
+      ],
+      "evidence": [
+        "tests/e2e/graph-client.spec.ts",
+        "RESUME.md",
+        "scripts/qualify-real.ts"
+      ],
+      "limitation": "Authorized installed Brain 0.3.0 scoped read-only GraphSnapshot validated and exercised through actual private reviewed import/edit/reimport/save/reopen/offline public export. Private producer/snapshot/journey receipts remain local; not a live collector or human owner verification.",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "status": "PARTIAL",
+          "limitation": "Synthetic full client journey passed; real authorized private Brain snapshot has not been supplied.",
+          "evidence": [
+            "tests/e2e/graph-client.spec.ts",
+            "RESUME.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DG-017",
+      "name": "Packaged client and preserved product",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "featureIds": [
+        "F068",
+        "F115"
+      ],
+      "evidence": [
+        "SHIP-REPORT.md",
+        "scripts/package-campaign.ts"
+      ],
+      "limitation": "Package is a candidate; no merge/deployment/owner verification. Exact source SHA and checksums are in the generated delivery receipt."
+    }
+  ],
+  "features": [
+    {
+      "id": "F001",
+      "name": "App shell extraction",
+      "originalAcceptance": "All current tests/e2e green; no UI behavior regression",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/App.tsx",
+        "src/ui/ProjectStart.tsx",
+        "src/app/ReviewShell.tsx",
+        "src/app/useProjectWorkspace.ts",
+        "src/app/useNavigationHistory.ts",
+        "tests/e2e/storage.spec.ts"
+      ],
+      "limitation": "Shell, workspace persistence/review controller, export dispatch and bounded navigation history extracted; existing authoring undo remains distinct.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/App.tsx",
+            "src/ui/ProjectStart.tsx"
+          ],
+          "limitation": "UI seams extracted; App remains an orchestrator, not a complete shell/controller extraction."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F002",
+      "name": "Source mode axis",
+      "originalAcceptance": "Mode visible in start flow and retained for session",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/ui/ProjectStart.tsx",
+        "tests/e2e/project-intelligence.spec.ts",
+        "src/ui/AnalysisProfilePanel.tsx",
+        "src/intelligence/profile.ts",
+        "src/intelligence/sourceBundle.ts",
+        "tests/source-bundle.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Repository Auto/Guided/Hybrid/Graph, seven purposes and retained session axes. Quick/Standard start; collapsed Deep/Custom profiles dispatch selected analyzers over explicitly selected source bytes, never execute source.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/ProjectStart.tsx",
+            "tests/e2e/project-intelligence.spec.ts"
+          ],
+          "limitation": "Repository/Guided/Hybrid/Graph and real purpose/depth work; no autonomous AI axis or full preset wizard."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F001"
+      ]
+    },
+    {
+      "id": "F003",
+      "name": "Purpose axis",
+      "originalAcceptance": "Purpose selects recipes/presets without changing truth",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/types.ts",
+        "src/ui/ProjectStart.tsx",
+        "src/ui/IntelligenceInsights.tsx",
+        "src/ui/AnalysisProfilePanel.tsx",
+        "src/intelligence/profile.ts",
+        "src/intelligence/sourceBundle.ts",
+        "tests/source-bundle.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Repository Auto/Guided/Hybrid/Graph, seven purposes and retained session axes. Quick/Standard start; collapsed Deep/Custom profiles dispatch selected analyzers over explicitly selected source bytes, never execute source.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/types.ts",
+            "src/ui/ProjectStart.tsx",
+            "src/ui/IntelligenceInsights.tsx"
+          ],
+          "limitation": "Five purposes and Quick/Standard affect acquisition, ranking, preview and impact budgets; Deep/Custom, education/work-review and all advanced axes remain future work."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F001"
+      ]
+    },
+    {
+      "id": "F004",
+      "name": "AI autonomy axis",
+      "originalAcceptance": "Off has no LLM dependency; gates clear",
+      "status": "PARTIAL",
+      "horizon": "V4",
+      "evidence": [
+        "src/ui/ProjectStart.tsx",
+        "src/core/patch.ts"
+      ],
+      "limitation": "AI Off and manual Assist proposals work; DiagramCloud-owned autonomous execution is parked by ownership/safety boundary.",
+      "origin": "candidate-or-partial-baseline",
+      "dependencies": [
+        "F001"
+      ]
+    },
+    {
+      "id": "F005",
+      "name": "ProjectBrief v1",
+      "originalAcceptance": "Schema, examples, validation, preview/import",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/brief.ts",
+        "src/intelligence/bridge.ts",
+        "tests/intelligence-brief.test.ts",
+        "tests/e2e/project-intelligence.spec.ts"
+      ],
+      "limitation": "Strict ProjectBrief and private candidate compiler; explicit bindings and human import review, no runtime claims.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/intelligence/brief.ts",
+            "src/intelligence/bridge.ts",
+            "tests/intelligence-brief.test.ts",
+            "tests/e2e/project-intelligence.spec.ts"
+          ],
+          "limitation": "Strict ProjectBrief and private candidate compiler; explicit bindings and human import review, no runtime claims."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F001"
+      ]
+    },
+    {
+      "id": "F006",
+      "name": "AnalysisProfile v1",
+      "originalAcceptance": "Deterministic validated profile",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/types.ts",
+        "src/ui/ProjectStart.tsx",
+        "src/ui/IntelligenceInsights.tsx",
+        "src/ui/AnalysisProfilePanel.tsx",
+        "src/intelligence/profile.ts",
+        "src/intelligence/sourceBundle.ts",
+        "tests/source-bundle.test.ts",
+        "tests/e2e/navigation-context.spec.ts",
+        "src/ui/SourceBundlePanel.tsx",
+        "src/intelligence/sourceBundleClient.ts",
+        "tests/e2e/configured-source-bundle.spec.ts"
+      ],
+      "limitation": "Repository Auto/Guided/Hybrid/Graph, seven purposes and retained session axes. Quick/Standard start; collapsed Deep/Custom profiles dispatch selected analyzers over explicitly selected source bytes, never execute source.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/types.ts",
+            "src/ui/ProjectStart.tsx",
+            "src/ui/IntelligenceInsights.tsx"
+          ],
+          "limitation": "Five purposes and Quick/Standard affect acquisition, ranking, preview and impact budgets; Deep/Custom, education/work-review and all advanced axes remain future work."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F001"
+      ]
+    },
+    {
+      "id": "F007",
+      "name": "AnalysisBundle v1",
+      "originalAcceptance": "Rebuildable; stable source refs; no Project limit inflation",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/materialize.ts",
+        "src/intelligence/graphSnapshot.ts",
+        "tests/acquisition.test.ts",
+        "src/intelligence/sourceBundle.ts",
+        "src/intelligence/profile.ts",
+        "src/intelligence/analysisWorker.ts",
+        "src/intelligence/deepClient.ts",
+        "tests/source-bundle.test.ts",
+        "tests/deep-cache.test.ts",
+        "tests/e2e/deep-source.spec.ts",
+        "src/ui/SourceBundlePanel.tsx",
+        "src/intelligence/sourceBundleClient.ts",
+        "tests/e2e/configured-source-bundle.spec.ts"
+      ],
+      "limitation": "Rebuildable private source analysis bundle is separate from bounded authoring Project. SHA-256 source/profile/parser cache keys, four-entry cloned generated cache, file/byte/node/link and worker cancellation limits; cache is optional memory optimization, not author truth.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/acquisition.ts",
+            "src/intelligence/materialize.ts",
+            "src/intelligence/graphSnapshot.ts",
+            "tests/acquisition.test.ts"
+          ],
+          "limitation": "Bounded generated analysis, source digest/profile identity and private receipts exist; no persistent general AnalysisBundle/cache database."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F006"
+      ]
+    },
+    {
+      "id": "F008",
+      "name": "Analysis cache key",
+      "originalAcceptance": "Same inputs produce same key/result",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/materialize.ts",
+        "src/intelligence/graphSnapshot.ts",
+        "tests/acquisition.test.ts",
+        "src/intelligence/sourceBundle.ts",
+        "src/intelligence/profile.ts",
+        "src/intelligence/analysisWorker.ts",
+        "src/intelligence/deepClient.ts",
+        "tests/source-bundle.test.ts",
+        "tests/deep-cache.test.ts",
+        "tests/e2e/deep-source.spec.ts",
+        "src/ui/SourceBundlePanel.tsx",
+        "src/intelligence/sourceBundleClient.ts",
+        "tests/e2e/configured-source-bundle.spec.ts"
+      ],
+      "limitation": "Rebuildable private source analysis bundle is separate from bounded authoring Project. SHA-256 source/profile/parser cache keys, four-entry cloned generated cache, file/byte/node/link and worker cancellation limits; cache is optional memory optimization, not author truth.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/acquisition.ts",
+            "src/intelligence/materialize.ts",
+            "src/intelligence/graphSnapshot.ts",
+            "tests/acquisition.test.ts"
+          ],
+          "limitation": "Bounded generated analysis, source digest/profile identity and private receipts exist; no persistent general AnalysisBundle/cache database."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F009",
+      "name": "Capability fingerprint",
+      "originalAcceptance": "No forced single project archetype",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/readiness.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts",
+        "tests/intelligence.test.ts"
+      ],
+      "limitation": "Evidence-based multi-capability signals and purpose-relative gaps; unavailable facts reported rather than probabilistic classification.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/intelligence/readiness.ts",
+            "src/intelligence/acquisition.ts",
+            "src/intelligence/domainAdapters.ts",
+            "tests/intelligence.test.ts"
+          ],
+          "limitation": "Evidence-based multi-capability signals and purpose-relative gaps; unavailable facts reported rather than probabilistic classification."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F010",
+      "name": "GapReport v1",
+      "originalAcceptance": "Every gap explains impact and resolution",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/readiness.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts",
+        "tests/intelligence.test.ts"
+      ],
+      "limitation": "Evidence-based multi-capability signals and purpose-relative gaps; unavailable facts reported rather than probabilistic classification.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/intelligence/readiness.ts",
+            "src/intelligence/acquisition.ts",
+            "src/intelligence/domainAdapters.ts",
+            "tests/intelligence.test.ts"
+          ],
+          "limitation": "Evidence-based multi-capability signals and purpose-relative gaps; unavailable facts reported rather than probabilistic classification."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F009"
+      ]
+    },
+    {
+      "id": "F011",
+      "name": "View Recipe registry",
+      "originalAcceptance": "Validated registry; data/config driven",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/delivery-intelligence.test.ts",
+        "src/intelligence/cookbook.ts",
+        "src/ui/RecipeWorkbench.tsx",
+        "src/intelligence/verification.ts",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Validated versioned recipe registry with five availability states, seven purposes, source-cited pattern candidates and five generated synthetic reference archetypes. Learning/audit presets expose exact evidence, stale claims and gaps; candidates require review.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/recipes.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Seven capability/purpose-ranked recipes with reason and availability open actual views; not the full historical versioned recipe/availability vocabulary."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F009",
+        "F010"
+      ]
+    },
+    {
+      "id": "F012",
+      "name": "Minimum View Contract",
+      "originalAcceptance": "Unknown/sparse repo still produces 4 useful outputs",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/ProjectOverview.tsx",
+        "tests/e2e/project-intelligence.spec.ts"
+      ],
+      "limitation": "Four usable baseline outputs for unknown/document-only/guided repositories, including honest empty-state.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/ui/AnalysisOutputs.tsx",
+            "src/ui/ProjectOverview.tsx",
+            "tests/e2e/project-intelligence.spec.ts"
+          ],
+          "limitation": "Four usable baseline outputs for unknown/document-only/guided repositories, including honest empty-state."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F011"
+      ]
+    },
+    {
+      "id": "F013",
+      "name": "Start Wizard",
+      "originalAcceptance": "Keyboard accessible; no advanced clutter",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/ui/ProjectStart.tsx",
+        "tests/e2e/project-intelligence.spec.ts",
+        "src/ui/AnalysisProfilePanel.tsx",
+        "src/intelligence/profile.ts",
+        "src/intelligence/sourceBundle.ts",
+        "tests/source-bundle.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Repository Auto/Guided/Hybrid/Graph, seven purposes and retained session axes. Quick/Standard start; collapsed Deep/Custom profiles dispatch selected analyzers over explicitly selected source bytes, never execute source.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/ProjectStart.tsx",
+            "tests/e2e/project-intelligence.spec.ts"
+          ],
+          "limitation": "Repository/Guided/Hybrid/Graph and real purpose/depth work; no autonomous AI axis or full preset wizard."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F002",
+        "F003",
+        "F004"
+      ]
+    },
+    {
+      "id": "F014",
+      "name": "Project navigator",
+      "originalAcceptance": "Navigate scope IDs and mappings",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx",
+        "src/intelligence/navigation.ts",
+        "tests/navigation-intelligence.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Logical scopes, bounded physical repository hierarchy, searched purpose/perspective views, environment/snapshot selection and exact-ID mapping crosswalk remain distinct; synchronized collapsible context exposes Details/Evidence/Gaps/Alternatives/Assets without inventing missing perspectives.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/ProjectNavigator.tsx",
+            "src/ui/ProjectContext.tsx",
+            "src/ui/AnalysisOutputs.tsx",
+            "src/ui/GraphExplorer.tsx",
+            "src/ui/EvolutionPanel.tsx"
+          ],
+          "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F005"
+      ]
+    },
+    {
+      "id": "F015",
+      "name": "Repository navigator",
+      "originalAcceptance": "Atlas repos then bounded structural drilldown",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx",
+        "src/intelligence/navigation.ts",
+        "tests/navigation-intelligence.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Logical scopes, bounded physical repository hierarchy, searched purpose/perspective views, environment/snapshot selection and exact-ID mapping crosswalk remain distinct; synchronized collapsible context exposes Details/Evidence/Gaps/Alternatives/Assets without inventing missing perspectives.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/ProjectNavigator.tsx",
+            "src/ui/ProjectContext.tsx",
+            "src/ui/AnalysisOutputs.tsx",
+            "src/ui/GraphExplorer.tsx",
+            "src/ui/EvolutionPanel.tsx"
+          ],
+          "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F016",
+      "name": "Views navigator",
+      "originalAcceptance": "Search and navigate views",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx",
+        "src/intelligence/navigation.ts",
+        "tests/navigation-intelligence.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Logical scopes, bounded physical repository hierarchy, searched purpose/perspective views, environment/snapshot selection and exact-ID mapping crosswalk remain distinct; synchronized collapsible context exposes Details/Evidence/Gaps/Alternatives/Assets without inventing missing perspectives.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/ProjectNavigator.tsx",
+            "src/ui/ProjectContext.tsx",
+            "src/ui/AnalysisOutputs.tsx",
+            "src/ui/GraphExplorer.tsx",
+            "src/ui/EvolutionPanel.tsx"
+          ],
+          "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F011"
+      ]
+    },
+    {
+      "id": "F017",
+      "name": "Context panel",
+      "originalAcceptance": "Collapsible; selection synchronized",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx",
+        "src/intelligence/navigation.ts",
+        "tests/navigation-intelligence.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Logical scopes, bounded physical repository hierarchy, searched purpose/perspective views, environment/snapshot selection and exact-ID mapping crosswalk remain distinct; synchronized collapsible context exposes Details/Evidence/Gaps/Alternatives/Assets without inventing missing perspectives.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/ProjectNavigator.tsx",
+            "src/ui/ProjectContext.tsx",
+            "src/ui/AnalysisOutputs.tsx",
+            "src/ui/GraphExplorer.tsx",
+            "src/ui/EvolutionPanel.tsx"
+          ],
+          "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F010",
+        "F011"
+      ]
+    },
+    {
+      "id": "F018",
+      "name": "Logical-physical combined view",
+      "originalAcceptance": "Origin of mappings visible",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx",
+        "src/intelligence/navigation.ts",
+        "tests/navigation-intelligence.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Logical scopes, bounded physical repository hierarchy, searched purpose/perspective views, environment/snapshot selection and exact-ID mapping crosswalk remain distinct; synchronized collapsible context exposes Details/Evidence/Gaps/Alternatives/Assets without inventing missing perspectives.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/ProjectNavigator.tsx",
+            "src/ui/ProjectContext.tsx",
+            "src/ui/AnalysisOutputs.tsx",
+            "src/ui/GraphExplorer.tsx",
+            "src/ui/EvolutionPanel.tsx"
+          ],
+          "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F005",
+        "F007"
+      ]
+    },
+    {
+      "id": "F019",
+      "name": "Existing Project model",
+      "originalAcceptance": "No second authoring truth",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/model.ts",
+        "tests/core.test.ts"
+      ],
+      "limitation": "Canonical bounded Project schema 1 retained; optional delivery is additive and validated.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/core/model.ts",
+            "tests/core.test.ts"
+          ],
+          "limitation": "Canonical bounded Project schema 1 retained; optional delivery is additive and validated."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F020",
+      "name": "Existing ViewSpec",
+      "originalAcceptance": "Stable IDs/evidence/path preserved",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/viewspec.ts",
+        "tests/viewspec.test.ts"
+      ],
+      "limitation": "Existing renderer-neutral public projection retained; no facts added by a renderer.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/core/viewspec.ts",
+            "tests/viewspec.test.ts"
+          ],
+          "limitation": "Existing renderer-neutral public projection retained; no facts added by a renderer."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F021",
+      "name": "Existing repository scanner",
+      "originalAcceptance": "No regressions",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "tests/scan.test.ts"
+      ],
+      "limitation": "Existing deterministic scanner retained, with additional selected native artifact paths.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/core/scan/scanner.ts",
+            "tests/scan.test.ts"
+          ],
+          "limitation": "Existing deterministic scanner retained, with additional selected native artifact paths."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F022",
+      "name": "Docs/knowledge v1",
+      "originalAcceptance": "Exact file/section/row evidence; no LLM required",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/documents.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/acquisition.test.ts",
+        "src/intelligence/structuredDocuments.ts",
+        "tests/structured-documents.test.ts",
+        "tests/structured-documents-integration.test.ts"
+      ],
+      "limitation": "Selected Markdown/CSV/JSON/YAML lexical declarations retain exact file/line, heading/row or AST pointer provenance and local-reference diagnostics. PDF extraction, remote fetches, YAML alias/tag evaluation and implicit requirement/test interpretations are unsupported, not invented.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/documents.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/acquisition.test.ts"
+          ],
+          "limitation": "Markdown/CSV source sections/records and exact links work; no generalized JSON/YAML/PDF/ADR requirement-to-test semantics."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F023",
+      "name": "dbt manifest adapter",
+      "originalAcceptance": "Artifact preferred over heuristic when available",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts",
+        "tests/night4-domain.test.ts",
+        "src/intelligence/nativeAdapters.ts",
+        "src/intelligence/crossRepository.ts",
+        "src/core/scan/dbt.ts",
+        "tests/dbt-artifact.test.ts",
+        "tests/native-adapters.test.ts",
+        "tests/cross-repository.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Selected dbt manifest wins over heuristic SQL; safe Databricks includes/targets/jobs/pipelines/notebooks, Fabric/PBIR/TMDL relationships, OpenAPI local refs, .NET solution/project/NuGet/ASP.NET/EF, ARM/Bicep/azd/Functions/Container Apps and bounded Helm/Kustomize declarations. Exact source paths/lines and explicit strong-key cross-repository candidates; dynamic compiler/template/runtime behavior remains unknown.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/intelligence/domainAdapters.ts",
+            "tests/campaign-examples.test.ts",
+            "tests/night4-domain.test.ts"
+          ],
+          "limitation": "dbt manifest v4-v12 native IDs, resources and exact dependencies preferred over heuristic text; no SQL execution."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F024",
+      "name": "Databricks bundle adapter",
+      "originalAcceptance": "Static-source only; included files resolved safely",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/campaign-examples.test.ts",
+        "src/intelligence/nativeAdapters.ts",
+        "src/intelligence/crossRepository.ts",
+        "src/core/scan/dbt.ts",
+        "tests/dbt-artifact.test.ts",
+        "tests/native-adapters.test.ts",
+        "tests/cross-repository.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Selected dbt manifest wins over heuristic SQL; safe Databricks includes/targets/jobs/pipelines/notebooks, Fabric/PBIR/TMDL relationships, OpenAPI local refs, .NET solution/project/NuGet/ASP.NET/EF, ARM/Bicep/azd/Functions/Container Apps and bounded Helm/Kustomize declarations. Exact source paths/lines and explicit strong-key cross-repository candidates; dynamic compiler/template/runtime behavior remains unknown.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/domainAdapters.ts",
+            "tests/delivery-intelligence.test.ts",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Bundle/resource YAML/JSON and Jobs task dependencies work; include resolution, targets and pipeline semantics incomplete."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F025",
+      "name": "Fabric/PBIP/TMDL adapter",
+      "originalAcceptance": "No Fabric runtime claims",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts",
+        "src/intelligence/nativeAdapters.ts",
+        "src/intelligence/crossRepository.ts",
+        "src/core/scan/dbt.ts",
+        "tests/dbt-artifact.test.ts",
+        "tests/native-adapters.test.ts",
+        "tests/cross-repository.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Selected dbt manifest wins over heuristic SQL; safe Databricks includes/targets/jobs/pipelines/notebooks, Fabric/PBIR/TMDL relationships, OpenAPI local refs, .NET solution/project/NuGet/ASP.NET/EF, ARM/Bicep/azd/Functions/Container Apps and bounded Helm/Kustomize declarations. Exact source paths/lines and explicit strong-key cross-repository candidates; dynamic compiler/template/runtime behavior remains unknown.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/domainAdapters.ts",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Supported PBIP/PBIR, selected semantic model and TMDL declarations/explicit references; not all platform/DAX/type semantics."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F026",
+      "name": "OpenAPI adapter",
+      "originalAcceptance": "Explicit contracts/evidence",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/delivery-intelligence.test.ts",
+        "src/intelligence/nativeAdapters.ts",
+        "src/intelligence/crossRepository.ts",
+        "src/core/scan/dbt.ts",
+        "tests/dbt-artifact.test.ts",
+        "tests/native-adapters.test.ts",
+        "tests/cross-repository.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Selected dbt manifest wins over heuristic SQL; safe Databricks includes/targets/jobs/pipelines/notebooks, Fabric/PBIR/TMDL relationships, OpenAPI local refs, .NET solution/project/NuGet/ASP.NET/EF, ARM/Bicep/azd/Functions/Container Apps and bounded Helm/Kustomize declarations. Exact source paths/lines and explicit strong-key cross-repository candidates; dynamic compiler/template/runtime behavior remains unknown.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/domainAdapters.ts",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Solution/project/NuGet and OpenAPI operations/schemas/local refs work; no general cross-repo resolver, ASP.NET/EF/deep C# call graph."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F027",
+      "name": ".NET analyzer",
+      "originalAcceptance": "Structured references first",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/delivery-intelligence.test.ts",
+        "src/intelligence/nativeAdapters.ts",
+        "src/intelligence/crossRepository.ts",
+        "src/core/scan/dbt.ts",
+        "tests/dbt-artifact.test.ts",
+        "tests/native-adapters.test.ts",
+        "tests/cross-repository.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Selected dbt manifest wins over heuristic SQL; safe Databricks includes/targets/jobs/pipelines/notebooks, Fabric/PBIR/TMDL relationships, OpenAPI local refs, .NET solution/project/NuGet/ASP.NET/EF, ARM/Bicep/azd/Functions/Container Apps and bounded Helm/Kustomize declarations. Exact source paths/lines and explicit strong-key cross-repository candidates; dynamic compiler/template/runtime behavior remains unknown.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/domainAdapters.ts",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Solution/project/NuGet and OpenAPI operations/schemas/local refs work; no general cross-repo resolver, ASP.NET/EF/deep C# call graph."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F028",
+      "name": "Azure analyzer",
+      "originalAcceptance": "Static config only",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/domainAdapters.ts",
+        "tests/campaign-examples.test.ts",
+        "src/intelligence/nativeAdapters.ts",
+        "src/intelligence/crossRepository.ts",
+        "src/core/scan/dbt.ts",
+        "tests/dbt-artifact.test.ts",
+        "tests/native-adapters.test.ts",
+        "tests/cross-repository.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Selected dbt manifest wins over heuristic SQL; safe Databricks includes/targets/jobs/pipelines/notebooks, Fabric/PBIR/TMDL relationships, OpenAPI local refs, .NET solution/project/NuGet/ASP.NET/EF, ARM/Bicep/azd/Functions/Container Apps and bounded Helm/Kustomize declarations. Exact source paths/lines and explicit strong-key cross-repository candidates; dynamic compiler/template/runtime behavior remains unknown.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/domainAdapters.ts",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Bicep resource type/API-version declarations only; ARM/azd/Functions/Container Apps resolution remains."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F029",
+      "name": "Helm/Kustomize",
+      "originalAcceptance": "Bounded config resolution",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "docs/product/CAMPAIGN_CLIENT.md",
+        "src/intelligence/domainAdapters.ts",
+        "src/intelligence/nativeAdapters.ts",
+        "src/intelligence/crossRepository.ts",
+        "src/core/scan/dbt.ts",
+        "tests/dbt-artifact.test.ts",
+        "tests/native-adapters.test.ts",
+        "tests/cross-repository.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Selected dbt manifest wins over heuristic SQL; safe Databricks includes/targets/jobs/pipelines/notebooks, Fabric/PBIR/TMDL relationships, OpenAPI local refs, .NET solution/project/NuGet/ASP.NET/EF, ARM/Bicep/azd/Functions/Container Apps and bounded Helm/Kustomize declarations. Exact source paths/lines and explicit strong-key cross-repository candidates; dynamic compiler/template/runtime behavior remains unknown.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "NOT_STARTED",
+          "evidence": [
+            "docs/product/CAMPAIGN_CLIENT.md"
+          ],
+          "limitation": "Existing K8s scanning does not implement bounded Helm/Kustomize packaging/overlay resolution."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F030",
+      "name": "Tree-sitter deep graph",
+      "originalAcceptance": "Deep profile only, explicit budgets",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "src/intelligence/deepAnalysis.ts",
+        "src/intelligence/deepClient.ts",
+        "src/intelligence/deepWorker.ts",
+        "scripts/lib/deepRuntime.ts",
+        "tests/deep-analysis.test.ts",
+        "tests/e2e/deep-source.spec.ts"
+      ],
+      "limitation": "Actual pinned local Tree-sitter WASM for TS/TSX/JS/Python/C#, explicit Deep/Custom budgets, syntax symbols and bounded call/import candidates with source ranges. No compiler dispatch, execution or runtime call-graph claims.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "NOT_STARTED",
+          "evidence": [
+            "src/core/scan/scanner.ts"
+          ],
+          "limitation": "No Tree-sitter symbol/call engine; existing textual imports are not a deep language graph."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F031",
+      "name": "Existing Project Atlas",
+      "originalAcceptance": "No single project SHA",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/atlas/compose.ts",
+        "tests/atlas.test.ts",
+        "tests/e2e/atlas.spec.ts"
+      ],
+      "limitation": "Explicit Atlas membership, per-repository revisions and preserved rescans.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/core/atlas/compose.ts",
+            "tests/atlas.test.ts",
+            "tests/e2e/atlas.spec.ts"
+          ],
+          "limitation": "Explicit Atlas membership, per-repository revisions and preserved rescans."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F032",
+      "name": "Hybrid reconciliation",
+      "originalAcceptance": "Never overwrite conflicting evidence",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/bridge.ts",
+        "src/intelligence/refresh.ts",
+        "tests/intelligence-refresh.test.ts",
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/sourceConflicts.ts",
+        "tests/source-conflicts.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Explicit Hybrid bindings, stable generated identity, authored content/position/public-evidence retention, exact revision review and source-discrepancy candidates; conflicting evidence is retained for human reconciliation.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/bridge.ts",
+            "src/intelligence/refresh.ts",
+            "tests/intelligence-refresh.test.ts"
+          ],
+          "limitation": "Hybrid bindings and authored retention/conflicts work; no general semantic reconciliation engine."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F005",
+        "F007"
+      ]
+    },
+    {
+      "id": "F033",
+      "name": "Cross-repo resolver",
+      "originalAcceptance": "No same-tech/name-only joins",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/bridge.ts",
+        "src/intelligence/domainAdapters.ts",
+        "src/intelligence/nativeAdapters.ts",
+        "src/intelligence/crossRepository.ts",
+        "src/core/scan/dbt.ts",
+        "tests/dbt-artifact.test.ts",
+        "tests/native-adapters.test.ts",
+        "tests/cross-repository.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Selected dbt manifest wins over heuristic SQL; safe Databricks includes/targets/jobs/pipelines/notebooks, Fabric/PBIR/TMDL relationships, OpenAPI local refs, .NET solution/project/NuGet/ASP.NET/EF, ARM/Bicep/azd/Functions/Container Apps and bounded Helm/Kustomize declarations. Exact source paths/lines and explicit strong-key cross-repository candidates; dynamic compiler/template/runtime behavior remains unknown.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "NOT_STARTED",
+          "evidence": [
+            "src/intelligence/bridge.ts"
+          ],
+          "limitation": "Cross-repository links are explicit declarations; no strong-key candidate resolver is shipped."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F032",
+        "F026"
+      ]
+    },
+    {
+      "id": "F034",
+      "name": "Collection v1",
+      "originalAcceptance": "Independent project revision vectors",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/App.tsx",
+        "src/intelligence/library.ts",
+        "src/ui/LibraryPanel.tsx",
+        "src/core/links.ts",
+        "tests/library.test.ts",
+        "tests/e2e/graph-canvas-library.spec.ts",
+        "tests/library-links-manual.test.ts",
+        "tests/e2e/library-links-images.spec.ts"
+      ],
+      "limitation": "Independent explicit-membership collections and immutable public handbook snapshots preserve project/repository revision vectors, source time, selected story/views and normalized presentation brief. Frozen output digest and stable library links; legacy document-only digests are labelled unbound, tampered/unsafe rows excluded without storage rewrite.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/recipes.ts",
+            "src/App.tsx"
+          ],
+          "limitation": "Independent gallery projects and pure projectCollection summary; no integrated organization landscape collection workflow."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F032"
+      ]
+    },
+    {
+      "id": "F035",
+      "name": "Document lexical/source layer",
+      "originalAcceptance": "All extracted relations link to sources",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/documents.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/acquisition.test.ts",
+        "src/intelligence/structuredDocuments.ts",
+        "tests/structured-documents.test.ts",
+        "tests/structured-documents-integration.test.ts"
+      ],
+      "limitation": "Selected Markdown/CSV/JSON/YAML lexical declarations retain exact file/line, heading/row or AST pointer provenance and local-reference diagnostics. PDF extraction, remote fetches, YAML alias/tag evaluation and implicit requirement/test interpretations are unsupported, not invented.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/documents.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/acquisition.test.ts"
+          ],
+          "limitation": "Markdown/CSV source sections/records and exact links work; no generalized JSON/YAML/PDF/ADR requirement-to-test semantics."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F022"
+      ]
+    },
+    {
+      "id": "F036",
+      "name": "Agent entity extraction",
+      "originalAcceptance": "Candidate only; review required",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/documents.ts",
+        "src/intelligence/entityProposal.ts",
+        "src/ui/RecipeWorkbench.tsx",
+        "tests/recipes-verification.test.ts"
+      ],
+      "limitation": "External agent-supplied entity/relation candidates require exact selected-source quotes and line ranges, unknown semantic basis and a private revision-guarded review patch. No mandatory model or autonomous extraction service.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "NOT_STARTED",
+          "evidence": [
+            "src/intelligence/documents.ts"
+          ],
+          "limitation": "Lexical source links only; no agent prose entity extraction."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F035",
+        "F004"
+      ]
+    },
+    {
+      "id": "F037",
+      "name": "Classic engineering profile",
+      "originalAcceptance": "Formalize profile, preserve canvas/export",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/Canvas.tsx",
+        "src/export/scene.ts",
+        "src/intelligence/publicationBrief.ts",
+        "src/export/publicationPages.ts",
+        "src/export/manual.ts",
+        "src/export/assetFidelity.ts",
+        "tests/publication-pages.test.ts",
+        "tests/business-publication.test.ts",
+        "tests/e2e/business-publication-settings.spec.ts"
+      ],
+      "limitation": "Presentation-only Classic/Blueprint/Editorial/Design/Business publication profile, scope/story/detail/paper settings and public fidelity ledgers. Dense views paginate into readable eight-component detail pages with original complete connection/evidence tables; omitted/cross-page data and specialized-figure fallback are explicit.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/Canvas.tsx",
+            "src/export/scene.ts"
+          ],
+          "limitation": "Existing technical canvas and export fidelity preserved; profile contract formalization remains."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F038",
+      "name": "Editorial profile",
+      "originalAcceptance": "Selective future type adoption",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/export/styled.ts",
+        "src/export/design/index.ts",
+        "tests/styled.test.ts"
+      ],
+      "limitation": "Existing Editorial/Blueprint/Diagram Design renderings and static offline public boundary retained.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/export/styled.ts",
+            "src/export/design/index.ts",
+            "tests/styled.test.ts"
+          ],
+          "limitation": "Existing Editorial/Blueprint/Diagram Design renderings and static offline public boundary retained."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F039",
+      "name": "Blueprint profile",
+      "originalAcceptance": "Preserve",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/export/styled.ts",
+        "src/export/design/index.ts",
+        "tests/styled.test.ts"
+      ],
+      "limitation": "Existing Editorial/Blueprint/Diagram Design renderings and static offline public boundary retained.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/export/styled.ts",
+            "src/export/design/index.ts",
+            "tests/styled.test.ts"
+          ],
+          "limitation": "Existing Editorial/Blueprint/Diagram Design renderings and static offline public boundary retained."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F040",
+      "name": "Business profile",
+      "originalAcceptance": "Not a general canvas",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/projectOverview.ts",
+        "src/export/intelligenceReport.ts",
+        "src/ui/ProjectOverview.tsx",
+        "tests/intelligence-overview.test.ts",
+        "src/ui/HowItWorksPanel.tsx",
+        "src/export/howItWorks.ts",
+        "tests/business-publication.test.ts",
+        "tests/e2e/business-publication-settings.spec.ts"
+      ],
+      "limitation": "Business overview shows context/contribution/constraints/outcomes with missing-data gaps. How It Works derives 3–6 real authored story/path steps; sparse, cyclic or branching paths remain partial, with public source basis and dated reviewed claims preserved.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/export/projectOverview.ts",
+            "src/export/intelligenceReport.ts",
+            "src/ui/ProjectOverview.tsx",
+            "tests/intelligence-overview.test.ts"
+          ],
+          "limitation": "Useful public overview, authored how-it-works story, delivery/evidence/verification gaps report; not all fixed historical business-sheet contracts."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F005",
+        "F011"
+      ]
+    },
+    {
+      "id": "F041",
+      "name": "Project Overview sheet",
+      "originalAcceptance": "Graceful gaps if context missing",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/projectOverview.ts",
+        "src/export/intelligenceReport.ts",
+        "src/ui/ProjectOverview.tsx",
+        "tests/intelligence-overview.test.ts",
+        "src/ui/HowItWorksPanel.tsx",
+        "src/export/howItWorks.ts",
+        "tests/business-publication.test.ts",
+        "tests/e2e/business-publication-settings.spec.ts"
+      ],
+      "limitation": "Business overview shows context/contribution/constraints/outcomes with missing-data gaps. How It Works derives 3–6 real authored story/path steps; sparse, cyclic or branching paths remain partial, with public source basis and dated reviewed claims preserved.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/export/projectOverview.ts",
+            "src/export/intelligenceReport.ts",
+            "src/ui/ProjectOverview.tsx",
+            "tests/intelligence-overview.test.ts"
+          ],
+          "limitation": "Useful public overview, authored how-it-works story, delivery/evidence/verification gaps report; not all fixed historical business-sheet contracts."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F040"
+      ]
+    },
+    {
+      "id": "F042",
+      "name": "How It Works sheet",
+      "originalAcceptance": "Derived from path/story, source labels retained",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/projectOverview.ts",
+        "src/export/intelligenceReport.ts",
+        "src/ui/ProjectOverview.tsx",
+        "tests/intelligence-overview.test.ts",
+        "src/ui/HowItWorksPanel.tsx",
+        "src/export/howItWorks.ts",
+        "tests/business-publication.test.ts",
+        "tests/e2e/business-publication-settings.spec.ts"
+      ],
+      "limitation": "Business overview shows context/contribution/constraints/outcomes with missing-data gaps. How It Works derives 3–6 real authored story/path steps; sparse, cyclic or branching paths remain partial, with public source basis and dated reviewed claims preserved.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/export/projectOverview.ts",
+            "src/export/intelligenceReport.ts",
+            "src/ui/ProjectOverview.tsx",
+            "tests/intelligence-overview.test.ts"
+          ],
+          "limitation": "Useful public overview, authored how-it-works story, delivery/evidence/verification gaps report; not all fixed historical business-sheet contracts."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F040"
+      ]
+    },
+    {
+      "id": "F043",
+      "name": "Work/Verification Brief",
+      "originalAcceptance": "No PASS without receipt",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/projectOverview.ts",
+        "src/export/intelligenceReport.ts",
+        "src/ui/ProjectOverview.tsx",
+        "tests/intelligence-overview.test.ts",
+        "src/intelligence/verification.ts",
+        "src/ui/WorkVerificationPanel.tsx",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Exact-revision PROPOSED/NOT_RUN VerificationSpec and owner-validator receipt ingestion stage private unreviewed claims; explicit component/connection checks, bounded impact, stale/conflicting evidence and mapping gaps. Host-fed cockpit permission/time/expiry checks, inert observability links and source-cited trust hooks; no runner, collector, coverage percentage, health or security certificate.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/export/projectOverview.ts",
+            "src/export/intelligenceReport.ts",
+            "src/ui/ProjectOverview.tsx",
+            "tests/intelligence-overview.test.ts"
+          ],
+          "limitation": "Useful public overview, authored how-it-works story, delivery/evidence/verification gaps report; not all fixed historical business-sheet contracts."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F040"
+      ]
+    },
+    {
+      "id": "F044",
+      "name": "IsoSVG profile",
+      "originalAcceptance": "No WebGL; fixed camera; static fallback",
+      "status": "NOT_STARTED",
+      "horizon": "R&D",
+      "evidence": [
+        "src/export/design/layers.ts"
+      ],
+      "limitation": "Existing Exploded static figure preserved; not a new IsoSVG fixed-camera profile or scenario animation/Trace.",
+      "origin": "candidate-or-partial-baseline",
+      "dependencies": [
+        "F011"
+      ]
+    },
+    {
+      "id": "F045",
+      "name": "Trace profile",
+      "originalAcceptance": "Illustrative vs observed explicit",
+      "status": "NOT_STARTED",
+      "horizon": "R&D",
+      "evidence": [
+        "src/export/design/layers.ts"
+      ],
+      "limitation": "Existing Exploded static figure preserved; not a new IsoSVG fixed-camera profile or scenario animation/Trace.",
+      "origin": "candidate-or-partial-baseline",
+      "dependencies": [
+        "F011"
+      ]
+    },
+    {
+      "id": "F046",
+      "name": "Mosaic external 3D",
+      "originalAcceptance": "Do not duplicate Three.js",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/export/concept.ts",
+        "tests/concept.test.ts"
+      ],
+      "limitation": "Existing owner-validated Mosaic concept adapter retained; no duplicated spatial engine.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/export/concept.ts",
+            "tests/concept.test.ts"
+          ],
+          "limitation": "Existing owner-validated Mosaic concept adapter retained; no duplicated spatial engine."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F047",
+      "name": "PublicationBrief v1",
+      "originalAcceptance": "Presentation-only settings",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/designBrief.ts",
+        "src/core/viewspec.ts",
+        "src/ui/LargeGraphPreview.tsx",
+        "src/intelligence/recipes.ts",
+        "src/intelligence/publicationBrief.ts",
+        "src/export/publicationPages.ts",
+        "src/export/manual.ts",
+        "src/export/assetFidelity.ts",
+        "tests/publication-pages.test.ts",
+        "tests/business-publication.test.ts",
+        "tests/e2e/business-publication-settings.spec.ts"
+      ],
+      "limitation": "Presentation-only Classic/Blueprint/Editorial/Design/Business publication profile, scope/story/detail/paper settings and public fidelity ledgers. Dense views paginate into readable eight-component detail pages with original complete connection/evidence tables; omitted/cross-page data and specialized-figure fallback are explicit. Paper/display geometry also triggers pagination for wide/tall views below count limits; measured primary-label threshold and complete ledgers are explicit.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/designBrief.ts",
+            "src/core/viewspec.ts",
+            "src/ui/LargeGraphPreview.tsx",
+            "src/intelligence/recipes.ts"
+          ],
+          "limitation": "Presentation-only brief, omission/fidelity reporting and bounded projection/preview exist; no complete publication contract or automatic dense-figure splitting for every recipe."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F011"
+      ]
+    },
+    {
+      "id": "F048",
+      "name": "Fidelity ledger",
+      "originalAcceptance": "Visible in preview/export QA",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/designBrief.ts",
+        "src/core/viewspec.ts",
+        "src/ui/LargeGraphPreview.tsx",
+        "src/intelligence/recipes.ts",
+        "src/intelligence/publicationBrief.ts",
+        "src/export/publicationPages.ts",
+        "src/export/manual.ts",
+        "src/export/assetFidelity.ts",
+        "tests/publication-pages.test.ts",
+        "tests/business-publication.test.ts",
+        "tests/e2e/business-publication-settings.spec.ts"
+      ],
+      "limitation": "Presentation-only Classic/Blueprint/Editorial/Design/Business publication profile, scope/story/detail/paper settings and public fidelity ledgers. Dense views paginate into readable eight-component detail pages with original complete connection/evidence tables; omitted/cross-page data and specialized-figure fallback are explicit. Paper/display geometry also triggers pagination for wide/tall views below count limits; measured primary-label threshold and complete ledgers are explicit.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/designBrief.ts",
+            "src/core/viewspec.ts",
+            "src/ui/LargeGraphPreview.tsx",
+            "src/intelligence/recipes.ts"
+          ],
+          "limitation": "Presentation-only brief, omission/fidelity reporting and bounded projection/preview exist; no complete publication contract or automatic dense-figure splitting for every recipe."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F011"
+      ]
+    },
+    {
+      "id": "F049",
+      "name": "Complexity budgets",
+      "originalAcceptance": "Split overview/detail instead of tiny graphs",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/designBrief.ts",
+        "src/core/viewspec.ts",
+        "src/ui/LargeGraphPreview.tsx",
+        "src/intelligence/recipes.ts",
+        "src/intelligence/publicationBrief.ts",
+        "src/export/publicationPages.ts",
+        "src/export/manual.ts",
+        "src/export/assetFidelity.ts",
+        "tests/publication-pages.test.ts",
+        "tests/business-publication.test.ts",
+        "tests/e2e/business-publication-settings.spec.ts"
+      ],
+      "limitation": "Presentation-only Classic/Blueprint/Editorial/Design/Business publication profile, scope/story/detail/paper settings and public fidelity ledgers. Dense views paginate into readable eight-component detail pages with original complete connection/evidence tables; omitted/cross-page data and specialized-figure fallback are explicit. Paper/display geometry also triggers pagination for wide/tall views below count limits; measured primary-label threshold and complete ledgers are explicit.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/designBrief.ts",
+            "src/core/viewspec.ts",
+            "src/ui/LargeGraphPreview.tsx",
+            "src/intelligence/recipes.ts"
+          ],
+          "limitation": "Presentation-only brief, omission/fidelity reporting and bounded projection/preview exist; no complete publication contract or automatic dense-figure splitting for every recipe."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F011"
+      ]
+    },
+    {
+      "id": "F050",
+      "name": "Geometric QA",
+      "originalAcceptance": "Extend, do not replace",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "tests/design-quality.test.ts",
+        "tests/helpers/designGeometry.ts",
+        "src/export/scene.ts"
+      ],
+      "limitation": "Unweakened geometric gates and measured scene routes preserved, including real local atlas qualification.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "tests/design-quality.test.ts",
+            "tests/helpers/designGeometry.ts",
+            "src/export/scene.ts"
+          ],
+          "limitation": "Unweakened geometric gates and measured scene routes preserved, including real local atlas qualification."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F051",
+      "name": "Semantic visual QA",
+      "originalAcceptance": "Sankey/treemap/waterfall/etc rules",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/design/recommend.ts",
+        "tests/design-quality.test.ts",
+        "src/intelligence/visualQuality.ts",
+        "src/ui/FigureQualityPanel.tsx",
+        "src/export/design/quality.ts",
+        "tests/visual-quality-intelligence.test.ts",
+        "src/export/design/waterfall.ts",
+        "tests/design-waterfall.test.ts",
+        "tests/e2e/waterfall.spec.ts"
+      ],
+      "limitation": "Actual Sankey width/value/unit/provenance and balance diagnostics, bar/heatmap/table encodings, treemap weights, and signed waterfall delta/cumulative/geometry rules. Waterfall prints derived arithmetic, missing-value gaps, source-row IDs and omissions; scores are local heuristics. Conservation remains UNKNOWN without a supplied closed-flow assumption.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/export/design/recommend.ts",
+            "tests/design-quality.test.ts"
+          ],
+          "limitation": "Existing semantic figure requirements/reasons and geometry checks; no general quantitative A/B/C candidate scoring ledger."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F048"
+      ]
+    },
+    {
+      "id": "F052",
+      "name": "Candidate comparison",
+      "originalAcceptance": "Scores expose reasons/metrics",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/design/recommend.ts",
+        "tests/design-quality.test.ts",
+        "src/intelligence/visualQuality.ts",
+        "src/ui/FigureQualityPanel.tsx",
+        "src/export/design/quality.ts",
+        "tests/visual-quality-intelligence.test.ts"
+      ],
+      "limitation": "Actual semantic numeric/provenance/geometry checks and reasoned A/B/C renders of the same public facts, with transparent defect weights. Scores are local heuristics; conservation remains UNKNOWN without a supplied closed-flow assumption. Unsupported encodings are not falsely passed.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/export/design/recommend.ts",
+            "tests/design-quality.test.ts"
+          ],
+          "limitation": "Existing semantic figure requirements/reasons and geometry checks; no general quantitative A/B/C candidate scoring ledger."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F048",
+        "F050",
+        "F051"
+      ]
+    },
+    {
+      "id": "F053",
+      "name": "Existing AI guide/design brief/patch",
+      "originalAcceptance": "Preserve human gate",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "docs/AI_GUIDE.md",
+        "src/core/patch.ts",
+        "src/core/designBrief.ts",
+        "tests/ai-guide.test.ts"
+      ],
+      "limitation": "Reviewed design/patch workflow and validated guide remain true; observations stay human-reviewed.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "docs/AI_GUIDE.md",
+            "src/core/patch.ts",
+            "src/core/designBrief.ts",
+            "tests/ai-guide.test.ts"
+          ],
+          "limitation": "Reviewed design/patch workflow and validated guide remain true; observations stay human-reviewed."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F054",
+      "name": "Thin MCP read/query",
+      "originalAcceptance": "Bounded outputs, no arbitrary FS",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "scripts/intelligence-mcp.ts",
+        "src/intelligence/context.ts",
+        "tests/mcp-client.test.ts",
+        "src/intelligence/analysisContext.ts",
+        "scripts/qualify-clients.ts"
+      ],
+      "limitation": "Seven bounded public-only read/render/proposal tools; optional eighth private context query only over one explicitly selected validated startup bundle. Actual isolated stdio clients exercise tools; no filesystem tool arguments, mutation or execution port.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "scripts/intelligence-mcp.ts",
+            "src/intelligence/context.ts",
+            "tests/mcp-client.test.ts"
+          ],
+          "limitation": "Bounded selected-file public-only stdio query for summary/components/evidence/views/impact/verification gaps; no arbitrary filesystem path or mutation."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007",
+        "F010"
+      ]
+    },
+    {
+      "id": "F055",
+      "name": "Thin MCP render",
+      "originalAcceptance": "No semantic mutation",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "scripts/intelligence-mcp.ts",
+        "src/intelligence/context.ts",
+        "tests/mcp-client.test.ts",
+        "src/intelligence/analysisContext.ts",
+        "scripts/qualify-clients.ts"
+      ],
+      "limitation": "Seven bounded public-only read/render/proposal tools; optional eighth private context query only over one explicitly selected validated startup bundle. Actual isolated stdio clients exercise tools; no filesystem tool arguments, mutation or execution port.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "scripts/intelligence-mcp.ts",
+            "src/intelligence/context.ts",
+            "tests/mcp-client.test.ts"
+          ],
+          "limitation": "Working public SVG render and design/NOT_RUN verification proposals; not every quality/delta/book/project/publication tool."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F054"
+      ]
+    },
+    {
+      "id": "F056",
+      "name": "Thin MCP proposal",
+      "originalAcceptance": "Proposal-only",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "scripts/intelligence-mcp.ts",
+        "src/intelligence/context.ts",
+        "tests/mcp-client.test.ts",
+        "src/intelligence/analysisContext.ts",
+        "scripts/qualify-clients.ts"
+      ],
+      "limitation": "Seven bounded public-only read/render/proposal tools; optional eighth private context query only over one explicitly selected validated startup bundle. Actual isolated stdio clients exercise tools; no filesystem tool arguments, mutation or execution port.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "scripts/intelligence-mcp.ts",
+            "src/intelligence/context.ts",
+            "tests/mcp-client.test.ts"
+          ],
+          "limitation": "Working public SVG render and design/NOT_RUN verification proposals; not every quality/delta/book/project/publication tool."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F054"
+      ]
+    },
+    {
+      "id": "F057",
+      "name": "VerificationSpec v1",
+      "originalAcceptance": "Spec is not result",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/context.ts",
+        "src/core/realization.ts",
+        "src/core/galaxy.ts",
+        "tests/realization.test.ts",
+        "src/intelligence/verification.ts",
+        "src/ui/WorkVerificationPanel.tsx",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Exact-revision PROPOSED/NOT_RUN VerificationSpec and owner-validator receipt ingestion stage private unreviewed claims; explicit component/connection checks, bounded impact, stale/conflicting evidence and mapping gaps. Host-fed cockpit permission/time/expiry checks, inert observability links and source-cited trust hooks; no runner, collector, coverage percentage, health or security certificate.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/context.ts",
+            "src/core/realization.ts",
+            "src/core/galaxy.ts",
+            "tests/realization.test.ts"
+          ],
+          "limitation": "NOT_RUN proposal and existing reviewed external claims/verification receipts; full external VerificationSpec and receipt ingestion owner contract remains."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F054"
+      ]
+    },
+    {
+      "id": "F058",
+      "name": "Verification receipt ingestion",
+      "originalAcceptance": "Exact revision/outcome/runner/evidence",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/context.ts",
+        "src/core/realization.ts",
+        "src/core/galaxy.ts",
+        "tests/realization.test.ts",
+        "src/intelligence/verification.ts",
+        "src/ui/WorkVerificationPanel.tsx",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Exact-revision PROPOSED/NOT_RUN VerificationSpec and owner-validator receipt ingestion stage private unreviewed claims; explicit component/connection checks, bounded impact, stale/conflicting evidence and mapping gaps. Host-fed cockpit permission/time/expiry checks, inert observability links and source-cited trust hooks; no runner, collector, coverage percentage, health or security certificate.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/context.ts",
+            "src/core/realization.ts",
+            "src/core/galaxy.ts",
+            "tests/realization.test.ts"
+          ],
+          "limitation": "NOT_RUN proposal and existing reviewed external claims/verification receipts; full external VerificationSpec and receipt ingestion owner contract remains."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F057"
+      ]
+    },
+    {
+      "id": "F059",
+      "name": "Impact query",
+      "originalAcceptance": "Bounded traversal with evidence",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/delivery-intelligence.test.ts",
+        "src/intelligence/verification.ts",
+        "src/ui/WorkVerificationPanel.tsx",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Exact-revision PROPOSED/NOT_RUN VerificationSpec and owner-validator receipt ingestion stage private unreviewed claims; explicit component/connection checks, bounded impact, stale/conflicting evidence and mapping gaps. Host-fed cockpit permission/time/expiry checks, inert observability links and source-cited trust hooks; no runner, collector, coverage percentage, health or security certificate.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/recipes.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Bounded supplied-edge impact and missing reviewed-check gaps; no requirement/test-link inference or coverage percentage."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007",
+        "F054"
+      ]
+    },
+    {
+      "id": "F060",
+      "name": "Test coverage gaps",
+      "originalAcceptance": "No fake coverage percentage",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/delivery-intelligence.test.ts",
+        "src/intelligence/verification.ts",
+        "src/ui/WorkVerificationPanel.tsx",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Exact-revision PROPOSED/NOT_RUN VerificationSpec and owner-validator receipt ingestion stage private unreviewed claims; explicit component/connection checks, bounded impact, stale/conflicting evidence and mapping gaps. Host-fed cockpit permission/time/expiry checks, inert observability links and source-cited trust hooks; no runner, collector, coverage percentage, health or security certificate.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/recipes.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Bounded supplied-edge impact and missing reviewed-check gaps; no requirement/test-link inference or coverage percentage."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F057",
+        "F059"
+      ]
+    },
+    {
+      "id": "F061",
+      "name": "DataPass Hop link",
+      "originalAcceptance": "Hop remains DataPass-owned",
+      "status": "PARTIAL",
+      "horizon": "V4",
+      "evidence": [
+        "src/core/atlas/lens.ts"
+      ],
+      "limitation": "Existing optional external pointers; Hop-specific owned contract unavailable here, no reimplementation.",
+      "origin": "candidate-or-partial-baseline",
+      "dependencies": []
+    },
+    {
+      "id": "F062",
+      "name": "Lens pointers",
+      "originalAcceptance": "Keep distinct from canvas minimap",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/atlas/lens.ts",
+        "tests/atlas.test.ts"
+      ],
+      "limitation": "Existing optional tolerant Lens runtime pointers retained; not copied into architecture facts.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/core/atlas/lens.ts",
+            "tests/atlas.test.ts"
+          ],
+          "limitation": "Existing optional tolerant Lens runtime pointers retained; not copied into architecture facts."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F063",
+      "name": "DataPass sidecar bridge",
+      "originalAcceptance": "No contract regression",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/bridge/sidecar.ts",
+        "tests/bridge.test.ts"
+      ],
+      "limitation": "Existing reviewed DataPass sidecar bridge retained.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/bridge/sidecar.ts",
+            "tests/bridge.test.ts"
+          ],
+          "limitation": "Existing reviewed DataPass sidecar bridge retained."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F064",
+      "name": "ProjectBrief compiler",
+      "originalAcceptance": "Avoid two truths; explicit precedence",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/intelligence/brief.ts",
+        "src/intelligence/bridge.ts",
+        "tests/intelligence-brief.test.ts",
+        "tests/e2e/project-intelligence.spec.ts"
+      ],
+      "limitation": "Strict ProjectBrief and private candidate compiler; explicit bindings and human import review, no runtime claims.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/intelligence/brief.ts",
+            "src/intelligence/bridge.ts",
+            "tests/intelligence-brief.test.ts",
+            "tests/e2e/project-intelligence.spec.ts"
+          ],
+          "limitation": "Strict ProjectBrief and private candidate compiler; explicit bindings and human import review, no runtime claims."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F005"
+      ]
+    },
+    {
+      "id": "F065",
+      "name": "Repository learning path",
+      "originalAcceptance": "Works AI Off",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/readiness.ts",
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "src/intelligence/cookbook.ts",
+        "src/ui/RecipeWorkbench.tsx",
+        "src/intelligence/verification.ts",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Validated versioned recipe registry with five availability states, seven purposes, source-cited pattern candidates and five generated synthetic reference archetypes. Learning/audit presets expose exact evidence, stale claims and gaps; candidates require review.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/readiness.ts",
+            "src/intelligence/recipes.ts",
+            "src/ui/IntelligenceInsights.tsx"
+          ],
+          "limitation": "Purpose-driven source/gap/recipe guidance and evidence gaps; not complete progressive education or stale-source audit preset."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F011",
+        "F015"
+      ]
+    },
+    {
+      "id": "F066",
+      "name": "Architecture/evidence audit preset",
+      "originalAcceptance": "Missing is reported, not guessed",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/readiness.ts",
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "src/intelligence/cookbook.ts",
+        "src/ui/RecipeWorkbench.tsx",
+        "src/intelligence/verification.ts",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Validated versioned recipe registry with five availability states, seven purposes, source-cited pattern candidates and five generated synthetic reference archetypes. Learning/audit presets expose exact evidence, stale claims and gaps; candidates require review.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/readiness.ts",
+            "src/intelligence/recipes.ts",
+            "src/ui/IntelligenceInsights.tsx"
+          ],
+          "limitation": "Purpose-driven source/gap/recipe guidance and evidence gaps; not complete progressive education or stale-source audit preset."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F010"
+      ]
+    },
+    {
+      "id": "F067",
+      "name": "Original project->task->workspace flow",
+      "originalAcceptance": "Do not lose historical root",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/experience/model.ts",
+        "tests/e2e/experience.spec.ts"
+      ],
+      "limitation": "Original project-to-task-to-workspace evidence path retained.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/experience/model.ts",
+            "tests/e2e/experience.spec.ts"
+          ],
+          "limitation": "Original project-to-task-to-workspace evidence path retained."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F068",
+      "name": "Roadmap/readme truth cleanup",
+      "originalAcceptance": "Docs match 1.23 behavior",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "README.md",
+        "docs/ROADMAP.md",
+        "docs/AI_GUIDE.md",
+        "docs/product/CAMPAIGN_CLIENT.md"
+      ],
+      "limitation": "Release, candidate and future distinctions updated; recovered historical inputs unchanged.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "README.md",
+            "docs/ROADMAP.md",
+            "docs/AI_GUIDE.md",
+            "docs/product/CAMPAIGN_CLIENT.md"
+          ],
+          "limitation": "Release, candidate and future distinctions updated; recovered historical inputs unchanged."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F069",
+      "name": "Analysis budgets",
+      "originalAcceptance": "No unbounded deep scan",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts",
+        "src/ui/LargeGraphPreview.tsx",
+        "src/intelligence/sourceBundle.ts",
+        "src/intelligence/profile.ts",
+        "src/intelligence/analysisWorker.ts",
+        "src/intelligence/deepClient.ts",
+        "tests/source-bundle.test.ts",
+        "tests/deep-cache.test.ts",
+        "tests/e2e/deep-source.spec.ts"
+      ],
+      "limitation": "Rebuildable private source analysis bundle is separate from bounded authoring Project. SHA-256 source/profile/parser cache keys, four-entry cloned generated cache, file/byte/node/link and worker cancellation limits; cache is optional memory optimization, not author truth.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/acquisition.ts",
+            "src/intelligence/domainAdapters.ts",
+            "src/ui/LargeGraphPreview.tsx"
+          ],
+          "limitation": "Real file/text/fact/relation/table budgets and omission receipts; no measured worker/time budget system for all analysis."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007"
+      ]
+    },
+    {
+      "id": "F070",
+      "name": "Source safety/redaction",
+      "originalAcceptance": "New analyzers respect existing rules",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/operations.ts",
+        "src/core/secrets.ts",
+        "tests/public-source-filter.test.ts",
+        "tests/graph-client.test.ts"
+      ],
+      "limitation": "Existing source safety and publicDocument retained and extended to internal receipts/delivery closure.",
+      "origin": "preserved-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/core/operations.ts",
+            "src/core/secrets.ts",
+            "tests/public-source-filter.test.ts",
+            "tests/graph-client.test.ts"
+          ],
+          "limitation": "Existing source safety and publicDocument retained and extended to internal receipts/delivery closure."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": []
+    },
+    {
+      "id": "F071",
+      "name": "Structurizr/LikeC4 export/import review",
+      "originalAcceptance": "Only if concrete workflow justifies",
+      "status": "NOT_STARTED",
+      "horizon": "V4",
+      "evidence": [
+        "src/core/interchange/index.ts"
+      ],
+      "limitation": "Existing draw.io/Mermaid/Visio adapters preserved; Structurizr/LikeC4 is research, not implementation.",
+      "origin": "candidate-or-partial-baseline",
+      "dependencies": [
+        "F011"
+      ]
+    },
+    {
+      "id": "F072",
+      "name": "Layout engine abstraction",
+      "originalAcceptance": "Do not destabilize current quality without benchmark",
+      "status": "PARTIAL",
+      "horizon": "V4",
+      "evidence": [
+        "src/core/layout.ts",
+        "tests/layout.test.ts"
+      ],
+      "limitation": "Current deterministic guarded layered layout retained; ELK/TALA evaluation parked without a concrete benchmark need.",
+      "origin": "candidate-or-partial-baseline",
+      "dependencies": [
+        "F050"
+      ]
+    },
+    {
+      "id": "F073",
+      "name": "Reference Architecture Cookbook",
+      "originalAcceptance": "Each core archetype has one synthetic reference fixture and expected views; generated outputs stay current in CI",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "examples/product-campaign/README.md",
+        "examples/product-campaign/truth.json",
+        "src/intelligence/recipes.ts",
+        "src/export/design/recommend.ts",
+        "src/intelligence/cookbook.ts",
+        "src/ui/RecipeWorkbench.tsx",
+        "src/intelligence/verification.ts",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Validated versioned recipe registry with five availability states, seven purposes, source-cited pattern candidates and five generated synthetic reference archetypes. Learning/audit presets expose exact evidence, stale claims and gaps; candidates require review.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "examples/product-campaign/README.md",
+            "examples/product-campaign/truth.json",
+            "src/intelligence/recipes.ts",
+            "src/export/design/recommend.ts"
+          ],
+          "limitation": "Versioned synthetic domains and reasoned recipes plus existing samples; not full generated pattern classifier/cookbook or automatic archetype assertions."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F011",
+        "F012"
+      ]
+    },
+    {
+      "id": "F074",
+      "name": "Snapshot header and revision vector",
+      "originalAcceptance": "Cannot claim live or infer rollout from Git ref; two comparable snapshots have source refs",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/evolution-delivery.spec.ts"
+      ],
+      "limitation": "Twelve immutable private source-qualified snapshots, independent revision vectors, stable-ID meaning/evidence/confidence/claim/presentation deltas and selected snapshot diff rail. Separately reviewed complete-predecessor graph assertion tombstones can prove removals; other absence remains not-in-scope. Current/transition/target/rollback plans point to existing sources/components and never claim rollout order or causality.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/graphSnapshot.ts",
+            "src/intelligence/evolution.ts",
+            "src/ui/EvolutionPanel.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007",
+        "F031"
+      ]
+    },
+    {
+      "id": "F075",
+      "name": "Semantic delta matching",
+      "originalAcceptance": "No false removed on incomplete scans; deterministic semantic delta",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/evolution-delivery.spec.ts"
+      ],
+      "limitation": "Twelve immutable private source-qualified snapshots, independent revision vectors, stable-ID meaning/evidence/confidence/claim/presentation deltas and selected snapshot diff rail. Separately reviewed complete-predecessor graph assertion tombstones can prove removals; other absence remains not-in-scope. Current/transition/target/rollback plans point to existing sources/components and never claim rollout order or causality.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/graphSnapshot.ts",
+            "src/intelligence/evolution.ts",
+            "src/ui/EvolutionPanel.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F074",
+        "F007"
+      ]
+    },
+    {
+      "id": "F076",
+      "name": "Project Evolution recipes",
+      "originalAcceptance": "Every claimed transition references source or says planned/unknown",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/evolution-delivery.spec.ts"
+      ],
+      "limitation": "Twelve immutable private source-qualified snapshots, independent revision vectors, stable-ID meaning/evidence/confidence/claim/presentation deltas and selected snapshot diff rail. Separately reviewed complete-predecessor graph assertion tombstones can prove removals; other absence remains not-in-scope. Current/transition/target/rollback plans point to existing sources/components and never claim rollout order or causality.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/graphSnapshot.ts",
+            "src/intelligence/evolution.ts",
+            "src/ui/EvolutionPanel.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F075",
+        "F011"
+      ]
+    },
+    {
+      "id": "F077",
+      "name": "Verification and confidence evolution",
+      "originalAcceptance": "Tested only for exact receipt; stale evidence visible",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/evolution-delivery.spec.ts"
+      ],
+      "limitation": "Twelve immutable private source-qualified snapshots, independent revision vectors, stable-ID meaning/evidence/confidence/claim/presentation deltas and selected snapshot diff rail. Separately reviewed complete-predecessor graph assertion tombstones can prove removals; other absence remains not-in-scope. Current/transition/target/rollback plans point to existing sources/components and never claim rollout order or causality.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/graphSnapshot.ts",
+            "src/intelligence/evolution.ts",
+            "src/ui/EvolutionPanel.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F075",
+        "F058"
+      ]
+    },
+    {
+      "id": "F078",
+      "name": "Current-transition-target migration map",
+      "originalAcceptance": "Planned target never labelled deployed",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/intelligence/evolution.ts",
+        "src/ui/EvolutionPanel.tsx",
+        "tests/campaign-examples.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/evolution-delivery.spec.ts"
+      ],
+      "limitation": "Twelve immutable private source-qualified snapshots, independent revision vectors, stable-ID meaning/evidence/confidence/claim/presentation deltas and selected snapshot diff rail. Separately reviewed complete-predecessor graph assertion tombstones can prove removals; other absence remains not-in-scope. Current/transition/target/rollback plans point to existing sources/components and never claim rollout order or causality.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/graphSnapshot.ts",
+            "src/intelligence/evolution.ts",
+            "src/ui/EvolutionPanel.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Graph generation timeline and scope-aware delta, source-qualified component/edge/evidence/claim/position comparison and navigable backup diff; no full migration planner, confidence-specific visuals or retained acquisition history engine."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F005",
+        "F076"
+      ]
+    },
+    {
+      "id": "F079",
+      "name": "Environment analysis identity",
+      "originalAcceptance": "Bronze/Silver/Gold separate; dynamic names; no secrets or forged runtime",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/model.ts",
+        "src/intelligence/delivery.ts",
+        "src/ui/DeliveryPanel.tsx",
+        "src/export/design/operations.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/delivery-figures.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/delivery-figures.spec.ts"
+      ],
+      "limitation": "Typed custom environment roles/lifecycle/nonsecret facets/config metadata, distinct source/build/digest/release/instance identity, sparse UNKNOWN/N/A matrix, release-chain and promotion figures. Only reviewed dated exact-source-revision claims can support comparison/gates; declarations do not establish deployment, health, drift or secret values.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/model.ts",
+            "src/intelligence/delivery.ts"
+          ],
+          "limitation": "Typed custom environment identity/source refs separate from repository/branch; ephemeral/persistent role and complete binding facets remain."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007",
+        "F021"
+      ]
+    },
+    {
+      "id": "F080",
+      "name": "Deployment instance facts",
+      "originalAcceptance": "One logical component across environments; source declaration not observed runtime",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/model.ts",
+        "src/intelligence/delivery.ts",
+        "tests/delivery-intelligence.test.ts",
+        "src/ui/DeliveryPanel.tsx",
+        "src/export/design/operations.ts",
+        "tests/delivery-figures.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/delivery-figures.spec.ts"
+      ],
+      "limitation": "Typed custom environment roles/lifecycle/nonsecret facets/config metadata, distinct source/build/digest/release/instance identity, sparse UNKNOWN/N/A matrix, release-chain and promotion figures. Only reviewed dated exact-source-revision claims can support comparison/gates; declarations do not establish deployment, health, drift or secret values.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/core/model.ts",
+            "src/intelligence/delivery.ts",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Distinct logical component/instance/environment/artifact identity and source declaration, with existing reviewed observation on instance only."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F079",
+        "F074"
+      ]
+    },
+    {
+      "id": "F081",
+      "name": "Build artifact and release chain",
+      "originalAcceptance": "No assume commit SHA is deployed artifact; preserve independent identities",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts",
+        "src/core/model.ts",
+        "src/ui/DeliveryPanel.tsx",
+        "src/export/design/operations.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/delivery-figures.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/delivery-figures.spec.ts"
+      ],
+      "limitation": "Typed custom environment roles/lifecycle/nonsecret facets/config metadata, distinct source/build/digest/release/instance identity, sparse UNKNOWN/N/A matrix, release-chain and promotion figures. Only reviewed dated exact-source-revision claims can support comparison/gates; declarations do not establish deployment, health, drift or secret values.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/delivery.ts",
+            "src/export/design/deployment.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F080",
+        "F021"
+      ]
+    },
+    {
+      "id": "F082",
+      "name": "Promotion topology and gates",
+      "originalAcceptance": "Views include only source-backed environments and actual/declared distinction",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts",
+        "src/core/model.ts",
+        "src/ui/DeliveryPanel.tsx",
+        "src/export/design/operations.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/delivery-figures.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/delivery-figures.spec.ts"
+      ],
+      "limitation": "Typed custom environment roles/lifecycle/nonsecret facets/config metadata, distinct source/build/digest/release/instance identity, sparse UNKNOWN/N/A matrix, release-chain and promotion figures. Only reviewed dated exact-source-revision claims can support comparison/gates; declarations do not establish deployment, health, drift or secret values. Promotion figures require public source citations on both environment endpoints and report exclusions; uncited author declarations stay available in other declaration profiles.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/delivery.ts",
+            "src/export/design/deployment.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F079",
+        "F081"
+      ]
+    },
+    {
+      "id": "F083",
+      "name": "Environment matrix",
+      "originalAcceptance": "No green checks for unknown; sparse and multi-cloud readable",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts",
+        "src/core/model.ts",
+        "src/ui/DeliveryPanel.tsx",
+        "src/export/design/operations.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/delivery-figures.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/delivery-figures.spec.ts"
+      ],
+      "limitation": "Typed custom environment roles/lifecycle/nonsecret facets/config metadata, distinct source/build/digest/release/instance identity, sparse UNKNOWN/N/A matrix, release-chain and promotion figures. Only reviewed dated exact-source-revision claims can support comparison/gates; declarations do not establish deployment, health, drift or secret values.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/delivery.ts",
+            "src/export/design/deployment.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F079",
+        "F011"
+      ]
+    },
+    {
+      "id": "F084",
+      "name": "Environment drift comparison",
+      "originalAcceptance": "No drift verdict from source YAML alone; timestamped evidence",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts",
+        "src/core/model.ts",
+        "src/ui/DeliveryPanel.tsx",
+        "src/export/design/operations.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/delivery-figures.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/delivery-figures.spec.ts"
+      ],
+      "limitation": "Typed custom environment roles/lifecycle/nonsecret facets/config metadata, distinct source/build/digest/release/instance identity, sparse UNKNOWN/N/A matrix, release-chain and promotion figures. Only reviewed dated exact-source-revision claims can support comparison/gates; declarations do not establish deployment, health, drift or secret values.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/delivery.ts",
+            "src/export/design/deployment.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F080",
+        "F058",
+        "F075"
+      ]
+    },
+    {
+      "id": "F085",
+      "name": "Feature flags and nonsecret config views",
+      "originalAcceptance": "No secrets in facts/exports; same code different configs can be expressed",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/model.ts",
+        "src/intelligence/delivery.ts",
+        "src/ui/DeliveryPanel.tsx",
+        "src/export/design/operations.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/delivery-figures.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/delivery-figures.spec.ts"
+      ],
+      "limitation": "Typed custom environment roles/lifecycle/nonsecret facets/config metadata, distinct source/build/digest/release/instance identity, sparse UNKNOWN/N/A matrix, release-chain and promotion figures. Only reviewed dated exact-source-revision claims can support comparison/gates; declarations do not establish deployment, health, drift or secret values.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "NOT_STARTED",
+          "evidence": [
+            "src/core/model.ts"
+          ],
+          "limitation": "No typed feature/config/region/tenant/residency/DR facets; do not invent optional claims."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F079",
+        "F070"
+      ]
+    },
+    {
+      "id": "F086",
+      "name": "Region, tenancy, residency and DR facets",
+      "originalAcceptance": "Extensible typed facet without 80 optional Project fields",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/model.ts",
+        "src/intelligence/delivery.ts",
+        "src/ui/DeliveryPanel.tsx",
+        "src/export/design/operations.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/delivery-figures.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/delivery-figures.spec.ts"
+      ],
+      "limitation": "Typed custom environment roles/lifecycle/nonsecret facets/config metadata, distinct source/build/digest/release/instance identity, sparse UNKNOWN/N/A matrix, release-chain and promotion figures. Only reviewed dated exact-source-revision claims can support comparison/gates; declarations do not establish deployment, health, drift or secret values.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "NOT_STARTED",
+          "evidence": [
+            "src/core/model.ts"
+          ],
+          "limitation": "No typed feature/config/region/tenant/residency/DR facets; do not invent optional claims."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F079"
+      ]
+    },
+    {
+      "id": "F087",
+      "name": "User analysis profile preset",
+      "originalAcceptance": "Normal user sees few controls and can inspect why a view is recommended",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/types.ts",
+        "src/ui/ProjectStart.tsx",
+        "src/ui/IntelligenceInsights.tsx",
+        "src/ui/AnalysisProfilePanel.tsx",
+        "src/intelligence/profile.ts",
+        "src/intelligence/sourceBundle.ts",
+        "tests/source-bundle.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Repository Auto/Guided/Hybrid/Graph, seven purposes and retained session axes. Quick/Standard start; collapsed Deep/Custom profiles dispatch selected analyzers over explicitly selected source bytes, never execute source.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/types.ts",
+            "src/ui/ProjectStart.tsx",
+            "src/ui/IntelligenceInsights.tsx"
+          ],
+          "limitation": "Five purposes and Quick/Standard affect acquisition, ranking, preview and impact budgets; Deep/Custom, education/work-review and all advanced axes remain future work."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F002",
+        "F003",
+        "F006",
+        "F009"
+      ]
+    },
+    {
+      "id": "F088",
+      "name": "Contextual view availability",
+      "originalAcceptance": "Optional enterprise facts never block basic repo overview",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/recipes.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/delivery-intelligence.test.ts",
+        "src/intelligence/cookbook.ts",
+        "src/ui/RecipeWorkbench.tsx",
+        "src/intelligence/verification.ts",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Validated versioned recipe registry with five availability states, seven purposes, source-cited pattern candidates and five generated synthetic reference archetypes. Learning/audit presets expose exact evidence, stale claims and gaps; candidates require review.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/recipes.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Seven capability/purpose-ranked recipes with reason and availability open actual views; not the full historical versioned recipe/availability vocabulary."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F009",
+        "F010",
+        "F011"
+      ]
+    },
+    {
+      "id": "F089",
+      "name": "Advanced parameter panel",
+      "originalAcceptance": "Advanced settings collapsed by default and never mutate semantic facts",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/types.ts",
+        "src/ui/ProjectStart.tsx",
+        "src/ui/IntelligenceInsights.tsx",
+        "src/ui/AnalysisProfilePanel.tsx",
+        "src/intelligence/profile.ts",
+        "src/intelligence/sourceBundle.ts",
+        "tests/source-bundle.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Repository Auto/Guided/Hybrid/Graph, seven purposes and retained session axes. Quick/Standard start; collapsed Deep/Custom profiles dispatch selected analyzers over explicitly selected source bytes, never execute source.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/types.ts",
+            "src/ui/ProjectStart.tsx",
+            "src/ui/IntelligenceInsights.tsx"
+          ],
+          "limitation": "Five purposes and Quick/Standard affect acquisition, ranking, preview and impact budgets; Deep/Custom, education/work-review and all advanced axes remain future work."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F006",
+        "F087"
+      ]
+    },
+    {
+      "id": "F090",
+      "name": "Navigation combined lens",
+      "originalAcceptance": "Project hierarchy and physical Git hierarchy not conflated",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/ProjectNavigator.tsx",
+        "src/ui/ProjectContext.tsx",
+        "src/ui/AnalysisOutputs.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "src/ui/EvolutionPanel.tsx",
+        "src/intelligence/navigation.ts",
+        "tests/navigation-intelligence.test.ts",
+        "tests/e2e/navigation-context.spec.ts"
+      ],
+      "limitation": "Logical scopes, bounded physical repository hierarchy, searched purpose/perspective views, environment/snapshot selection and exact-ID mapping crosswalk remain distinct; synchronized collapsible context exposes Details/Evidence/Gaps/Alternatives/Assets without inventing missing perspectives.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/ProjectNavigator.tsx",
+            "src/ui/ProjectContext.tsx",
+            "src/ui/AnalysisOutputs.tsx",
+            "src/ui/GraphExplorer.tsx",
+            "src/ui/EvolutionPanel.tsx"
+          ],
+          "limitation": "Logical/physical/views navigation, explicit bindings, graph filters, source inspector and comparison rail exist; no unified environment/evolution navigator or full alternatives panel."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F018",
+        "F079"
+      ]
+    },
+    {
+      "id": "F091",
+      "name": "Pattern library classifier",
+      "originalAcceptance": "Bronze Silver Gold names not proof of deployed medallion pipeline",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "examples/product-campaign/README.md",
+        "examples/product-campaign/truth.json",
+        "src/intelligence/recipes.ts",
+        "src/export/design/recommend.ts",
+        "src/intelligence/cookbook.ts",
+        "src/ui/RecipeWorkbench.tsx",
+        "src/intelligence/verification.ts",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Validated versioned recipe registry with five availability states, seven purposes, source-cited pattern candidates and five generated synthetic reference archetypes. Learning/audit presets expose exact evidence, stale claims and gaps; candidates require review.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "examples/product-campaign/README.md",
+            "examples/product-campaign/truth.json",
+            "src/intelligence/recipes.ts",
+            "src/export/design/recommend.ts"
+          ],
+          "limitation": "Versioned synthetic domains and reasoned recipes plus existing samples; not full generated pattern classifier/cookbook or automatic archetype assertions."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F009",
+        "F011"
+      ]
+    },
+    {
+      "id": "F092",
+      "name": "Architecture pattern catalog",
+      "originalAcceptance": "Pattern templates labelled illustrative with explicit evidence requirements",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "examples/product-campaign/README.md",
+        "examples/product-campaign/truth.json",
+        "src/intelligence/recipes.ts",
+        "src/export/design/recommend.ts",
+        "src/intelligence/cookbook.ts",
+        "src/ui/RecipeWorkbench.tsx",
+        "src/intelligence/verification.ts",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Validated versioned recipe registry with five availability states, seven purposes, source-cited pattern candidates and five generated synthetic reference archetypes. Learning/audit presets expose exact evidence, stale claims and gaps; candidates require review.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "examples/product-campaign/README.md",
+            "examples/product-campaign/truth.json",
+            "src/intelligence/recipes.ts",
+            "src/export/design/recommend.ts"
+          ],
+          "limitation": "Versioned synthetic domains and reasoned recipes plus existing samples; not full generated pattern classifier/cookbook or automatic archetype assertions."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F011",
+        "F073"
+      ]
+    },
+    {
+      "id": "F093",
+      "name": "Synthetic client zoo baseline",
+      "originalAcceptance": "Tiny, multi-repo, docs, ambiguous, secrets and conflict fixtures pass",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "examples/product-campaign/truth.json",
+        "tests/campaign-examples.test.ts",
+        "tests/graph-client.test.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/fixtures/projects",
+        "tests/synthetic-oracle.test.ts",
+        "tests/zoo-matrix.test.ts",
+        "scripts/qualify-real.ts",
+        "tests/design-quality.test.ts"
+      ],
+      "limitation": "Independent synthetic truth and negative privacy assertions cover original zoo cases; actual read-only qualification over three explicitly selected local sources plus real installed Brain GraphSnapshot/browser journey. Receipts name source revisions/digests and actual checks; real source contents stay private and outside Git/archive.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "examples/product-campaign/truth.json",
+            "tests/campaign-examples.test.ts",
+            "tests/graph-client.test.ts",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Versioned cross-domain synthetic fixtures and independent positive/negative privacy truth; not the full 25-project zoo matrix."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F012",
+        "F021"
+      ]
+    },
+    {
+      "id": "F094",
+      "name": "Negative fixture assertions",
+      "originalAcceptance": "Missing data never converted to unsupported fact; privacy fail=release block",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "examples/product-campaign/truth.json",
+        "tests/campaign-examples.test.ts",
+        "tests/graph-client.test.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/fixtures/projects",
+        "tests/synthetic-oracle.test.ts",
+        "tests/zoo-matrix.test.ts",
+        "scripts/qualify-real.ts",
+        "tests/design-quality.test.ts"
+      ],
+      "limitation": "Independent synthetic truth and negative privacy assertions cover original zoo cases; actual read-only qualification over three explicitly selected local sources plus real installed Brain GraphSnapshot/browser journey. Receipts name source revisions/digests and actual checks; real source contents stay private and outside Git/archive.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "examples/product-campaign/truth.json",
+            "tests/campaign-examples.test.ts",
+            "tests/graph-client.test.ts",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Versioned cross-domain synthetic fixtures and independent positive/negative privacy truth; not the full 25-project zoo matrix."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F093",
+        "F010"
+      ]
+    },
+    {
+      "id": "F095",
+      "name": "Temporary Git history factory",
+      "originalAcceptance": "No nested tracked .git; stable fixtures across platforms",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "tests/fixtures/atlas/shop.manifest.json",
+        "tests/helpers/gitHistory.ts",
+        "tests/git-history.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Deterministic temporary Git repositories with fixed commits/branches/worktree metadata in checked OS-temporary roots; no nested .git committed and no external history collected.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "NOT_STARTED",
+          "evidence": [
+            "tests/fixtures/atlas/shop.manifest.json"
+          ],
+          "limitation": "Existing fixture Git hints are not a deterministic isolated Git-history factory."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F093"
+      ]
+    },
+    {
+      "id": "F096",
+      "name": "Truth manifests and oracle",
+      "originalAcceptance": "Assertions independent of model output; no blind pixel-only goldens",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "examples/product-campaign/truth.json",
+        "tests/campaign-examples.test.ts",
+        "tests/graph-client.test.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/fixtures/projects",
+        "tests/synthetic-oracle.test.ts",
+        "tests/zoo-matrix.test.ts",
+        "scripts/qualify-real.ts",
+        "tests/design-quality.test.ts"
+      ],
+      "limitation": "Independent synthetic truth and negative privacy assertions cover original zoo cases; actual read-only qualification over three explicitly selected local sources plus real installed Brain GraphSnapshot/browser journey. Receipts name source revisions/digests and actual checks; real source contents stay private and outside Git/archive.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "examples/product-campaign/truth.json",
+            "tests/campaign-examples.test.ts",
+            "tests/graph-client.test.ts",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "Versioned cross-domain synthetic fixtures and independent positive/negative privacy truth; not the full 25-project zoo matrix."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F093"
+      ]
+    },
+    {
+      "id": "F097",
+      "name": "Real read-only qualification stage",
+      "originalAcceptance": "Qualified claims list source SHA and tests, no private committed contents",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "tests/design-quality.test.ts",
+        "SHIP-REPORT.md",
+        "tests/fixtures/projects",
+        "tests/synthetic-oracle.test.ts",
+        "tests/zoo-matrix.test.ts",
+        "scripts/qualify-real.ts"
+      ],
+      "limitation": "Independent synthetic truth and negative privacy assertions cover original zoo cases; actual read-only qualification over three explicitly selected local sources plus real installed Brain GraphSnapshot/browser journey. Receipts name source revisions/digests and actual checks; real source contents stay private and outside Git/archive.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "tests/design-quality.test.ts",
+            "SHIP-REPORT.md"
+          ],
+          "limitation": "Real local atlas quality is run without publication; real Brain/specialist installed-project qualification still unavailable."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F093",
+        "F070"
+      ]
+    },
+    {
+      "id": "F098",
+      "name": "Generic Core icon catalog",
+      "originalAcceptance": "Offline, deterministic, theme-safe fallback and attribution",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/icons.ts",
+        "src/intelligence/assets.ts",
+        "tests/icons.test.ts",
+        "src/core/iconGlyph.ts",
+        "src/export/assetFidelity.ts",
+        "src/ui/Inspector.tsx",
+        "tests/custom-icons.test.ts",
+        "tests/recipe-assets.test.ts",
+        "tests/e2e/custom-icons.spec.ts"
+      ],
+      "limitation": "Nine original semantic glyphs, deterministic generic fallback, per-recipe scoped asset requirements and downloadable rights/source/blob/terms checklists. Backwards-compatible project raster IconRef with rights/public closure and preserved aspect ratio in canvas/SVG/editable PPTX; no new vendor artwork or font binaries.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/icons.ts",
+            "src/intelligence/assets.ts",
+            "tests/icons.test.ts"
+          ],
+          "limitation": "Original semantic kind registry entries and attributed safe asset plan/fallback; not every historical icon or per-recipe asset derivation."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F070"
+      ]
+    },
+    {
+      "id": "F099",
+      "name": "Asset requirement derivation",
+      "originalAcceptance": "Never blocks correct diagram; source/icon provenance explicit",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/icons.ts",
+        "src/intelligence/assets.ts",
+        "tests/icons.test.ts",
+        "src/core/iconGlyph.ts",
+        "src/export/assetFidelity.ts",
+        "src/ui/Inspector.tsx",
+        "tests/custom-icons.test.ts",
+        "tests/recipe-assets.test.ts",
+        "tests/e2e/custom-icons.spec.ts"
+      ],
+      "limitation": "Nine original semantic glyphs, deterministic generic fallback, per-recipe scoped asset requirements and downloadable rights/source/blob/terms checklists. Backwards-compatible project raster IconRef with rights/public closure and preserved aspect ratio in canvas/SVG/editable PPTX; no new vendor artwork or font binaries.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/icons.ts",
+            "src/intelligence/assets.ts",
+            "tests/icons.test.ts"
+          ],
+          "limitation": "Original semantic kind registry entries and attributed safe asset plan/fallback; not every historical icon or per-recipe asset derivation."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F011",
+        "F098"
+      ]
+    },
+    {
+      "id": "F100",
+      "name": "Optional Cloudflare R2 source",
+      "originalAcceptance": "No browser account token, no public bucket/default fetch during export",
+      "status": "NOT_STARTED",
+      "horizon": "R&D",
+      "evidence": [
+        "src/intelligence/assets.ts"
+      ],
+      "limitation": "No R2 or generation provider adapter; optional cloud/generation remains separate R&D and no paid installation authorized.",
+      "origin": "candidate-or-partial-baseline",
+      "dependencies": [
+        "F099",
+        "F070"
+      ]
+    },
+    {
+      "id": "F101",
+      "name": "Project-specific custom icon reference",
+      "originalAcceptance": "Backwards compatible existing icon ID and exports",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/model.ts",
+        "src/core/icons.ts",
+        "src/core/iconGlyph.ts",
+        "src/intelligence/assets.ts",
+        "src/export/assetFidelity.ts",
+        "src/ui/Inspector.tsx",
+        "tests/custom-icons.test.ts",
+        "tests/recipe-assets.test.ts",
+        "tests/e2e/custom-icons.spec.ts"
+      ],
+      "limitation": "Nine original semantic glyphs, deterministic generic fallback, per-recipe scoped asset requirements and downloadable rights/source/blob/terms checklists. Backwards-compatible project raster IconRef with rights/public closure and preserved aspect ratio in canvas/SVG/editable PPTX; no new vendor artwork or font binaries.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/model.ts",
+            "src/core/icons.ts"
+          ],
+          "limitation": "Existing project asset/image rights and icon IDs; no new scoped custom IconRef catalog adapter."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F099",
+        "F019"
+      ]
+    },
+    {
+      "id": "F102",
+      "name": "External image provider adapter",
+      "originalAcceptance": "Never fabricates official provider logo or diagrams; candidate only",
+      "status": "NOT_STARTED",
+      "horizon": "R&D",
+      "evidence": [
+        "src/intelligence/assets.ts"
+      ],
+      "limitation": "No R2 or generation provider adapter; optional cloud/generation remains separate R&D and no paid installation authorized.",
+      "origin": "candidate-or-partial-baseline",
+      "dependencies": [
+        "F101",
+        "F070"
+      ]
+    },
+    {
+      "id": "F103",
+      "name": "Submodules, subtrees, worktrees metadata",
+      "originalAcceptance": "Nested boundaries typed and not accidentally scanned as one repository",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts",
+        "src/core/scan/inventory.ts",
+        "scripts/lib/readRepo.ts",
+        "tests/source-inventory.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Explicit submodule/worktree/nested Git markers are metadata-only; pointers never followed. Authored/generated/vendor/secret/failed/unsupported inventory retains skip reasons and exact metadata origin, and missing scope is never implementation absence. Git subtree history is not inferred from path shape.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/scan/scanner.ts",
+            "src/intelligence/acquisition.ts",
+            "src/intelligence/domainAdapters.ts"
+          ],
+          "limitation": "Nested/worktree/vendor/secret exclusions and bounded omission diagnostics preserved; no full Git metadata/noise taxonomy or cancellation worker."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F021",
+        "F074"
+      ]
+    },
+    {
+      "id": "F104",
+      "name": "Authored/generated/vendor noise partition",
+      "originalAcceptance": "Skip reason counts never treated as absent implementation",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts",
+        "src/core/scan/inventory.ts",
+        "scripts/lib/readRepo.ts",
+        "tests/source-inventory.test.ts",
+        "tests/zoo-matrix.test.ts"
+      ],
+      "limitation": "Explicit submodule/worktree/nested Git markers are metadata-only; pointers never followed. Authored/generated/vendor/secret/failed/unsupported inventory retains skip reasons and exact metadata origin, and missing scope is never implementation absence. Git subtree history is not inferred from path shape.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/scan/scanner.ts",
+            "src/intelligence/acquisition.ts",
+            "src/intelligence/domainAdapters.ts"
+          ],
+          "limitation": "Nested/worktree/vendor/secret exclusions and bounded omission diagnostics preserved; no full Git metadata/noise taxonomy or cancellation worker."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007",
+        "F069"
+      ]
+    },
+    {
+      "id": "F105",
+      "name": "Secret-safe source inventory",
+      "originalAcceptance": "No secret tokens in facts and failed files tracked explicitly",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "src/intelligence/acquisition.ts",
+        "src/intelligence/domainAdapters.ts",
+        "src/core/scan/inventory.ts",
+        "scripts/lib/readRepo.ts",
+        "tests/source-inventory.test.ts",
+        "tests/zoo-matrix.test.ts",
+        "src/intelligence/selectedFileRead.ts",
+        "tests/selected-file-read.test.ts",
+        "tests/acquisition-failure.test.ts"
+      ],
+      "limitation": "Explicit submodule/worktree/nested Git markers are metadata-only; pointers never followed. Authored/generated/vendor/secret/failed/unsupported inventory retains skip reasons and exact metadata origin, and missing scope is never implementation absence. Git subtree history is not inferred from path shape. Safe failed-read paths are tracked; arbitrary underlying permission errors and byte-drift source bytes are refused.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/scan/scanner.ts",
+            "src/intelligence/acquisition.ts",
+            "src/intelligence/domainAdapters.ts"
+          ],
+          "limitation": "Nested/worktree/vendor/secret exclusions and bounded omission diagnostics preserved; no full Git metadata/noise taxonomy or cancellation worker."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F070",
+        "F007"
+      ]
+    },
+    {
+      "id": "F106",
+      "name": "No AI offline qualification",
+      "originalAcceptance": "No API required; useful safe fallback on unsupported repo",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "tests/e2e/project-intelligence.spec.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Unknown/local, Guided, Hybrid, graph and private/public offline report journeys need no model/service.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "tests/e2e/project-intelligence.spec.ts",
+            "tests/e2e/graph-client.spec.ts"
+          ],
+          "limitation": "Unknown/local, Guided, Hybrid, graph and private/public offline report journeys need no model/service."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F093",
+        "F012"
+      ]
+    },
+    {
+      "id": "F107",
+      "name": "Publication and read-permission matrix",
+      "originalAcceptance": "All formats filter data before render, no metadata leak",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/core/operations.ts",
+        "tests/graph-client.test.ts",
+        "tests/delivery-intelligence.test.ts",
+        "src/export/manual.ts",
+        "src/intelligence/library.ts",
+        "tests/business-publication.test.ts",
+        "tests/library.test.ts",
+        "tests/custom-icons.test.ts",
+        "tests/e2e/business-publication-settings.spec.ts",
+        "tests/library-links-manual.test.ts",
+        "tests/e2e/library-links-images.spec.ts"
+      ],
+      "limitation": "Existing independently filtered public document drives every public renderer and frozen snapshot; nested delivery/config/asset/evidence rights and internal receipts remain private. Secret-shaped legacy metadata and changed publication settings fail validation; no metadata or bundled private JSON bypass.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/core/operations.ts",
+            "tests/graph-client.test.ts",
+            "tests/delivery-intelligence.test.ts"
+          ],
+          "limitation": "All existing public export boundary and delivery/receipt negative privacy checks; not a general independent host authorization policy engine."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F070",
+        "F035"
+      ]
+    },
+    {
+      "id": "F108",
+      "name": "Cancelable bounded analysis workers",
+      "originalAcceptance": "Large fixture does not freeze UI or silently drop sources",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/acquisition.ts",
+        "src/ui/LargeGraphPreview.tsx",
+        "src/intelligence/sourceBundle.ts",
+        "src/intelligence/profile.ts",
+        "src/intelligence/analysisWorker.ts",
+        "src/intelligence/deepClient.ts",
+        "tests/source-bundle.test.ts",
+        "tests/deep-cache.test.ts",
+        "tests/e2e/deep-source.spec.ts",
+        "src/ui/SourceBundlePanel.tsx",
+        "src/intelligence/sourceBundleClient.ts",
+        "tests/e2e/configured-source-bundle.spec.ts"
+      ],
+      "limitation": "Rebuildable private source analysis bundle is separate from bounded authoring Project. SHA-256 source/profile/parser cache keys, four-entry cloned generated cache, file/byte/node/link and worker cancellation limits; cache is optional memory optimization, not author truth.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/acquisition.ts",
+            "src/ui/LargeGraphPreview.tsx"
+          ],
+          "limitation": "Bounded reading and selected-file paging exist; no background worker queue/cancellation for all large parsing/rendering."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007",
+        "F069"
+      ]
+    },
+    {
+      "id": "F109",
+      "name": "Environment and promotion visual profiles",
+      "originalAcceptance": "Readable flat 2D preferred, no 3D ornament",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/intelligence/delivery.ts",
+        "src/export/design/deployment.ts",
+        "src/ui/IntelligenceInsights.tsx",
+        "tests/campaign-examples.test.ts",
+        "src/core/model.ts",
+        "src/ui/DeliveryPanel.tsx",
+        "src/export/design/operations.ts",
+        "tests/delivery-intelligence.test.ts",
+        "tests/delivery-figures.test.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/delivery-figures.spec.ts"
+      ],
+      "limitation": "Typed custom environment roles/lifecycle/nonsecret facets/config metadata, distinct source/build/digest/release/instance identity, sparse UNKNOWN/N/A matrix, release-chain and promotion figures. Only reviewed dated exact-source-revision claims can support comparison/gates; declarations do not establish deployment, health, drift or secret values.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/delivery.ts",
+            "src/export/design/deployment.ts",
+            "src/ui/IntelligenceInsights.tsx",
+            "tests/campaign-examples.test.ts"
+          ],
+          "limitation": "Private reviewed artifacts/digests/instances/promotions/gates, useful matrix/declared-environment figure and reviewed revision comparison; no complete source-build-release chain, sparse N/A contract, freshness/health policy or promotion-path figure."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F079",
+        "F082",
+        "F083"
+      ]
+    },
+    {
+      "id": "F110",
+      "name": "Evolution navigation and diff rail",
+      "originalAcceptance": "Comparison recovers selection; does not rewrite original Project",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/ui/EvolutionPanel.tsx",
+        "src/ui/GraphExplorer.tsx",
+        "tests/e2e/graph-client.spec.ts",
+        "src/intelligence/evolution.ts",
+        "src/intelligence/graphSnapshot.ts",
+        "tests/evolution-delivery-workbench.test.ts",
+        "tests/e2e/evolution-delivery.spec.ts"
+      ],
+      "limitation": "Twelve immutable private source-qualified snapshots, independent revision vectors, stable-ID meaning/evidence/confidence/claim/presentation deltas and selected snapshot diff rail. Separately reviewed complete-predecessor graph assertion tombstones can prove removals; other absence remains not-in-scope. Current/transition/target/rollback plans point to existing sources/components and never claim rollout order or causality.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/ui/EvolutionPanel.tsx",
+            "src/ui/GraphExplorer.tsx",
+            "tests/e2e/graph-client.spec.ts"
+          ],
+          "limitation": "Working graph timeline and previous-backup diff rail/current-component navigation; no combined immutable source snapshot selector."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F075",
+        "F017"
+      ]
+    },
+    {
+      "id": "F111",
+      "name": "Source-backed project handbook/library",
+      "originalAcceptance": "No duplicate semantic truth; per-release immutable output snapshots",
+      "status": "IMPLEMENTED",
+      "horizon": "V2",
+      "evidence": [
+        "src/export/manual.ts",
+        "src/export/design/book.ts",
+        "src/export/intelligenceReport.ts",
+        "src/intelligence/library.ts",
+        "src/ui/LibraryPanel.tsx",
+        "src/core/links.ts",
+        "tests/library.test.ts",
+        "tests/e2e/graph-canvas-library.spec.ts",
+        "tests/library-links-manual.test.ts",
+        "tests/e2e/library-links-images.spec.ts"
+      ],
+      "limitation": "Independent explicit-membership collections and immutable public handbook snapshots preserve project/repository revision vectors, source time, selected story/views and normalized presentation brief. Frozen output digest and stable library links; legacy document-only digests are labelled unbound, tampered/unsafe rows excluded without storage rewrite.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/export/manual.ts",
+            "src/export/design/book.ts",
+            "src/export/intelligenceReport.ts"
+          ],
+          "limitation": "Existing public manual/figure book and new evidence/delivery report; no versioned immutable collection publication library."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F034",
+        "F047"
+      ]
+    },
+    {
+      "id": "F112",
+      "name": "Observed cockpit snapshot adapter",
+      "originalAcceptance": "ChatGPT not assumed always live; timestamps and permissions enforced",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/intelligence/graphSnapshot.ts",
+        "src/core/atlas/lens.ts",
+        "src/intelligence/verification.ts",
+        "src/ui/WorkVerificationPanel.tsx",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Exact-revision PROPOSED/NOT_RUN VerificationSpec and owner-validator receipt ingestion stage private unreviewed claims; explicit component/connection checks, bounded impact, stale/conflicting evidence and mapping gaps. Host-fed cockpit permission/time/expiry checks, inert observability links and source-cited trust hooks; no runner, collector, coverage percentage, health or security certificate.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "PARTIAL",
+          "evidence": [
+            "src/intelligence/graphSnapshot.ts",
+            "src/core/atlas/lens.ts"
+          ],
+          "limitation": "Offline scoped GraphSnapshot and optional existing runtime refs; no live observed-cockpit host adapter or supplied real Brain acceptance."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F074",
+        "F058",
+        "F062"
+      ]
+    },
+    {
+      "id": "F113",
+      "name": "Optional observability source links",
+      "originalAcceptance": "Link is source/observed scoped; no fabricated health",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "src/intelligence/verification.ts",
+        "src/ui/WorkVerificationPanel.tsx",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Exact-revision PROPOSED/NOT_RUN VerificationSpec and owner-validator receipt ingestion stage private unreviewed claims; explicit component/connection checks, bounded impact, stale/conflicting evidence and mapping gaps. Host-fed cockpit permission/time/expiry checks, inert observability links and source-cited trust hooks; no runner, collector, coverage percentage, health or security certificate.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "NOT_STARTED",
+          "evidence": [
+            "src/core/scan/scanner.ts"
+          ],
+          "limitation": "Generic selected source references/IaC scanning preserved; no typed observability mapping or IAM/trust-boundary analyzer and no security certification."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007",
+        "F112"
+      ]
+    },
+    {
+      "id": "F114",
+      "name": "Trust/IAM boundary view hooks",
+      "originalAcceptance": "Can say unknown; never a security certification",
+      "status": "IMPLEMENTED",
+      "horizon": "V3",
+      "evidence": [
+        "src/core/scan/scanner.ts",
+        "src/intelligence/verification.ts",
+        "src/ui/WorkVerificationPanel.tsx",
+        "tests/recipes-verification.test.ts",
+        "tests/e2e/verification-recipes.spec.ts"
+      ],
+      "limitation": "Exact-revision PROPOSED/NOT_RUN VerificationSpec and owner-validator receipt ingestion stage private unreviewed claims; explicit component/connection checks, bounded impact, stale/conflicting evidence and mapping gaps. Host-fed cockpit permission/time/expiry checks, inert observability links and source-cited trust hooks; no runner, collector, coverage percentage, health or security certificate.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "NOT_STARTED",
+          "evidence": [
+            "src/core/scan/scanner.ts"
+          ],
+          "limitation": "Generic selected source references/IaC scanning preserved; no typed observability mapping or IAM/trust-boundary analyzer and no security certification."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F007",
+        "F070"
+      ]
+    },
+    {
+      "id": "F115",
+      "name": "Compatibility and migration gates",
+      "originalAcceptance": "Original project/documents reopen unchanged and public projection preserved",
+      "status": "IMPLEMENTED",
+      "horizon": "V1",
+      "evidence": [
+        "src/core/model.ts",
+        "tests/bridge.test.ts",
+        "tests/atlas.test.ts",
+        "tests/campaign-examples.test.ts",
+        "tests/e2e/graph-client.spec.ts"
+      ],
+      "limitation": "Schema-1/sidecar/Atlas/export contracts and original browser flows qualified on candidate; older clients may drop optional new delivery fields, retain backup.",
+      "origin": "candidate-or-partial-baseline",
+      "implementationHistory": [
+        {
+          "sourceSha": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+          "recordedAt": "2026-10-09T00:22:03Z",
+          "status": "IMPLEMENTED",
+          "evidence": [
+            "src/core/model.ts",
+            "tests/bridge.test.ts",
+            "tests/atlas.test.ts",
+            "tests/campaign-examples.test.ts",
+            "tests/e2e/graph-client.spec.ts"
+          ],
+          "limitation": "Schema-1/sidecar/Atlas/export contracts and original browser flows qualified on candidate; older clients may drop optional new delivery fields, retain backup."
+        }
+      ],
+      "qualification": "Candidate implementation; exact source SHA and local/CI results are external immutable delivery receipt, not owner verification.",
+      "dependencies": [
+        "F019",
+        "F063",
+        "F093"
+      ]
+    }
+  ],
+  "continuation": {
+    "startedAt": "2026-10-09T00:22:03Z",
+    "previousCandidate": "f38ab2dfc6fc977b3ddba235f145e4e11d51db88",
+    "scope": "AMBITIOUS_COMPLETE V1-V3; original horizons and acceptance preserved",
+    "ownerVerified": false,
+    "exactQualification": "See immutable SOURCE_COMMIT.txt, READY.json and delivery-receipt.json. Initial f38 CI does not qualify subsequent changes."
+  }
+}

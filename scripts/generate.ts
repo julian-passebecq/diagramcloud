@@ -1,3 +1,8 @@
+import {publicationBriefSchema} from '../src/intelligence/publicationBrief';
+import {cookbookManifest} from '../src/intelligence/cookbook';
+import {recipeRegistry,patternCatalog} from '../src/intelligence/recipes';
+import {profileSchema,analysisBundleSchema} from '../src/intelligence/profile';
+import {collectionSchema} from '../src/intelligence/library';
 import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
 import {zodToJsonSchema} from 'zod-to-json-schema';
 import {documentSchema,validateDocument} from '../src/core/model';
@@ -28,6 +33,10 @@ checkIcons();
 const icons=fileIcons();
 
 mkdirSync('public/examples',{recursive:true});
+writeFileSync('public/examples/cookbook-manifest.json',JSON.stringify(cookbookManifest,null,2)+'\n');
+writeFileSync('public/examples/recipe-registry.json',JSON.stringify(recipeRegistry,null,2)+'\n');
+writeFileSync('public/examples/pattern-catalog.json',JSON.stringify(patternCatalog,null,2)+'\n');
+for(const [name,schema] of [['analysis-profile',profileSchema],['analysis-bundle',analysisBundleSchema],['collection',collectionSchema],['publication-brief',publicationBriefSchema]] as const)writeFileSync('public/examples/'+name+'.schema.json',JSON.stringify(zodToJsonSchema(schema,{name,target:'jsonSchema7'}),null,2)+'\n');
 writeFileSync('public/diagramcloud.project-brief.schema.json',JSON.stringify({...zodToJsonSchema(projectBriefSchema,{name:'DiagramCloudProjectBrief',target:'jsonSchema7'}),description:'Author declarations. Must pass validateProjectBrief, compile, then the candidate review before applying. Not observed runtime evidence.'},null,2)+'\n');
 const schema=zodToJsonSchema(documentSchema,{name:'DiagramCloudDocument',target:'jsonSchema7'});
 writeFileSync('public/diagramcloud.schema.json',JSON.stringify({...schema,$id:'https://diagramcloud.local/schema/v1',description:'Structural schema. Imports must ALSO pass validateDocument for relational references, view membership and drilldown-cycle checks.'},null,2)+'\n');

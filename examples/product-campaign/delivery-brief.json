@@ -1,0 +1,50 @@
+{
+  "format": "diagramcloud.delivery-brief",
+  "version": 1,
+  "projectId": "brief-synthetic-delivery",
+  "baseRevision": 0,
+  "delivery": {
+    "environments": [
+      {
+        "id": "development",
+        "label": "Synthetic development"
+      },
+      {
+        "id": "production",
+        "label": "Synthetic production"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "candidate",
+        "label": "Fictional build",
+        "version": "candidate-1",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "instances": [
+      {
+        "id": "api-development",
+        "nodeId": "api-development-instance",
+        "componentId": "brief-scope-api",
+        "environmentId": "development",
+        "artifactId": "candidate",
+        "declaredRevision": "fixture-revision"
+      }
+    ],
+    "promotions": [
+      {
+        "id": "promotion",
+        "fromEnvironmentId": "development",
+        "toEnvironmentId": "production",
+        "artifactId": "candidate",
+        "gates": [
+          {
+            "id": "owner-approval",
+            "label": "Declared owner approval, result UNKNOWN"
+          }
+        ]
+      }
+    ]
+  }
+}

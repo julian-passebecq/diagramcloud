@@ -2,4 +2,4 @@ import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import {readFileSync} from 'node:fs';
 const {version}=JSON.parse(readFileSync('package.json','utf8')) as {version:string};
-export default defineConfig({plugins:[react()],define:{__APP_VERSION__:JSON.stringify(version)},base:'./',build:{sourcemap:true},server:{port:5173},preview:{port:4173}});
+export default defineConfig({plugins:[react()],define:{__APP_VERSION__:JSON.stringify(version)},base:'./',worker:{format:'es'},build:{sourcemap:true},server:{port:5173},preview:{port:4173}});
