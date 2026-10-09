@@ -1,46 +1,26 @@
-import {useState, type KeyboardEvent} from 'react';
+import {useMemo,useState,type KeyboardEvent} from 'react';
 import type {Project} from '../core/model';
-import {overviewProjection} from '../export/projectOverview';
+import {PERSPECTIVE_LABEL} from '../core/viewspec';
+import {projectNavigation,type NavigationBranch} from '../intelligence/navigation';
 import './project-intelligence.css';
 
-export function ProjectNavigator({project, publicMode = false, selectedViewId, selectedNodeId, onView, onNode, onOverview, onRepository, onWorkspace}: {
-  project: Project; publicMode?: boolean; selectedViewId?: string; selectedNodeId?: string;
-  onView: (id: string) => void; onNode: (id: string) => void; onOverview: () => void;
-  onRepository?: (id: string) => void; onWorkspace?: (id: string) => void;
-}) {
-  const [tab, setTab] = useState('project');
-  const [filter, setFilter] = useState('');
-  const p = overviewProjection(project, publicMode), active = p.atlas?.snapshots.find(s => s.id === p.atlas?.activeSnapshotId);
-  const query = filter.trim().toLocaleLowerCase();
-  const matches = (...values: string[]) => !query || values.some(value => value.toLocaleLowerCase().includes(query));
-  const nodesById = new Map(p.nodes.map(n => [n.id, n]));
-  const viewsById = new Map(p.views.map(v => [v.id, v]));
-  const branchMatches = (id: string, seen = new Set<string>()): boolean => {
-    const n = nodesById.get(id); if(!n || seen.has(id)) return false;
-    if(matches(n.id, n.label)) return true;
-    const next = new Set([...seen, id]);
-    return (viewsById.get(n.childViewId || '')?.nodeIds || []).some(child => branchMatches(child, next));
-  };
-  const roots = (viewsById.get(p.rootViewId)?.nodeIds || []).filter(id => branchMatches(id));
-  const repositories = active?.repositories.filter(r => matches(r.id, r.title)) || [];
-  const views = p.views.filter(v => matches(v.id, v.title));
-  const tabs = ['project','repositories','views'];
-  const moveTab = (e: KeyboardEvent<HTMLButtonElement>) => {
-    const index = tabs.indexOf(tab);
-    const next = e.key === 'ArrowRight' ? (index + 1) % tabs.length : e.key === 'ArrowLeft' ? (index + tabs.length - 1) % tabs.length : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : -1;
-    if(next < 0) return;
-    e.preventDefault(); setTab(tabs[next]);
-    e.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`#nav-tab-${tabs[next]}`)?.focus();
-  };
-  const node = (id: string, trail: Set<string> = new Set(), depth = 0): React.ReactNode => {
-    const n = nodesById.get(id); if(!n || trail.has(id) || !branchMatches(id)) return null;
-    const child = viewsById.get(n.childViewId || ''), next = new Set([...trail, id]);
-    const button = <button type="button" aria-current={selectedNodeId === id ? 'true' : undefined} onClick={() => onNode(id)}>{n.label}</button>;
-    return <li key={id}>{button}{child && depth < 5 && <details open={!!query || depth < 1}><summary>Children of {n.label}</summary><ul>{child.nodeIds.map(id => node(id, next, depth + 1))}</ul></details>}{n.experienceWorkspaceId && onWorkspace && <button type="button" className="pi-workspace-link" onClick={() => onWorkspace(n.experienceWorkspaceId!)}>Workspace</button>}</li>;
-  };
-  return <nav className="project-navigator" aria-label="Project navigation" data-testid="project-navigator"><div className="pi-tabs" role="tablist" aria-label="Navigation scope">{tabs.map(t => <button id={`nav-tab-${t}`} type="button" role="tab" tabIndex={t === tab ? 0 : -1} onKeyDown={moveTab} aria-selected={t === tab} aria-controls="project-nav-panel" key={t} onClick={() => setTab(t)}>{t[0].toUpperCase() + t.slice(1)}</button>)}</div><label className="pi-navigation-filter">Filter <input aria-label="Navigation filter" type="search" value={filter} onChange={e => setFilter(e.target.value)}/></label><div id="project-nav-panel" role="tabpanel" aria-labelledby={`nav-tab-${tab}`}>
-    {tab === 'project' && <><button type="button" onClick={onOverview}>Project Overview</button><ul className="pi-nav-list">{roots.map(id => node(id))}</ul>{!roots.length && <p className="micro">{query ? 'No matching components.' : 'No components in this projection.'}</p>}</>}
-    {tab === 'repositories' && <>{active?.repositories.length ? <><p className="micro">Each repository has its own revision. No single project SHA.</p><ul className="pi-nav-list">{repositories.map(r => <li key={r.id}><button type="button" onClick={() => {if(onRepository) onRepository(r.id); else {const n = nodesById.get(r.nodeId || ''); if(n?.childViewId) onView(n.childViewId); else if(n) onNode(n.id);}}}>{r.title}</button><small>{r.scanStatus} · {r.revision?.slice(0,12) || 'revision unknown'}</small>{r.note && <small>{r.note}</small>}</li>)}</ul>{!repositories.length && <p className="micro">No matching repositories.</p>}</> : <p className="micro">No repository membership declared. Guided projects do not require Git.</p>}</>}
-    {tab === 'views' && <><ul className="pi-nav-list">{views.map(v => <li key={v.id}><button type="button" aria-current={selectedViewId === v.id ? 'page' : undefined} onClick={() => onView(v.id)}>{v.title}</button><small>{v.perspective || 'authored view'}</small></li>)}</ul>{!views.length && <p className="micro">No matching views.</p>}</>}
-  </div></nav>;
+export function ProjectNavigator({project,publicMode=false,selectedViewId,selectedNodeId,onView,onNode,onOverview,onRepository,onWorkspace}:{
+ project:Project;publicMode?:boolean;selectedViewId?:string;selectedNodeId?:string;
+ onView:(id:string)=>void;onNode:(id:string)=>void;onOverview:()=>void;onRepository?:(id:string)=>void;onWorkspace?:(id:string)=>void;
+}){
+ const [tab,setTab]=useState('project'),[filter,setFilter]=useState(''),[environment,setEnvironment]=useState(''),[snapshot,setSnapshot]=useState(''),[viewGrouping,setViewGrouping]=useState<'perspective'|'purpose'>('perspective');
+ const data=useMemo(()=>projectNavigation(project,{publicMode,query:filter,environmentId:environment||undefined,snapshotId:snapshot||undefined}),[project,publicMode,filter,environment,snapshot]);
+ const tabs=['project','repositories','views','mappings'];
+ const viewGroups=viewGrouping==='perspective'?data.groupedViews:Object.values(data.groupedViews).flat().reduce<Record<string,Project['views']>>((groups,v)=>{(groups[v.description||'Purpose not supplied']??=[]).push(v);return groups;},{});
+ const moveTab=(e:KeyboardEvent<HTMLButtonElement>)=>{const index=tabs.indexOf(tab),next=e.key==='ArrowRight'?(index+1)%tabs.length:e.key==='ArrowLeft'?(index+tabs.length-1)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:-1;if(next<0)return;e.preventDefault();setTab(tabs[next]);e.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`#nav-tab-${tabs[next]}`)?.focus();};
+ const branch=(n:NavigationBranch):React.ReactNode=><li key={n.id}><button type="button" aria-current={selectedNodeId===n.id?'true':undefined} onClick={()=>onNode(n.id)}>{n.label}</button><small>{n.kind} · {n.basis} · <code>{n.id}</code></small>{n.children.length>0&&<details open={!!filter||selectedNodeId===n.id}><summary>Children of {n.label}</summary><ul>{n.children.map(branch)}</ul></details>}{n.omitted>0&&<small>{n.omitted} child branches omitted by the stated navigation budget.</small>}{n.workspaceId&&onWorkspace&&<button type="button" className="pi-workspace-link" onClick={()=>onWorkspace(n.workspaceId!)}>Workspace</button>}</li>;
+ return <nav className="project-navigator" aria-label="Project navigation" data-testid="project-navigator"><div className="pi-tabs" role="tablist" aria-label="Navigation scope">{tabs.map(t=><button id={`nav-tab-${t}`} style={{flex:"1 1 85px"}} type="button" role="tab" tabIndex={t===tab?0:-1} onKeyDown={moveTab} aria-selected={t===tab} aria-controls="project-nav-panel" key={t} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)}</button>)}</div><label className="pi-navigation-filter">Filter <input aria-label="Navigation filter" type="search" value={filter} onChange={e=>setFilter(e.target.value)}/></label>
+ <details><summary>Navigation scope and budgets</summary><p className="micro">{data.note}</p><label>Environment filter<select style={{maxWidth:"100%",display:"block"}} aria-label="Navigation environment filter" value={environment} onChange={e=>setEnvironment(e.target.value)}><option value="">All components</option>{data.environments.map(e=><option key={e.id} value={e.id}>{e.label}</option>)}</select></label><label>Evolution filter<select style={{maxWidth:"100%",display:"block"}} aria-label="Navigation evolution filter" value={snapshot} onChange={e=>setSnapshot(e.target.value)}><option value="">Current document membership</option>{data.snapshots.map(s=><option key={s.id} value={s.id}>{s.label} · document {s.documentRevision}</option>)}</select></label><p className="micro">Up to {data.budget.nodesPerHierarchy} component pointers per hierarchy; {data.budget.maxDepth} child levels. Filters retain the selected stable ID. Snapshot membership does not replace current facts.</p>{data.filterProblems.map(m=><p key={m}>{m}</p>)}{data.omitted>0&&<p>{data.omitted} branches omitted; search a narrower scope.</p>}</details>
+ {selectedNodeId&&data.selectionExists(selectedNodeId)&&data.filtered&&!data.selectionVisible(selectedNodeId)&&<p role="status" className="micro">Selected component {selectedNodeId} remains selected outside this filter.</p>}
+ <div id="project-nav-panel" role="tabpanel" aria-labelledby={`nav-tab-${tab}`}>
+ {tab==='project'&&<><button type="button" onClick={onOverview}>Project Overview</button><p className="micro">{data.logicalOrigin}</p><ul className="pi-nav-list">{data.project.map(branch)}</ul>{!data.project.length&&<p className="micro">No matching components in this logical projection.</p>}</>}
+ {tab==='repositories'&&<><p className="micro">Each repository has its own revision. No single project SHA. Container/module/file drilldown uses the existing bounded source hierarchy.</p><ul className="pi-nav-list">{data.repositories.map(r=><li key={r.id}><button type="button" onClick={()=>{if(onRepository)onRepository(r.id);else if(r.nodeId)onNode(r.nodeId);}}>{r.title}</button><small>{r.host} · {r.scanStatus} · {r.authority}</small><small><code>{r.revision??'revision UNKNOWN'}</code></small>{r.note&&<small>{r.note}</small>}{r.acquisition&&<small>{r.acquisition.profile} source profile · {r.acquisition.readFiles}/{r.acquisition.selectedFiles} selected files read · {r.acquisition.readBytes} bytes · scope {r.acquisition.complete?'established':'partial'} · {r.acquisition.limited} limited / {r.acquisition.omitted} inventory entries omitted</small>}{r.children.length>0?<details open={!!filter}><summary>Structure of {r.title}</summary><ul>{r.children.map(branch)}</ul></details>:<small>No structural children retained in this projection.</small>}</li>)}</ul>{!data.repositories.length&&<p className="micro">No matching explicit repository membership. Guided projects do not require Git.</p>}</>}
+ {tab==='views'&&<><label>Group views by<select aria-label="View grouping" style={{maxWidth:"100%",display:"block"}} value={viewGrouping} onChange={e=>setViewGrouping(e.target.value as typeof viewGrouping)}><option value="perspective">Perspective</option><option value="purpose">Stated purpose</option></select></label>{Object.entries(viewGroups).map(([group,views])=><section key={group}><h3 title={group}>{viewGrouping==='perspective'?PERSPECTIVE_LABEL[group as keyof typeof PERSPECTIVE_LABEL]:group.length>90?group.slice(0,89)+'…':group}</h3><ul className="pi-nav-list">{views.map(v=><li key={v.id}><button type="button" aria-current={selectedViewId===v.id?'page':undefined} onClick={()=>onView(v.id)}>{v.title}</button><small><code>{v.id}</code> · {v.nodeIds.length} components · {v.edgeIds.length} connections</small><small>{v.description||'View purpose not supplied.'}</small></li>)}</ul></section>)}{!Object.keys(data.groupedViews).length&&<p className="micro">No matching views.</p>}</>}
+ {tab==='mappings'&&<><p className="micro">Logical scope → implementation. Only explicit typed relations to registered repository entities appear here.</p><ul className="pi-nav-list">{data.crosswalk.map(m=><li key={m.id}><button type="button" aria-current={selectedNodeId===m.logicalId?'true':undefined} onClick={()=>onNode(m.logicalId)}>{m.logicalLabel}</button> → <button type="button" onClick={()=>onNode(m.physicalId)}>{m.physicalLabel}</button><small>{m.kind} · {m.assertion} · {m.origin}</small><small>Sources: {m.sourceIds.join(', ')||'not attached'} · mapping <code>{m.id}</code></small><small>{m.repositoryTitle} · {m.revision}</small></li>)}</ul>{!data.crosswalk.length&&<p className="micro">No explicit scope-to-repository mapping established in this projection.</p>}</>}
+ </div></nav>;
 }

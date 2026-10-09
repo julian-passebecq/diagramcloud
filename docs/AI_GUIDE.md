@@ -6,7 +6,7 @@ This page is for an AI agent (Claude Code, Codex, any LLM with a shell) that has
 
 - **A document model, not a drawing.** A project is one JSON document (`diagramcloud.json`, schema version 1). It has components (`nodes`), connections (`edges`), views that each show a subset with positions, evidence blocks, sources, a guided story and optional observations. `src/core/model.ts` is the contract and `validateDocument` is the gate: JSON Schema alone (`public/diagramcloud.schema.json`, written by `npm run generate`) is not enough.
 - **Facts come from repositories, not from memory.** A deterministic scanner reads a folder (no code run, no network, no secret files) and produces components and links, each with file:line evidence and a confidence. An atlas joins several repositories, each at **its own Git revision**: there is never one project revision.
-- **Drawing is a separate layer.** Diagram Design mode renders any public view as one of 20 figure types. You choose the figure through a *design brief*; you never change facts to make a picture look better.
+- **Drawing is a separate layer.** Diagram Design mode renders any public view as one of 21 figure types. You choose the figure through a *design brief*; you never change facts to make a picture look better.
 - **Public vs private is enforced.** Every export goes through `publicDocument`, which drops private components, connections, evidence and repositories. Mark something `"visibility": "private"` instead of leaving it out.
 
 ## 2. Three meanings you must keep apart
@@ -39,7 +39,7 @@ The scanner also skips nested repositories and git worktrees (any sub-folder wit
 
 ### Project Intelligence inputs and outputs (1.24.0)
 
-In the UI, **New analysis** selects Repository / Guided / Hybrid, purpose and Quick/Standard. Read `docs/release-1.24/RELEASE_NOTES.md` for acquisition limits and `examples/project-intelligence/project-brief.json` for a synthetic no-Git brief. The generated `public/diagramcloud.project-brief.schema.json` is structural guidance; `validateProjectBrief`, `compileProjectBrief` (or `compileHybridBrief`), `validateDocument` and candidate review are all required. A ProjectBrief declares workstreams/systems/tasks, repository IDs/bindings and authored relationships; it never attests runtime. A task workspace displays evidence, never executes it.
+In the UI, **New analysis** selects Repository / Guided / Hybrid / Graph, purpose and Quick/Standard acquisition. Explicit optional Deep/Custom analysis profiles use bounded local parsers and reviewed projections. Read `docs/release-1.24/RELEASE_NOTES.md` for acquisition limits and `examples/project-intelligence/project-brief.json` for a synthetic no-Git brief. The generated `public/diagramcloud.project-brief.schema.json` is structural guidance; `validateProjectBrief`, `compileProjectBrief` (or `compileHybridBrief`), `validateDocument` and candidate review are all required. A ProjectBrief declares workstreams/systems/tasks, repository IDs/bindings and authored relationships; it never attests runtime. A task workspace displays evidence, never executes it.
 
 `npm run intelligence -- brief --input examples/project-intelligence/project-brief.json --out <new-folder>` writes a new private candidate. `npm run intelligence -- inspect --input <document.json> --out <new-folder>` derives private readiness/asset context, not a new repository scan. Reuse existing review/patch guards to apply; reimport must retain authored text, positions, story, visibility, assets and evidence. Matching stable IDs remain; missing entries in partial input are not removals.
 
@@ -128,6 +128,7 @@ Run `npm run design -- doc.json --out figures/` and read `figures/suggestions.js
 | Which parts are in which designed state? | `status` | designed statuses |
 | Where does this come from and go? | `lineage` | a flow 3+ steps deep |
 | How much moves along each connection? | `sankey` | `quantity` on connections |
+| How do supplied signed increments accumulate in table order? | `waterfall` | One public numeric table column, at most eight readable rows with omissions reported; running sums are derived, never observed or causal totals |
 | Which repositories moved? | `atlas` | an atlas document |
 
 A figure reads well up to about 9 components and 12 connections; beyond 24, use drilldown views. Focal components (0–2) get the accent colour: pick where a decision is made, where data lands, or what changed.
@@ -178,7 +179,7 @@ npm run intelligence:mcp -- .local/delivery/project.candidate.json
 
 Graph imports and reimports are private proposals; review `proposal.patch.json` in JSON / AI. Generation comparison does not execute tombstones. The browser can browse a large selected file and create a bounded partial selection; the CLI requires a scoped input within Project limits. Declared environments, artifacts and instances are separate from source branches. A `diagramcloud.delivery-brief/1` cannot create or review observations. Use the versioned examples rather than writing observed claims. The `deployment` figure groups declared instances by environment when those facts exist; its runtime remains unknown.
 
-Project Evolution in Edit compares a selected previous authoring backup locally; it does not import it. Comparison JSON is private. MCP stdout is JSON-RPC over stdio (protocol 2025-06-18); the process reads one selected document at startup and exposes only public query/render and reviewable design/NOT_RUN verification proposals. It cannot read arbitrary files or execute checks. MCP clients must initialize before calling tools. See `docs/product/CAMPAIGN_CLIENT.md` for supported source versions, limits and missing capabilities.
+Project Evolution in Edit compares a selected previous authoring backup locally; it does not import it. Comparison JSON is private. MCP stdout is JSON-RPC over stdio (protocol 2025-06-18); the process reads one selected document at startup and exposes seven public query/render/proposal tools. An explicit optional startup analysis bundle adds a private bounded author-context tool. It cannot read arbitrary files or execute checks. MCP clients must initialize before calling tools. See `docs/product/CAMPAIGN_CLIENT.md` for supported source versions, limits and missing capabilities.
 
 | Need | File |
 |---|---|
@@ -192,3 +193,14 @@ Project Evolution in Edit compares a selected previous authoring backup locally;
 | Figures, suggestions, figure book, deck | `src/export/design/` |
 | Design brief | `src/core/designBrief.ts`, `skills/diagramcloud-design/SKILL.md` |
 | Contributor rules and current limits | `AGENTS.md` |
+
+
+### Continuation interfaces (unmerged candidate)
+
+The CLI also accepts `profile`, `bundle`, `deep`, `verification-spec`, `verification-receipt`, `cockpit`, `entity-proposal`, `cross-repository` and `publication`. Each command requires explicitly selected inputs and a new output directory. `deep` takes `{files, profile, repositoryId, revision}` and uses installed or packaged local WASM grammars; it never compiles or executes source. `bundle` has the same selected-source identity and generates lexical source analysis, separate from the bounded authoring Project. Read `docs/product/CAMPAIGN_CLIENT.md` for arguments and supported formats.
+
+MCP defaults to seven public-only Project tools. Optional startup `--analysis <selected-analysis-bundle.json>` adds one private author-context query, only for that explicitly selected, validated bundle. Neither mode accepts filesystem paths as tool arguments or collects another source. Entity, design, project, publication and NOT_RUN verification tools produce proposals. Receipt/cockpit imports stage private, unreviewed observations through patches; the author decides review, visibility and sharing in Edit.
+
+A `diagramcloud.publication-brief/1` holds existing public view/story selection, audience, detail, paper size and rendering profile. It changes presentation only. Immutable public library snapshots retain independent source revisions; collections never flatten repository identities or manufacture one project SHA. Custom icon references use a scoped existing raster asset with recorded rights; inspect the public artwork fidelity ledger before sharing.
+
+Saved collection/publication links are local stable identities: `?collection=<saved-id>` or `?publication=<saved-id>`, with at most one library target and optional project context. They resolve only through validated local IndexedDB records; missing targets report unavailable and never inject frozen outputs into editable projects. The publication `digest` covers its public document; `outputDigest` additionally binds normalized header/brief/time/ID/revision vector. Older records are explicitly `legacy-unbound`. Neither digest is an external verification or signature.

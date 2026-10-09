@@ -2,10 +2,11 @@ import {useState} from 'react';
 import type {Project} from '../core/model';
 
 /** Gallery buckets: the author's portfolio, the cloud architecture reference gallery, and the user's own or imported projects. */
-export type GalleryFilter='all'|'portfolio'|'cloud'|'mine';
-export const GALLERY_FILTERS:{id:GalleryFilter;label:string}[]=[{id:'all',label:'All'},{id:'portfolio',label:'Portfolio'},{id:'cloud',label:'Cloud architectures'},{id:'mine',label:'Your projects'}];
+export type GalleryFilter='all'|'portfolio'|'cloud'|'recipes'|'mine';
+export const GALLERY_FILTERS:{id:GalleryFilter;label:string}[]=[{id:'all',label:'All'},{id:'portfolio',label:'Portfolio'},{id:'cloud',label:'Cloud architectures'},{id:'recipes',label:'Reference recipes'},{id:'mine',label:'Your projects'}];
 /** The DataPass planning maps are reference-category documents about the author's own work, so they sit with the portfolio. */
 export function galleryBucket(p:Project):Exclude<GalleryFilter,'all'>{
+ if(p.tags.includes('Cookbook'))return 'recipes';
  if(p.category==='Portfolio'||p.category==='Reference'&&p.tags.some(t=>t==='Portfolio'||t==='Datapass'))return 'portfolio';
  return p.category==='Reference'?'cloud':'mine';
 }
@@ -15,6 +16,7 @@ export function galleryCaption(p:Project):string{
  if(p.tags.includes('Scanned'))return 'Scanned repository';
  const bucket=galleryBucket(p);
  if(bucket==='portfolio')return p.category==='Portfolio'?'Portfolio':'Portfolio map';
+ if(bucket==='recipes')return 'Synthetic reference recipe';
  if(bucket==='cloud')return `Cloud architecture${p.tags[0]&&p.tags[0]!==p.title?` · ${p.tags[0]}`:''}`;
  return p.category;
 }

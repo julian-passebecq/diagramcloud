@@ -2,12 +2,16 @@ import {parseAllDocuments} from 'yaml';
 import type {ProjectEdge,ProjectNode} from '../model';
 import {inferKind} from '../interchange/graph';
 import {DEPLOY_ACTIONS,FRAMEWORK_KIND,IMAGE_TECH,TECHS,TERRAFORM_PROVIDER,techOfPackage,terraformKind,type TechKey} from './tech';
+import {gitBoundaries,VENDOR_PATH,GENERATED_PATH,GENERATED_HEADER,type GitBoundary} from './inventory';
+import {dbtArtifactModelPaths} from './dbt';
 
 /**
  * Deterministic repository scanner. It reads manifests (package.json, requirements, pyproject, go.mod), Dockerfiles,
  * docker-compose, Kubernetes manifests, Terraform, GitHub Actions workflows, SQL / dbt / Prisma schemas, example env
  * files (key names only) and import statements, and returns a model of systems, containers, components, tables and
- * resources. Every item and link carries file:line evidence and a confidence:
+ * resources. Source findings carry file:line evidence; selected root/directory
+ * grouping metadata is explicitly distinct and carries no invented source line.
+ * Both carry a confidence:
  *  - confirmed: declared explicitly (depends_on, an import statement, a Terraform reference, a foreign key);
  *  - inferred: implied by a declaration (a database driver in the dependencies, a host name in configuration);
  *  - possible: a hint only (a key name in an example env file).
@@ -15,11 +19,11 @@ import {DEPLOY_ACTIONS,FRAMEWORK_KIND,IMAGE_TECH,TECHS,TERRAFORM_PROVIDER,techOf
  */
 export type ScanFile={path:string;text:string};
 export type Confidence='confirmed'|'inferred'|'possible';
-export type Evidence={file:string;line:number;finding:string;confidence:Confidence};
+export type Evidence=({kind?:'source';file:string;line:number}|{kind:'selection-metadata';path:string})&{finding:string;confidence:Confidence};
 export type ScanLayer='system'|'external'|'container'|'component'|'file'|'table'|'resource'|'ci'|'group';
 export type ScanItem={key:string;label:string;kind:ProjectNode['kind'];provider:string;layer:ScanLayer;parent?:string;summary:string;confidence:Confidence;evidence:Evidence[];tech?:TechKey;files?:number};
 export type ScanLink={from:string;to:string;label:string;kind:ProjectEdge['kind'];confidence:Confidence;evidence:Evidence[];layer:'container'|'component'|'file'|'data'|'resource'|'ci';count:number};
-export type ScanModel={name:string;branch?:string;commit?:string;items:Map<string,ScanItem>;links:ScanLink[];detectors:Map<string,number>;skipped:Map<string,number>};
+export type ScanModel={name:string;branch?:string;commit?:string;items:Map<string,ScanItem>;links:ScanLink[];detectors:Map<string,number>;skipped:Map<string,number>;boundaries?:GitBoundary[];partition?:{authored:number;generated:number;vendor:number;boundary:number;unsupported:number}};
 
 const RANK:Record<Confidence,number>={confirmed:3,inferred:2,possible:1};
 const best=(a:Confidence,b:Confidence)=>RANK[a]>=RANK[b]?a:b;
@@ -37,7 +41,7 @@ function normalize(p:string):string{const out:string[]=[];for(const s of p.split
 /** Directories never scanned, and files never read because they may hold secrets. */
 export const IGNORED_DIR=/(^|\/)(node_modules|\.git|dist|build|out|coverage|vendor|target|\.venv|venv|env|__pycache__|\.next|\.nuxt|\.turbo|\.cache|\.idea|\.vscode|bin|obj|\.terraform|site-packages|test-results|playwright-report|\.claude\/worktrees|\.worktrees)(\/|$)/;
 export const SECRET_FILE=/(^|\/)(\.env(\.(?!example$|sample$|template$|dist$)[^/]*)?|\.npmrc|\.pypirc|id_[a-z0-9]+|[^/]*\.(pem|key|p12|pfx|jks|keystore|tfstate|tfstate\.backup|tfvars)|[^/]*(secret|credential)s?[^/]*\.(json|ya?ml|txt))$/i;
-const SOURCE=/\.(ts|tsx|js|jsx|mjs|cjs|py)$/;
+const SOURCE=/\.(ts|tsx|js|jsx|mjs|cjs|py|cs)$/;
 const GIT_FILES=/^\.git\/(HEAD|packed-refs|refs\/heads\/.+)$/;
 /** Whether a repository-relative path is worth reading (used by the browser folder picker and the CLI walker). */
 /** Sub-folders that carry their own `.git` (a nested clone, submodule or git worktree): another repository, never part of this one. */
@@ -49,26 +53,33 @@ export function nestedRepositoryPrefixes(paths:string[]):string[]{
 export function outsideNestedRepositories<T extends {path:string}>(items:T[]):T[]{const nested=nestedRepositoryPrefixes(items.map(i=>i.path));return items.filter(i=>!nested.some(n=>i.path===n||i.path.startsWith(`${n}/`)));}
 export function wantedFile(path:string):boolean{
  if(GIT_FILES.test(path))return true;
- if((IGNORED_DIR.test(path)&&!/(^|\/)target\/manifest\.json$/i.test(path))||SECRET_FILE.test(path))return false;
+ if(((IGNORED_DIR.test(path)||GENERATED_PATH.test(path))&&!/(^|\/)target\/manifest\.json$/i.test(path))||SECRET_FILE.test(path))return false;
  const name=baseOf(path).toLowerCase();
- return name==='package.json'||/^requirements[\w.-]*\.txt$/.test(name)||name==='pyproject.toml'||name==='go.mod'||/^dockerfile/.test(name)||/\.dockerfile$/.test(name)
+ return name==='.gitmodules'||name==='package.json'||/^requirements[\w.-]*\.txt$/.test(name)||name==='pyproject.toml'||name==='go.mod'||/^dockerfile/.test(name)||/\.dockerfile$/.test(name)
   ||/\.(ya?ml)$/.test(name)||/\.tf$/.test(name)||name==='schema.prisma'||/\.sql$/.test(name)
-  ||/\.(pbir|pbip|tmdl|bicep|csproj|sln|slnx)$/.test(name)||name==='manifest.json'||name==='definition.pbism'||name==='openapi.json'||name==='swagger.json'||name==='.platform'||name==='databricks.json'||/\.job\.json$/.test(name)||/^\.env\.(example|sample|template|dist)$/.test(name)||SOURCE.test(name);
+  ||/\.(pbir|pbip|tmdl|bicep|csproj|sln|slnx)$/.test(name)||name==='manifest.json'||name==='definition.pbism'||name==='asyncapi.json'||name==='openapi.json'||name==='swagger.json'||name==='.platform'||name==='databricks.json'||/\.job\.json$/.test(name)||/^(?:azuredeploy|main|template|deploymenttemplate|function|host|containerapp)\.json$/.test(name)||name==='kustomization'||/^\.env\.(example|sample|template|dist)$/.test(name)||SOURCE.test(name);
 }
 export const MAX_FILE_BYTES=512*1024,MAX_FILES=6000;
 
-export function scanRepository(input:ScanFile[],options:{name?:string}={}):ScanModel{
+export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPaths?:string[];boundaryMarkers?:ScanFile[];preferDbtManifest?:boolean}={}):ScanModel{
  const files=new Map<string,string>(),skipped=new Map<string,number>(),detectors=new Map<string,number>();
  const skip=(why:string)=>skipped.set(why,(skipped.get(why)??0)+1),seen=(what:string,n=1)=>detectors.set(what,(detectors.get(what)??0)+n);
+ const boundaries=gitBoundaries(options.boundaryPaths??input.map(f=>f.path),input.find(f=>f.path==='.gitmodules'),options.boundaryMarkers??input.filter(f=>/\/\.git$/.test(f.path))),partition={authored:0,generated:0,vendor:0,boundary:0,unsupported:0};
  for(const f of input){
+  const raw=f.path.replace(/\\/g,'/');if(!raw||raw.length>512||/^(?:\/|[a-z]:)/i.test(raw)||/[\u0000-\u001f]/.test(raw)||raw.split('/').some(s=>!s||s==='.'||s==='..')){skip('unsafe source paths refused');continue;}
   const path=normalize(f.path.replace(/\\/g,'/'));
+  if(boundaries.some(b=>path===b.path||path.startsWith(b.path+'/'))){partition.boundary++;skip('nested repository boundary entries excluded (metadata only)');continue;}
   if(SECRET_FILE.test(path)&&!GIT_FILES.test(path)){skip('secret or credential file(s) never read');continue;}
-  if(!wantedFile(path))continue;
+  if(VENDOR_PATH.test(path)){partition.vendor++;skip('vendor/dependency entries excluded');continue;}
+  if((GENERATED_PATH.test(path)&&!/(^|\/)target\/manifest\.json$/i.test(path))||(wantedFile(path)&&GENERATED_HEADER.test(f.text.slice(0,2048)))){partition.generated++;skip('generated/build entries excluded');continue;}
+  if(!wantedFile(path)){partition.unsupported++;continue;}
   if(files.size>=MAX_FILES){skip(`file(s) beyond the first ${MAX_FILES} not read`);continue;}
   if(f.text.length>MAX_FILE_BYTES){skip('file(s) over 512 KiB not read');continue;}
   files.set(path,f.text);
+  partition.authored++;
  }
  const items=new Map<string,ScanItem>(),links=new Map<string,ScanLink>();
+ const artifactModels=options.preferDbtManifest?dbtArtifactModelPaths([...files].map(([path,text])=>({path,text}))):new Set<string>();
  const item=(key:string,init:Omit<ScanItem,'key'|'evidence'|'confidence'>&{confidence?:Confidence},ev?:Evidence):ScanItem=>{
   let it=items.get(key);
   if(!it){it={key,evidence:[],confidence:ev?.confidence??init.confidence??'inferred',...init};items.set(key,it);}
@@ -82,6 +93,7 @@ export function scanRepository(input:ScanFile[],options:{name?:string}={}):ScanM
   links.set(k,{from,to,label,layer,kind,confidence:ev.confidence,evidence:[ev],count:1});
  };
  const ev=(file:string,line:number,finding:string,confidence:Confidence):Evidence=>({file,line,finding,confidence});
+ const metadata=(path:string,finding:string):Evidence=>({kind:'selection-metadata',path:path||'.',finding,confidence:'confirmed'});
 
  // ---- Git identity (read-only: HEAD and refs, never objects) ----
  let branch:string|undefined,commit:string|undefined;
@@ -93,7 +105,8 @@ export function scanRepository(input:ScanFile[],options:{name?:string}={}):ScanM
  const rootPkg=files.get('package.json');let rootJson:Record<string,unknown>={};try{rootJson=rootPkg?JSON.parse(rootPkg):{};}catch{skip('package.json file(s) that are not valid JSON');}
  const name=(options.name||(typeof rootJson.name==='string'?rootJson.name.replace(/^@[^/]+\//,''):'')||'repository').slice(0,120);
  const systemKey='system';
- item(systemKey,{label:name,kind:'app',provider:'Generic',layer:'system',summary:'The scanned repository as one system.',confidence:'confirmed'},ev('.',1,'Repository root','confirmed'));
+ const selectedRootFile=(files.has('package.json')?'package.json':[...files.keys()].sort().find(p=>!GIT_FILES.test(p)));
+ item(systemKey,{label:name,kind:'app',provider:'Generic',layer:'system',summary:'The explicitly selected repository grouped as one system; this does not establish a runtime boundary.',confidence:'confirmed'},selectedRootFile?ev(selectedRootFile,1,'Selected repository source inventory includes this file; root is a presentation grouping','confirmed'):metadata('.','Explicitly selected repository root; no source file was admitted'));
  const containerDirs=new Set<string>();const packageNames=new Map<string,string>();
  const manifests=[...files.keys()].filter(p=>/(^|\/)(package\.json|pyproject\.toml|go\.mod)$|(^|\/)requirements[\w.-]*\.txt$|(^|\/)([\w.-]*\.)?dockerfile$|(^|\/)dockerfile[\w.-]*$/i.test(p));
  const isWorkspaceRoot=Array.isArray(rootJson.workspaces)||typeof rootJson.workspaces==='object'&&rootJson.workspaces!==null||files.has('pnpm-workspace.yaml')||files.has('lerna.json');
@@ -107,7 +120,7 @@ export function scanRepository(input:ScanFile[],options:{name?:string}={}):ScanM
   const tech=techOfPackage(dep);if(tech){seen('dependency on a known external system');linkTech(containerKey(d),tech,ev(file,line,`${how} ${dep}`,'inferred'),`uses (${dep})`);}
  };
  const techTargets=new Map<TechKey,string>();
- const techNode=(tech:TechKey)=>{const t=techTargets.get(tech);if(t)return t;const k=`x:${tech}`,T=TECHS[tech];item(k,{label:T.label,kind:T.kind,provider:T.provider,layer:'external',summary:'External system used by the code.',tech,confidence:'possible'});return k;};
+ const techNode=(tech:TechKey,e:Evidence)=>{const t=techTargets.get(tech);if(t){const existing=items.get(t);if(existing&&existing.evidence.length<20)existing.evidence.push(e);return t;}const k=`x:${tech}`,T=TECHS[tech];item(k,{label:T.label,kind:T.kind,provider:T.provider,layer:'external',summary:'Technology dependency declaration; runtime usage and deployed instance unknown.',tech,confidence:'possible'},e);return k;};
  const pendingTech:[string,TechKey,Evidence,string][]=[];
  function linkTech(from:string,tech:TechKey,e:Evidence,label:string){pendingTech.push([from,tech,e,label]);}
 
@@ -131,7 +144,8 @@ export function scanRepository(input:ScanFile[],options:{name?:string}={}):ScanM
   const kinds=[...(usesFramework.get(d)??[])].map(s=>s.split('|'));
   const kind=(kinds.find(k=>k[1]==='app')??kinds.find(k=>k[1]==='process')??kinds[0])?.[1] as ProjectNode['kind']|undefined;
   summary=kinds.length?`${[...new Set(kinds.map(k=>k[0]))].join(', ')} (${[...new Set(kinds.map(k=>k[2]))].slice(0,4).join(', ')})`:summary;
-  item(key,{label,kind:kind??inferKind(label),provider:'Generic',layer:'container',summary:`${summary} · ${found.join(', ')}`,confidence:'confirmed'},ev(found[0]==='package.json'?pkgPath:join(d,found[0]?.split(' ')[0]??''),1,`Manifest: ${found.join(', ')}`,'confirmed'));
+  const manifestPath=found[0]==='package.json'?pkgPath:found.length?join(d,found[0].split(' ')[0]):undefined;
+  item(key,{label,kind:kind??inferKind(label),provider:'Generic',layer:'container',summary:found.length?`${summary} · ${found.join(', ')}`:'Selected source folder group; deployment boundary unknown',confidence:'confirmed'},manifestPath&&files.has(manifestPath)?ev(manifestPath,1,`Manifest: ${found.join(', ')}`,'confirmed'):metadata(d,'Selected source folder group without a deployable-unit manifest'));
  }
 
  // ---- docker-compose ----
@@ -243,6 +257,7 @@ export function scanRepository(input:ScanFile[],options:{name?:string}={}):ScanM
  const IDENT=String.raw`((?:["\`\[]?[A-Za-z_][\w$]*["\`\]]?\.){0,2}["\`\[]?[A-Za-z_][\w$]*["\`\]]?)`;
  const dbtRoots=[...files.keys()].filter(p=>/(^|\/)dbt_project\.ya?ml$/.test(p)).map(dirOf);
  for(const [path,text] of files)if(/\.sql$/i.test(path)){
+  if(artifactModels.has(path)){seen('selected dbt manifest preferred over SQL heuristics');continue;}
   const dbtRoot=dbtRoots.find(r=>path.startsWith(r?`${r}/`:'')&&/\/models\/|^models\//.test(path.slice(r?r.length+1:0)));
   if(dbtRoot!==undefined){
    const model=baseOf(path).replace(/\.sql$/i,''),to=table(model,path,1,'dbt model','confirmed');seen('dbt model');
@@ -293,7 +308,7 @@ export function scanRepository(input:ScanFile[],options:{name?:string}={}):ScanM
   const top=[...counts].sort((a,b)=>b[1]-a[1]).slice(0,24).map(([m])=>m),kept=new Set(top);
   const container=containerKey(d),mkey=(m:string)=>`m:${d||'.'}:${kept.has(m)?m:'(other)'}`;
   for(const [m,n] of counts){const k=mkey(m),label=kept.has(m)?(m==='(entry)'?`${items.get(container)?.label??'app'} entry`:m):'other modules';
-   const it=item(k,{label,kind:m==='(entry)'?'app':inferKind(m),provider:'Generic',layer:'component',parent:container,summary:'',confidence:'confirmed',files:0},ev(join(root,m==='(entry)'?'':m)||'.',1,`${n} source file(s)`,'confirmed'));it.files=(it.files??0)+n;it.summary=`${it.files} source file(s) in ${join(root,m==='(entry)'?'':m)||'.'}`;}
+   const it=item(k,{label,kind:m==='(entry)'?'app':inferKind(m),provider:'Generic',layer:'component',parent:container,summary:'',confidence:'confirmed',files:0},metadata(join(root,m==='(entry)'?'':m),`${n} admitted source file(s) grouped by selected directory; not a source declaration`));it.files=(it.files??0)+n;it.summary=`${it.files} source file(s) in ${join(root,m==='(entry)'?'':m)||'.'}`;}
   seen('code module',counts.size);
   // Files: the finest level, one view per module, linked by the imports between files of the same module.
   for(const p of list){const m=moduleOf(p);if(!m||!kept.has(m)||baseOf(p)==='__init__.py')continue;const text=files.get(p)!;
@@ -329,7 +344,7 @@ export function scanRepository(input:ScanFile[],options:{name?:string}={}):ScanM
  }
 
  // Resolve technology links last, so a compose or Kubernetes service running that technology is preferred over an external node.
- for(const [from,tech,e,label] of pendingTech){const to=techNode(tech);const layer=items.get(from)?.layer==='component'?'component':'container';link(from,to,label,layer,e,TECHS[tech].kind==='storage'?'query':'batch');}
+ for(const [from,tech,e,label] of pendingTech){const to=techNode(tech,e);const layer=items.get(from)?.layer==='component'?'component':'container';link(from,to,label,layer,e,TECHS[tech].kind==='storage'?'query':'batch');}
  for(const it of items.values())if(it.layer==='external'&&it.tech){const inbound=[...links.values()].filter(l=>l.to===it.key);if(inbound.length)it.confidence=inbound.map(l=>l.confidence).reduce(best);}
- return {name,branch,commit,items,links:[...links.values()],detectors,skipped};
+ return {name,branch,commit,items,links:[...links.values()],detectors,skipped,boundaries,partition};
 }

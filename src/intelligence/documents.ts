@@ -1,5 +1,6 @@
 import type {DocumentInput, DocumentMap, DocumentDiagnostic, DocumentLink} from './types';
 import {secretInText} from '../core/secrets';
+import {mapStructuredDocuments,wantedStructuredDocument} from './structuredDocuments';
 
 /** Application boundary for already-authorized inventory text. Filtering remains
  * mandatory even when metadata was accepted; document instructions stay inert. */
@@ -16,7 +17,7 @@ export function wantedDocument(path: string): boolean {
   if (p.split('/').some(s => !s || s === '.' || s === '..')) return false;
   if (/(^|\/)(\.git|node_modules|vendor|dist|build|out|target|coverage|\.venv|venv|\.cache|\.worktrees|\.claude|\.terraform|test-results|playwright-report)(\/|$)/i.test(p)) return false;
   if (/(^|\/)[^/]*(secret|credential|private[-_]?key)[^/]*\.(md|csv)$/i.test(p)) return false;
-  return /\.(md|csv)$/i.test(p);
+  return /\.(md|csv)$/i.test(p)||wantedStructuredDocument(p);
 }
 
 type Row = {cells: string[]; startLine: number; endLine: number};
@@ -79,7 +80,14 @@ export function mapDocuments(input: readonly DocumentInput[], isSafeText: (text:
   const pending: {path: string; line: number; ids: string[]}[] = [];
   const sourceRecords = new Map<string, {path: string; line: number}[]>();
   const addLink = (link: DocumentLink) => {if (links.length < DOCUMENT_LIMITS.links) links.push(link); else {omitted.links++; diagnostic({path: link.fromPath, line: link.fromLine, code: 'limited', message: 'Link budget reached.'});}};
+  const structured=mapStructuredDocuments([...files].filter(([path])=>wantedStructuredDocument(path)).map(([path,text])=>({path,text})),isSafeText,[...files.keys()]);
+  documents.push(...structured.documents);structured.links.forEach(addLink);structured.diagnostics.forEach(diagnostic);
+  omitted.documents+=structured.omitted.documents;omitted.links+=structured.omitted.links;omitted.diagnostics+=structured.omitted.diagnostics;
+  const structuredPaths=new Set(structured.documents.map(d=>d.path));
+  // A malformed selected structured file cannot resolve a Markdown provenance link.
+  for(const path of files.keys())if(wantedStructuredDocument(path)&&!structuredPaths.has(path))files.delete(path);
   for (const [path, text] of files) {
+    if(wantedStructuredDocument(path))continue;
     const entry: DocumentMap['documents'][number] = {path, kind: /\.md$/i.test(path) ? 'markdown' : 'csv', headings: [], records: []};
     documents.push(entry);
     if (entry.kind === 'markdown') {
@@ -135,9 +143,9 @@ export function mapDocuments(input: readonly DocumentInput[], isSafeText: (text:
   }
   const unique = new Map(links.map(link => [JSON.stringify(link), link]));
   return {format: 'diagramcloud.document-map', version: 1, documents, links: [...unique.values()], diagnostics, omitted,
-    limitations: ['Only selected Markdown/CSV documents are mapped; source files are not fetched.',
+    limitations: ['Only selected Markdown/CSV/JSON/YAML documents are mapped; source files are not fetched.',
       'Markdown support is limited to ATX headings and inline relative file links outside fenced code; fragments/images/reference links are not resolved.',
       'CSV source_ids uses semicolons and resolves only unique id rows in selected sources.csv files. This is a provenance link, not data lineage.',
       'Filename current/history, prose, dates and status text do not prove implementation or supersession.',
-      'The map is private authoring context until separately projected and reviewed for publication.']};
+      'The map is private authoring context until separately projected and reviewed for publication.',...structured.limitations]};
 }

@@ -235,7 +235,7 @@ export type GraphGeneration={
    sourceIds:string[];signature:string;evidenceSignature:string}[];
 };
 const STATE_PREFIX='analysis-graph-state-';
-const generationReceiptSchema=z.object({format:z.literal('diagramcloud.graph-generation/1'),graphId:name,generationId:name,capturedAt:instant,
+export const generationReceiptSchema=z.object({format:z.literal('diagramcloud.graph-generation/1'),graphId:name,generationId:name,capturedAt:instant,
  parserVersion:name,minor:z.number().int().nonnegative(),synthetic:z.boolean(),scope:graphSnapshotSchema.shape.scope,complete:z.boolean(),predecessor:name.nullable(),
  omitted:graphSnapshotSchema.shape.omitted,tombstones:ids,sourceVector:graphSnapshotSchema.shape.source_vector,
  nodes:z.array(z.object({externalId:name,localId:name,kind:name,organization:name,domain:name,state:z.string().max(160),parent:name.nullable(),groups:ids,sourceIds:ids,signature:name}).strict()).max(470),
@@ -303,7 +303,10 @@ export function previewGraphReimport(current:Project,raw:unknown,baseRevision:nu
  const g=validateGraphSnapshot(raw),candidate=compileGraphSnapshot(g),history=readGraphHistory(current),fresh=graphGeneration(g),prior=history.at(-1);
  if(!prior)throw new Error('This older graph import has no generation receipt. Import into a new project or recover the original input first.');
  if(prior.graphId!==fresh.graphId)throw new Error('Graph identity differs');
- if(prior.generationId===fresh.generationId&&signature(prior)!==signature(fresh))throw new Error('Generation identity conflict: the same generation ID has different content');
+ // Brain stamps each scoped read at collection time while retaining the source
+ // generation. Re-reading identical facts is safe; changed scope/content is not.
+ const generationContent=(receipt:GraphGeneration)=>({...receipt,capturedAt:''});
+ if(prior.generationId===fresh.generationId&&signature(generationContent(prior))!==signature(generationContent(fresh)))throw new Error('Generation identity conflict: the same generation ID has different content');
  for(const row of fresh.nodes){const old=prior.nodes.find(x=>x.externalId===row.externalId);if(old&&(old.kind!==row.kind||old.domain!==row.domain||old.organization!==row.organization))throw new Error('Conflicting semantic node identity: '+row.externalId);}
  for(const row of fresh.assertions){const old=prior.assertions.find(x=>x.externalId===row.externalId);if(old&&(old.from!==row.from||old.to!==row.to||old.family!==row.family))throw new Error('Conflicting assertion identity: '+row.externalId);}
  const delta=compareGraphGenerations(prior,fresh),proposal=previewCandidateReimport(current,candidate.document,baseRevision),merged=proposal.document;

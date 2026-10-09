@@ -66,6 +66,6 @@ test('native specialist joins are exact, bounded and versioned',()=>{
  {path:'main.bicep',text:"resource web 'Microsoft.Web/sites@2024-04-01' = {}"}
  ]);
  for(const expected of ['PBIR declared datasetReference','PackageReference 1.2.3','solution member','operation schema $ref','declared depends_on'])assert.ok(found.links.some(l=>l.label===expected),expected);
- assert.ok(found.capabilities.includes('azure'));assert.ok(found.sources.every(s=>s.parserVersion==='diagramcloud-domain/2'));assert.doesNotThrow(()=>extendWithDomainFacts(project(),found));
+ assert.ok(found.capabilities.includes('azure'));assert.ok(found.sources.every(s=>s.parserVersion==='diagramcloud-domain/3'));assert.doesNotThrow(()=>extendWithDomainFacts(project(),found));
  const unsupported=analyzeDomainFiles([{path:'target/manifest.json',text:'{"metadata":{"dbt_schema_version":"https://schemas.getdbt.com/dbt/manifest/v999.json"},"nodes":{"model.synthetic.x":{"name":"x"}}}'}]);assert.equal(unsupported.facts.length,0);assert.ok(unsupported.diagnostics.some(d=>d.includes('Unsupported')));
 });

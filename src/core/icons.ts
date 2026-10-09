@@ -32,6 +32,7 @@ function fabricIcon(id:string,upstream:string,label:string,represents:string,blo
 }
 
 export const ICON_REGISTRY:IconEntry[]=[
+ ...['api','job','test','ci','git','owner','document','decision','artifact'].map(role=>({id:'generic-'+role,label:'Generic '+role+' symbol',origin:'original' as const,alt:role+' semantic symbol',represents:role,rules:['Original DiagramCloud semantic geometry in src/core/iconGlyph.ts (MIT).','Offline line artwork; theme ink applies only to these original symbols. No vendor branding.']})),
  ...(['source','process','storage','model','report','app','control','function','table'] as const).map(kind=>({id:'generic-'+kind,label:'Generic '+kind+' symbol',origin:'original' as const,alt:kind+' component',represents:kind,rules:['Original DiagramCloud semantic symbol (MIT).','Uses the existing kind glyph on the canvas; exports retain the semantic kind. No vendor branding.']})),
  {id:'generic',label:'Generic component symbol',origin:'original',alt:'',
   rules:['Original DiagramCloud line symbols chosen by component kind. Not a vendor logo.']},

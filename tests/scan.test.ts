@@ -46,8 +46,8 @@ test('scanner: containers, compose links, Kubernetes, Terraform, CI, data lineag
  assert.ok(link('f:worker/app/store/repo.py','f:worker/app/store/models.py'));
  assert.ok(link('f:apps/web/src/lib/format.ts','f:apps/web/src/lib/api.ts'));
  // Evidence points at a file and a line.
- const dep=link('c:apps/web','c:apps/api')!.evidence[0];assert.equal(dep.file,'docker-compose.yml');assert.ok(dep.line>1);
- const s3=link('c:apps/api','x:s3')!.evidence[0];assert.equal(s3.file,'apps/api/package.json');
+ const dep=link('c:apps/web','c:apps/api')!.evidence[0];assert.notEqual(dep.kind,'selection-metadata');if(dep.kind==='selection-metadata')throw new Error('Compose dependency must be source-backed');assert.equal(dep.file,'docker-compose.yml');assert.ok(dep.line>1);
+ const s3=link('c:apps/api','x:s3')!.evidence[0];assert.notEqual(s3.kind,'selection-metadata');if(s3.kind==='selection-metadata')throw new Error('Package dependency must be source-backed');assert.equal(s3.file,'apps/api/package.json');
  assert.ok(readFileSync(join(ROOT,s3.file),'utf8').split('\n')[s3.line-1].includes('@aws-sdk/client-s3'));
 });
 
@@ -73,8 +73,8 @@ test('scan document: macro → medium → mini → files drilldown, data lineage
  assert.ok(d.nodes.some(n=>n.label==='lib'&&n.childViewId?.startsWith('files-')),'a module drills into its files');
  assert.ok(view('data-lineage').nodeIds.length>=8);assert.ok(view('infrastructure-aws'));
  assert.equal(node('data-model').childViewId,'data-lineage');
- // Every node has a source-derived evidence table; confidence is a tag and is spelled out on non-confirmed edge labels.
- for(const n of d.nodes){const b=d.blocks.find(b=>n.blockIds.includes(b.id));assert.ok(b&&b.type==='table'&&b.provenance==='source-derived',`${n.id} has evidence`);assert.ok(['confirmed','inferred','possible'].includes(n.tags[0]));}
+ // Source tables and selected-directory metadata stay distinct. Confidence is a tag.
+ for(const n of d.nodes){const b=d.blocks.find(b=>n.blockIds.includes(b.id));assert.ok(b&&b.type==='table'&&['source-derived','reference'].includes(b.provenance),`${n.id} has evidence`);if(b.provenance==='reference'){assert(b.title.includes('no source line'));assert(!b.columns.includes('Line'));}assert.ok(['confirmed','inferred','possible'].includes(n.tags[0]));}
  assert.ok(d.edges.some(e=>/\(inferred\)$/.test(e.label)));assert.ok(d.edges.some(e=>/\(possible\)$/.test(e.label)&&e.kind==='dependency'));
  // Scans are planned/designed information: no observations, and all content is reachable in public exports.
  assert.equal(d.observations.length,0);

@@ -41,3 +41,8 @@ test('gallery buckets and marks',()=>{
  assert.deepEqual(samples.filter(s=>galleryBucket(s)==='cloud').map(s=>s.id),['fabric-medallion','databricks-reference',...gallery.map(p=>p.id),'contoso-forecasting']);
  assert.equal(galleryCaption(gallery[0]),'Cloud architecture · AWS');
 });
+
+
+test('generated cookbook is a separate synthetic recipe gallery rather than vendor cloud references',()=>{
+ const recipes=samples.filter(p=>galleryBucket(p)==='recipes');assert.equal(recipes.length,5);assert.ok(recipes.every(p=>p.tags.includes('Cookbook')&&p.blocks.every(b=>b.provenance==='synthetic')&&p.observations.length===0));assert.ok(recipes.every(p=>galleryCaption(p)==='Synthetic reference recipe'));assert.ok(recipes.some(p=>p.tags.includes('documents')));
+});

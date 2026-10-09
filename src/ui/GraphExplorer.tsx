@@ -2,27 +2,25 @@ import {useMemo,useState} from 'react';
 import type {Project} from '../core/model';
 import {compareGraphGenerations,graphEvidenceChain,graphRows,readGraphHistory,graphTombstonePatch,type GraphFilter} from '../intelligence/graphSnapshot';
 import {download} from '../export/browser';
+import {GraphFilters} from './GraphFilters';
 
 /** The offline inspector queries imported, private facts only. Portfolio receives
  * publicDocument, which has no generation receipt, so no hidden names/counts. */
-export function GraphExplorer({project,onOpen}:{project:Project;onOpen:(view:string,node?:string)=>void}){
- const [filter,setFilter]=useState<GraphFilter>({}),[selected,setSelected]=useState<string>(),[page,setPage]=useState(0);
+export function GraphExplorer({project,onOpen,filter:sharedFilter,onFilter}:{project:Project;onOpen:(view:string,node?:string)=>void;filter?:GraphFilter;onFilter?:(filter:GraphFilter)=>void}){
+ const [localFilter,setFilter]=useState<GraphFilter>({}),[selected,setSelected]=useState<string>(),[page,setPage]=useState(0);
+ const filter=sharedFilter??localFilter;
+ const updateFilter=(next:GraphFilter)=>{setFilter(next);onFilter?.(next);setPage(0);};
  const history=useMemo(()=>readGraphHistory(project),[project]);
  const rows=useMemo(()=>graphRows(project,filter),[project,filter]);
  const chain=useMemo(()=>selected?graphEvidenceChain(project,selected):null,[project,selected]);
  const latest=history.at(-1);if(!latest)return null;
- const set=(key:keyof GraphFilter,value:string)=>{setFilter(f=>({...f,[key]:value||undefined}));setPage(0);};
- const choices={organization:[...new Set(latest.nodes.map(n=>n.organization))],
-  project:latest.nodes.filter(n=>n.kind==='project').map(n=>n.externalId),
-  family:[...new Set(latest.assertions.map(a=>a.family))],state:[...new Set(latest.nodes.map(n=>n.state))],
-  origin:[...new Set(latest.assertions.map(a=>a.origin))]};
  const label=(id:string)=>project.nodes.find(n=>n.id===id)?.label??id;
  const open=(id:string)=>{const view=project.views.find(v=>v.id!=='graph-root'&&v.nodeIds.includes(id));if(view)onOpen(view.id,id);};
  const delta=history.length>1?compareGraphGenerations(history.at(-2)!,latest):null;
  return <section className="project-overview graph-explorer" data-testid="graph-explorer"><span className="pi-eyebrow">Private offline snapshot · {latest.synthetic?'Synthetic':'Source-provided'}</span><h2>Graph explorer</h2>
   <p>Generation {latest.generationId} · captured {latest.capturedAt} · {latest.complete?'Complete declared scope':'Partial declared scope'}. No live activity or runtime verification is inferred.</p>
-  <div className="pi-controls"><label>Search imported facts <input aria-label="Graph search" value={filter.search??''} onChange={e=>set('search',e.target.value)}/></label>
-   {(Object.keys(choices) as (keyof typeof choices)[]).map(key=><label key={key}>{key}<select aria-label={'Graph '+key} value={filter[key]??''} onChange={e=>set(key,e.target.value)}><option value="">All imported {key}</option>{choices[key].map(v=><option key={v} value={v}>{v}</option>)}</select></label>)}</div>
+  <GraphFilters project={project} filter={filter} onChange={updateFilter}/>
+  <p>These filters also apply to the imported canvas. Authored cards and parent navigation remain available.</p>
   <details><summary>Perspectives and scope limits</summary><div className="pi-controls">{project.views.filter(v=>v.id.startsWith('graph-view-')).map(v=><button key={v.id} onClick={()=>onOpen(v.id)}>{v.title}</button>)}</div><p>Project membership uses explicit groups or parent IDs. A scope selector does not grant access. Imported source paths are inert references.</p><ul>{latest.omitted.map((o,i)=><li key={i}>{o.reason}</li>)}</ul></details>
   <p role="status">{rows.nodes.length} matching components · {rows.assertions.length} matching assertions. Table pages contain at most 50 rows.</p>
   <div className="graph-table-scroll"><table><caption>Imported facts with source-declared states</caption><thead><tr><th>Component</th><th>Kind</th><th>Declared state</th><th>Organization</th><th>Sources</th><th>Actions</th></tr></thead><tbody>{rows.nodes.slice(page*50,(page+1)*50).map(n=><tr key={n.localId}><td><button className="pi-text-button" onClick={()=>setSelected(n.localId)}>{label(n.localId)}</button></td><td>{n.kind}</td><td>{n.state}</td><td>{n.organization}</td><td>{n.sourceIds.filter(id=>project.sources.some(s=>s.id===id)).length}</td><td><button onClick={()=>open(n.localId)}>Open diagram</button></td></tr>)}</tbody></table></div>
