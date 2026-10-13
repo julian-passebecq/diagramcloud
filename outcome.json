@@ -4,9 +4,19 @@
   "sourceBranch": "codex/full-product-campaign-20261009",
   "basedOn": "091947452683102849eb225d67ef870fc6e2f1d0",
   "shippedBaseline": "309099ef8b4fcaa8e6f836f2b40a39b148b5a6c1",
-  "merged": false,
-  "deployed": false,
+  "merged": true,
+  "deployed": true,
   "ownerVerified": false,
+  "release": {
+    "version": "1.25.0",
+    "recordedAt": "2026-10-14",
+    "pullRequest": "https://github.com/julian-passebecq/diagramcloud/pull/59",
+    "mergeCommit": "f230ae0f234092ddeaaf6b5925f56568d425bf83",
+    "ci": "https://github.com/julian-passebecq/diagramcloud/actions/runs/38449161237",
+    "deployment": "Vercel Production from main, deployed and kept with the owner's agreement",
+    "package": "STAGED locally (READY.json sha256 0b51916ec6a0c782c2f950d26b077a09b4de508fe68321247c08d88f779e394a); no approved private destination yet",
+    "tag": "none"
+  },
   "scopeRule": "Statuses describe code against original feature scope, not release certification. Horizons guide the sole roadmap in docs/ROADMAP.md. Exact packaged source SHA/checks are generated in delivery-receipt.json and READY.json.",
   "catalogue": "docs/product/FEATURES_PREPRO_20261008.csv",
   "dg": [
