@@ -1,5 +1,5 @@
 /** Data-only GraphSnapshot -> existing Project candidate. No new persistent graph.
- * Spec: galaxy-prompt-spec@92d256f, datapass.graph/1.
+ * Spec: datapass.graph/1 (owner-held external specification).
  * File import is user-selected, inert and PRIVATE. Nothing here grants scope or observation review.
  */
 import {z} from 'zod';
