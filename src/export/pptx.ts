@@ -5,6 +5,8 @@ import {wrapLines,caption} from './text';
 import {NODE_PAD,SCENE_FONT,buildScene,type SceneText} from './scene';
 import {textWidth} from './measure';
 import {noIcons,type IconData} from './iconData';
+import {rasterDimensions} from './rasterDimensions';
+import {assetFidelity} from './assetFidelity';
 import type {IconEntry} from '../core/icons';
 import {TRANSFORM_LABEL} from '../core/transform';
 import {CLAIM_LABEL,REALIZATION_EXPORT_NOTE,day,observationLine,presentedObservations} from '../core/realization';
@@ -59,13 +61,16 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
    const route=e.points.map(q=>({x:X(q.x),y:Y(q.y)}));
    for(let i=1;i<route.length;i++){const a=route[i-1],z=route[i];if(Math.abs(a.x-z.x)+Math.abs(a.y-z.y)<.0001)continue;slide.addShape(shape.line,{x:Math.min(a.x,z.x),y:Math.min(a.y,z.y),w:Math.max(.001,Math.abs(z.x-a.x)),h:Math.max(.001,Math.abs(z.y-a.y)),flipH:a.x>z.x,flipV:a.y>z.y,line:{color:'8FA2BA',width:1.5,beginArrowType:'none',endArrowType:i===route.length-1?'triangle':'none',dashType:e.dashed?'dash':'solid'}});}
   }
-  const embedded:IconEntry[]=[];
+  const embedded:IconEntry[]=[],unavailableCustom=new Set<string>();
   for(const n of scene.nodes){
    const screen=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined,x=X(n.x),y=Y(n.y),w=n.w*scale,h=n.h*scale;
    slide.addShape(shape.roundRect,{x,y,w,h,rectRadius:12*scale,line:{color:screen?'7FB3DF':'CBD5E1',width:1},fill:{color:'FFFFFF'}});
    slide.addShape(shape.roundRect,{x,y:Y(n.y+12),w:4*scale,h:28*scale,rectRadius:2*scale,line:{color:'2563EB',width:0},fill:{color:'2563EB'}});
    const data=n.icon?icons(n.icon.entry):undefined;
-   if(n.icon&&data){slide.addImage({data,x:X(n.icon.x),y:Y(n.icon.y),w:n.icon.size*scale,h:n.icon.size*scale,altText:`${n.icon.entry.label} (${n.icon.entry.vendor} artwork)`});if(!embedded.includes(n.icon.entry))embedded.push(n.icon.entry);}
+   let artwork=false;
+   if(n.customIcon){try{const c=n.customIcon,intrinsic=rasterDimensions(c.asset.data),side=c.size*scale,ratio=intrinsic.width/intrinsic.height,w=Math.min(side,side*ratio),h=w/ratio;slide.addImage({data:c.asset.data,x:X(c.x)+(side-w)/2,y:Y(c.y)+(side-h)/2,w,h,altText:c.asset.name+' · '+c.asset.rights});artwork=true;}catch{unavailableCustom.add(n.id);}}
+   else if(n.icon&&data){slide.addImage({data,x:X(n.icon.x),y:Y(n.icon.y),w:n.icon.size*scale,h:n.icon.size*scale,altText:`${n.icon.entry.label} (${n.icon.entry.vendor} artwork)`});if(!embedded.includes(n.icon.entry))embedded.push(n.icon.entry);artwork=true;}
+   if(!artwork&&n.genericIcon){const g=n.genericIcon,u=g.size*scale/24;for(const p of g.glyph.primitives){const common={line:{color:'52647A',width:.8},fill:{color:'FFFFFF',transparency:100}};if(p.type==='line')slide.addShape(shape.line,{...common,x:X(g.x)+Math.min(p.x1,p.x2)*u,y:Y(g.y)+Math.min(p.y1,p.y2)*u,w:Math.max(.001,Math.abs(p.x2-p.x1)*u),h:Math.max(.001,Math.abs(p.y2-p.y1)*u),flipH:p.x1>p.x2,flipV:p.y1>p.y2});else if(p.type==='rect')slide.addShape(shape.rect,{...common,x:X(g.x)+p.x*u,y:Y(g.y)+p.y*u,w:p.w*u,h:p.h*u});else slide.addShape(shape.ellipse,{...common,x:X(g.x)+(p.cx-p.rx)*u,y:Y(g.y)+(p.cy-p.ry)*u,w:2*p.rx*u,h:2*p.ry*u});}}
    put(n.provider);
    // The box title opens the deeper view; without one it opens the task screen. The SCREEN link, on the footer row, always opens the screen.
    const screenLink=screen?{slide:screen.slide,tooltip:`Task screen: ${caption(screen.title,80,1)}`}:undefined;
@@ -79,7 +84,8 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
   const credit=iconCredit(embedded),badges=scene.nodes.filter(n=>n.realization);
   if(credit)slide.addText(credit,{x:.6,y:6.92,w:12.1,h:.18,fontSize:8,color:'6F8197',margin:0});
   if(badges.length)slide.addText(REALIZATION_EXPORT_NOTE,{x:.6,y:credit?6.72:6.92,w:12.1,h:.18,fontSize:8,color:'6F8197',margin:0});
-  slide.addNotes(notes([v.title,v.description,...(credit?[credit]:[]),...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>{const sc=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined;const obs=presentedObservations(d).filter(o=>o.nodeId===n.id);return `${n.label}\n${n.summary}\n${n.role}${sc?`\nTask screen: ${sc.title} (slide ${sc.slide})`:''}${obs.length?`\n[Realization]\n${obs.map(o=>observationLine(o,n.label)).join('\n')}`:''}`;}),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));
+  const fidelity=assetFidelity(d,v.id,'powerpoint',icons);for(const entry of fidelity.entries)if(unavailableCustom.has(entry.nodeId)){entry.rendered='semantic-symbol';entry.reason='Custom raster could not be embedded; original semantic glyph used. Author asset and reference retained.';}
+  slide.addNotes(notes([v.title,v.description,...(credit?[credit]:[]),JSON.stringify(fidelity),...scene.nodes.flatMap(n=>n.customIcon&&!unavailableCustom.has(n.id)?[`Custom artwork: ${n.customIcon.asset.name}. Rights: ${n.customIcon.asset.rights}. Contained without cropping or distortion.`]:[]),...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>{const sc=n.experienceWorkspaceId?parts.screens?.get(n.experienceWorkspaceId):undefined;const obs=presentedObservations(d).filter(o=>o.nodeId===n.id);return `${n.label}\n${n.summary}\n${n.role}${sc?`\nTask screen: ${sc.title} (slide ${sc.slide})`:''}${obs.length?`\n[Realization]\n${obs.map(o=>observationLine(o,n.label)).join('\n')}`:''}`;}),...d.story.filter(s=>s.viewId===v.id).map(s=>`${s.title}: ${s.narration}`)]));
  }
  for(const b of blocks){
   const subtitle=d.nodes.filter(n=>n.blockIds.includes(b.id)).map(n=>n.label).join(' / ')+` | ${b.provenance}`+(b.transform?` | ${TRANSFORM_LABEL[b.transform]} (explanatory, not executed)`:'');

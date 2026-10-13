@@ -3,7 +3,7 @@ import type {IconEntry} from '../core/icons';
 /**
  * Exports are standalone files, so a registered vendor icon is embedded as a data URI of its exact, unmodified
  * file. The caller supplies the bytes: the browser fetches them from the app, the build and tests read public/.
- * Without a provider an export simply leaves the icon slot empty.
+ * Without a provider an export uses the original semantic glyph for that component.
  */
 export type IconData=(entry:IconEntry)=>string|undefined;
 export const noIcons:IconData=()=>undefined;
@@ -20,6 +20,6 @@ export function iconDataFrom(map:Map<string,string>):IconData{return e=>map.get(
 /** Browser: fetch each registered vendor file once from the app's own origin. */
 export async function loadBrowserIcons(entries:IconEntry[],base:string):Promise<IconData>{
  const map=new Map<string,string>();
- for(const e of entries){if(!e.file||map.has(e.id))continue;try{const r=await fetch(base+e.file);if(r.ok)map.set(e.id,iconDataUri(e.file,new Uint8Array(await r.arrayBuffer())));}catch{/* The export still works; the slot stays empty. */}}
+ for(const e of entries){if(!e.file||map.has(e.id))continue;try{const r=await fetch(base+e.file);if(r.ok)map.set(e.id,iconDataUri(e.file,new Uint8Array(await r.arrayBuffer())));}catch{/* The export uses the original semantic glyph. */}}
  return iconDataFrom(map);
 }

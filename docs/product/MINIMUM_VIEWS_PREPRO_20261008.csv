@@ -1,0 +1,34 @@
+recipe,scope,view,condition,content,preferred_render,requirement
+repo-baseline,single-repo,Repository Overview,always,Repo identity/revision + tech + external deps + build/deploy signals + provenance,classic,required
+repo-baseline,single-repo,Structure Map,always,"Containers if known, else modules/directories, bounded file drilldown",classic/tree,required
+repo-baseline,single-repo,Relations / Flow,if any confident edges; otherwise explicit no-relation inventory,Dependency/data/deployment relation most informative for capability fingerprint,classic,required
+repo-baseline,single-repo,Evidence & Gaps,always,"Analyzers, evidence/confidence counts, unsupported/missing/ambiguous/stale",business/classic,required
+multi-repo,project,Project Map,always,Repository roles + declared/strong static cross-repo relationships,classic/editorial,required
+multi-repo,project,Cross-repo Contracts,when relations exist,Only boundary-crossing relations with origin/confidence,classic,required-conditional
+multi-repo,project,Capability Map,always,Which repos supply UI/API/data/infra/docs/etc,business/classic,required
+multi-repo,project,Repository Drilldown,always,Baseline views for each scanned repo,mixed,required
+multi-repo,project,Project Evidence & Gaps,always,"Unscanned/stale repos, unresolved relations, missing context",business/classic,required
+multi-repo,project,Ownership,if ProjectBrief ownership exists,Teams/people -> project scope/components,business/org,optional
+collection,multi-project,Portfolio Map,always,Projects and declared inter-project relationships only,business/editorial,required
+collection,multi-project,Project Summary Cards,always,Purpose/capability/evidence/staleness summary,business,required
+collection,multi-project,Project Drilldown,always,Enter independent project model,navigation,required
+data-pipeline,conditional,Data Lineage,data assets + relations,Source -> transform/job -> dataset -> consumer,lineage,recommended
+data-pipeline,conditional,Orchestration / DAG,jobs/tasks discovered,Job/task dependencies and source refs,classic,recommended
+bi-analytics,conditional,Semantic Model -> Reports,model/report artifacts,Tables/relationships/measures bounded -> reports/pages,classic/editorial,recommended
+fabric,conditional,Fabric Item Map,.platform/item definitions,Workspace Git items and source-control identity,classic,recommended
+databricks,conditional,Bundle Resource Map,databricks.yml,Jobs/pipelines/notebooks/resources/targets,classic,recommended
+cloud-iac,conditional,Infrastructure,IaC resources found,Provider/resource dependency zones,classic/blueprint,recommended
+docs-knowledge,conditional,Knowledge Map,documents/CSV records,Folders/docs/data sources and explicit refs,classic,recommended
+docs-knowledge,conditional,Provenance Map,source IDs/URLs,Records -> source records/URLs,classic,recommended
+audit,purpose,Evidence Matrix,always for audit purpose,Declared/static/observed/verified status by component/relation,matrix/business,recommended
+portfolio,purpose,Project Overview,ProjectBrief preferred,"Purpose, architecture, contribution/outcome/evidence",business,recommended
+presentation,purpose,How It Works,path/story available,3-6 semantic steps with business + technical captions,business,recommended
+work-review,purpose,Work / Verification Brief,change/receipt context,"Changed, impacted, verified, unknown, next gate",business,recommended
+environment-scope,environment,Environment Matrix,when custom environment facts exist,"Declared/observed/unknown deployment per logical component, source ref",classic/business,conditional-not-global
+environment-scope,environment,Promotion Flow,when source-backed promotion stages/gates exist,Version/build/release movement; declared gates distinct from observed outcomes,classic/editorial,optional
+environment-scope,environment,Environment Delta,when two comparable env snapshots exist,Target vs observed or stage vs prod with timestamps,classic/business,conditional
+evolution-scope,project-or-repo,Evolution Delta,when two comparable snapshots exist,Added/removed/moved/superseded with evidence,classic/editorial,conditional
+evolution-scope,project-or-repo,Verification Evolution,when dated tested/observed receipts exist,Confidence/evidence transitions,classic/business,optional
+project-brief,guided,Project Tree,when human scope hierarchy is supplied,Org/project/workstream/task without fabricated Git nodes,classic/business,conditional
+app-portfolio,project,Work Brief,when work evidence or task contribution exists,Changes contributions tests unknowns and next actions,business,optional
+migration,project,Current-Transition-Target,when source-backed intended transition exists,"Old/coexist/new components, cutover and rollback declared vs observed",classic/editorial,conditional

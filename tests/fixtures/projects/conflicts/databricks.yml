@@ -1,0 +1,11 @@
+bundle:
+  name: synthetic
+include:
+  - missing/*.yml
+resources:
+  jobs:
+    job:
+      tasks:
+        - task_key: start
+          depends_on:
+            - task_key: unavailable

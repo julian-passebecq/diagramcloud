@@ -1,0 +1,47 @@
+id,render,kind,state,profiles,purposes,required_semantics,guardrail,priority
+R001,System Context,projection+layout,SHIPPED,classic/editorial,"engineering,education,presentation",systems/external relations,No invented externals,P0
+R002,Architecture,layout,SHIPPED,classic/editorial,"engineering,presentation",components+relations,Complexity budget,P0
+R003,Layers,layout,SHIPPED,editorial,"architecture,education",layer metadata/grouping,Use only meaningful layers,P1
+R004,Exploded Stack,layout,SHIPPED,editorial,"education,presentation",layer order,Pseudo-3D only,P1
+R005,Tree,layout,SHIPPED,classic/editorial,"structure,education",hierarchy,Avoid giant trees,P0
+R006,Swimlane,layout,SHIPPED,editorial/classic,"ownership,process",lanes + ordered steps,Needs lane semantics,P1
+R007,Sequence,layout,SHIPPED,editorial/classic,request/process,ordered messages,Illustrative vs observed,P1
+R008,Timeline,layout,SHIPPED,editorial,"story,history",dated/ordered events,Dates need evidence,P1
+R009,Chart,quantitative,SHIPPED,editorial/business,metrics,structured numeric table,No invented metrics,P2
+R010,Deployment,projection+layout,SHIPPED,classic/editorial,"cloud,engineering",deployment entities/relations,Static config != running state,P0
+R011,Evidence Matrix,projection,SHIPPED,classic/business,audit,entities x evidence state,No fake percentage,P0
+R012,Treemap,quantitative,SHIPPED,editorial,composition,values,Area semantics must validate,P2
+R013,Hub,layout,SHIPPED,editorial,integration,central relation set,Avoid overuse,P2
+R014,Heatmap,quantitative,SHIPPED,editorial/business,status/metrics,matrix values,Scale/legend required,P2
+R015,Line,quantitative,SHIPPED,editorial/business,trend,ordered numeric series,Units/time required,P2
+R016,Status,projection,SHIPPED,editorial/business,audit/work,explicit status,Source status semantics,P1
+R017,Lineage,projection+layout,SHIPPED,classic/editorial,data,data assets/flows,Basis shown,P0
+R018,Radial Reach,projection+layout,SHIPPED,editorial,impact,graph neighborhood,Depth bounded,P1
+R019,Atlas Revisions,projection,SHIPPED,editorial/classic,multi-repo/history,repo revision vector,No single project SHA,P1
+R020,Sankey,quantitative flow,SHIPPED,editorial,data/flow,edge quantities,Conservation semantics when applicable,P2
+R021,Architecture Delta,comparison,SHIPPED,editorial/business,change,two comparable versions,Stable identity required,P0
+R022,Blueprint,visual profile,SHIPPED,blueprint,engineering/print,existing scene,"Style only, same facts",P0
+R023,Project Overview,business sheet,NEW_1_24,business,"portfolio,meeting",ProjectBrief+bounded architecture,Gaps visible,P0
+R024,How It Works,business sheet,NEW_1_24,business,"education,portfolio,meeting",3-6 semantic steps,No fabricated steps,P0
+R025,Work Verification Brief,business sheet,NEW_1_24,business,"work,audit",change/evidence/receipts,Unknown explicit,P1
+R026,Ownership Sheet,business/org,NEW_AFTER_CONTEXT,business/classic,"project,meeting",team/person ownership,Requires declared/reviewed ownership,P1
+R027,Dependency Graph,projection/layout,CANDIDATE_1_25,classic/editorial,"engineering,impact",dependency relations,Crossings/complexity budget,P1
+R028,DB Schema / ER,projection/layout,CANDIDATE_1_25,classic/editorial,"data,bi",tables/fields/relations,Structured schema required,P1
+R029,Medallion,semantic layout,CANDIDATE_1_25,editorial/isosvg,lakehouse,layer/stage semantics,Do not infer Bronze/Silver/Gold from colors,P1
+R030,Process / Flowchart,layout,CANDIDATE_1_25,classic/editorial,business/process,ordered/branched process,Decision semantics explicit,P1
+R031,State,layout,CANDIDATE_1_25,classic/editorial,software/process,states/transitions,Needs state semantics,P2
+R032,IsoSVG Layer Stack,visual profile,EXPERIMENT_1_25,isosvg,architecture/lakehouse,real layer dimension,No decorative 3D,P1
+R033,IsoSVG Git/Worktree,visual profile,EXPERIMENT_1_25,isosvg,git/work,branch/worktree/revision dimension,No fake topology,P2
+R034,Trace Scenario,motion profile,EXPERIMENT_1_25,trace,"education,debug,presentation",ordered scenario,Illustrative/observed label mandatory,P1
+R035,Mosaic Spatial,external renderer,SHIPPED_BRIDGE,mosaic,spatial/3d,ConceptSpec,External product owns Three.js,P2
+R036,Project Evolution,temporal projection,PROPOSED_1_25,classic/business/editorial,"audit,work,project",two comparable source-backed snapshots,Never conflate absent scan data with removed node,P1
+R037,Repository Evolution,git temporal projection,PROPOSED_1_25,classic/editorial,"engineering,education",repo revisions and identity mapping,Git history changes not equal deployed runtime,P1
+R038,Verification Evolution,evidence temporal matrix,PROPOSED_1_26,business/classic,"audit,work",dated receipts/claims,Tested status exact SHA only,P1
+R039,Environment Matrix,environment × component,PROPOSED_1_24x,classic/business,"engineering,audit",environment refs and component membership,No green prod status from static files,P1
+R040,Promotion / Release Flow,temporal deployment graph,PROPOSED_1_25,classic/editorial,"engineering,work",artifact release deployment relation,Branch is not release or deployment,P1
+R041,Environment Delta,comparison matrix,PROPOSED_1_26,classic/business,"audit,work",comparable snapshots/observed scopes,No false drift from stale results,P1
+R042,Migration Map,current-transition-target,PROPOSED_1_25,classic/editorial/business,"engineering,presentation",declared or evidenced state transitions,Planned target not implemented claim,P1
+R043,Knowledge / Decision Evolution,document/source delta,PROPOSED_1_25,classic/editorial,"project,audit",document versions and reviewed links,Notes not proof of operational change,P2
+R044,Source-to-Project Crosswalk,two-tree mapping,PROPOSED_1_24x,classic,"engineering,project",logical scope mapped to physical repo files,No ungrounded mapping,P1
+R045,Config / Flag Delta,environment config matrix,PROPOSED_1_26,classic,"audit,work",nonsecret configuration keys/status,Never show credentials,P2
+R046,Pattern Candidate Gallery,bounded patterns/examples,PROPOSED_1_25,editorial/business/classic,"education,presentation",candidate vs supported source-backed pattern,Must display candidate/illustrative status,P2

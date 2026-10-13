@@ -1,6 +1,7 @@
 import {DESIGN_TYPES,type DesignType,type Project} from '../../core/model';
 import {designContext} from './context';
 import {chartableTable} from './chart';
+import {waterfallTable} from './waterfall';
 import {flowRanks} from './flow';
 import {layersOf} from './layers';
 import {contextRoles} from './systemContext';
@@ -32,6 +33,7 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
  const repos=doc.atlas?.snapshots.find(x=>x.id===doc.atlas!.activeSnapshotId)?.repositories.length??0;
  const layers=layersOf(spec.nodes).length,count=spec.nodes.length,empty=!count;
  const numeric=table?.series.length??0,rows=table?.block.rows.length??0,on=table?` on ${owner??'a component'}`:'',noTable='no numeric table evidence on this view';
+ const waterfall=waterfallTable(c);
  const r:Record<FigureType,[number,string]>={
   architecture:[empty?10:50,empty?'no public components in this view':`a sound default for ${n(count,'component')} and ${n(edges.length,'connection')}`],
   layers:layers>=3?[55,`${layers} layers of component kinds`]:[layers===2?30:12,layers===2?'only 2 layers of component kinds':'fewer than 2 layers of component kinds'],
@@ -42,6 +44,7 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
   sequence:edges.length>=2&&edges.length<=18&&count<=10?[48,`${n(edges.length,'connection')} between ${n(count,'component')} (order from connections, not timing)`]:[edges.length>18||count>10?20:8,edges.length>18||count>10?'too many connections or components for a sequence':'fewer than 2 connections'],
   timeline:steps.length?[here?62:50,`${n(steps.length,'public story step')}${here?`, ${here} on this view`:''}`]:[5,'no public story steps'],
   chart:table?[90,`a numeric table${on}`]:[3,noTable],
+  waterfall:waterfall?[waterfall.incrementLabel?84:26,waterfall.incrementLabel?`supplied signed increments in ${waterfall.block.columns[waterfall.column]}; sums are derived in table order, not observed or causal totals`:`numeric evidence can be interpreted as increments by a reviewed choice; the source does not explicitly label deltas`]:[3,noTable],
   line:table?[rows>=3?82:68,`a numeric table${on} with ${n(rows,'row')}`]:[3,noTable],
   heatmap:table?[numeric>=2?78:60,`a numeric table${on} with ${n(numeric,'numeric column')}`]:[3,noTable],
   deployment:shared>=2?[Math.min(80,58+shared*4),`${shared} providers each running 2 or more components`]:providers.length>=2?[40,`${providers.length} providers, mostly one component each`]:[providers.length?18:10,providers.length?'only 1 provider in this view':'no named provider in this view'],

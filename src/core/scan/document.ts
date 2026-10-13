@@ -1,6 +1,6 @@
 import {documentSchema,validateDocument,type Perspective,type Project,type ProjectEdge} from '../model';
 import {layeredPositions,slug,type ImportResult} from '../interchange/graph';
-import type {Confidence,ScanItem,ScanLink,ScanModel} from './scanner';
+import type {Confidence,Evidence,ScanItem,ScanLink,ScanModel} from './scanner';
 
 /**
  * A scan becomes one project with levels of detail as drilldown views:
@@ -9,7 +9,8 @@ import type {Confidence,ScanItem,ScanLink,ScanModel} from './scanner';
  *  - Containers (medium): deployable units (packages, compose services, Kubernetes workloads), their datastores,
  *    links between them, and a data model card;
  *  - Components (mini): the modules inside each container and their imports; plus Data lineage and Infrastructure views.
- * Every node carries a source-derived evidence table (file, line, finding, confidence). Scans are Planned/designed
+ * Source nodes carry source-derived evidence tables; selection metadata has its
+ * own reference table with no invented file/line. Scans are Planned/designed
  * information about code, never Observed/verified claims, and they are never marked reviewed.
  */
 export const SCAN_LIMITS={nodes:480,edges:1400,views:78,componentViews:20,fileViews:30,filesPerView:40,perView:120};
@@ -27,7 +28,7 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
  const commit=model.commit?model.commit.slice(0,12):undefined;
  const doc:Project=documentSchema.parse({schemaVersion:1,id:docId,title:clip(`${model.name} architecture (scanned)`,160),category:'Blank',tags:['Scanned','Repository'],rootViewId:'overview',
   summary:clip(`Generated from the ${model.name} repository${model.branch?` (${model.branch}${commit?` @ ${commit}`:''})`:commit?` @ ${commit}`:''}: system context, containers, components, data lineage and infrastructure. Confirmed links are declared in the code or configuration; inferred and possible links are hints to review.`,3000),
-  provenance:clip(`Repository scan of ${options.fileName??model.name}${model.branch?` on branch ${model.branch}`:''}${commit?` at commit ${commit}`:''}, ${now.toISOString().slice(0,10)}. Deterministic: manifests, Dockerfiles, docker-compose, Kubernetes, Terraform, GitHub Actions, SQL/dbt/Prisma and import statements; nothing executed, secret files never read, environment values never copied. Each component lists the file and line it comes from.`,3000),
+  provenance:clip(`Repository scan of ${options.fileName??model.name}${model.branch?` on branch ${model.branch}`:''}${commit?` at commit ${commit}`:''}, ${now.toISOString().slice(0,10)}. Deterministic: manifests, Dockerfiles, docker-compose, Kubernetes, Terraform, GitHub Actions, SQL/dbt/Prisma and import statements; nothing executed, secret files never read, environment values never copied. Source findings list actual file and line; selected directory groups carry separate metadata with no invented source line.`,3000),
   nodes:[],edges:[],views:[{id:'overview',title:'System context'}]});
  const nodeOf=new Map<string,string>();
  const addNode=(it:ScanItem,childViewId?:string)=>{
@@ -38,10 +39,12 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
   return id;
  };
  const rows=new Map<string,(string|number)[][]>();
+ const metadataRows=new Map<string,(string|number)[][]>();
  const evidenceRow=(key:string,row:(string|number)[])=>{const r=rows.get(key)??rows.set(key,[]).get(key)!;if(r.length<60)r.push(row);};
- for(const it of items)for(const e of it.evidence)evidenceRow(it.key,[e.file,e.line,clip(e.finding,300),e.confidence]);
- for(const l of model.links)for(const e of l.evidence.slice(0,8))evidenceRow(l.from,[e.file,e.line,clip(`→ ${model.items.get(l.to)?.label??l.to}: ${e.finding}`,300),e.confidence]);
- for(const l of model.links)for(const e of l.evidence.slice(0,4))evidenceRow(l.to,[e.file,e.line,clip(`← ${model.items.get(l.from)?.label??l.from}: ${e.finding}`,300),e.confidence]);
+ const recordEvidence=(key:string,e:Evidence,finding=e.finding)=>{if(e.kind==='selection-metadata'){const r=metadataRows.get(key)??metadataRows.set(key,[]).get(key)!;if(r.length<60)r.push([e.path,clip(finding,300),e.confidence]);}else evidenceRow(key,[e.file,e.line,clip(finding,300),e.confidence]);};
+ for(const it of items)for(const e of it.evidence)recordEvidence(it.key,e);
+ for(const l of model.links)for(const e of l.evidence.slice(0,8))recordEvidence(l.from,e,`→ ${model.items.get(l.to)?.label??l.to}: ${e.finding}`);
+ for(const l of model.links)for(const e of l.evidence.slice(0,4))recordEvidence(l.to,e,`← ${model.items.get(l.from)?.label??l.from}: ${e.finding}`);
  let edgeCount=0;
  const addEdge=(viewId:string,from:string,to:string,label:string,confidence:Confidence,kind:ProjectEdge['kind'],count=1)=>{
   const s=nodeOf.get(from),t=nodeOf.get(to);if(!s||!t||s===t||edgeCount>=L.edges)return undefined;
@@ -59,7 +62,7 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
  const externalsUsed=[...new Set(containerLinks.map(l=>l.to).filter(k=>model.items.get(k)?.layer==='external'))];
  const tables=byLayer('table');
  const dataKey='data:model';
- if(tables.length){model.items.set(dataKey,{key:dataKey,label:'Data model',kind:'table',provider:'Generic',layer:'group',summary:`${tables.length} tables, views or models; ${model.links.filter(l=>l.layer==='data').length} lineage links (SQL, dbt, Prisma)`,confidence:'confirmed',evidence:[]});for(const t of tables.slice(0,40))for(const e of t.evidence.slice(0,1))evidenceRow(dataKey,[e.file,e.line,clip(`${t.label}: ${e.finding}`,300),e.confidence]);}
+ if(tables.length){model.items.set(dataKey,{key:dataKey,label:'Data model',kind:'table',provider:'Generic',layer:'group',summary:`${tables.length} tables, views or models; ${model.links.filter(l=>l.layer==='data').length} lineage links (SQL, dbt, Prisma)`,confidence:'confirmed',evidence:[]});for(const t of tables.slice(0,40))for(const e of t.evidence.slice(0,1))recordEvidence(dataKey,e,`${t.label}: ${e.finding}`);}
  const dbFor=externalsUsed.concat(containers.map(c=>c.key)).find(k=>{const i=model.items.get(k);return i?.kind==='storage'&&(i.tech==='postgresql'||i.tech==='mysql'||i.tech==='sqlserver'||i.tech==='sqlite'||i.tech==='snowflake'||i.tech==='bigquery');});
  views.push({id:'containers',title:'Containers',description:'Deployable units of the repository (packages, compose services, Kubernetes workloads) and the systems they use. Open a container to see its modules.',
   keys:[...containers.map(c=>c.key),...externalsUsed,...(tables.length?[dataKey]:[])],
@@ -90,7 +93,7 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
  for(const p of providers){
   const list=resources.filter(r=>r.provider===p).slice(0,L.perView),vid=`infrastructure-${slug(p,'p')}`.slice(0,80),gk=`group:${p}`;
   model.items.set(gk,{key:gk,label:p==='Generic'?'Terraform modules':`${p} infrastructure`,kind:'control',provider:p,layer:'group',summary:`${list.length} Terraform resource(s) or module(s)`,confidence:'confirmed',evidence:list[0]?.evidence.slice(0,1)??[]});
-  for(const r of list)for(const e of r.evidence.slice(0,1))evidenceRow(gk,[e.file,e.line,clip(`${r.label}: ${e.finding}`,300),e.confidence]);
+  for(const r of list)for(const e of r.evidence.slice(0,1))recordEvidence(gk,e,`${r.label}: ${e.finding}`);
   groupKeys.push(gk);componentViews.set(gk,vid);
   views.push({id:vid,title:`${p==='Generic'?'Terraform modules':`${p} infrastructure`}`,description:'Terraform resources and modules, linked where one references another.',keys:list.map(r=>r.key),links:model.links.filter(l=>l.layer==='resource'&&list.some(r=>r.key===l.from))});
  }
@@ -132,15 +135,19 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
  for(const [key,list] of rows){const nodeId=nodeOf.get(key);if(!nodeId)continue;const id=`ev-${nodeId}`.slice(0,80);
   doc.blocks.push({id,title:'Scan evidence',type:'table',columns:['File','Line','Finding','Confidence'],rows:list,visibility:'public',sourceIds:[],provenance:'source-derived'});
   doc.nodes.find(n=>n.id===nodeId)!.blockIds.push(id);}
+ for(const [key,list] of metadataRows){const nodeId=nodeOf.get(key);if(!nodeId)continue;const id=`meta-${nodeId}`.slice(0,80);doc.blocks.push({id,title:'Selected inventory metadata · no source line or runtime claim',type:'table',columns:['Selected path','Grouping metadata','Confidence'],rows:list,visibility:'public',sourceIds:[],provenance:'reference'});doc.nodes.find(n=>n.id===nodeId)!.blockIds.push(id);}
  doc.story=[
   {title:'System context',viewId:'overview',nodeId:nodeOf.get('system'),narration:`${model.name} and the systems around it, from manifests, configuration and CI.`,highlightEdgeIds:[]},
   ...(doc.views.some(v=>v.id==='containers')?[{title:'Containers',viewId:'containers',narration:'The deployable units and what each one talks to. Dashed or “possible” links are hints from configuration names.',highlightEdgeIds:[]}]:[]),
   ...(doc.views.some(v=>v.id==='data-lineage')?[{title:'Data lineage',viewId:'data-lineage',narration:'How tables, views and models feed each other.',highlightEdgeIds:[]}]:[]),
  ].map(s=>s.nodeId?s:{...s,nodeId:undefined}).map(({nodeId,...s})=>nodeId?{...s,nodeId}:s);
 
- // Perspectives and basis: everything here is read from source or configuration.
+ // Selection-only groups have unknown implementation basis. File-backed nodes
+ // and relationships retain static-source; metadata never becomes a source claim.
  for(const v of doc.views)v.perspective=scanPerspective(v.id);
- for(const n of doc.nodes)n.basis='static-source';for(const e of doc.edges)e.basis='static-source';
+ const keyOfNode=new Map([...nodeOf].map(([key,id])=>[id,key]));
+ for(const n of doc.nodes){const key=keyOfNode.get(n.id)??'';n.basis=metadataRows.has(key)&&!rows.has(key)?'unknown':'static-source';}for(const e of doc.edges)e.basis='static-source';
+ if(model.boundaries?.length||model.partition){const root=doc.nodes.find(n=>n.id===nodeOf.get('system'));if(root){const id='scan-source-inventory';doc.blocks.push({id,title:'Private source inventory and Git boundaries',type:'code',language:'json',code:JSON.stringify({format:'diagramcloud.source-inventory/1',partition:model.partition??null,boundaries:model.boundaries??[],note:'Metadata only. Submodule paths are explicit declarations; generic .git boundaries do not identify worktree/clone type. No gitdir target or nested source read. Generated/vendor absence never means implementation removal.'}),sourceIds:[],provenance:'reference',visibility:'private'});root.blockIds.push(id);}}
  const document=validateDocument(doc);
  const counts=(layer:ScanItem['layer'])=>items.filter(i=>i.layer===layer).length;
  const conf=(c:Confidence)=>model.links.filter(l=>l.confidence===c).length;

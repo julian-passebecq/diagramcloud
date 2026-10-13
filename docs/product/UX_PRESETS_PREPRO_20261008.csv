@@ -1,0 +1,21 @@
+preset_id,name,source,purpose,depth,scope,capability_predicate,recommended_views,visual_profile,AI_default,conditional_filters,status
+PST-01,Unknown Git quick,Auto,Understand,Quick,Repo,any,overview;structure;best-relations-or-unknown;gaps,Classic,Off,none,PROPOSED
+PST-02,Repository onboarding,Auto,Education,Standard,Repo,any,overview;structure;learning path;gaps,Classic,Off,code if available,PROPOSED
+PST-03,Tech lead review,Hybrid,Project,Deep,Project,service OR multi-repo,Project Map;interfaces;dependencies;evidence,Classic,Assist,technical,PROPOSED
+PST-04,Executive presentation,Guided,Presentation,Standard,Project,has brief,Project Overview;How It Works;decision sheet,Business,Assist,public reviewed,PROPOSED
+PST-05,Portfolio,Guided,Portfolio,Standard,Project,experience OR brief,contributions;workspaces;selected evidence,Business,Assist,approved artifacts,PROPOSED
+PST-06,Architecture audit,Hybrid,Audit,Deep,Project,any,project map;source discrepancy;gaps;verification,Classic,Assist,confirmed + conflicts,PROPOSED
+PST-07,BI / Power BI,Auto,Understand,Standard,Project,bi OR semantic model,model-report;data lineage;source relations;gaps,Classic,Off,semantic model if found,PROPOSED
+PST-08,Fabric BI,Auto,Understand,Deep,Project,fabric AND (bi OR data),Fabric item map;semantic model;lineage;environments,Classic,Off,static only by default,PROPOSED
+PST-09,Databricks data engineering,Auto,Understand,Deep,Project,databricks OR lakehouse,job DAG;pipeline;lineage;targets;gaps,Classic,Off,no fake runtime,PROPOSED
+PST-10,dbt warehouse,Auto,Understand,Standard,Repo,dbt,model DAG;tests;exposures;gaps,Classic,Off,prefer manifest.json,PROPOSED
+PST-11,Azure .NET,Auto,Understand,Standard,Repo,dotnet OR azure,project references;API;deployment declared,Classic,Off,adapter availability,PROPOSED
+PST-12,Docs / Galaxy Knowledge-like,Auto,Education,Standard,Repo,docs AND knowledge,document graph;source references;decision links,Classic,Off,do not infer deployment,PROPOSED
+PST-13,Cross-repo project,Hybrid,Project,Deep,Multi-repo,multi-repo,project map;cross-repo contracts;per repo;gaps,Classic,Assist,strong keys only,PROPOSED
+PST-14,Environment audit,Hybrid,Audit,Deep,Environment,environments known,matrix;promotion;drift or unavailable,Classic,Assist,require timestamps for actual,PROPOSED
+PST-15,Project evolution,Hybrid,Work Review,Deep,Project,two snapshots,architecture delta;work evidence;verification delta,Classic,Assist,snapshot comparisons only,PROPOSED
+PST-16,CLI/library release,Auto,Understand,Standard,Repo,library OR cli,modules;dependencies;tests;releases,Classic,Off,prod not required,PROPOSED
+PST-17,Migration planning,Guided,Presentation,Deep,Project,migration planned,current;transition;target;risks,Editorial,Assist,planned explicit,PROPOSED
+PST-18,IsoSVG education,Hybrid,Education,Standard,Component,semantic layers,layers;exploded;detail,IsoSVG,Assist,future 1.25 only,PROPOSED
+PST-19,Work/CI brief,Auto,Work Review,Standard,Component,receipt or PR,work brief;affected map;tests;unknown,Business,Off,exact SHA,PROPOSED
+PST-20,Security boundary question,Hybrid,Audit,Deep,Project,trust boundary evidence,trust map;unknown inventory,Classic,Assist,must not present certification,PROPOSED

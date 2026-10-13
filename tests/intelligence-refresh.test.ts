@@ -6,6 +6,16 @@ import {parseManifest} from '../src/core/atlas/manifest';
 import {scanRepository} from '../src/core/scan/scanner';
 import {previewRepositoryRescan} from '../src/intelligence/refresh';
 import {validateDocument} from '../src/core/model';
+import {repositoryOutputFacts} from '../src/intelligence/recipes';
+
+test('selected repository outputs cannot borrow global or another repository relationships and evidence',()=>{
+ const manifest=parseManifest(readFileSync('tests/fixtures/atlas/shop.manifest.json','utf8')).manifest;
+ const scan=scanRepository([{path:'package.json',text:'{"name":"synthetic","dependencies":{"react":"18"}}'}],{name:'Synthetic'});
+ const d=documentFromAtlas(manifest,{shop:{model:scan}},{}).document,scope=repositoryOutputFacts(d,'shop');
+ assert.ok(scope.nodes.length>0);assert.ok(scope.nodes.every(n=>n.id==='repo-shop'||n.id.startsWith('shop.')));assert.ok(scope.views.every(v=>v.id.startsWith('shop.')));
+ const ids=new Set(scope.nodes.map(n=>n.id));assert.ok(scope.edges.every(e=>ids.has(e.source)&&ids.has(e.target)));assert.deepEqual(repositoryOutputFacts(d,'unlisted'),{nodes:[],edges:[],views:[]});
+ assert.ok(scope.nodes.length<repositoryOutputFacts(d).nodes.length);
+});
 
 test('repository refresh preserves authored presentation and references while refreshing private scan evidence/vector', () => {
   const manifest = parseManifest(readFileSync('tests/fixtures/atlas/shop.manifest.json', 'utf8')).manifest;

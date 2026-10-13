@@ -1,8 +1,10 @@
-import type {Observation,Project,ProjectView} from '../core/model';
+import type {Asset,Observation,Project,ProjectView} from '../core/model';
+import {semanticGlyph,type IconGlyph} from '../core/iconGlyph';
 import {positionFor} from '../core/operations';
 import {iconFor,type IconEntry} from '../core/icons';
 import {CLAIM_BADGE,presentedObservation,realizationOf} from '../core/realization';
 import {measureLines,textWidth} from './measure';
+import {rasterAvailable} from './rasterDimensions';
 export type ScenePoint={x:number;y:number};
 export type SceneBounds={x:number;y:number;width:number;height:number};
 export const NODE_WIDTH=220;
@@ -62,7 +64,7 @@ export type SceneText={lines:string[];x:number;y:number;size:number;lineHeight:n
 export type SceneIcon={entry:IconEntry;x:number;y:number;size:number};
 /** A reviewed, public observation drawn on the footer row: claim badge plus the full provenance as a tooltip/note. */
 export type SceneBadge={claim:Observation['claim'];x:number;y:number;w:number;h:number;fill:string;stroke:string;text:SceneText;title:string};
-export type SceneNode={id:string;x:number;y:number;w:number;h:number;provider:SceneText;label:SceneText;summary:SceneText;footer:SceneText;icon?:SceneIcon;realization?:SceneBadge;childViewId?:string;experienceWorkspaceId?:string};
+export type SceneNode={id:string;x:number;y:number;w:number;h:number;provider:SceneText;label:SceneText;summary:SceneText;footer:SceneText;icon?:SceneIcon;customIcon?:{asset:Asset;x:number;y:number;size:number};genericIcon?:{glyph:IconGlyph;x:number;y:number;size:number};realization?:SceneBadge;childViewId?:string;experienceWorkspaceId?:string};
 export type SceneEdge={id:string;points:ScenePoint[];dashed:boolean;label?:SceneText};
 export type Scene={bounds:SceneBounds;nodes:SceneNode[];edges:SceneEdge[];vendorIcons:IconEntry[]};
 
@@ -79,8 +81,9 @@ function text(value:string,x:number,y:number,width:number,size:number,lineHeight
 export function buildScene(d:Project,view:ProjectView):Scene{
  const nodes=d.nodes.filter(n=>view.nodeIds.includes(n.id)).map((n):SceneNode=>{
   const p=positionFor(view,n.id),x=p.x,y=p.y,w=NODE_WIDTH,h=NODE_HEIGHT,inner=w-2*NODE_PAD,entry=iconFor(n.icon);
-  const icon=entry.origin==='vendor'?{entry,x:x+w-NODE_PAD-ICON_SIZE+6,y:y+10,size:ICON_SIZE}:undefined;
-  const provider=text(n.provider.toUpperCase(),x+NODE_PAD,y+22,inner-(icon?ICON_SIZE+4:0),10,12.5,MUTED,1);
+  const asset=n.customIconAssetId?d.assets.find(a=>a.id===n.customIconAssetId&&a.rights.trim()&&rasterAvailable(a.data)):undefined,slot={x:x+w-NODE_PAD-ICON_SIZE+6,y:y+10,size:ICON_SIZE};
+  const customIcon=asset?{asset,...slot}:undefined,icon=!asset&&entry.origin==='vendor'?{entry,...slot}:undefined,genericIcon={glyph:semanticGlyph(n),...slot};
+  const provider=text(n.provider.toUpperCase(),x+NODE_PAD,y+22,inner-ICON_SIZE-4,10,12.5,MUTED,1);
   const label=text(n.label,x+NODE_PAD,y+44,inner,14,17,INK,2,true);
   const summaryTop=label.y+label.lineHeight*(label.lines.length-1)+16;
   const summary=text(n.summary,x+NODE_PAD,summaryTop,inner,10,12.5,MUTED,label.lines.length>1?1:2);
@@ -89,7 +92,7 @@ export function buildScene(d:Project,view:ProjectView):Scene{
   const realization=obs&&style?{claim:obs.claim,x:x+w-NODE_PAD-bw,y:y+h-11-BADGE_SIZE-1,w:bw,h:BADGE_SIZE+5,fill:style.fill,stroke:style.stroke,
    text:text(style.text,x+w-NODE_PAD-bw+5,y+h-11,bw,BADGE_SIZE,BADGE_SIZE+2,style.ink,1,true),title:realizationOf({observations:[obs]},n.id).title}:undefined;
   const footer=text(n.childViewId?'Open subdiagram':n.blockIds.length?`${n.blockIds.length} evidence block${n.blockIds.length===1?'':'s'}`:'Component',x+NODE_PAD,y+h-11,inner-(bw?bw+6:0),10,12.5,LINK,1);
-  return {id:n.id,x,y,w,h,provider,label,summary,footer,icon,...(realization?{realization}:{}),...(n.childViewId?{childViewId:n.childViewId}:{}),...(n.experienceWorkspaceId?{experienceWorkspaceId:n.experienceWorkspaceId}:{})};
+  return {id:n.id,x,y,w,h,provider,label,summary,footer,icon,customIcon,genericIcon,...(realization?{realization}:{}),...(n.childViewId?{childViewId:n.childViewId}:{}),...(n.experienceWorkspaceId?{experienceWorkspaceId:n.experienceWorkspaceId}:{})};
  });
  const boxes=nodes.map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
  const shown=d.edges.filter(e=>view.edgeIds.includes(e.id));

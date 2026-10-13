@@ -104,3 +104,9 @@ The portfolio sample descriptions derive from user-supplied PDFs. Raw PDFs and p
 ## Google Identity Services / Google Picker / Google Drive API
 
 DiagramCloud can optionally load Google-hosted Identity Services and Google Picker JavaScript at runtime and call Google Drive API endpoints after explicit user authorization. These Google services are not vendored into this MIT repository and are governed by Google's applicable API/service terms. DiagramCloud requests the per-file `drive.file` scope and keeps OAuth access tokens in browser memory only.
+
+## Optional local syntax analysis
+
+`web-tree-sitter` 0.25.10 (MIT, Tree-sitter project) supplies the optional syntax runtime. `@vscode/tree-sitter-wasm` 0.3.1 (MIT, Microsoft Visual Studio Code team) supplies the pinned TypeScript, TSX, JavaScript, Python and C# grammars. Source identity is recorded in the lockfile; standalone CLI delivery includes `grammars/identity.json` with each redistributed WASM file's SHA-256, byte count and package version, plus both upstream LICENSE files. Browser delivery serves the same pinned local assets. No analyzed code is executed and no grammar is fetched from an external service.
+
+Upstream packages: https://github.com/tree-sitter/tree-sitter/tree/master/lib/binding_web and https://github.com/microsoft/vscode-tree-sitter-wasm. This runtime attribution does not grant rights to analyzed code, provider artwork or custom uploaded images.

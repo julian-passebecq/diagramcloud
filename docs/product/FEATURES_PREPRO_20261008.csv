@@ -1,0 +1,116 @@
+id,epic,feature,description,current_state,target,priority,complexity,dependencies,module,acceptance
+F001,Foundation,App shell extraction,Extract monolithic App orchestration without behavior change,SHIPPED_MONOLITHIC,1.24,P0,M,none,src/app,All current tests/e2e green; no UI behavior regression
+F002,Product UX,Source mode axis,Auto / Guided / Hybrid session configuration,MISSING,1.24,P0,S,F001,src/app,Mode visible in start flow and retained for session
+F003,Product UX,Purpose axis,Understand/Portfolio/Presentation/Education/Audit/Work Review,MISSING,1.24,P0,S,F001,src/app,Purpose selects recipes/presets without changing truth
+F004,Agent UX,AI autonomy axis,Off / Assist / Autonomous-with-gates,MISSING,1.24,P0,S,F001,src/app,Off has no LLM dependency; gates clear
+F005,Contracts,ProjectBrief v1,Human business/project/team/scope/repo context,MISSING,1.24,P0,M,F001,src/intelligence,"Schema, examples, validation, preview/import"
+F006,Contracts,AnalysisProfile v1,Quick/Standard/Deep/Custom analyzer/depth contract,MISSING,1.24,P0,S,F001,src/intelligence,Deterministic validated profile
+F007,Analysis,AnalysisBundle v1,Generated larger source-backed graph separate from Project,MISSING,1.24,P0,L,F006,src/intelligence,Rebuildable; stable source refs; no Project limit inflation
+F008,Analysis,Analysis cache key,Revision vector + profile hash for local generated cache,MISSING,1.24,P1,M,F007,src/intelligence/storage,Same inputs produce same key/result
+F009,Analysis,Capability fingerprint,Multi-label capabilities with evidence/confidence,MISSING,1.24,P0,M,F007,src/intelligence,No forced single project archetype
+F010,Analysis,GapReport v1,Required/optional/ambiguous/conflicting/unsupported/stale gaps,MISSING,1.24,P0,M,F009,src/intelligence,Every gap explains impact and resolution
+F011,Recipes,View Recipe registry,Versioned question->requirements->projection->render rules,MISSING,1.24,P0,M,F009;F010,src/intelligence/recipes,Validated registry; data/config driven
+F012,Recipes,Minimum View Contract,Baseline views for every repository,PARTIAL,1.24,P0,M,F011,src/intelligence/recipes,Unknown/sparse repo still produces 4 useful outputs
+F013,Navigation,Start Wizard,Source/Purpose/AI onboarding,MISSING,1.24,P0,M,F002;F003;F004,src/ui/shell,Keyboard accessible; no advanced clutter
+F014,Navigation,Project navigator,Logical ProjectBrief scope tree,MISSING,1.24,P0,M,F005,src/ui/shell,Navigate scope IDs and mappings
+F015,Navigation,Repository navigator,Physical repo/container/module/file tree,PARTIAL,1.24,P0,M,F007,src/ui/shell,Atlas repos then bounded structural drilldown
+F016,Navigation,Views navigator,Generated/authored views grouped by perspective/purpose,PARTIAL,1.24,P1,S,F011,src/ui/shell,Search and navigate views
+F017,Navigation,Context panel,Details/Evidence/Gaps/Alternatives tabs,PARTIAL_INSPECTOR,1.24,P0,M,F010;F011,src/ui/shell,Collapsible; selection synchronized
+F018,Navigation,Logical-physical combined view,Project scope mapped to implementation entities,MISSING,1.24,P1,M,F005;F007,src/intelligence,Origin of mappings visible
+F019,Core,Existing Project model,Canonical bounded authoring/publication JSON,SHIPPED,keep,P0,-,none,src/core/model.ts,No second authoring truth
+F020,Core,Existing ViewSpec,Renderer-neutral bounded projection,SHIPPED,keep,P0,-,none,src/core/viewspec.ts,Stable IDs/evidence/path preserved
+F021,Scanner,Existing repository scanner,Manifests/Docker/K8s/Terraform/CI/SQL/dbt/Prisma/imports,SHIPPED,keep,P0,-,none,src/core/scan,No regressions
+F022,Scanner,Docs/knowledge v1,Markdown/ADR/CSV/JSON/YAML explicit reference graph,MISSING,1.24,P0,L,F007,src/intelligence/analyzers,Exact file/section/row evidence; no LLM required
+F023,Scanner,dbt manifest adapter,Use structured manifest resources and parent map,MISSING,1.24,P1,M,F007,src/intelligence/analyzers,Artifact preferred over heuristic when available
+F024,Scanner,Databricks bundle adapter,databricks.yml resources/tasks/pipelines/targets,MISSING,1.24,P1,M,F007,src/intelligence/analyzers,Static-source only; included files resolved safely
+F025,Scanner,Fabric/PBIP/TMDL adapter,.platform/PBIR/TMDL/report-model relations,MISSING,1.24.x,P1,L,F007,src/intelligence/analyzers,No Fabric runtime claims
+F026,Scanner,OpenAPI adapter,Routes/services/contracts and cross-repo join keys,MISSING,1.24,P1,M,F007,src/intelligence/analyzers,Explicit contracts/evidence
+F027,Scanner,.NET analyzer,.sln/.csproj/ProjectReference/NuGet/ASP.NET/EF,MISSING,1.25,P1,L,F007,src/intelligence/analyzers,Structured references first
+F028,Scanner,Azure analyzer,Bicep/ARM/azd/Functions/Container Apps,MISSING,1.25,P2,L,F007,src/intelligence/analyzers,Static config only
+F029,Scanner,Helm/Kustomize,K8s packaging and overlays,MISSING,later,P2,M,F007,src/intelligence/analyzers,Bounded config resolution
+F030,Scanner,Tree-sitter deep graph,Symbols/calls/imports for supported languages,MISSING,later,P2,XL,F007,src/intelligence/analyzers,"Deep profile only, explicit budgets"
+F031,Multi-repo,Existing Project Atlas,N repos each with own revision vector,SHIPPED,keep,P0,-,none,src/core/atlas,No single project SHA
+F032,Multi-repo,Hybrid reconciliation,Declared vs static relationships/gaps,MISSING,1.24,P0,L,F005;F007,src/intelligence,Never overwrite conflicting evidence
+F033,Multi-repo,Cross-repo resolver,Strong-key candidate joins across scans,MISSING,1.24,P1,L,F032;F026,src/intelligence,No same-tech/name-only joins
+F034,Multi-project,Collection v1,Project-level landscape/portfolio without flattening repos,MISSING,1.25,P2,M,F032,src/intelligence,Independent project revision vectors
+F035,Documents,Document lexical/source layer,Document->section/chunk/record provenance,MISSING,1.24,P1,M,F022,src/intelligence,All extracted relations link to sources
+F036,Documents,Agent entity extraction,Source-cited candidate entities/relations from prose,MISSING,1.26,P2,L,F035;F004,agent/MCP,Candidate only; review required
+F037,Rendering,Classic engineering profile,Accurate technical default,SHIPPED_PARTIAL,1.24,P0,S,none,src/presentation,"Formalize profile, preserve canvas/export"
+F038,Rendering,Editorial profile,Existing Diagram Design grammar,SHIPPED,keep,P0,-,none,src/export/design,Selective future type adoption
+F039,Rendering,Blueprint profile,Existing engineering drawing style,SHIPPED,keep,P1,-,none,src/export,Preserve
+F040,Rendering,Business profile,Fixed project/business sheets,MISSING,1.24,P0,L,F005;F011,src/presentation/business,Not a general canvas
+F041,Rendering,Project Overview sheet,Purpose/team/architecture/outcomes/evidence,MISSING,1.24,P0,M,F040,src/presentation/business,Graceful gaps if context missing
+F042,Rendering,How It Works sheet,3-6 semantic steps with business+technical captions,MISSING,1.24,P0,M,F040,src/presentation/business,"Derived from path/story, source labels retained"
+F043,Rendering,Work/Verification Brief,Change/impact/checks/unknown/next gate,MISSING,1.24,P1,M,F040,src/presentation/business,No PASS without receipt
+F044,Rendering,IsoSVG profile,Pure SVG 2.5D semantic depth,MISSING,1.25,P1,L,F011,src/presentation/isosvg,No WebGL; fixed camera; static fallback
+F045,Rendering,Trace profile,Deterministic scenario/packet animation,MISSING,1.25,P1,L,F011,src/presentation/trace,Illustrative vs observed explicit
+F046,Rendering,Mosaic external 3D,ConceptSpec to real spatial renderer,SHIPPED_BRIDGE,keep,P1,-,none,src/export/concept,Do not duplicate Three.js
+F047,Rendering,PublicationBrief v1,Audience/detail/size/story/profile output contract,MISSING,1.24,P0,M,F011,src/presentation,Presentation-only settings
+F048,Rendering,Fidelity ledger,Shown/collapsed/omitted and reasons,MISSING,1.24,P0,M,F011,src/presentation/fidelity,Visible in preview/export QA
+F049,Rendering,Complexity budgets,Per-recipe/type node/edge/detail limits,MISSING,1.24,P0,S,F011,src/presentation,Split overview/detail instead of tiny graphs
+F050,Quality,Geometric QA,Overlap/clipping/crossings/routing checks,SHIPPED_STRONG,keep,P0,-,none,tests/helpers,"Extend, do not replace"
+F051,Quality,Semantic visual QA,Validate encoding semantics by figure type,MISSING,1.25,P1,L,F048,src/presentation,Sankey/treemap/waterfall/etc rules
+F052,Quality,Candidate comparison,A/B/C view/render measurable comparison,MISSING,1.25,P1,M,F048;F050;F051,src/presentation,Scores expose reasons/metrics
+F053,Agent,Existing AI guide/design brief/patch,Agent-friendly reviewed proposals,SHIPPED,keep,P0,-,none,docs/core,Preserve human gate
+F054,Agent,Thin MCP read/query,Project/analysis/view/evidence/gap tools,MISSING,1.26,P1,L,F007;F010,mcp,"Bounded outputs, no arbitrary FS"
+F055,Agent,Thin MCP render,Render candidates/quality/delta/book,MISSING,1.26,P1,M,F054,mcp,No semantic mutation
+F056,Agent,Thin MCP proposal,Project/design/publication/verification proposals,MISSING,1.26,P1,M,F054,mcp,Proposal-only
+F057,Verification,VerificationSpec v1,Defined checks for components/relations/revisions,MISSING,1.26,P1,M,F054,src/verification,Spec is not result
+F058,Verification,Verification receipt ingestion,CI/provider result -> staged evidence,PARTIAL_RECEIPT_PRIMITIVE,1.26,P1,M,F057,src/verification,Exact revision/outcome/runner/evidence
+F059,Verification,Impact query,Change -> affected components/tests/views,MISSING,1.26,P1,L,F007;F054,src/intelligence,Bounded traversal with evidence
+F060,Verification,Test coverage gaps,Relations/components lacking relevant checks,MISSING,1.26,P2,M,F057;F059,src/verification,No fake coverage percentage
+F061,Integration,DataPass Hop link,Optional Open in Hop/UnderstandingSpec consumption,PARTIAL_EXTERNAL,later,P2,S,none,adapter,Hop remains DataPass-owned
+F062,Integration,Lens pointers,Observed Git/CI/request/agent refs,SHIPPED,keep,P0,-,none,src/core/atlas/lens.ts,Keep distinct from canvas minimap
+F063,Integration,DataPass sidecar bridge,Full Project sidecar review/writeback,SHIPPED,keep,P0,-,none,src/bridge,No contract regression
+F064,Integration,ProjectBrief compiler,Compile guided brief to manifest/declarations,MISSING,1.24,P0,M,F005,src/intelligence,Avoid two truths; explicit precedence
+F065,Education,Repository learning path,Start here / what to read next / progressive detail,MISSING,1.24,P1,M,F011;F015,src/intelligence/recipes,Works AI Off
+F066,Audit,Architecture/evidence audit preset,"Evidence, gaps, stale, conflicts, unsupported",MISSING,1.24,P1,S,F010,src/intelligence/recipes,"Missing is reported, not guessed"
+F067,Portfolio,Original project->task->workspace flow,Project experience and contribution evidence,SHIPPED_STRONG,keep,P0,-,none,src/experience,Do not lose historical root
+F068,Docs,Roadmap/readme truth cleanup,Remove stale limitations already shipped,STALE_DOCS_FOUND,1.24,P0,S,none,docs,Docs match 1.23 behavior
+F069,Performance,Analysis budgets,File/node/fact/time budgets by profile,PARTIAL_SCANNER_LIMITS,1.24,P0,M,F007,src/intelligence,No unbounded deep scan
+F070,Security,Source safety/redaction,Secret exclusion/public projection remain universal,SHIPPED_STRONG,keep,P0,-,none,core/security,New analyzers respect existing rules
+F071,Interop,Structurizr/LikeC4 export/import review,Model/view interoperability research,RESEARCHED_PARTIAL,later,P3,M,F011,src/core/interchange,Only if concrete workflow justifies
+F072,Layout,Layout engine abstraction,Keep current deterministic; evaluate ELK/TALA only if needed,PARTIAL,later,P3,M,F050,src/core/layout,Do not destabilize current quality without benchmark
+F073,Recipes,Reference Architecture Cookbook,Versioned synthetic examples generated from domain recipes and used by Gallery/CI,PARTIAL_SAMPLES,1.24,P1,M,F011;F012,src/data/recipes,Each core archetype has one synthetic reference fixture and expected views; generated outputs stay current in CI
+F074,Evolution,Snapshot header and revision vector,"Immutable time-labelled snapshot identity with repo revisions, collection time and analyzer/profile version",PARTIAL_ATLAS_REVISIONS,DESIGN_HOOK_1_24,P0,M,F007;F031,src/core/analysis/evolution,Cannot claim live or infer rollout from Git ref; two comparable snapshots have source refs
+F075,Evolution,Semantic delta matching,"Diff entity and relation identity, rename/move, partial scan and stale source handling",PARTIAL_ARCHITECTURE_DELTA,1.25,P1,L,F074;F007,src/core/analysis/evolution,No false removed on incomplete scans; deterministic semantic delta
+F076,Evolution,Project Evolution recipes,Project/repo/work/knowledge/data evolution views with evidence timestamps,MISSING,1.25,P1,M,F075;F011,src/core/recipes/evolution,Every claimed transition references source or says planned/unknown
+F077,Evolution,Verification and confidence evolution,Shows how known facts gained/lost test/runtime evidence across snapshots,MISSING,1.26,P1,M,F075;F058,src/core/analysis/evolution,Tested only for exact receipt; stale evidence visible
+F078,Evolution,Current-transition-target migration map,Business and technical migration/coexistence/cutover/rollback plans,PARTIAL_ARCHITECTURE_DELTA,1.25,P2,M,F005;F076,src/core/recipes/evolution,Planned target never labelled deployed
+F079,Environments,Environment analysis identity,EnvironmentRef custom roles ephemeral/persistent and nonsecret scope bindings,PARTIAL_STATIC_DEPLOYMENT,DESIGN_HOOK_1_24,P0,M,F007;F021,src/core/analysis/environments,Bronze/Silver/Gold separate; dynamic names; no secrets or forged runtime
+F080,Environments,Deployment instance facts,Logical component + environment + release/artifact + provenance status,MISSING,1.24.x,P1,M,F079;F074,src/core/analysis/deployments,One logical component across environments; source declaration not observed runtime
+F081,Delivery,Build artifact and release chain,Source revision -> build digest -> release -> deployed instance,PARTIAL_CI,1.25,P1,L,F080;F021,src/core/analysis/delivery,No assume commit SHA is deployed artifact; preserve independent identities
+F082,Delivery,Promotion topology and gates,Dev/test/stage/prod or custom stages and test/approval gates,MISSING,1.25,P1,M,F079;F081,src/core/recipes/delivery,Views include only source-backed environments and actual/declared distinction
+F083,Environments,Environment matrix,Component x environment: declared/observed/unknown/not-applicable,MISSING,1.24.x,P1,M,F079;F011,src/export/design/environments,No green checks for unknown; sparse and multi-cloud readable
+F084,Environments,Environment drift comparison,Staging vs prod or desired vs actual with per-source freshness,MISSING,1.26,P1,L,F080;F058;F075,src/core/analysis/environments,No drift verdict from source YAML alone; timestamped evidence
+F085,Environments,Feature flags and nonsecret config views,"Config/feature metadata by environment, without leaking values",MISSING,1.26,P2,M,F079;F070,src/core/analysis/config,No secrets in facts/exports; same code different configs can be expressed
+F086,Domain,"Region, tenancy, residency and DR facets",Optional provider/tenant/scope/backup/region relationships,MISSING,DESIGN_HOOK_1_24,P2,M,F079,src/core/analysis/facets,Extensible typed facet without 80 optional Project fields
+F087,UX,User analysis profile preset,"Multi-label archetype + goal + audience + scope defaults, overrideable",MISSING,1.24,P0,M,F002;F003;F006;F009,src/core/recipes/presets,Normal user sees few controls and can inspect why a view is recommended
+F088,UX,Contextual view availability,recommended/useful/available/unavailable/not-applicable,MISSING,1.24,P0,S,F009;F010;F011,src/core/recipes,Optional enterprise facts never block basic repo overview
+F089,UX,Advanced parameter panel,"Granularity, perspective, confidence, scope, environment, revision, asset and autonomy",MISSING,1.24.x,P1,M,F006;F087,src/ui/shell,Advanced settings collapsed by default and never mutate semantic facts
+F090,UX,Navigation combined lens,"Project/Repo crosswalk with stable entity selection, environment and evolution filters",MISSING,1.24.x,P1,M,F018;F079,src/ui/navigator,Project hierarchy and physical Git hierarchy not conflated
+F091,Recipes,Pattern library classifier,"Recognize candidate patterns, do not assert patterns as source truth",PARTIAL_SAMPLES,1.25,P2,M,F009;F011,src/core/recipes/patterns,Bronze Silver Gold names not proof of deployed medallion pipeline
+F092,Recipes,Architecture pattern catalog,"Versioned C4-ish, modular monolith, medallion, event, migration patterns",PARTIAL_SAMPLES,1.24.x,P1,M,F011;F073,src/core/recipes/patterns,Pattern templates labelled illustrative with explicit evidence requirements
+F093,Qualification,Synthetic client zoo baseline,Plain repo-root fixtures and truth manifests across archetypes,PARTIAL_TEST_FIXTURES,1.24,P0,M,F012;F021,tests/fixtures/projects,"Tiny, multi-repo, docs, ambiguous, secrets and conflict fixtures pass"
+F094,Qualification,Negative fixture assertions,"Zero fabricated runtime, secrets and cross-repo false joins",MISSING,1.24,P0,M,F093;F010,tests/qualification,Missing data never converted to unsupported fact; privacy fail=release block
+F095,Qualification,Temporary Git history factory,"Deterministic git init, branch, commit, worktree in isolated tmp folder",MISSING,1.24.x,P1,M,F093,tests/helpers/git-history,No nested tracked .git; stable fixtures across platforms
+F096,Qualification,Truth manifests and oracle,Expected and forbidden capabilities/facts/relations/gaps/views with exact source refs,MISSING,1.24,P0,M,F093,tests/fixtures/truth,Assertions independent of model output; no blind pixel-only goldens
+F097,Qualification,Real read-only qualification stage,Pinned DiagramCloud/Galaxy Knowledge/Contoso/other repos with optional private data,PARTIAL_REAL_ATLAS,1.24,P0,M,F093;F070,tests/qualification/real,"Qualified claims list source SHA and tests, no private committed contents"
+F098,Assets,Generic Core icon catalog,Semantic SVG symbols: API/function/db/job/test/CI/Git/owner/report/...,PARTIAL_GENERIC_AND_FABRIC,1.24.x,P1,M,F070,src/core/icons,"Offline, deterministic, theme-safe fallback and attribution"
+F099,Assets,Asset requirement derivation,"View Recipe to AssetPlan, resolved/missing, legal policy and fallback",MISSING,1.24.x,P1,M,F011;F098,src/core/assets/plan,Never blocks correct diagram; source/icon provenance explicit
+F100,Assets,Optional Cloudflare R2 source,Private R2AssetSource import/sync and local normalized cache,NO_ADAPTER_BUCKET_EXISTS,1.25,P2,L,F099;F070,src/assets/providers/r2,"No browser account token, no public bucket/default fetch during export"
+F101,Assets,Project-specific custom icon reference,Reviewed scoped IconRef for project asset without global registry pollution,MISSING,1.25,P1,M,F099;F019,src/core/model or adapter,Backwards compatible existing icon ID and exports
+F102,Assets,External image provider adapter,Model-neutral generation of optional illustrations with review and rights,MISSING,1.25,P2,M,F101;F070,src/assets/generation,Never fabricates official provider logo or diagrams; candidate only
+F103,Source,"Submodules, subtrees, worktrees metadata",Read Git structure without swallowing nested repositories as one repo,PARTIAL_IGNORES_NESTED,1.25,P2,L,F021;F074,src/core/scan/git,Nested boundaries typed and not accidentally scanned as one repository
+F104,Source,Authored/generated/vendor noise partition,Signal filter for generated files and dependencies with omission receipt,PARTIAL_IGNORES_VENDOR,1.24.x,P1,M,F007;F069,src/core/scan,Skip reason counts never treated as absent implementation
+F105,Source,Secret-safe source inventory,Reject credentials/private exports and record scan limits/cancel/abort,SHIPPED_PARTIAL,1.24,P0,M,F070;F007,src/core/analysis/inventory,No secret tokens in facts and failed files tracked explicitly
+F106,Quality,No AI offline qualification,"All four minimum views, gaps, export from arbitrary repo with network blocked",PARTIAL_SCANNER_ONLY,1.24,P0,M,F093;F012,tests/e2e,No API required; useful safe fallback on unsupported repo
+F107,Security,Publication and read-permission matrix,Private project/docs/host/asset rights with independently filtered public projection,SHIPPED_PARTIAL,1.24,P0,M,F070;F035,src/core/public,"All formats filter data before render, no metadata leak"
+F108,Performance,Cancelable bounded analysis workers,"Abort/progress, queue and memory budgets for big scans and documents",MISSING,1.24.x,P1,L,F007;F069,src/core/analysis/worker,Large fixture does not freeze UI or silently drop sources
+F109,Rendering,Environment and promotion visual profiles,"Environment matrix, release chain with declared/observed chips",MISSING,1.25,P1,M,F079;F082;F083,src/export/design/operations,"Readable flat 2D preferred, no 3D ornament"
+F110,Rendering,Evolution navigation and diff rail,"Snapshot time selector, source revision, what/why/provenance and unknown",MISSING,1.25,P1,M,F075;F017,src/ui/evolution,Comparison recovers selection; does not rewrite original Project
+F111,Publication,Source-backed project handbook/library,"Versioned curated views per project, selection/collection, stable deep links",PARTIAL_FIGURE_BOOK,1.25,P1,M,F034;F047,src/core/library,No duplicate semantic truth; per-release immutable output snapshots
+F112,Interop,Observed cockpit snapshot adapter,Sanitized host-fed scoped observations independent of renderer/live collector,MISSING,1.26,P2,L,F074;F058;F062,src/interop/cockpit,ChatGPT not assumed always live; timestamps and permissions enforced
+F113,Operations,Optional observability source links,Service to logs metrics traces/runbooks source mapping without becoming Grafana,MISSING,1.26,P2,M,F007;F112,src/core/analysis/ops,Link is source/observed scoped; no fabricated health
+F114,Security,Trust/IAM boundary view hooks,"Policy/trust concepts from IaC/docs, no credentials or universal security analysis claims",MISSING,1.25,P2,M,F007;F070,src/core/analysis/security,Can say unknown; never a security certification
+F115,Architecture,Compatibility and migration gates,Project v1/sidecar/Atlas/import/export regression with versioned contracts,SHIPPED_PARTIAL_TESTS,1.24,P0,M,F019;F063;F093,tests/contracts,Original project/documents reopen unchanged and public projection preserved

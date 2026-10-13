@@ -2,7 +2,7 @@
  * Functions consuming Project require the existing validateDocument boundary first.
  * No model call, filesystem access, execution, or publication approval is implicit.
  */
-export const PURPOSES = ['understand', 'project', 'portfolio', 'presentation', 'audit'] as const;
+export const PURPOSES = ['understand', 'project', 'portfolio', 'presentation', 'education', 'work-review', 'audit'] as const;
 export type Purpose = typeof PURPOSES[number];
 export type AnalysisOptions = {purpose: Purpose; depth: 'quick' | 'standard'; includeInferred: boolean};
 export const DEFAULT_OPTIONS: Readonly<AnalysisOptions> = {
@@ -16,7 +16,7 @@ export type Capability = {
 };
 export type Gap = {
   id: string;
-  state: 'missing-required' | 'missing-optional' | 'unsupported' | 'ambiguous' | 'stale';
+  state: 'missing-required' | 'missing-optional' | 'unsupported' | 'ambiguous' | 'conflicting' | 'stale';
   subjectId?: string;
   title: string;
   reason: string;
@@ -49,22 +49,36 @@ export type AssetRequirement = {
   recommendation: 'keep' | 'semantic-symbol' | 'official-asset-review';
   blocksRendering: false;
   reason: string;
+  customAssetId?: string;
+  origin?: 'original' | 'vendor' | 'project-asset';
+  rights?: string;
+  assetVisibility?: 'public' | 'private';
+  sourceIdentity?: {repository:string;commit:string;blob:string};
+  terms?: {name:string;url:string};
 };
 export type AssetPlan = {
   format: 'diagramcloud.asset-plan'; version: 1;
   projectId: string; projectRevision: number;
+  scope?: {
+    kind: 'project' | 'view' | 'recipe'; recipeId?: string;
+    viewIds: string[]; nodeIds: string[];
+    availability: 'available' | 'partial' | 'unknown';
+    state: 'recommended' | 'available' | 'useful' | 'unavailable' | 'not-applicable';
+    reason: string; options?: AnalysisOptions;
+    context?: {archetypes: string[]; repositoryId?: string; environmentId?: string};
+  };
   requirements: AssetRequirement[];
   limitations: string[];
 };
 export type DocumentInput = {path: string; text: string};
 export type DocumentEntry = {
-  path: string; kind: 'markdown' | 'csv';
+  path: string; kind: 'markdown' | 'csv' | 'json' | 'yaml';
   headings: {title: string; line: number; level: number}[];
   records: {id: string; startLine: number; endLine: number}[];
 };
 export type DocumentLink = {
   fromPath: string; fromLine: number; toPath: string; toLine?: number;
-  kind: 'document-link' | 'source-record';
+  kind: 'document-link' | 'source-record' | 'structured-reference';
 };
 export type DocumentDiagnostic = {
   path: string; line?: number;

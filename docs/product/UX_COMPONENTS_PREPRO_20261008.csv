@@ -1,0 +1,23 @@
+id,component,state,responsibility,module,target
+U001,StartWizard,new,Source/Purpose/AI selection,src/ui/shell,1.24
+U002,ProjectNavigator,new,Project/Repository/Views tabs and search,src/ui/shell,1.24
+U003,ContextPanel,evolve Inspector,Details/Evidence/Gaps/Alternatives/Agent,src/ui/shell,1.24
+U004,Canvas MiniMap,existing,Spatial viewport only,src/ui/Canvas.tsx,keep
+U005,ScopeMap,new optional,Compact logical project topology,src/ui/shell,1.24.x
+U006,LensStatus,evolve Atlas,Observed Git/delivery pointers,src/ui/Atlas.tsx,keep
+U007,PerspectiveStrip,existing/evolve,System/Code/Data/Cloud/Delivery/Git/Work/Decisions/Evidence/Ownership,src/ui/Perspectives.tsx,1.24
+U008,GapBadge,new,Compact known/missing/ambiguous status,src/ui/shell,1.24
+U009,RecipePicker,new advanced,Alternate useful projections,src/ui/shell,1.24
+U010,RenderProfilePicker,new advanced,Classic/Editorial/Blueprint/Business,src/ui/shell,1.24
+U011,ProjectBriefEditor,new bounded,Human project context import/edit/review,src/ui,1.24
+U012,AnalysisPanel,new advanced,Profile/analyzers/revision/cache/coverage,src/ui,1.24
+U013,BusinessPreview,new,Business fixed-purpose sheets,src/presentation/business,1.24
+U014,CandidateCompare,new later,A/B/C render comparison,src/ui,1.25
+U015,AgentPanel,new later,Proposal/query/test-loop host controls,src/ui/shell,1.26
+U016,EnvironmentSelector,new,Contextual stage/scope filter separate from data zones,src/ui/contexts,1.24.x
+U017,EvolutionCompareBar,new,Snapshot/time/revision compare with explicit provenance,src/ui/evolution,1.25
+U018,EvolutionDeltaRail,new,What changed/why/source/evidence/unknown per selection,src/ui/evolution,1.25
+U019,PresetPicker,new,"Capability+purpose-driven recommended configs, advanced disclosure",src/ui/shell,1.24
+U020,AssetPlannerTab,new,"Resolved/missing official/generic/project assets, fallback and checklist",src/ui/context,1.24.x
+U021,ProjectRepoCrosswalk,new,Business project node mapped to physical repo location,src/ui/navigator,1.24.x
+U022,QualificationGallery,new,Read-only built-in synthetic example selection and expected outcome,src/ui/samples,1.25

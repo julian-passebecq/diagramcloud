@@ -11,7 +11,7 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.24.0** (`package.json`; shown in the header) |
+| Product version | **1.25.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -24,7 +24,9 @@ DiagramCloud is a local-first, static web studio for explaining a project: selec
 
 ## Project Intelligence (1.24.0)
 
-**New analysis** offers Repository, Guided (without Git), or Hybrid with explicitly declared repositories. Choose a purpose and Quick/Standard depth, review the validated candidate, then apply. The toolbar opens Business overview, Structure, Relationships and Evidence / gaps. **Navigate** switches one filtered Project / Repositories / Views tree at a time; **Details panel** opens optional Evidence / Gaps / Assets.
+DiagramCloud 1.25.0 integrates the full-product campaign (`codex/full-product-campaign-20261009`, PR #58, stacked on PR #57). It extends source-backed analysis, grouped GraphSnapshot exploration, reviewed environment/release declarations, semantic evolution, independent collections, immutable curated publications, and optional selected-file CLI/MCP. It keeps Project schema 1 and all existing authoring, workspace, story and export paths. Integration does not imply owner verification. See [interfaces and limits](docs/product/CAMPAIGN_CLIENT.md), [qualification report](SHIP-REPORT.md), [original acceptance outcomes](outcome.json) and the [sole roadmap](docs/ROADMAP.md).
+
+**New analysis** offers Repository (automatic static analysis), Guided, Hybrid and selected GraphSnapshot. Source, purpose and Quick/Standard acquisition settings remain for the session. Deep/Custom are explicit optional analysis profiles with budgets, a cancellable local Tree-sitter worker and selected-result review; repository code is never executed. Business overview includes recipes, source evidence, How It Works, verification, evolution, delivery and publication tools. **Navigate** keeps logical scope, repository hierarchy and views separate, with environment/snapshot filters and source-cited crosswalks. **Details panel** synchronizes Details / Evidence / Gaps / Alternatives / Assets with the selected component or view. Advanced tools remain collapsed.
 
 A selected unknown/docs-only folder returns a bounded inventory and exact Markdown/CSV provenance links, with honest missing-relationship and unsupported states. Guided ProjectBrief tasks reuse evidence workspaces. Hybrid uses the existing Atlas and individual rescans; unavailable members remain declared and each repository keeps its own revision. Acquired files and reports are private until author publication review. Business overview exports semantic public HTML offline; asset plans use the icon registry and generic fallbacks. No model, Git setup, server, token or cloud service is needed.
 
