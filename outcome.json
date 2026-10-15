@@ -14,8 +14,19 @@
     "mergeCommit": "f230ae0f234092ddeaaf6b5925f56568d425bf83",
     "ci": "https://github.com/julian-passebecq/diagramcloud/actions/runs/38449161237",
     "deployment": "Vercel Production from main, deployed and kept with the owner's agreement",
-    "package": "STAGED locally (READY.json sha256 0b51916ec6a0c782c2f950d26b077a09b4de508fe68321247c08d88f779e394a); no approved private destination yet",
-    "tag": "none"
+    "package": "PUBLISHED privately 2026-10-14: juliandatapass-group/galaxy-release-vault generic package diagramcloud/1.25.0-f230ae0 (13 files, READY.json sha256 0b51916ec6a0c782c2f950d26b077a09b4de508fe68321247c08d88f779e394a, SHA256SUMS.txt sha256 f9c2daee7567e2ecded68c2c100cf64c696da2f367b9d33648bc8cf0b778bc43); authenticated re-download matched every sha256; anonymous access refused (401 files, 404 project)",
+    "tag": "none",
+    "packageUrl": "https://gitlab.com/juliandatapass-group/galaxy-release-vault/-/packages/72517673",
+    "packageReceipt": {
+      "sourceSha": "f230ae0f234092ddeaaf6b5925f56568d425bf83",
+      "destination": "https://gitlab.com/api/v4/projects/87564954/packages/generic/diagramcloud/1.25.0-f230ae0/",
+      "newImmutablePath": true,
+      "confidentialityScan": "PASS: no private paths, no real secrets (only regex detectors and SYNTHETIC test fixtures already public in the repo), no client data or transcripts; source archive equals git tree f230ae0 plus dist/ and generated public/ files",
+      "authenticatedRedownload": "PASS: 13/13 sha256 match",
+      "anonymousAccess": "refused: 401 on package files, 404 on project",
+      "checksReused": "8 exact-SHA gates from READY.json (typecheck, unit, build, browser 102, real-atlas-quality, pptx-zip, pptx-visual, bundled-cli) and GitHub Actions run 38449161237; no requalification",
+      "productionJourney": "PASS 2026-10-14 on https://diagramcloud.vercel.app (deployment from f0a3c40, docs-only change after f230ae0): import, review, edit, save, reload, reopen, interactive HTML and SVG export carry the edited label, no page errors. The deployed bundle is not byte-identical to the packaged web build (main JS hash differs)."
+    }
   },
   "scopeRule": "Statuses describe code against original feature scope, not release certification. Horizons guide the sole roadmap in docs/ROADMAP.md. Exact packaged source SHA/checks are generated in delivery-receipt.json and READY.json.",
   "catalogue": "docs/product/FEATURES_PREPRO_20261008.csv",
