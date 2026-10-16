@@ -31,7 +31,15 @@ const basis=z.enum(BASES).optional();
 /** Perspectives a view can belong to; the same stable component ID may appear in several. */
 export const PERSPECTIVES=['system','code','data','cloud','git','cicd','agents','decisions','evidence'] as const;
 export type Perspective=typeof PERSPECTIVES[number];
-export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),customIconAssetId:id.optional(),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),basis,visibility}).strict();
+/** Optional rationale: goal, options, reasons, tradeoffs, assumptions and when to revisit. No numeric score or saving.
+ * A candidate (an AI recommendation included) is never an accepted decision; acceptance records who decided and when. */
+export const CHOICE_STATUSES=['candidate','accepted'] as const;
+export const CHOICE_ORIGINS=['author','ai','imported'] as const;
+const choiceLine=z.string().min(1).max(500),choiceLines=z.array(choiceLine).max(20).default([]);
+export const choiceOptionSchema=z.object({id,label:short,summary:z.string().max(1000).default('')}).strict();
+export const choiceSchema=z.object({id,title:short,goal:z.string().min(1).max(1000),options:z.array(choiceOptionSchema).min(1).max(12),recommendedOptionId:id.optional(),chosenOptionId:id.optional(),reasons:choiceLines,tradeoffs:choiceLines,assumptions:choiceLines,revisitWhen:z.string().max(500).optional(),status:z.enum(CHOICE_STATUSES).default('candidate'),origin:z.enum(CHOICE_ORIGINS).default('author'),decidedBy:z.string().min(1).max(160).optional(),decidedAt:z.string().regex(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2}))?$/,'Use a date such as 2026-10-16 or an ISO 8601 timestamp with a time zone').optional(),sourceIds:refs,visibility}).strict();
+const choices=z.array(choiceSchema).max(20).optional();
+export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),customIconAssetId:id.optional(),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),basis,choices,visibility}).strict();
 /** An optional amount carried by a connection (rows/day, GB, events/s…), with its provenance; drawn by the Sankey figure. Never inferred by an importer. */
 export const quantitySchema=z.object({value:z.number().finite().min(0).max(1e15),unit:z.string().min(1).max(24),provenance:z.enum(PROVENANCES),note:z.string().max(200).optional()}).strict();
 export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),basis,quantity:quantitySchema.optional(),visibility}).strict();
@@ -41,7 +49,7 @@ export type DesignType=typeof DESIGN_TYPES[number];
 export const DESIGN_THEMES=['light','dark','editorial'] as const;
 export type DesignTheme=typeof DESIGN_THEMES[number];
 export const designSchema=z.object({type:z.enum(DESIGN_TYPES).default('auto'),focal:z.array(id).max(2).default([]),theme:z.enum(DESIGN_THEMES).optional(),caption:z.string().max(300).optional()}).strict();
-export const viewSchema=z.object({id,title:short,description:z.string().max(2000).default(''),nodeIds:refs,edgeIds:refs,positions:z.record(id,point).default({}),perspective:z.enum(PERSPECTIVES).optional(),design:designSchema.optional(),visibility}).strict();
+export const viewSchema=z.object({id,title:short,description:z.string().max(2000).default(''),nodeIds:refs,edgeIds:refs,positions:z.record(id,point).default({}),perspective:z.enum(PERSPECTIVES).optional(),design:designSchema.optional(),choices,visibility}).strict();
 const instant=z.string().datetime({offset:true,message:'Use an ISO 8601 timestamp with a time zone, e.g. 2026-09-25T10:00:00Z'});
 const openUri=z.string().max(2000).refine(isOpenUri,'Only http(s) or vscode links without embedded credentials');
 /**
@@ -97,6 +105,7 @@ export type Project=z.infer<typeof documentSchema>;
 export type ProjectNode=z.infer<typeof nodeSchema>;
 export type ProjectEdge=z.infer<typeof edgeSchema>;
 export type ProjectView=z.infer<typeof viewSchema>;
+export type Choice=z.infer<typeof choiceSchema>;
 export type EvidenceBlock=z.infer<typeof blockSchema>;
 export type Asset=z.infer<typeof assetSchema>;
 export type Observation=z.infer<typeof observationSchema>;
@@ -139,6 +148,12 @@ export function validateDocument(input:unknown):Project {
   for(const s of d.atlas.snapshots){ids(s.repositories,`repository in ${s.id}`);for(const r of s.repositories){if(r.nodeId)check(r.nodeId,nodes,`${s.id}/${r.id}`);if(r.scanStatus==='scanned'&&!r.scannedAt)errors.push(`${s.id}/${r.id}: a scanned repository records when it was scanned`);}
    for(const f of secretFindings(s,`atlas.${s.id}`))errors.push(`Refused ${f}`);}}
  for(const s of d.story){check(s.viewId,views,'story');for(const r of s.observationIds??[]){const o=d.observations.find(o=>o.id===r);if(!o)check(r,observations,'story');else if(!o.reviewedAt)errors.push(`Story cites observation ${r} before it is reviewed`);else if(!d.views.find(v=>v.id===s.viewId)?.nodeIds.includes(o.nodeId))errors.push(`Story observation ${r} is about a component outside ${s.viewId}`);}if(s.nodeId&&!d.views.find(v=>v.id===s.viewId)?.nodeIds.includes(s.nodeId))errors.push(`Story node ${s.nodeId} not in ${s.viewId}`);s.highlightEdgeIds.forEach(r=>{if(!d.views.find(v=>v.id===s.viewId)?.edgeIds.includes(r))errors.push(`Story edge ${r} not in ${s.viewId}`);});}
+ // Choices: stable IDs, options that exist, and a candidate never carries a chosen option.
+ const allChoices=[...d.nodes,...d.views].flatMap(owner=>(owner.choices??[]).map(c=>({owner:owner.id,c})));ids(allChoices.map(x=>x.c),'choice');
+ for(const {owner,c} of allChoices){const where=`${owner}/${c.id}`,options=ids(c.options,`option in ${where}`);c.sourceIds.forEach(r=>check(r,sources,where));
+  for(const ref of [c.recommendedOptionId,c.chosenOptionId])if(ref)check(ref,options,where);
+  if(c.status==='candidate'&&c.chosenOptionId)errors.push(`${where}: a candidate has no chosen option; use recommendedOptionId, or accept it with chosenOptionId, decidedBy and decidedAt`);
+  if(c.status==='accepted'&&!(c.chosenOptionId&&c.decidedBy&&c.decidedAt))errors.push(`${where}: an accepted decision records chosenOptionId, decidedBy and decidedAt`);}
  // Data-flow cycles are legal. Recursive view expansion is not.
  const done=new Set<string>(),visiting=new Set<string>();
  function visit(viewId:string){if(visiting.has(viewId)){errors.push(`Recursive drilldown cycle at ${viewId}`);return;}if(done.has(viewId))return;visiting.add(viewId);const v=d.views.find(v=>v.id===viewId);for(const n of d.nodes.filter(n=>v?.nodeIds.includes(n.id)))if(n.childViewId)visit(n.childViewId);visiting.delete(viewId);done.add(viewId);}
