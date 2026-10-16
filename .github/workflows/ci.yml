@@ -11,7 +11,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       # Test the pull request's head commit, not GitHub's temporary merge commit, so the receipt names the code that ran.
       - uses: actions/checkout@v4
