@@ -1,10 +1,7 @@
 import {z} from 'zod';
 import {validateDocument,type Project} from '../../core/model';
 import {compileProjectBrief} from '../brief';
-import warehouseBrief from './examples/warehouse.project-brief.json';
-import ragBrief from './examples/rag.project-brief.json';
-import agentsBrief from './examples/agents.project-brief.json';
-import syntheticTables from './examples/synthetic-tables.json';
+import {warehouseBrief,ragBrief,agentsBrief,syntheticTables} from './exampleData';
 /** Synthetic teaching examples compiled through the native ProjectBrief compiler and validateDocument. Each result is a NEW candidate: import it through the ordinary review. */
 export const LEARNING_EXAMPLES=[
  {id:'warehouse',brief:warehouseBrief,lessonIds:['star-grain','scd-history']},

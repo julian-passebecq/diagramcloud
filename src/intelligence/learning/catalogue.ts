@@ -1,19 +1,8 @@
 import {z} from 'zod';
 import {patternSchema,recipeSchema,patternCatalog,recipeRegistry,type ViewRecipe,type CatalogueFamilyFilter} from '../recipes';
-import sourceFile from './sources.json';
+import {R4_LEARNING_SOURCES} from './sources';
+import {R4_LEARNING_CARDS} from './cards';
 import {AUTHORED_FAILURE_MODES,CASE_STUDIES,LEARNING_ADOPTED_ON} from './content';
-import oltpOlap from './cards/oltp-olap.json';
-import starGrain from './cards/star-grain.json';
-import scdHistory from './cards/scd-history.json';
-import medallionEnvironments from './cards/medallion-environments.json';
-import batchStreamCdc from './cards/batch-stream-cdc.json';
-import dbtSparkSql from './cards/dbt-spark-sql.json';
-import trainingInferenceRag from './cards/training-inference-rag.json';
-import ragPipeline from './cards/rag-pipeline.json';
-import graphMemory from './cards/graph-memory.json';
-import workflowAgent from './cards/workflow-agent.json';
-import worktreesCi from './cards/worktrees-ci.json';
-import anthropicScion from './cards/anthropic-scion.json';
 /** Optional typed catalogue entries. Editorial lesson content is separate from recognition rules: nothing here reads a Project or changes a match. */
 export const CATALOGUE_ENTRY_KINDS=['concept','pattern','procedure','technology','case-study','view-recipe'] as const;
 export type CatalogueEntryKind=typeof CATALOGUE_ENTRY_KINDS[number];
@@ -27,7 +16,7 @@ const safeUrl=z.string().url().max(2048).refine(value=>{try{const url=new URL(va
 /** Static documentation records for lessons. A citation is not proof of an owner installation, runtime or applicability. */
 export const learningSourceSchema=z.object({id:sourceRef,title:text(200),url:safeUrl,kind:z.enum(['primary-documentation','primary-provider-case-study','primary-project-documentation','inspected-repository-source','inspected-repository-search-excerpt','observed-github-metadata']),retrievedOn:date,externalRevision:z.string().regex(/^[a-f0-9]{40}$/).nullable(),contentSha256:z.string().regex(/^[a-f0-9]{64}$/).nullable(),limits:text(300)}).strict();
 export type LearningSource=z.infer<typeof learningSourceSchema>;
-export const learningSources:readonly LearningSource[]=(()=>{const rows=z.array(learningSourceSchema).min(1).max(100).parse(sourceFile.sources);if(new Set(rows.map(row=>row.id)).size!==rows.length)throw new Error('Duplicate learning source ID');return rows;})();
+export const learningSources:readonly LearningSource[]=(()=>{const rows=z.array(learningSourceSchema).min(1).max(100).parse(R4_LEARNING_SOURCES.sources);if(new Set(rows.map(row=>row.id)).size!==rows.length)throw new Error('Duplicate learning source ID');return rows;})();
 const claimSchema=z.object({text:text(),basis:z.enum(['primary-source-summary','provider-reported','authored-reasoning']),sourceRefs:z.array(sourceRef).max(6)}).strict();
 /** Optional lesson sections. Absent optional sections are hidden, never an error. */
 export const lessonSchema=z.object({
@@ -104,7 +93,7 @@ export function adoptLearningCard(input:unknown):LearningEntry{
   ...(caseStudy?{caseStudy}:{}),instanceMappings:[],instanceMappingPolicy:card.instanceMappingPolicy});
 }
 /** Curriculum order: warehousing, data engineering, AI systems, agentic development, case study. */
-export const learningCatalogue:readonly LearningEntry[]=validateLearningCatalogue([oltpOlap,starGrain,scdHistory,medallionEnvironments,batchStreamCdc,dbtSparkSql,trainingInferenceRag,ragPipeline,graphMemory,workflowAgent,worktreesCi,anthropicScion].map(adoptLearningCard));
+export const learningCatalogue:readonly LearningEntry[]=validateLearningCatalogue(R4_LEARNING_CARDS.map(adoptLearningCard));
 /** Every catalogue row: legacy registry entries decoded unchanged, then authored lessons. Legacy objects are copied, never shared with the matcher. */
 export function catalogueRows(lessons:readonly unknown[]=learningCatalogue):CatalogueRow[]{
  return [...patternCatalog.map(row=>decodeCatalogueEntry(structuredClone(row))),...recipeRegistry.map(row=>decodeCatalogueEntry(structuredClone(row))),...lessons.map(row=>decodeCatalogueEntry(structuredClone(row)))];

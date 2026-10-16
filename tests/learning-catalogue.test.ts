@@ -11,7 +11,8 @@ import {learningCookbook,referenceCookbook} from '../src/intelligence/cookbook';
 import {samples} from '../src/data/samples';
 import {LearningCatalogue} from '../src/ui/LearningCatalogue';
 import {matcherSnapshot} from './helpers/matcherSnapshot';
-import ragCard from '../src/intelligence/learning/cards/rag-pipeline.json';
+import {R4_LEARNING_CARDS} from '../src/intelligence/learning/cards';
+const ragCard=R4_LEARNING_CARDS.find(card=>(card as {id:string}).id==='rag-pipeline') as Record<string,unknown>;
 
 const lesson=(id:string)=>structuredClone(learningCatalogue.find(entry=>entry.id===id)!);
 test('legacy matcher output is byte-identical to the snapshot recorded before the catalogue extension',()=>{
