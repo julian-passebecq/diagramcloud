@@ -1,0 +1,24 @@
+{
+ "registries": "c05d11e4eec2b610eb94197588ea189baf3cbc14af4738e891b3a48e74535cbf",
+ "browse": "3485b8c9afa85067fb687a5f00eab1b61f03bb81f61da97e5ca6c93fb41a5e47",
+ "fixtures": {
+  "project-constellation": "571a0c90e08a5ef23891eba01177e5e9bb1cfa3da87e397508e46c53272c5cf4",
+  "datapass-platform": "af7325f0b1550566161f91d115cb7246988f18c041b9224fce361533fb5f4556",
+  "foilo-databricks": "6dd6c4ffd8113cb6031c380b28390b6cece5ba12271904d7856af0c8cbec8259",
+  "total-project-controls": "31a9bd30c589241bfe25643a74effcec1b0fce825cb77764534af883a6940af8",
+  "fabric-medallion": "44c757b744388f1c9a3efaf15749936f0dd5e113e6f51b490f7c7052616a359e",
+  "databricks-reference": "ed791f90d9f124977edfb5d873e08c1365d139adccc9832d189c404e4555b7ce",
+  "aws-serverless-web": "d065c14eeffdf554989900357ee5b04e7f6c4fc44910b77304361288a1bed77f",
+  "azure-web-app-private-data": "d4cd362bd65b19a9e7b17d2665a8dbd8677db2ddaa9096068ce3bbf4f61d219a",
+  "gcp-streaming-analytics": "00255113c3b28b41799d3b67a35a0e3980cfa1a4e18e8dc204baf5780ca06fea",
+  "kubernetes-microservices": "461b5a862d57b5d4e51c57f1ab2f567fa85543e0f05433b974783ac7e7431be7",
+  "event-driven-outbox": "e2e1e351f1ca1c71e545dd9c48ee86253c10c9f58ed9034760b218082a9e0c0e",
+  "contoso-forecasting": "2ee9cfaaf10f230c0c36d153f5b392dfb14640f48d5a513170f166a60c0401a0",
+  "blank-project": "4de3f41401654b0e49c896fa1160bd810ae7f26eb1a7ef575a9a63a9df38a1bb",
+  "recipe-application": "99f44e2c4589c1af050f8b176eedf581c8676050b4f61b9bde11bccc69215e82",
+  "recipe-data": "7229e44bd6e4a4f09aa79a1ae07048e0128d05551a84543787c81c1ea5836f4c",
+  "recipe-cloud": "f4d78e3e96799bfc4693a4ba0ea48e1513e32b4615aea514588514e754f27607",
+  "recipe-jobs": "b36e98c08fda75b4ab6720f209e790d939ae4221fd044ce64b8078235b992a7d",
+  "recipe-documents": "abffc65ec9431c34d31fba49f3710bdadcb6183689ed283684e9d90d4946ce87"
+ }
+}
