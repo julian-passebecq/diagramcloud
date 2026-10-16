@@ -14,7 +14,7 @@ export type ChangeDetail={changes:ItemChange[];cautions:string[]};
 export const GROUP_LABEL:Record<string,string>={project:'Project',nodes:'Components',edges:'Connections',views:'Views',blocks:'Evidence',assets:'Images',sources:'Sources',observations:'Observations',story:'Story steps',
  pack:'Evidence workspaces',entities:'Scopes',items:'Panels',workspaces:'Screens','pack-sources':'Workspace sources',relations:'Relations'};
 const SINGULAR:Record<string,string>={nodes:'component',edges:'connection',views:'view',blocks:'evidence block',assets:'image',sources:'source',observations:'observation',story:'story step',
- entities:'scope',items:'panel',workspaces:'screen','pack-sources':'source',relations:'relation'};
+ entities:'scope',items:'panel',workspaces:'screen','pack-sources':'source',relations:'relation',learningMappings:'concept mapping'};
 
 type Rec=Record<string,unknown>;
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
@@ -71,6 +71,7 @@ function diffGroup(group:string,current:Rec[],incoming:Rec[],out:ChangeDetail){
   if(group==='observations'){out.cautions.push(`New ${x.sourceApp} observation about ${String(x.nodeId)} claims “${String(x.claim)}” as of ${String(x.observedAt)} (revision ${String(x.sourceRevision)}). Check the source before you review it.`);
    if(x.reviewedAt)out.cautions.push(`Observation “${nameOf(x)}” arrives already marked reviewed. Review it yourself.`);
    if(x.visibility==='public')out.cautions.push(`Observation “${nameOf(x)}” arrives public.`);}
+  if(group==='learningMappings'&&(x.state==='reviewed'||x.state==='source-declared'))out.cautions.push(`Concept mapping “${String(x.id)}” arrives already ${String(x.state)}. A name or tag match is not evidence; review it yourself.`);
   if(x.provenance==='source-derived'&&isStrings(x.sourceIds)&&!x.sourceIds.length)out.cautions.push(`New ${what} “${nameOf(x)}” is labelled source-derived but cites no source.`);
   if(x.assertion==='verified-in-source'&&isStrings(x.sourceIds)&&!x.sourceIds.length)out.cautions.push(`New ${what} “${nameOf(x)}” claims to be verified in a source but cites none.`);}
  for(const id of d.removed)out.changes.push({kind:'removed',group,id,name:nameOf(d.before.get(id)!),fields:[]});
@@ -78,6 +79,7 @@ function diffGroup(group:string,current:Rec[],incoming:Rec[],out:ChangeDetail){
   out.changes.push({kind:'changed',group,id,name:name===nameOf(a)?name:`${nameOf(a)} → ${name}`,fields:fieldChanges(a,b)});
   if(a.visibility!=='public'&&b.visibility==='public'&&a.visibility!==undefined)out.cautions.push(`Makes ${what} “${name}” public.`);
   if(group==='observations'){if(!a.reviewedAt&&b.reviewedAt)out.cautions.push(`Marks observation “${name}” reviewed.`);if(!a.shareable&&b.shareable)out.cautions.push(`Marks observation “${name}” shareable in the portfolio index.`);if(a.claim!==b.claim)out.cautions.push(`Changes the claim of observation “${name}” from ${String(a.claim)} to ${String(b.claim)}. Only the source app can say this.`);}
+  if(group==='learningMappings'&&a.state!==b.state&&(b.state==='reviewed'||b.state==='source-declared'))out.cautions.push(`Marks concept mapping “${name}” ${String(b.state)}. Only a person reviews a mapping, against its cited evidence.`);
   if(a.approval==='draft'&&b.approval==='approved')out.cautions.push(`Approves ${what} “${name}” for public export.`);
   if(a.provenance!==b.provenance&&(a.provenance==='synthetic'||b.provenance==='source-derived'))out.cautions.push(`Relabels ${what} “${name}” from ${a.provenance} to ${b.provenance}. Only do this when a real source backs it.`);
   if(group==='edges'){const qa=a.quantity as Rec|undefined,qb=b.quantity as Rec|undefined;if(qa?.provenance==='synthetic'&&qb&&qb.provenance!=='synthetic')out.cautions.push(`Relabels the quantity on ${what} “${name}” from synthetic to ${String(qb.provenance)}. Only do this when a real source backs it.`);}
@@ -113,6 +115,7 @@ export function describeChanges(current:Project,incoming:Project):ChangeDetail{
  if(meta.length)out.changes.push({kind:'changed',group:'project',id:incoming.id,name:incoming.title,fields:meta});
  for(const g of ['nodes','edges','views','blocks','assets','sources','observations'] as const)diffGroup(g,current[g] as unknown as Rec[],incoming[g] as unknown as Rec[],out);
  diffGroup('story',steps(current.story),steps(incoming.story),out);
+ diffGroup('learningMappings',(current.learningMappings??[]) as unknown as Rec[],(incoming.learningMappings??[]) as unknown as Rec[],out);
  if(current.experience&&incoming.experience)describePackChanges(current.experience,incoming.experience,out);
  else if(current.experience||incoming.experience)out.changes.push({kind:incoming.experience?'added':'removed',group:'pack',id:(incoming.experience??current.experience)!.id,name:(incoming.experience??current.experience)!.title,fields:[]});
  out.cautions=[...new Set(out.cautions)];

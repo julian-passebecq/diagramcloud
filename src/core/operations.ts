@@ -1,5 +1,6 @@
 import {clone,validateDocument,viewSchema,type Project,type ProjectView} from './model';
 import {publicPack} from '../experience/model';
+import {publicLearningMappings} from './learningMapping';
 export function positionFor(view:ProjectView,nodeId:string){const i=Math.max(0,view.nodeIds.indexOf(nodeId));return view.positions[nodeId]??{x:(i%3)*290,y:Math.floor(i/3)*170};}
 export function traceNodes(doc:Project,viewId:string,start:string,direction:'upstream'|'downstream'):Set<string>{const view=doc.views.find(v=>v.id===viewId),edges=doc.edges.filter(e=>view?.edgeIds.includes(e.id)),seen=new Set([start]),queue=[start];while(queue.length){const current=queue.shift();for(const e of edges){const next=direction==='downstream'?(e.source===current?e.target:null):(e.target===current?e.source:null);if(next&&!seen.has(next)){seen.add(next);queue.push(next);}}}return seen;}
 export function pathToView(doc:Project,target:string):string[]{function visit(viewId:string,path:string[]):string[]|null{if(viewId===target)return[...path,viewId];if(path.includes(viewId))return null;const v=doc.views.find(v=>v.id===viewId);for(const n of doc.nodes.filter(n=>v?.nodeIds.includes(n.id)))if(n.childViewId){const result=visit(n.childViewId,[...path,viewId]);if(result)return result;}return null;}return visit(doc.rootViewId,[])??[target];}
@@ -50,7 +51,10 @@ export function publicDocument(input:Project):Project{
  if(d.atlas){const active=d.atlas.snapshots.find(s=>s.id===d.atlas!.activeSnapshotId)!;// A repository reaches public output through its public card, or, without a card, only when its author marked it public.
  const repositories=active.repositories.filter(r=>r.nodeId?keptNodes.has(r.nodeId):r.visibility==='public');
   if(repositories.length)d.atlas={snapshots:[{...active,repositories,runtimeRefs:[],contextRefs:[]}],activeSnapshotId:active.id};else delete d.atlas;}
- d.story=d.story.filter(s=>keptViews.has(s.viewId)&&(!s.nodeId||keptNodes.has(s.nodeId))).map(s=>({...s,highlightEdgeIds:s.highlightEdgeIds.filter(id=>edges.has(id)),...(s.observationIds?{observationIds:s.observationIds.filter(id=>observations.has(id))}:{})}));return validateDocument(d);
+ d.story=d.story.filter(s=>keptViews.has(s.viewId)&&(!s.nodeId||keptNodes.has(s.nodeId))).map(s=>({...s,highlightEdgeIds:s.highlightEdgeIds.filter(id=>edges.has(id)),...(s.observationIds?{observationIds:s.observationIds.filter(id=>observations.has(id))}:{})}));
+ // Concept mappings last: projected after every other closure, so a mapping never pulls a source, block, node or view into public output.
+ if(d.learningMappings){const kept=publicLearningMappings(input,d,{nodes:keptNodes,views:keptViews,sources,blocks});if(kept.length)d.learningMappings=kept;else delete d.learningMappings;}
+ return validateDocument(d);
 }
 export type History={past:Project[];present:Project;future:Project[]};
 export function commitHistory(h:History,input:Project):History{return{past:[...h.past,h.present].slice(-25),present:validateDocument({...input,revision:h.present.revision+1}),future:[]};}
