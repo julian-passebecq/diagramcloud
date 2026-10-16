@@ -54,6 +54,8 @@ test('lesson -> In my project -> exact component -> back to the same lesson, dep
  await expect(lesson.getByRole('status',{name:'Lesson return context'})).toHaveText('Returned to this lesson at depth Detail, content revision 2026-10-16.1.');
  await expect(lesson.getByRole('radio',{name:'Detail',exact:true})).toBeChecked();
  await expect(lesson.getByRole('status',{name:'Explanation at selected depth'})).toContainText('Detail:');
+ // The lesson diagram reopens at the same depth: depth is a containment level over its example, not only text.
+ await expect(lesson.getByRole('status',{name:'Lesson diagram state'})).toContainText('Depth Detail · containment level 2');
  await expect(back).toHaveCount(0);
 
  // The component lists the concept that explains it, linking back to the lesson.
