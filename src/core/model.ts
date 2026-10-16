@@ -68,6 +68,17 @@ export type StateFacet=typeof STATE_FACETS[number];
 const stateText=short.refine(s=>s.trim().length>0,'State value and scope must be explicit, nonblank source text');
 export const stateFacetSchema=z.object({facet:z.enum(STATE_FACETS),value:stateText,scope:stateText}).strict();
 export const observationSchema=z.object({id,nodeId:id,sourceApp:z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/,'Source app is a lowercase Galaxy/app name such as datapass_vscode or datapass-vscode'),authority:short,observedAt:instant,sourceRevision:z.string().min(1).max(120),claim:z.enum(OBSERVATION_CLAIMS),summary:z.string().min(1).max(500),link:openUri.optional(),blockIds:refs,caveat:z.string().max(1000).default(''),visibility:z.enum(['public','private']).default('private'),reviewedAt:instant.optional(),shareable:z.boolean().default(false),stateFacet:stateFacetSchema.optional()}).strict();
+/** Reference-to-instance association: a catalogue concept (at a content revision) explained by one exact component or
+ * view of this project (at an evidence fingerprint). Stored states only; `stale` is derived on reading, never stored, so a
+ * change of lesson content or target evidence can never be silently rebound. A name, alias, tag or icon may rank a
+ * candidate; it is never evidence: source-declared and reviewed mappings cite project sources or evidence blocks. */
+export const MAPPING_STATES=['suggested','source-declared','reviewed','rejected'] as const;
+export const MAPPING_ORIGINS=['author','ai','imported','source'] as const;
+export const learningMappingSchema=z.object({id,conceptId:z.string().regex(/^[a-z][a-z0-9-]{0,60}$/,'Use the catalogue concept ID'),contentRevision:z.string().min(1).max(80),
+ target:z.object({projectId:id,kind:z.enum(['node','view']),id,projectRevision:z.number().int().nonnegative(),fingerprint:z.string().regex(/^[0-9a-f]{16}$/,'A target fingerprint is 16 hexadecimal characters')}).strict(),
+ evidence:z.object({sourceIds:refs,blockIds:refs}).strict().default({sourceIds:[],blockIds:[]}),
+ state:z.enum(MAPPING_STATES).default('suggested'),origin:z.enum(MAPPING_ORIGINS).default('author'),suggestedBy:z.string().min(1).max(160).optional(),reviewedBy:z.string().min(1).max(160).optional(),reviewedAt:instant.optional(),note:z.string().max(500).optional(),visibility}).strict();
+export type LearningMapping=z.infer<typeof learningMappingSchema>;
 export const portfolioSchema=z.object({projectRef:z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/,'Use a stable project reference such as a DATAPASSCONTROL entity_id').optional(),openUri:openUri.optional(),lastReviewedAt:instant.optional(),indexVisibility:z.enum(['private','shareable']).default('private')}).strict();
 const stepSchema=z.object({title:short,viewId:id,nodeId:id.optional(),narration:z.string().max(2000),highlightEdgeIds:refs,observationIds:z.array(id).max(20).optional()}).strict();
 /**
@@ -100,7 +111,7 @@ export const deliverySchema=z.object({
  configurations:z.array(z.object({...deliveryBase,componentId:id,environmentId:id,kind:z.enum(['flag','configuration']),name:short,valueState:z.enum(['declared-enabled','declared-disabled','configured','unknown'])}).strict()).max(300).optional()
 }).strict();
 export type ProjectDelivery=z.infer<typeof deliverySchema>;
-export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([]),observations:z.array(observationSchema).max(500).default([]),portfolio:portfolioSchema.optional(),experience:packSchema.optional(),atlas:atlasSchema.optional(),delivery:deliverySchema.optional()}).strict();
+export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([]),observations:z.array(observationSchema).max(500).default([]),portfolio:portfolioSchema.optional(),experience:packSchema.optional(),atlas:atlasSchema.optional(),delivery:deliverySchema.optional(),learningMappings:z.array(learningMappingSchema).max(500).optional()}).strict();
 export type Project=z.infer<typeof documentSchema>;
 export type ProjectNode=z.infer<typeof nodeSchema>;
 export type ProjectEdge=z.infer<typeof edgeSchema>;
@@ -154,6 +165,15 @@ export function validateDocument(input:unknown):Project {
   for(const ref of [c.recommendedOptionId,c.chosenOptionId])if(ref)check(ref,options,where);
   if(c.status==='candidate'&&c.chosenOptionId)errors.push(`${where}: a candidate has no chosen option; use recommendedOptionId, or accept it with chosenOptionId, decidedBy and decidedAt`);
   if(c.status==='accepted'&&!(c.chosenOptionId&&c.decidedBy&&c.decidedAt))errors.push(`${where}: an accepted decision records chosenOptionId, decidedBy and decidedAt`);}
+ // Concept mappings: an unknown or changed target is stale (derived), not invalid; establishing a mapping needs evidence and a human reviewer.
+ ids(d.learningMappings??[],'concept mapping');const mappingPairs=new Set<string>();
+ for(const m of d.learningMappings??[]){const pair=m.conceptId+'\0'+m.target.kind+'\0'+m.target.id;if(mappingPairs.has(pair))errors.push(`${m.id}: duplicate mapping of ${m.conceptId} to ${m.target.kind} ${m.target.id}`);mappingPairs.add(pair);
+  if((m.state==='reviewed'||m.state==='source-declared')&&!m.evidence.sourceIds.length&&!m.evidence.blockIds.length)errors.push(`${m.id}: a ${m.state} mapping cites at least one project source or evidence block; a shared name, tag or icon is not evidence`);
+  if(m.state==='reviewed'&&!(m.reviewedBy&&m.reviewedAt))errors.push(`${m.id}: a reviewed mapping records reviewedBy and reviewedAt`);
+  if((m.state==='suggested'||m.state==='source-declared')&&(m.reviewedBy||m.reviewedAt))errors.push(`${m.id}: only a reviewed or rejected mapping records a reviewer`);
+  if(m.origin==='ai'&&m.state==='source-declared')errors.push(`${m.id}: an AI suggestion is not a source declaration`);
+  if(m.origin==='ai'&&!m.suggestedBy)errors.push(`${m.id}: an AI suggestion records suggestedBy`);
+  if(m.origin==='ai'&&m.state==='reviewed'&&m.reviewedBy?.trim().toLowerCase()===m.suggestedBy?.trim().toLowerCase())errors.push(`${m.id}: an AI suggestion cannot review itself; a person reviews it in Edit mode`);}
  // Data-flow cycles are legal. Recursive view expansion is not.
  const done=new Set<string>(),visiting=new Set<string>();
  function visit(viewId:string){if(visiting.has(viewId)){errors.push(`Recursive drilldown cycle at ${viewId}`);return;}if(done.has(viewId))return;visiting.add(viewId);const v=d.views.find(v=>v.id===viewId);for(const n of d.nodes.filter(n=>v?.nodeIds.includes(n.id)))if(n.childViewId)visit(n.childViewId);visiting.delete(viewId);done.add(viewId);}
