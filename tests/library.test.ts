@@ -56,3 +56,36 @@ test('library load validates rows independently, excludes unsafe and tampered ou
  const result=await validateLibraryRows(collections,rows);assert.equal(result.collections.length,1);assert.deepEqual(result.publications.map(p=>p.id),[bound.id,'legacy-output']);assert.equal(result.warnings.filter(w=>w.includes('invalid publication')).length,2);assert.ok(result.warnings.some(w=>w.includes('legacy-unbound')));assert.equal(JSON.stringify({rows,collections}),before);
  assert.equal(JSON.stringify(result).includes('forbidden-value'),false);assert.equal(result.publications[1].outputDigest,undefined);
 });
+
+
+import {preparePublicationRestore,restorePublication,PUBLICATION_RESTORE_REFUSED} from '../src/intelligence/library';
+import {imageManualProject} from './helpers/manualImages';
+function restoreTestProject(){return validateDocument(documentSchema.parse({schemaVersion:1,id:'synthetic-public-restore',title:'Synthetic structured publication',rootViewId:'root',nodes:[{id:'a',label:'Synthetic public component',blockIds:['code'],sourceIds:['source']}],edges:[],views:[{id:'root',title:'Synthetic public view',nodeIds:['a'],edgeIds:[]}],blocks:[{id:'code',title:'Literal code',type:'code',language:'text',code:'<script>window.syntheticExecuted=true</script>',provenance:'synthetic'}],sources:[{id:'source',title:'Synthetic reference',location:'Supplied synthetic source',url:'https://example.invalid/reference',visibility:'public'}]}));}
+async function restoreTestSnapshot(doc=restoreTestProject()){return createPublication(doc,{title:'Synthetic restore',audience:'Synthetic reviewer',viewIds:[doc.rootViewId],profile:'classic'},'2026-10-15T12:00:00Z');}
+test('native restore admission keeps structured frozen identity and literal code without changing authoring inputs',async()=>{
+ const doc=restoreTestProject();doc.privateNotes='SYNTHETIC_PRIVATE_RESTORE';const before=JSON.stringify(doc),snapshot=await restoreTestSnapshot(doc),raw=JSON.stringify(snapshot),prepared=await preparePublicationRestore(snapshot);
+ assert.deepEqual(prepared,snapshot);assert.equal(JSON.stringify(snapshot),raw);assert.equal(JSON.stringify(doc),before);assert.ok(!raw.includes('SYNTHETIC_PRIVATE_RESTORE'));assert.equal(prepared.document.observations.length,0);
+ const html=technicalManualHtml(prepared.document,{viewIds:prepared.viewIds,brief:prepared.brief,now:new Date(prepared.createdAt)});assert.ok(html.includes('&lt;script&gt;window.syntheticExecuted=true&lt;/script&gt;'));assert.ok(!html.includes('<script>'));assert.ok(html.includes("default-src 'none'"));
+});
+test('restore refuses valid opaque assets, experience and reviewed observations without stripping them or touching native validator',async()=>{
+ const media=await restoreTestSnapshot(imageManualProject());await validatePublication(media);assert.ok(media.document.assets.length);await assert.rejects(()=>preparePublicationRestore(media),error=>error instanceof Error&&error.message===PUBLICATION_RESTORE_REFUSED);
+ const doc=restoreTestProject();doc.experience={format:'diagramcloud.experience',schemaVersion:1,id:'synthetic-pack',title:'Synthetic pack',revision:0,rootId:'entity',sources:[],entities:[{id:'entity',label:'Synthetic entity',type:'project',summary:'',children:[],workspaceIds:[],sourceIds:[],visibility:'public',assertion:'illustrative'}],relations:[],items:[],workspaces:[]};
+ const workspace=await restoreTestSnapshot(validateDocument(doc));await validatePublication(workspace);assert.ok(workspace.document.experience);await assert.rejects(()=>preparePublicationRestore(workspace),{message:PUBLICATION_RESTORE_REFUSED});
+ const withClaim=restoreTestProject();withClaim.observations=[{id:'synthetic-claim',nodeId:'a',sourceApp:'synthetic-test',authority:'Synthetic negative-test producer',observedAt:'2026-10-15T10:00:00Z',sourceRevision:'synthetic-revision',claim:'partial',summary:'Synthetic boundary fixture, not a runtime result.',caveat:'Never admitted by publication file restoration.',blockIds:[],visibility:'public',reviewedAt:'2026-10-15T11:00:00Z',shareable:false}];
+ const claim=await restoreTestSnapshot(validateDocument(withClaim)),raw=JSON.stringify(claim);await validatePublication(claim);assert.equal(claim.document.observations.length,1);await assert.rejects(()=>preparePublicationRestore(claim),{message:PUBLICATION_RESTORE_REFUSED});assert.equal(JSON.stringify(claim),raw);
+});
+test('restore rejects whole-document known sensitive text and active/foreign fields with only generic diagnostics',async()=>{
+ const doc=restoreTestProject();doc.nodes[0].summary='token: SYNTHETIC_BOUNDARY_VALUE';const sensitive=await restoreTestSnapshot(doc);await validatePublication(sensitive);
+ const snapshot=await restoreTestSnapshot();for(const input of [sensitive,{...snapshot,frozenHTML:'<script>SYNTHETIC_PRIVATE_HTML</script>'},{...snapshot,document:{...snapshot.document,privateNotes:'SYNTHETIC_PRIVATE_NOTES'}},{...snapshot,document:{...snapshot.document,title:'Tampered'}},{format:'galaxy.publication-snapshot/1',snapshot_id:'other',contract_versions:[]}]){
+  await assert.rejects(()=>preparePublicationRestore(input),error=>error instanceof Error&&error.message===PUBLICATION_RESTORE_REFUSED&&!/SYNTHETIC_PRIVATE|BOUNDARY_VALUE/.test(error.message));
+ }
+});
+test('legacy input remains unbound and revoked restore stops before opening any IndexedDB transaction',async()=>{
+ const value=await restoreTestSnapshot(),legacy=structuredClone(value);delete legacy.outputDigest;delete legacy.brief;legacy.outputBinding='bound';const prepared=await preparePublicationRestore(legacy);assert.equal(prepared.outputBinding,'legacy-unbound');assert.equal(prepared.outputDigest,undefined);assert.equal(prepared.id,value.id);assert.equal(prepared.digest,value.digest);
+ await assert.rejects(()=>restorePublication(prepared,()=>false),{message:PUBLICATION_RESTORE_REFUSED});
+});
+
+
+test('restore admission refuses credential-bearing source links even when canonical snapshot validation succeeds',async()=>{
+ const doc=restoreTestProject();doc.sources[0].url='https://synthetic-user:synthetic-password@example.invalid/reference';const snapshot=await restoreTestSnapshot(doc);await validatePublication(snapshot);await assert.rejects(()=>preparePublicationRestore(snapshot),{message:PUBLICATION_RESTORE_REFUSED});
+});

@@ -3,9 +3,12 @@
 import {parseAllDocuments,parseDocument,isMap,isNode} from 'yaml';
 import type {ScanFile} from '../core/scan/scanner';
 import type {DomainFact,DomainLink} from './domainAdapters';
+import type {DocumentDiagnostic} from './types';
+import {gapAdvice} from './gapDetails';
 
 type Obj=Record<string,unknown>;
-export type NativeContext={files:ScanFile[];facts:Map<string,DomainFact>;add:(f:DomainFact)=>void;edge:(e:DomainLink)=>void;diag:(p:string,m:string)=>void;parsed:(f:ScanFile,json:boolean)=>unknown};
+export type NativeDiagnosticAdvice=Pick<DocumentDiagnostic,'code'>&Partial<Pick<DocumentDiagnostic,'line'|'cause'|'action'>>;
+export type NativeContext={files:ScanFile[];facts:Map<string,DomainFact>;add:(f:DomainFact)=>void;edge:(e:DomainLink)=>void;diag:(p:string,m:string,advice?:NativeDiagnosticAdvice)=>void;parsed:(f:ScanFile,json:boolean)=>unknown};
 const obj=(v:unknown):v is Obj=>!!v&&typeof v==='object'&&!Array.isArray(v);
 const entries=(v:unknown):[string,unknown][]=>obj(v)?Object.entries(v):[];
 const arr=(v:unknown):unknown[]=>Array.isArray(v)?v:[];
@@ -202,6 +205,15 @@ function bicepBlocks(text:string):Block[]{
   if(!depth)out.push({name:m[1],type:m[2],api:m[3],body:text.slice(start,i-1),index:m.index!,bodyIndex:start,existing:!!m[4]});
  }return out;
 }
+/** Recognize only ARM parameters()/variables() calls outside quoted literals; never evaluate them. */
+function dynamicArmDependency(value:string):boolean{
+ const text=value.trim();if(!/^\[(?!\[)[\s\S]*\]$/.test(text))return false;
+ for(let i=1;i<text.length-1;i++){
+  if(text[i]==="'"){let closed=false;for(i++;i<text.length-1;i++){if(text[i]!=="'")continue;if(text[i+1]==="'"){i++;continue;}closed=true;break;}if(!closed)return false;continue;}
+  if(!/[\w.]/.test(text[i-1])&&/^(?:parameters|variables)\s*\(\s*'(?:[^']|'')+'\s*\)/i.test(text.slice(i)))return true;
+ }
+ return false;
+}
 export function analyzeAzure(c:NativeContext):void{
  const locations=new Map<string,ReturnType<typeof parseDocument>>();
  const sourceLine=(f:ScanFile,path:(string|number)[],fallback:string)=>{try{if(!locations.has(f.path))locations.set(f.path,parseDocument(f.text));const doc=locations.get(f.path)!,parent=doc.getIn(path.slice(0,-1),true);if(isMap(parent)){const pair=parent.items.find(p=>isNode(p.key)&&String(p.key.toJSON())===String(path.at(-1)));if(isNode(pair?.key)&&pair.key.range)return at(f.text,pair.key.range[0]);}const node=doc.getIn(path,true);return isNode(node)&&node.range?at(f.text,node.range[0]):line(f.text,fallback);}catch{return line(f.text,fallback);}};
@@ -214,7 +226,7 @@ export function analyzeAzure(c:NativeContext):void{
      const key=id+':'+field+':'+index,source=sourceLine(f,['properties','template',field,index,'name'],str(container.name));
      c.add({key,domain:'azure',kind:'process',label:str(container.name),path:f.path,line:source,summary:field==='initContainers'?'Container Apps init container declaration; commands are not copied or executed.':'Container Apps container declaration; image availability, environment values and runtime execution unknown.'});c.edge({from:id,to:key,label:'Container Apps declared '+field,path:f.path,line:source});
     }
-   }else c.diag(f.path,'Unsupported Container Apps config shape; requires properties.template.containers. No resource guessed from filename.');
+   }else c.diag(f.path,'Unsupported Container Apps config shape; requires properties.template.containers. No resource guessed from filename.',{code:'unsupported',line:1,...gapAdvice('unsupported-analyzer')});
   }
   if(name.endsWith('.bicep')){const blocks=bicepBlocks(f.text),key=(symbol:string)=>'azure:resource:'+f.path+':'+symbol;
    for(const block of blocks)c.add({key:key(block.name),domain:'azure',kind:/Storage|Sql|DocumentDB/i.test(block.type)?'storage':'app',label:block.name,path:f.path,line:at(f.text,block.index),summary:'Declared Bicep '+block.type+' API '+block.api+(block.existing?'; existing-resource reference':'')+'. Deployment and health UNKNOWN.'});
@@ -237,7 +249,9 @@ export function analyzeAzure(c:NativeContext):void{
    };walk(data.resources);
    for(const r of resources){if(r.parent)c.edge({from:r.parent,to:r.id,label:'ARM nested resource',path:f.path,line:sourceLine(f,[...r.path,'name'],str(r.raw.name))});
     for(const [index,dep] of arr(r.raw.dependsOn).map(str).entries()){const match=/^\[resourceId\(\s*'([^']+)'\s*,\s*'([^']+)'\s*\)\]$/.exec(dep),direct=resources.filter(x=>str(x.raw.name)===dep||str(x.raw.type)+'/'+str(x.raw.name)===dep),resolved=match?resources.filter(x=>str(x.raw.type)===match[1]&&str(x.raw.name)===match[2]):direct;
-     if(resolved.length===1)c.edge({from:resolved[0].id,to:r.id,label:'ARM exact dependsOn',path:f.path,line:sourceLine(f,[...r.path,'dependsOn',index],dep)});else c.diag(f.path,'ARM dependsOn expression unresolved or ambiguous; not evaluated.');}
+     if(resolved.length===1)c.edge({from:resolved[0].id,to:r.id,label:'ARM exact dependsOn',path:f.path,line:sourceLine(f,[...r.path,'dependsOn',index],dep)});
+     else if(dynamicArmDependency(dep))c.diag(f.path,'ARM dependsOn expression unresolved; recognized parameters()/variables() references are not evaluated.',{code:'unresolved',line:sourceLine(f,[...r.path,'dependsOn',index],dep),...gapAdvice('dynamic-unresolved')});
+     else c.diag(f.path,'ARM dependsOn expression unresolved or ambiguous; not evaluated.');}
    }
   }
   if(name==='function.json'&&obj(data)&&Array.isArray(data.bindings)){
@@ -264,7 +278,7 @@ export function analyzeKubernetesPackaging(c:NativeContext):void{
  };
  const packages=c.files.filter(f=>/^(?:Chart\.ya?ml|kustomization\.ya?ml|Kustomization)$/i.test(base(f.path)));
  for(const f of packages){const raw=c.parsed(f,false);if(!obj(raw))continue;const helm=/^Chart\./i.test(base(f.path)),id='kubernetes:'+(helm?'chart:':'overlay:')+f.path;
-  if(helm&&!/^(?:v1|v2)$/.test(str(raw.apiVersion))){c.diag(f.path,'Unsupported Helm Chart API version.');continue;}
+  if(helm&&!/^(?:v1|v2)$/.test(str(raw.apiVersion))){c.diag(f.path,'Unsupported Helm Chart API version.',{code:'unsupported',line:line(f.text,str(raw.apiVersion)),...gapAdvice('unsupported-analyzer')});continue;}
   c.add({key:id,domain:'kubernetes',kind:'control',label:helm?str(raw.name)||base(dir(f.path)):base(dir(f.path))||'Kustomize overlay',path:f.path,line:1,summary:helm?'Helm chart declaration; templates never rendered and no dependency downloaded.':'Kustomize package/overlay declaration; transformers and cluster state not evaluated.'});
   if(helm){for(const dep of arr(raw.dependencies)){if(!obj(dep)||!str(dep.name))continue;const repository=str(dep.repository);
     if(repository.startsWith('file://')){const path=localPath(f.path,repository.slice(7)),target=path?c.files.find(x=>dir(x.path)===path&&/^Chart\.ya?ml$/i.test(base(x.path))):null;

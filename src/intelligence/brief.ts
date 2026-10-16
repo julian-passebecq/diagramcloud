@@ -84,10 +84,30 @@ export function compileProjectBrief(input: unknown): {document: Project; manifes
   });
   const nodeId = (id: string) => `brief-scope-${id}`;
   const sourceIds = ['project-brief-source'];
+  const repositorySourceId = (id: string) => `brief-repository-${id}`;
+  for (const repository of [...b.repositories].sort((a, c) => a.id.localeCompare(c.id))) {
+    // Membership is declared by the brief. It never attests that repository content was read.
+    // A local path/locator is acquisition input only, even in a private authoring document.
+    let remote: string | undefined;
+    if (repository.host !== 'local') {
+      try {
+        const url = new URL(repository.locator);
+        if (['http:', 'https:'].includes(url.protocol) && !url.username && !url.password && !url.search && !url.hash) remote = url.href;
+      } catch {
+        if (['github', 'gitlab', 'bitbucket'].includes(repository.host) && /^[\w.-]+\/[\w.-]+$/.test(repository.locator)) remote = repository.locator;
+      }
+    }
+    const ref = repository.ref && !/^[a-z][a-z0-9+.-]*:|^\/|[\\\u0000-\u001f]/i.test(repository.ref) && !repository.ref.split('/').some(part => part === '..' || part === '.') ? repository.ref : undefined;
+    document.sources.push({id: repositorySourceId(repository.id), title: `Declared repository: ${repository.title}`.slice(0, 160), visibility: 'private',
+      location: [`Author-declared ${repository.host} repository ${repository.id}`, ...(remote ? [remote] : []),
+        ...(ref ? [`ref ${ref}`] : []), ...(repository.revision ? [`revision ${repository.revision}`] : []), 'Source not inspected; runtime unknown.'].join(' · ')});
+  }
   for (const s of b.scope) {
     const owners = b.ownership.filter(o => o.scopeId === s.id).map(o => `${o.role}: ${b.teams.find(t => t.id === o.teamId)!.title}`);
     const blockId = `brief-meta-${s.id}`;
-    document.blocks.push({id: blockId, title: 'Declared project context', type: 'text', visibility: 'private', sourceIds, provenance: 'author',
+    const bindingSourceIds = [...sourceIds, ...[...new Set(s.repositoryIds)].sort().map(repositorySourceId)];
+    // Bind the private declaration evidence, not the authored caption: node.sourceIds retain their existing meaning.
+    document.blocks.push({id: blockId, title: 'Declared project context', type: 'text', visibility: 'private', sourceIds: bindingSourceIds, provenance: 'author',
       text: [s.summary, ...owners, s.repositoryIds.length ? `Declared repository bindings: ${s.repositoryIds.join(', ')}` : 'No repository binding supplied.'].filter(Boolean).join('\n')});
     document.nodes.push({id: nodeId(s.id), label: s.title, kind: s.kind === 'system' ? 'app' : s.kind === 'workstream' ? 'control' : 'process',
       provider: 'Generic', icon: 'generic', summary: s.summary, role: owners.join('; ').slice(0, 1000), status: 'idle',

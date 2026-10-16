@@ -1,0 +1,80 @@
+{
+  "format": "diagramcloud.project-brief",
+  "version": 1,
+  "project": {
+    "id": "draft-01-petit-client",
+    "title": "Petit client sans outils",
+    "summary": "Exemple synthetique independant de Galaxy. Une page commande des donnees a une API et les presente; rien n a ete execute."
+  },
+  "scope": [
+    {
+      "id": "scope",
+      "title": "Client demonstrateur",
+      "kind": "system",
+      "summary": "Petit projet sans organisation ni depot obligatoire."
+    },
+    {
+      "id": "page",
+      "title": "Ecran de consultation",
+      "kind": "component",
+      "summary": "Affiche le resultat fourni. Ne declare pas de framework non fourni.",
+      "parentId": "scope"
+    },
+    {
+      "id": "api",
+      "title": "API du projet",
+      "kind": "component",
+      "summary": "Traite la demande. Implementation non fournie.",
+      "parentId": "scope"
+    },
+    {
+      "id": "data",
+      "title": "Donnees",
+      "kind": "component",
+      "summary": "Stockage illustratif; schema et moteur inconnus.",
+      "parentId": "scope"
+    },
+    {
+      "id": "request",
+      "title": "Demander les donnees",
+      "kind": "task",
+      "summary": "Etape illustrative de lecture.",
+      "parentId": "api"
+    },
+    {
+      "id": "reply",
+      "title": "Retourner un resultat",
+      "kind": "task",
+      "summary": "Format non fourni; ne pas inventer de colonnes.",
+      "parentId": "api"
+    }
+  ],
+  "relationships": [
+    {
+      "id": "link-1",
+      "from": "page",
+      "to": "api",
+      "label": "Requete declaree",
+      "kind": "query"
+    },
+    {
+      "id": "link-2",
+      "from": "api",
+      "to": "data",
+      "label": "Lecture illustrative",
+      "kind": "query"
+    },
+    {
+      "id": "link-3",
+      "from": "request",
+      "to": "reply",
+      "label": "Ordre explicatif",
+      "kind": "control"
+    }
+  ],
+  "questions": [
+    "Quel contrat API est fourni ?",
+    "Quel schema de donnees est fourni ?",
+    "Aucune execution ni performance n est mesuree."
+  ]
+}

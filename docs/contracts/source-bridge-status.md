@@ -1,0 +1,71 @@
+# Sources & Bridge display slice
+
+This internal, read-only display joins existing provenance in Structure/Evidence outputs, selected or pinned ProjectContext Evidence, and the transient configured-source result. It creates no Project fields, stored receipt, consumer protocol, parser, cache, permission or action port. Public citations remain in their existing lists. It does not qualify the full V2 bridge acceptance.
+
+`sourceBridgeStatus(project, {publicMode, repositoryId?, bundle?})` returns a derived display projection. `SourceBridgeSummary` renders it as native progressive disclosures. Public mode returns the same `private-metadata-unavailable` result before reading Project, repository selectors, historical receipts or validating optional private bundles. It reveals no private presence, invalidity, count, path, hash or installed version. The configured panel remains author-only through its existing mount boundary; it supplies only its existing validated transient result. No App or sidecar state is added.
+
+The historical acquisition path uses the existing reader rules through internal `inspectAcquisitionAnalysis`; the legacy `readAcquisitionAnalysis` return contract is unchanged. An explicit repository request never falls back to global or another repository's receipt. A context pin is explanatory scope, not the canonical Edit target. A global receipt is explicitly acquisition-wide and unattributed to the selected component, pin or canonical Edit target. A transient configured result has its explicit revision vector; no attribution to another repository is inferred. Passing both a repository receipt selector and a transient bundle is refused as unavailable: these independent scopes are never implicitly joined, even when the strings happen to match. Missing and unreadable historical receipts both remain unavailable/UNKNOWN under the legacy reader contract; the author summary additionally distinguishes those two local read outcomes using fixed text only.
+
+## Fact boundaries
+
+| Display | Supplied fact and limit |
+| --- | --- |
+| Source producer application/build version | UNKNOWN: neither receipt supplies an installed producer build. |
+| Original source contract | UNKNOWN: an output bundle/document-map version is not an original input version. |
+| Local consumer | Exact acquisition analyzerVersion or configured parserVersion; never relabelled producer. |
+| Output contract | Exact existing document-map/1 or analysis-bundle/1 returned contract. |
+| Receipt capture | Acquisition observedAt is receipt capture time, not runtime verification or freshness. Configured capture time UNKNOWN. |
+| Revision | Acquisition sourceRevision is a HEAD hint; configured revision is supplied context, potentially `unknown`. Neither verifies dirty state, deployment or freshness. |
+| Aggregate digest | Exact inspected-content digest/vector. Never copied into per-file SHA fields. |
+| Per-file SHA/range | Configured source rows preserve their supplied repositoryId and source ID as well as hashes and line/endLine, even when two repositories have the same path, revision and bytes. Historical acquisition inventory has the explicit repository selector when supplied, otherwise global/unattributed; no source ID, per-file hash or range is retained there: UNKNOWN. Structured field selector UNKNOWN. No opaque source location or ID is parsed. |
+| Requested profile | Depth and requested analyzers where supplied. A requested analyzer is not proof it ran, succeeded or supported every input. |
+| Admission | Existing acquisition selected/read/unsupported/ignored/limited counts. No inventory is invented for configured text ranges. |
+| Returned outputs | Actual returned categories only. Missing category UNKNOWN; known zero is preserved. No coverage denominator, runtime ranking or unsupported classification from empty results. |
+| Diagnostic cause | Only an existing validated typed cause. Prose never supplies a cause. Standard next-step advice is inert and grants no access. Existing diagnostic messages/citations remain in their original surfaces. |
+
+The summary limits are 24 entry/range rows, 12 revision rows and 8 typed diagnostics. Each omitted-row count is the exact returned length minus its displayed limit. Producer omissions remain separate, with their original categories. No truncation is silently presented as completeness. Native details keep the default display small; the source table has a labelled keyboard-focusable region with local horizontal overflow, including 390px and 1150px prepared journeys.
+
+## Acceptance retained and incomplete
+
+Original feature IDs remain `r3:bridge-workspace` (parents `v2:bridge;v2:design-gap-loop;r2:micro-hop`), `r3:actionable-gaps` and `v2:bridge` (inherited `F032;F063;F064;DG-002`). Original UX keys are `journey-bridge-workspace`, `journey-actionable-gaps`, `modern-bridge`, `gap-loop`. The exact original feature/UX fields, nested ZIP identities and selected source facts are preserved in the ignored plan `.local/v2-studio-layout/next-source-bridge-plan.json` (SHA256 b35f1903124b0fa1f24b5cde289c360d301263bcc40430c0433ef8a93fff128a). These are source acceptance criteria, not a new certification.
+
+The bounded display addresses fragmented existing provenance and helps preserve the usable source-only path. It does not close these independent prerequisites:
+
+1. Modern v5 Hub/Core coverage needs its owner's exact contract, validator, producer revision and valid/invalid/stale/incompatible fixtures. No v5 adapter or owner format is invented. Global provider/MCP configuration stays with its owner.
+2. Reopened GraphSnapshot receipts do not retain the original structured per-file source_ref hash/selector. Preserving that needs a separately approved private receipt/compatibility change. Opaque source.location/IDs/signatures are never reversed into hashes. The existing GraphSnapshot import remains available.
+3. Live sidecar link/permission/base-file-hash is App session state, not Project facts. This first slice has no App/sidecar props, read/poll/write action or inferred offline/absent state. A separately selected narrow integration would be needed.
+4. The author-only historical summary distinguishes absent from retained-but-unreadable context using the existing reader rules. This is a local diagnostic, not a producer fault, stale revision, denied access, repair or owner adoption. Full source-vector/handoff reconciliation remains open.
+
+Hub capability imports, exact installed producer version, current freshness and dynamic/runtime outcomes remain UNKNOWN when not supplied. No automatic AI completion, reviewed proposal, observation, source rewrite or authoring mutation is introduced. State remains PARTIAL, independently of whether this local slice later passes its own gates.
+
+## Prepared validation
+
+Units exercise actual acquisition and document-bundle producers, reopened serialization, known zero versus unknown, exact bounded omissions, per-repository isolation, caller mutation isolation, typed versus generic failure, public poison getters/noninterference and preservation of public citations. Browser payloads use ordinary validated imports, the selected-folder acquisition and configured worker UI, actual downloaded bundle identity, pinned explanatory scope, mode reset, canonical JSON equality, public constant output and controlled 390/1150 overflow with screenshots. Prepared tests are not a claim that they ran; qualification belongs to a later source-bound root receipt.
+
+
+## Author diagnostic for retained acquisition context
+
+`inspectAcquisitionAnalysis(project, repositoryId?)` is an internal read result, not a persisted or external format. It returns `absent`, `unreadable`, or `available` with the same validated analysis that the legacy reader returns. The old `readAcquisitionAnalysis(project, repositoryId?)` still returns that parsed payload for an available receipt and `undefined` otherwise. Prefix selection, private visibility, sort order, the 42-block / 2,000,000-character limits, JSON/schema parsing and legacy compatibility remain unchanged. This addition does not require contiguous chunk suffixes, rewrite a retained receipt or tighten the canonical Project schema.
+
+Only the author summary's historical unavailable output receives optional `retainedContext: absent | unreadable`. Valid historical metadata and configured transient-result metadata retain their previous output shape and values. A private block set that the current rules cannot read gets the same fixed notice whether its JSON, bounds or schema caused the refusal; no raw exception, imported byte snippet, path, analyzer name, source ID, digest or count is reflected. An absent scope gets a separate fixed notice. Neither condition establishes a producer error or missing source implementation. No typed GapCause is invented from malformed text or a capture date.
+
+The summary validates explicit repository selectors before using this private reader. Invalid/empty selectors never fall back to global context, another repository is never substituted, and a repository selector plus a transient bundle remains refused as an ambiguous combination. Those input failures keep a generic unavailable outcome rather than pretending a retained receipt was inspected. The global context remains acquisition-wide and unattributed to a pin or canonical Edit target.
+
+The public constant branch still runs before every private Project, repository, bundle, presence or validation access. Public output is identical for absent, valid and unreadable author receipts, with existing public citations preserved. It exposes no private validity oracle. The UI offers fixed inert advice to review or reselect the original source through the existing analysis controls; it performs no read, retry, repair, import, scan, patch, permission or network action. Opening the diagnostic changes no Project field, revision, source vector, observation, profile or persistent store. Capture age and a HEAD hint do not become a freshness or runtime verdict.
+
+This independently selected maintenance slice partially supports original `r3:actionable-gaps` and `r3:bridge-workspace`. The exact immutable parent `v2:recovery` has a different W1 meaning: recover native owners/worktrees and original deltas, preserve inherited identities/history, register one adopted delta and resolve source-vector conflicts/unknowns. Its `adopt` and `remote-delivery` journeys require their own real ownership/adoption and delivery inputs. It remains **OPEN**; browser backup, this diagnostic and a source panel do not complete it. Original full rows and UX are retained separately in the ignored criteria plan, without new owner formats, source grants or execution authority. All eight workstreams remain PARTIAL.
+
+Prepared tests use actual selected acquisition, existing private attachment and save/serialize/reopen paths, safe corrupt fixtures through ordinary reviewed import, explicit scope isolation, valid legacy compatibility, over-budget/current-schema refusals, caller mutation isolation and public poison getters. Browser evidence must cover actual saved-row equality, generic author text without payload reflection, mode/project changes and native 390px disclosure/focus/overflow. Existing tests and limits remain. A prepared payload or syntax check establishes no runtime result; root must review and qualify the exact later applied source and inspect fresh PNGs.
+
+
+## Retained diagnostic pages in the existing summary
+
+The author-only **Producer-supplied diagnostic causes** disclosure provides native Previous/Next controls over all diagnostic rows retained by the existing validated receipt or explicitly supplied configured bundle. The first page remains eight rows. The display states the exact retained total, current range, page and rows after this page. Rows outside a display page remain distinct from producer-reported omissions: producer-omitted rows are unavailable here and are never recovered, inferred or fabricated. Entry/range24 and revision12 limits, parser/reader formats, acquisition budgets and the configured SourceBundlePanel complete-list surface are unchanged.
+
+The optional internal diagnostic page input accepts only nonnegative safe integers; invalid values use the first page without coercion and valid excessive values clamp to the last retained page. Without a page request, the pure summary retains its previous first-eight output shape and values. Page metadata is ephemeral display data, never a new persisted model, schema, protocol, source version or store.
+
+Only the existing validated producer `cause` supplies `actionForGapCause` advice. Legacy diagnostic prose stays unclassified. Path, line, code and message retain their supplied meaning. Advice is inert and performs no read, retry, repair, permission, network or authoring action. Diagnostic count never proves analyzer coverage, runtime, producer fault or modern bridge support.
+
+The public constant returns before Project, repository, bundle or page access/validation. It exposes no private counts, paths, invalidity or retained page. The UI masks obsolete page state synchronously on Project object, ID/revision, repository, bundle and public transitions; returning to an author scope starts at its first page. Page state is local to this mounted summary, independent of selection/Pin and canonical Edit targets. Explicit missing repositories and contradictory repository-plus-bundle inputs keep their existing unavailable result without global fallback.
+
+Prepared tests cover exact0/8/9/17rows, current bounds, non-coercing inputs, producer omissions, legacy reader results and cause absence, defensive display copies, public poison getters, explicit repository/bundle identity, normal import/save/reopen/replacement, native keyboard paging and full-text390/1150px controls. These cases have not been run by the proposal author. Actual affected and mandatory source-bound qualification and root image inspection remain separate prerequisites after reviewed application. All eight workstreams remain PARTIAL. W1 `v2:recovery` retains its original source-vector/writers/grants/worktree/adoption meaning and stays OPEN; this display is not browser backup or owner adoption.

@@ -6,6 +6,8 @@ import {mapDocuments, wantedDocument, DOCUMENT_LIMITS} from './documents';
 import type {DocumentMap, Purpose} from './types';
 import {materializeAnalysis} from './materialize';
 import {analyzeDomainFiles,extendWithDomainFacts} from './domainAdapters';
+import {selectedReadFailureCause} from './selectedFileRead';
+import {actionForGapCause} from './gapDetails';
 
 export const ACQUISITION_PROFILES = {
   quick: {files:200, fileBytes:64*1024, totalBytes:4*1024*1024},
@@ -47,11 +49,11 @@ export async function analyzePickedFolder(list:ArrayLike<File>,options:{depth:'q
     if(!Number.isSafeInteger(f.size)||f.size<0||f.size>fileCap||reservedFiles>=budget.files||reservedBytes+f.size>budget.totalBytes||(doc&&(docFiles>=DOCUMENT_LIMITS.files||docBytes+f.size>DOCUMENT_LIMITS.totalBytes))){limited++;add({path,bytes:Math.max(0,f.size||0),state:'limited'});continue;}
     reservedFiles++;reservedBytes+=f.size;if(doc){docFiles++;docBytes+=f.size;}picked.push(item);
   }
-  const files:ScanFile[]=[],documents:ScanFile[]=[],hashes:string[]=[],failedPaths:string[]=[];let readBytes=0,readFiles=0;
+  const files:ScanFile[]=[],documents:ScanFile[]=[],hashes:string[]=[],failedReads:{path:string;cause?:'access-denied'}[]=[];let readBytes=0,readFiles=0;
   for(const {f,path} of picked){
     abort(signal);await yieldTurn();abort(signal);
     let buffer:ArrayBuffer;
-    try{buffer=await f.arrayBuffer();}catch(error){abort(signal);if(error instanceof Error&&error.name==='AbortError')throw error;ignored++;failedPaths.push(path);add({path,bytes:f.size,state:'failed'});continue;}
+    try{buffer=await f.arrayBuffer();}catch(error){abort(signal);if(error instanceof Error&&error.name==='AbortError')throw error;ignored++;failedReads.push({path,cause:selectedReadFailureCause(error)});add({path,bytes:f.size,state:'failed'});continue;}
     const bytes=new Uint8Array(buffer);abort(signal);
     if(bytes.byteLength!==f.size){throw new Error('Selected file changed during analysis; select the folder again.');}
     readBytes+=bytes.byteLength;readFiles++;
@@ -66,7 +68,7 @@ export async function analyzePickedFolder(list:ArrayLike<File>,options:{depth:'q
   const result=documentFromScan(model,{fileName:selectedRoot});
   const documentMap=mapDocuments(documents,text=>!secretInText(text));
   documentMap.diagnostics.push(...sourceConflictCandidates(documents,files));
-  documentMap.diagnostics.push(...failedPaths.map(path=>({path,code:'unsupported' as const,message:'Selected file read failed; contents unavailable and absence does not establish removal. Read error text is omitted.'})));
+  documentMap.diagnostics.push(...failedReads.map(({path,cause})=>({path,code:'unsupported' as const,message:'Selected file read failed; contents unavailable and absence does not establish removal. Read error text is omitted.',...(cause?{cause,action:actionForGapCause(cause)}:{})})));
   const domain=analyzeDomainFiles(files);
   // Persist a bounded map rather than allowing hundreds of long heading/record lists
   // to exceed the authoring document's size budget.
@@ -84,7 +86,7 @@ export async function analyzePickedFolder(list:ArrayLike<File>,options:{depth:'q
   result.report.kept.push(`Inspected ${readFiles} of ${all.length} selected files (${options.depth}); ${documents.length} lexical documents mapped. Content digest identifies inspected bytes; HEAD and dirty state are separate.`);
   if(domain.facts.length)result.report.kept.push(`Static specialist artifacts: ${domain.facts.length} facts, ${domain.links.length} explicitly declared relations, ${domain.capabilities.join(', ')}. Nothing executed.`);
   if(domain.diagnostics.length)result.report.lost.push(`Specialist limitations: ${domain.diagnostics.slice(0,12).join(' | ')}`);
-  if(failedPaths.length)result.report.lost.push(`${failedPaths.length} selected files could not be read; each is recorded privately as failed and the source scope is partial.`);
+  if(failedReads.length)result.report.lost.push(`${failedReads.length} selected files could not be read; each is recorded privately as failed and the source scope is partial.`);
   result.report.lost.push(`${unsupported} unsupported, ${ignored} excluded/unsafe, ${limited} budget-limited files. Revision ${model.commit?'is a HEAD hint only':'unknown'}; dirty state unknown. No runtime claims established.`);
   return {document,report:result.report,analysis,read:readFiles,model,domain};
 }

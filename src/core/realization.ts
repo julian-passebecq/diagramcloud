@@ -1,5 +1,5 @@
 import {PATCH_FORMAT,type Patch} from './patch';
-import type {Observation,Project} from './model';
+import {STATE_FACETS,type StateFacet,type Observation,type Project} from './model';
 
 /**
  * Three meanings kept apart in content and UI (see the observation contract in model.ts):
@@ -25,21 +25,35 @@ export function observationsFor(doc:Pick<Project,'observations'>,nodeId:string):
 
 export type Realization={state:'designed'|Observation['claim'];latest?:Observation;count:number;presented:boolean;text:string;title:string};
 export function realizationOf(doc:Pick<Project,'observations'>,nodeId:string):Realization{
- const list=observationsFor(doc,nodeId),latest=list[0],presented=list.some(isPresented);
- if(!latest)return {state:'designed',count:0,presented:false,text:'Designed',title:`${MEANING.designed.label}: ${MEANING.designed.help}`};
+ const list=observationsFor(doc,nodeId).filter(o=>!o.stateFacet),latest=list[0],presented=list.some(isPresented);
+ if(!latest)return {state:'designed',count:0,presented:false,text:'Designed',title:`${MEANING.designed.label}: ${MEANING.designed.help}${doc.observations.some(o=>o.nodeId===nodeId&&o.stateFacet)?' Independent scoped source states are shown separately; no general realization claim.':''}`};
  return {state:latest.claim,latest,count:list.length,presented,text:`${CLAIM_LABEL[latest.claim]} · ${day(latest.observedAt)}`,
   title:`${CLAIM_LABEL[latest.claim]} by ${latest.sourceApp} (authority: ${latest.authority}) at revision ${latest.sourceRevision}, ${latest.observedAt}.${latest.reviewedAt?'':' Not reviewed yet.'}${latest.caveat?` Caveat: ${latest.caveat}`:''}`};
 }
 
 /** What another app sends: the fact and its provenance. Review, visibility and sharing are the author's decisions. */
-export type ObservationInput=Pick<Observation,'id'|'nodeId'|'sourceApp'|'authority'|'observedAt'|'sourceRevision'|'claim'|'summary'>&{link?:string;caveat?:string;blockIds?:string[]};
+export type ObservationInput=Pick<Observation,'id'|'nodeId'|'sourceApp'|'authority'|'observedAt'|'sourceRevision'|'claim'|'summary'>&{link?:string;caveat?:string;blockIds?:string[];stateFacet?:Observation['stateFacet']};
+
+export const STATE_FACET_LABEL:Record<StateFacet,string>={lifecycle:'Lifecycle',selection:'Selection',implementation:'Implementation',verification:'Verification',distribution:'Distribution',runtime:'Runtime'};
+/** Dated claims, including history and disagreements. No cross-source winner, current-state verdict or
+ * inference from design status, a summary, absence of commits or a folder digest. Missing axes stay unknown. */
+export function stateFacetsFor(doc:Pick<Project,'observations'>,nodeId:string):{facet:StateFacet;label:string;observations:Observation[]}[]{
+ const observations=observationsFor(doc,nodeId).filter(o=>o.stateFacet).sort((a,b)=>Date.parse(b.observedAt)-Date.parse(a.observedAt)||(a.id<b.id?-1:a.id>b.id?1:0));
+ return STATE_FACETS.map(facet=>({facet,label:STATE_FACET_LABEL[facet],observations:observations.filter(o=>o.stateFacet?.facet===facet)}));
+}
+export function stateFacetLine(o:Observation):string{
+ return o.stateFacet?`${STATE_FACET_LABEL[o.stateFacet.facet]}: ${o.stateFacet.value} (scope: ${o.stateFacet.scope})`:'';
+}
 
 /**
  * A revision-guarded patch that adds one observation, for DataPass VS Code, an operator script or a test. It goes
  * through the normal JSON / AI review; the observation arrives private, unreviewed and not shareable.
  */
 export function observationPatch(doc:Pick<Project,'id'|'revision'>,input:ObservationInput):Patch{
- const value={...input,blockIds:input.blockIds??[],caveat:input.caveat??'',visibility:'private',shareable:false};
+ // A JavaScript producer must not smuggle author decisions through the TypeScript boundary.
+ // Retain all other input keys so strict validation still refuses unexpected or secret fields.
+ const {reviewedAt:_reviewedAt,...source}=input as ObservationInput&{reviewedAt?:unknown};
+ const value={...source,blockIds:input.blockIds??[],caveat:input.caveat??'',visibility:'private',shareable:false};
  return {format:PATCH_FORMAT,version:1,target:'project',targetId:doc.id,baseRevision:doc.revision,
   summary:`Add a ${input.sourceApp} observation for ${input.nodeId} (${input.claim}, revision ${input.sourceRevision})`,
   operations:[{op:'test',path:`/nodes/@${input.nodeId}/id`,value:input.nodeId},{op:'add',path:'/observations/-',value}]};
@@ -57,9 +71,10 @@ export const CLAIM_BADGE:Record<Observation['claim'],{text:string;fill:string;st
  'not-observed':{text:'Not observed',fill:'F1F5F9',stroke:'64748B',ink:'475569'}
 };
 export const REALIZATION_EXPORT_NOTE='Badges show reviewed, public observations owned by other apps; unbadged components are planned / designed only. Design status is illustrative.';
-/** The newest Presented observation about a component, if any. */
+/** The newest general Presented observation about a component. A scoped facet claim must never
+ * become a Verified badge for the whole component; typed facets have their own dated display. */
 export function presentedObservation(doc:Pick<Project,'observations'>,nodeId:string):Observation|undefined{
- return observationsFor(doc,nodeId).find(isPresented);
+ return observationsFor(doc,nodeId).find(o=>!o.stateFacet&&isPresented(o));
 }
 /** Every Presented observation, newest first: what an appendix or notes may cite. */
 export function presentedObservations(doc:Pick<Project,'observations'>):Observation[]{
@@ -67,5 +82,5 @@ export function presentedObservations(doc:Pick<Project,'observations'>):Observat
 }
 /** One plain-text line with the claim, its owner, the revision and the date. */
 export function observationLine(o:Observation,component:string):string{
- return `${component}: ${CLAIM_LABEL[o.claim]} by ${o.sourceApp} (authority: ${o.authority}) at revision ${o.sourceRevision}, observed ${day(o.observedAt)}. ${o.summary}${o.caveat?` Caveat: ${o.caveat}`:''}`;
+ return `${component}: ${CLAIM_LABEL[o.claim]} by ${o.sourceApp} (authority: ${o.authority}) at revision ${o.sourceRevision}, observed ${day(o.observedAt)}. ${o.summary}${o.stateFacet?` ${stateFacetLine(o)}.`:''}${o.caveat?` Caveat: ${o.caveat}`:''}`;
 }

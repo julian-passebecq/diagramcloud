@@ -57,6 +57,8 @@ export function viewSpec(input:Project,viewId:string,options:{audience?:'public'
  if(audience==='public'){const full=input.views.find(v=>v.id===viewId);if(full){const hidden=full.nodeIds.length-view.nodeIds.length,hiddenEdges=full.edgeIds.length-view.edgeIds.length;
   if(hidden>0)omissions.push(`${hidden} private or unreachable component(s) removed.`);if(hiddenEdges>0)omissions.push(`${hiddenEdges} private connection(s) removed.`);}}
  if(specNodes.some(n=>n.basis==='unknown'))omissions.push('Some components are declared but nothing was read for them (basis unknown).');
+ const scopedStates=doc.observations.filter(o=>ids.has(o.nodeId)&&o.stateFacet).length;
+ if(scopedStates)omissions.push(`${scopedStates} scoped state-facet claim(s) retained in Project observation history; not represented as general component realization in this view.`);
  const snap=doc.atlas?.snapshots.find(s=>s.id===doc.atlas!.activeSnapshotId);
  const uniq=(xs:(string|undefined)[])=>[...new Set(xs.filter((x):x is string=>!!x))].sort();
  return {format:'diagramcloud.viewspec',version:1,projectId:doc.id,projectRevision:doc.revision,projectTitle:doc.title,viewId,title:view.title,purpose:view.description,audience,perspective:perspectiveOf(view),

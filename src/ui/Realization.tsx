@@ -1,6 +1,6 @@
 import {Badge,Button} from '@fluentui/react-components';
 import type {Observation,Project,ProjectNode} from '../core/model';
-import {CLAIM_LABEL,MEANING,day,isPresented,observationsFor} from '../core/realization';
+import {CLAIM_LABEL,MEANING,day,isPresented,observationsFor,stateFacetLine} from '../core/realization';
 
 export type ObservationActions={onReview:(id:string)=>void;onUpdate:(o:Observation)=>void;onRemove:(id:string)=>void};
 // No green: a verified claim is the source app's statement, not a DiagramCloud validation.
@@ -17,6 +17,7 @@ export function ObservationCard({o,doc,actions}:{o:Observation;doc:Project;actio
  return <article className="observation-card" data-testid={`observation-${o.id}`}>
   <div className="observation-head"><Badge appearance="tint" color={CLAIM_COLOR[o.claim]} size="small">{CLAIM_LABEL[o.claim]}</Badge><Badge appearance="outline" size="small">{review(o)}</Badge>{o.shareable&&<Badge appearance="outline" size="small">Shareable in index</Badge>}</div>
   <p className="observation-summary">{o.summary}</p>
+  {o.stateFacet&&<p className="observation-state">{stateFacetLine(o)}. This scoped claim does not establish another state axis.</p>}
   <dl className="observation-meta">
    <div><dt>Source</dt><dd>{o.sourceApp}</dd></div><div><dt>Authority</dt><dd>{o.authority}</dd></div>
    <div><dt>Observed</dt><dd><time dateTime={o.observedAt}>{o.observedAt}</time></dd></div><div><dt>Revision</dt><dd><code>{o.sourceRevision}</code></dd></div>
@@ -50,5 +51,5 @@ export function RealizationSection({doc,node,actions}:{doc:Project;node:ProjectN
 export function StoryEvidence({doc,ids}:{doc:Project;ids?:string[]}){
  const cited=(ids??[]).map(id=>doc.observations.find(o=>o.id===id)).filter((o):o is Observation=>!!o);
  if(!cited.length)return null;
- return <ul className="story-evidence" aria-label="Reviewed evidence for this step">{cited.map(o=><li key={o.id}><b>{CLAIM_LABEL[o.claim]}</b> · {o.summary} <small>{o.sourceApp} @ {o.sourceRevision} · {day(o.observedAt)} · authority: {o.authority}{o.caveat?` · caveat: ${o.caveat}`:''}</small></li>)}</ul>;
+ return <ul className="story-evidence" aria-label="Reviewed evidence for this step">{cited.map(o=><li key={o.id}><b>{CLAIM_LABEL[o.claim]}</b> · {o.stateFacet&&<>{stateFacetLine(o)} · </>}{o.summary} <small>{o.sourceApp} @ {o.sourceRevision} · {day(o.observedAt)} · authority: {o.authority}{o.caveat?` · caveat: ${o.caveat}`:''}</small></li>)}</ul>;
 }

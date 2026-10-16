@@ -16,11 +16,13 @@ export function deepLink(base:string,target:DeepLink):string{
  return url.toString();
 }
 
-/** Reads a deep link; any value that is not a stable ID is ignored. */
+/** Explicit view routes fail closed; legacy project/node-only parsing retains its existing behavior. */
 export function readDeepLink(search:string):DeepLink|null{
  const q=new URLSearchParams(search),pick=(k:string)=>{const v=q.get(k);return v&&ID.test(v)?v:undefined;};
  const library=(k:string)=>{const value=q.get(k);return value&&LIBRARY_ID.test(value)?value:undefined;},collection=library('collection'),publication=library('publication');
  if(q.has('collection')&&!collection||q.has('publication')&&!publication||collection&&publication)return null;
+ const explicit=q.has('view');
+ if(explicit&&(['project','view','node'].some(k=>q.has(k)&&(q.getAll(k).length!==1||!pick(k)))||collection||publication))return null;
  const project=pick('project');if(!project&&!collection&&!publication)return null;
  const view=pick('view'),node=pick('node');
  return {...(project?{project}:{}),...(view?{view}:{}),...(node?{node}:{}),...(collection?{collection}:{}),...(publication?{publication}:{})};

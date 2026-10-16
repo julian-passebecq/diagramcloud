@@ -40,7 +40,7 @@ export function previewDeliveryBrief(current:Project,input:unknown){
 }
 export function environmentMatrix(doc:Project,options:{at?:string;maxAgeHours?:number}={}){
  const d=doc.delivery;if(!d)return [];
- return d.instances.map(i=>{const observation=doc.observations.filter(o=>o.nodeId===i.nodeId&&o.reviewedAt).sort((a,b)=>Date.parse(a.observedAt)-Date.parse(b.observedAt)||a.id.localeCompare(b.id)).at(-1);
+ return d.instances.map(i=>{const observation=doc.observations.filter(o=>!o.stateFacet&&o.nodeId===i.nodeId&&o.reviewedAt).sort((a,b)=>Date.parse(a.observedAt)-Date.parse(b.observedAt)||a.id.localeCompare(b.id)).at(-1);
   return {id:i.id,nodeId:i.nodeId,component:doc.nodes.find(n=>n.id===i.componentId)?.label??i.componentId,
    environment:d.environments.find(e=>e.id===i.environmentId)?.label??i.environmentId,
    artifact:d.artifacts.find(a=>a.id===i.artifactId),release:d.releases?.find(r=>r.id===i.releaseId),declaredRevision:i.declaredRevision??'UNKNOWN',
@@ -54,8 +54,8 @@ export function evidenceFreshness(capturedAt:string,options:{at?:string;maxAgeHo
  return captured>now?'future-timestamp':now-captured>hours*3600000?'stale':'within-selected-age';
 }
 export function deliveryGates(doc:Project,options:{at?:string;maxAgeHours?:number}={}){return (doc.delivery?.promotions??[]).map(p=>({...p,gates:p.gates.map(g=>{
- const result=g.observationId?doc.observations.find(o=>o.id===g.observationId&&o.reviewedAt):undefined,artifact=doc.delivery?.artifacts.find(a=>a.id===p.artifactId);
- return {...g,result,freshness:result?evidenceFreshness(result.observedAt,options):'UNKNOWN',revisionMatch:!result||!artifact?.sourceRevision?'UNKNOWN':result.sourceRevision===artifact.sourceRevision?'exact-source-revision':'different-source-revision'};
+ const linked=g.observationId?doc.observations.find(o=>o.id===g.observationId):undefined,result=linked?.reviewedAt&&!linked.stateFacet?linked:undefined,artifact=doc.delivery?.artifacts.find(a=>a.id===p.artifactId);
+ return {...g,result,...(linked?.stateFacet?{reason:'scoped-state-claim-not-general-gate' as const}:{}),freshness:result?evidenceFreshness(result.observedAt,options):'UNKNOWN',revisionMatch:!result||!artifact?.sourceRevision?'UNKNOWN':result.sourceRevision===artifact.sourceRevision?'exact-source-revision':'different-source-revision'};
  })}));}
 /** Sparse declarations are expanded only for selected logical components;
  * missing cells are UNKNOWN, never undeployed or implicitly applicable. */

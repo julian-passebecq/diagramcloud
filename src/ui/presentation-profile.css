@@ -1,0 +1,9 @@
+.presentation-profile { display: grid; grid-template-columns: auto minmax(8rem, 12rem); align-items: center; gap: .3rem .6rem; padding: .5rem .75rem; min-width: 0; }
+.presentation-profile label { font-weight: 600; }
+.presentation-profile select { max-width: 100%; min-width: 0; padding: .3rem .45rem; border: 1px solid var(--border, #888); border-radius: 4px; color: var(--ink, CanvasText); background: var(--panel, Canvas); font: inherit; color-scheme: light; }
+.studio[data-theme=dark] .presentation-profile select { color-scheme: dark; }
+.presentation-profile select:focus-visible { outline: 2px solid Highlight; outline-offset: 2px; }
+.presentation-profile p { grid-column: 1 / -1; margin: 0; font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.presentation-profile-scope { opacity: .8; }
+.presentation-profile-warning { font-weight: 600; }
+@media (max-width: 460px) { .presentation-profile { grid-template-columns: 1fr; } }

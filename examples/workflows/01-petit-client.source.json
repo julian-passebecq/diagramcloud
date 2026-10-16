@@ -1,0 +1,32 @@
+{
+  "originalIndex": {
+    "document_key": "01-petit-client",
+    "canonical_project_id": null,
+    "title": "Petit client sans outils",
+    "basis": "SYNTHETIC",
+    "source_refs": [
+      "S03",
+      "S17"
+    ],
+    "file": "workflows/01-petit-client.project-brief.json",
+    "native_validation": "NOT_RUN",
+    "structure_checks": "SOURCE_DERIVED_CONSTRAINT_CHECKS_ONLY",
+    "runtime_claim": "NONE",
+    "audience": "PRIVATE_DRAFT",
+    "source_revision": null,
+    "notes": "Local document IDs are not invented external identities. Source locators and bases live in this card, not fabricated extra fields in native ProjectBrief."
+  },
+  "source": {
+    "archive": "DiagramCloud_V2_Delivery_r3_2026-10-14.zip",
+    "archiveSha256": "bab1150ea6c19d3ee85dba9d1db60c01fb83bc94c975688941cbe890eb163c73",
+    "entry": "workflows/01-petit-client.project-brief.json",
+    "entrySha256": "d1c33ff28eea2584d9125b433e3891fdcf373ed6de202ab1c7f552508202f8a8",
+    "sourceProjectId": "draft-01-petit-client"
+  },
+  "nativeAdoption": {
+    "kind": "private-guided-template",
+    "runtimeClaim": "NONE",
+    "newInstance": "Explicit load generates a new local ProjectBrief project ID. Scope IDs stay unchanged.",
+    "originalValidation": "NOT_RUN in original packet; adoption tests are independent."
+  }
+}

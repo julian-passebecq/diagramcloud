@@ -1,0 +1,7 @@
+{
+  "name": "synthetic-overnight-workflow",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Synthetic teaching fixture. Source is inspected, never executed."
+}

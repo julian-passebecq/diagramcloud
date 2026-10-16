@@ -1,3 +1,4 @@
+import {pathTo,perspectiveOf,PERSPECTIVE_LABEL} from '../core/viewspec';
 import {validatePublicationBrief,publicationBriefSchema,type PublicationBrief} from './publicationBrief';
 import {z} from 'zod';
 import {validateDocument,type Project} from '../core/model';
@@ -69,3 +70,73 @@ export function resolveLibraryTarget(target:LibraryTarget,library:{collections:P
 export async function loadLibrary(){const db=await openLibrary();try{return await new Promise<Awaited<ReturnType<typeof validateLibraryRows>>>((resolve,reject)=>{const tx=db.transaction(['collections','publications'],'readonly'),c=tx.objectStore('collections').getAll(),p=tx.objectStore('publications').getAll();tx.oncomplete=()=>{validateLibraryRows(c.result,p.result).then(resolve,reject);};tx.onabort=()=>reject(tx.error);});}finally{db.close();}}
 export async function saveCollection(input:ProjectCollection,expectedRevision:number|null){const value=validateCollection(input),db=await openLibrary();try{await new Promise<void>((resolve,reject)=>{const tx=db.transaction('collections','readwrite'),store=tx.objectStore('collections');let problem:Error|undefined;const current=store.get(value.id);current.onsuccess=()=>{if((current.result?.revision??null)!==expectedRevision){problem=new Error('Another tab changed this collection. Reload the library before editing.');tx.abort();return;}if(value.revision!==(expectedRevision??-1)+1){problem=new Error('Invalid collection revision');tx.abort();return;}store.put(value);};tx.oncomplete=()=>resolve();tx.onabort=tx.onerror=()=>reject(problem??tx.error??new Error('Collection not saved'));});}finally{db.close();}}
 export async function savePublication(input:PublicationSnapshot){const value=await validatePublication(input),db=await openLibrary();try{await new Promise<void>((resolve,reject)=>{const tx=db.transaction('publications','readwrite');tx.objectStore('publications').add(value);tx.oncomplete=()=>resolve();tx.onabort=tx.onerror=()=>reject(tx.error??new Error('Immutable publication already exists or could not be saved'));});}finally{db.close();}}
+
+
+/** Narrow local file admission, never authoring import or trust in a self-supplied digest.
+ * No opaque assets/workspaces/observations in this first restoration journey. */
+export const PUBLICATION_RESTORE_REFUSED='This file cannot be restored. Choose a supported public publication snapshot without assets, workspaces, observations or sensitive content.';
+export const PUBLICATION_RESTORE_COLLISION='A different publication already uses this ID. The existing publication was not changed.';
+export async function preparePublicationRestore(input:unknown):Promise<PublicationSnapshot>{
+ try{const value=await validatePublication(input);
+  if(value.document.assets.length||value.document.experience||value.document.observations.length||value.document.sources.some(source=>source.url&&!isOpenUri(source.url))||secretFindings(value).length)throw new Error('Unsupported restoration scope');
+  return value;
+ }catch{throw new Error(PUBLICATION_RESTORE_REFUSED);}
+}
+/** Key order does not distinguish equal validated JSON; array order and all values do. */
+function publicationValueKey(value:unknown){return JSON.stringify(value,(_key,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.entries(item).sort(([a],[b])=>a<b?-1:a>b?1:0)):item);}
+function sameRestoredPublication(stored:unknown,value:PublicationSnapshot){
+ try{const parsed=snapshotSchema.parse(stored),document=validateDocument(parsed.document);
+  return publicationValueKey({...parsed,document,outputBinding:parsed.outputDigest?'bound':'legacy-unbound'})===publicationValueKey(value);
+ }catch{return false;}
+}
+/** Existing immutable publications store only. Revocation is checked before every write;
+ * a confirmed transaction that already committed is not claimed to be rolled back. */
+export async function restorePublication(input:unknown,isCurrent:()=>boolean):Promise<'restored'|'already-present'>{
+ try{
+  if(!isCurrent())throw new Error(PUBLICATION_RESTORE_REFUSED);
+  const value=await preparePublicationRestore(input);if(!isCurrent())throw new Error(PUBLICATION_RESTORE_REFUSED);
+  const db=await openLibrary();try{
+   if(!isCurrent())throw new Error(PUBLICATION_RESTORE_REFUSED);
+   return await new Promise<'restored'|'already-present'>((resolve,reject)=>{
+    const tx=db.transaction('publications','readwrite'),store=tx.objectStore('publications'),request=store.get(value.id);let result:'restored'|'already-present'='restored',problem=PUBLICATION_RESTORE_REFUSED;
+    request.onsuccess=()=>{
+     if(!isCurrent()){tx.abort();return;}
+     if(request.result!==undefined){if(sameRestoredPublication(request.result,value))result='already-present';else{problem=PUBLICATION_RESTORE_COLLISION;tx.abort();}}
+     else{try{store.add(value);}catch{tx.abort();}}
+    };
+    tx.oncomplete=()=>resolve(result);tx.onabort=tx.onerror=()=>reject(new Error(problem));
+   });
+  }finally{db.close();}
+ }catch(error){throw new Error(error instanceof Error&&error.message===PUBLICATION_RESTORE_COLLISION?PUBLICATION_RESTORE_COLLISION:PUBLICATION_RESTORE_REFUSED);}
+}
+
+import {isOpenUri} from '../core/secrets';
+
+
+/** Local navigation projection over already validated workspace Projects. Not a saved bookmark format. */
+export const WORKSPACE_VIEW_UNAVAILABLE='This view is unavailable in the current workspace context.';
+export type WorkspaceViewTarget={projectId:string;viewId:string;revision:number};
+export type WorkspaceViewRow={target:WorkspaceViewTarget;projectTitle:string;title:string;purpose:string;perspective:string};
+export const WORKSPACE_VIEW_PAGE_SIZE=8;
+const workspaceId=/^[a-z][a-z0-9_.-]{0,79}$/;
+/** Public Library is unavailable: branch before inspecting any authoring row, target or count. */
+export function resolveWorkspaceView(projects:readonly Project[],target:unknown,options:{publicMode?:boolean}={}):{state:'unavailable'}|{state:'available';project:Project;path:string[];row:WorkspaceViewRow}{
+ const unavailable={state:'unavailable' as const};if(options.publicMode)return unavailable;
+ try{
+ if(!target||typeof target!=='object'||Array.isArray(target))return unavailable;
+ const t=target as Record<string,unknown>;
+ if(Object.keys(t).length!==3||!Object.hasOwn(t,'projectId')||!Object.hasOwn(t,'viewId')||!Object.hasOwn(t,'revision')||typeof t.projectId!=='string'||!workspaceId.test(t.projectId)||typeof t.viewId!=='string'||!workspaceId.test(t.viewId)||!Number.isSafeInteger(t.revision)||(t.revision as number)<0)return unavailable;
+ const matches=projects.filter(p=>p.id===t.projectId);if(matches.length!==1)return unavailable;
+ const project=matches[0];if(project.revision!==t.revision)return unavailable;
+ const views=project.views.filter(v=>v.id===t.viewId);if(views.length!==1)return unavailable;
+ const view=views[0],path=pathTo(project,view.id).map(v=>v.viewId);if(!path.length)return unavailable;
+ return {state:'available',project,path,row:{target:{projectId:project.id,viewId:view.id,revision:project.revision},projectTitle:project.title,title:view.title,purpose:view.description,perspective:PERSPECTIVE_LABEL[perspectiveOf(view)]}};
+ }catch{return unavailable;}
+}
+export function workspaceViewPage(projects:readonly Project[],options:{publicMode?:boolean;page?:number}={}){
+ if(options.publicMode)return {state:'unavailable' as const,rows:[] as WorkspaceViewRow[],total:0,page:0,pages:0,displayed:0,omitted:0};
+ const rows:WorkspaceViewRow[]=[];
+ for(const project of projects)for(const view of project.views){const resolved=resolveWorkspaceView(projects,{projectId:project.id,viewId:view.id,revision:project.revision});if(resolved.state==='available')rows.push(resolved.row);}
+ const pages=Math.ceil(rows.length/WORKSPACE_VIEW_PAGE_SIZE),requested=Number.isFinite(options.page)?Math.max(0,Math.floor(options.page!)):0,page=Math.min(requested,Math.max(0,pages-1)),shown=rows.slice(page*WORKSPACE_VIEW_PAGE_SIZE,(page+1)*WORKSPACE_VIEW_PAGE_SIZE);
+ return {state:'available' as const,rows:shown,total:rows.length,page,pages,displayed:shown.length,omitted:rows.length-shown.length};
+}
