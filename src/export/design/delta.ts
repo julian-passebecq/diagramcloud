@@ -21,12 +21,13 @@ const MOVE=8;
  * more than 8 units) or both; a relationship is added, removed, changed (label, kind or basis) or rewired (same ID,
  * other endpoints). Both states are public documents. A delta has two states only: it does not establish migration
  * order, downtime or causality.
+ * The `author` audience (a baseline-bound variant compared in Edit mode) reads the authoring documents; it is never exported.
  */
-export function compareView(beforeInput:Project,afterInput:Project,viewId:string,now=new Date()):ViewDelta{
+export function compareView(beforeInput:Project,afterInput:Project,viewId:string,now=new Date(),audience:'public'|'author'='public'):ViewDelta{
  if(beforeInput.id!==afterInput.id)throw new Error(`These are two different projects (${beforeInput.id}, ${afterInput.id}): compare two versions of the same project.`);
- const has=(d:Project)=>publicDocument(d).views.some(v=>v.id===viewId);
- if(!has(beforeInput)||!has(afterInput))throw new Error(`View ${viewId} is not public in ${has(beforeInput)?'the newer':'the earlier'} version: pick a view both versions show.`);
- const before=viewSpec(beforeInput,viewId,{now}),after=viewSpec(afterInput,viewId,{now});
+ const has=(d:Project)=>(audience==='public'?publicDocument(d):d).views.some(v=>v.id===viewId);
+ if(!has(beforeInput)||!has(afterInput))throw new Error(`View ${viewId} is not ${audience==='public'?'public':'present'} in ${has(beforeInput)?'the newer':'the earlier'} version: pick a view both versions show.`);
+ const before=viewSpec(beforeInput,viewId,{now,audience}),after=viewSpec(afterInput,viewId,{now,audience});
  const bn=new Map(before.nodes.map(n=>[n.id,n])),an=new Map(after.nodes.map(n=>[n.id,n])),be=new Map(before.edges.map(e=>[e.id,e])),ae=new Map(after.edges.map(e=>[e.id,e]));
  const components=new Map<string,ComponentStatus>(),relationships=new Map<string,RelationshipStatus>(),ledger:string[]=[];
  const name=(id:string)=>an.get(id)?.label??bn.get(id)?.label??id;

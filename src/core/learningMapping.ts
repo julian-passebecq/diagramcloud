@@ -1,7 +1,7 @@
 import type {LearningMapping,Project} from './model';
 /** Deterministic 64-bit FNV-1a over canonical JSON: an identity of the target's evidence, not a proof of truth. */
-function fnv64(text:string){let h1=0x811c9dc5,h2=0x01000193;for(let i=0;i<text.length;i++){const c=text.charCodeAt(i);h1=Math.imul(h1^c,0x01000193)>>>0;h2=Math.imul(h2^c^(i&0xff),0x01000193)>>>0;}return h1.toString(16).padStart(8,'0')+h2.toString(16).padStart(8,'0');}
-const canonical=(value:unknown):string=>Array.isArray(value)?'['+value.map(canonical).join(',')+']':value&&typeof value==='object'?'{'+Object.keys(value as object).sort().map(k=>JSON.stringify(k)+':'+canonical((value as Record<string,unknown>)[k])).join(',')+'}':JSON.stringify(value??null);
+export function fnv64(text:string){let h1=0x811c9dc5,h2=0x01000193;for(let i=0;i<text.length;i++){const c=text.charCodeAt(i);h1=Math.imul(h1^c,0x01000193)>>>0;h2=Math.imul(h2^c^(i&0xff),0x01000193)>>>0;}return h1.toString(16).padStart(8,'0')+h2.toString(16).padStart(8,'0');}
+export const canonical=(value:unknown):string=>Array.isArray(value)?'['+value.map(canonical).join(',')+']':value&&typeof value==='object'?'{'+Object.keys(value as object).sort().map(k=>JSON.stringify(k)+':'+canonical((value as Record<string,unknown>)[k])).join(',')+'}':JSON.stringify(value??null);
 /**
  * Evidence fingerprint of a mapping target in one document. A component covers its kind, cited sources (title, location,
  * URL) and evidence blocks; a view covers its component and connection membership. Labels, summaries, positions and
