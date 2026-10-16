@@ -6,6 +6,7 @@ import {layersOf} from './layers';
 import {clipMono,f,footerLine,header,KIND_TAG,labelText,legendStrip,markers,monoWidth,MONO,nodeBox,svgDocument,treatmentOf,txt,type LegendItem,type Treatment} from './kit';
 import {xml} from '../diagram';
 import {flowRanks} from '../../core/layout';
+import {figureAvailability,scheduleNote,withheldSvg} from './availability';
 
 /** Reading order of a view; lives in core (`src/core/layout.ts`) and is re-exported here for existing callers. */
 export {flowRanks};
@@ -34,10 +35,11 @@ const M=48,MAX_MESSAGES=18,STEP=44,PW=144,PH=64,COL=184;
 /**
  * Sequence: participants are the view's components in reading order, each with a dashed lifeline; every connection of
  * the view is one numbered message, top to bottom in reading order. Self-explanatory about what it is not: the order
- * is derived from the connections, not from timing.
+ * is derived from the connections, not from timing. Without a connection to order, the figure is withheld (availability.ts).
  */
 export function sequenceSvg(input:Project,viewId:string,options:DesignOptions={}):string{
- const c=designContext(input,viewId,'sequence',options),{spec,t}=c,ranks=flowRanks(spec.nodes,spec.edges);
+ const c=designContext(input,viewId,'sequence',options),{spec,t}=c,ranks=flowRanks(spec.nodes,spec.edges),a=figureAvailability(c,'sequence');
+ if(!a.available)return withheldSvg(c,a,{label:'Sequence'});
  const parts=[...spec.nodes].sort((a,b)=>(ranks.get(a.id)??0)-(ranks.get(b.id)??0)||a.position.y-b.position.y||a.position.x-b.position.x).slice(0,10);
  const col=new Map(parts.map((p,i)=>[p.id,i])),all=flowMessages(parts,spec.edges),msgs=all.slice(0,MAX_MESSAGES),dropped=spec.edges.length-msgs.length;
  const contentW=Math.max(640,parts.length*COL-(COL-PW)),hdr=header(eyebrowOf(c,'Sequence'),spec.title,c.purpose,M,M,contentW,t,c.editorial);
@@ -66,13 +68,16 @@ export function sequenceSvg(input:Project,viewId:string,options:DesignOptions={}
 
 /**
  * Story timeline: the project's guided story as a horizontal axis of numbered steps (title, view, component). Steps on
- * private views are not drawn and are counted. Without a story, the figure says so instead of inventing one.
+ * private views are not drawn and are counted. Steps are evenly spaced in presentation order, never on a time axis: the
+ * scheduled timeline (Gantt) is withheld and its missing dates, durations or estimates are named. Without a public story,
+ * the whole figure is withheld (availability.ts) instead of inventing one.
  */
 export function timelineSvg(input:Project,viewId:string,options:DesignOptions={}):string{
- const c=designContext(input,viewId,'timeline',options),{doc,spec,t}=c,steps=doc.story.filter(s=>doc.views.some(v=>v.id===s.viewId)).slice(0,12),hidden=input.story.length-steps.length;
- const SLOT=200,contentW=Math.max(640,steps.length*SLOT),hdr=header(eyebrowOf(c,'Story timeline'),doc.title,steps.length?`The guided story, step by step. Highlighted: steps on ${spec.title}.`:'This project has no public story yet: add steps in the story composer.',M,M,contentW,t,c.editorial);
+ const c=designContext(input,viewId,'timeline',options),{doc,spec,t}=c,steps=doc.story.filter(s=>doc.views.some(v=>v.id===s.viewId)).slice(0,12),hidden=input.story.length-steps.length,a=figureAvailability(c,'timeline');
+ if(!a.available)return withheldSvg(c,a,{label:'Story timeline',title:doc.title});
+ const SLOT=200,contentW=Math.max(640,steps.length*SLOT),hdr=header(eyebrowOf(c,'Story timeline'),doc.title,`The guided story in presentation order, not timing. Highlighted: steps on ${spec.title}.`,M,M,contentW,t,c.editorial);
  const axisY=M+hdr.height+112,ox=M+(contentW-steps.length*SLOT)/2,out:string[]=[];
- if(steps.length){out.push(`<line x1="${f(ox)}" y1="${axisY}" x2="${f(ox+steps.length*SLOT)}" y2="${axisY}" stroke="${t.ruleSolid}" stroke-width="1.2" marker-end="url(#${c.slug}-arrow)"/>`);
+ {out.push(`<line x1="${f(ox)}" y1="${axisY}" x2="${f(ox+steps.length*SLOT)}" y2="${axisY}" stroke="${t.ruleSolid}" stroke-width="1.2" marker-end="url(#${c.slug}-arrow)"/>`);
   steps.forEach((s,i)=>{const x=ox+i*SLOT+SLOT/2,here=s.viewId===spec.viewId,up=i%2===1,vt=doc.views.find(v=>v.id===s.viewId)?.title??s.viewId,node=s.nodeId?doc.nodes.find(n=>n.id===s.nodeId)?.label:undefined;
    const titleLines=clipMono(s.title,SLOT-24,11*0.9),ty=up?axisY-84:axisY+34;
    out.push(`<g data-step="${i+1}"${here?' data-focal="true"':''}><line x1="${f(x)}" y1="${axisY}" x2="${f(x)}" y2="${f(up?axisY-48:axisY+14)}" stroke="${here?t.accent:t.ruleSolid}" stroke-width="1"/>`,
@@ -80,10 +85,11 @@ export function timelineSvg(input:Project,viewId:string,options:DesignOptions={}
     txt(String(i+1).padStart(2,'0'),x,up?ty-14:ty-12,{size:8,fill:here?t.accent:t.soft,font:MONO,anchor:'middle',tracking:0.14}),
     txt(titleLines,x,ty+2,{size:11,fill:t.ink,weight:600,anchor:'middle'}),txt(clipMono(vt,SLOT-24,9),x,ty+17,{size:9,fill:t.muted,font:MONO,anchor:'middle'}),
     node?txt(clipMono(node,SLOT-24,8),x,ty+30,{size:8,fill:t.soft,font:MONO,anchor:'middle'}):'','</g>');});}
- const bottom=axisY+88+(hidden>0?16:0);
  if(hidden>0)out.push(txt(`${hidden} step(s) on private views not drawn.`,M,axisY+92,{size:10,fill:t.muted,italic:true}));
- const legend=legendStrip(steps.length?[{kind:'box',treatment:'focal',label:'Step on this view'},{kind:'box',treatment:'backend',label:'Step'}]:[],M,bottom+24,contentW,t);
+ const sched=scheduleNote(a,M,axisY+92+(hidden>0?16:0),contentW,c);out.push(sched.svg);
+ const bottom=axisY+88+(hidden>0?16:0)+sched.height;
+ const legend=legendStrip([{kind:'box',treatment:'focal',label:'Step on this view'},{kind:'box',treatment:'backend',label:'Step'}],M,bottom+24,contentW,t);
  let y=bottom+24+legend.height+12;const cards=c.editorial?summaryCards(c,M,y+8,contentW):undefined;if(cards)y+=cards.height+24;
- return svgDocument({slug:c.slug,width:contentW+2*M,height:y+12+M-12,title:`${doc.title} · story timeline`,desc:`Story timeline of ${steps.length} public step(s)${hidden>0?`; ${hidden} on private views not drawn`:''}.`,
+ return svgDocument({slug:c.slug,width:contentW+2*M,height:y+12+M-12,title:`${doc.title} · story timeline`,desc:`Story timeline of ${steps.length} public step(s) in presentation order, not timing${hidden>0?`; ${hidden} on private views not drawn`:''}. Scheduled timeline (Gantt) withheld: no dates, durations or labelled estimates.`,
   t,theme:c.theme,type:'timeline',viewId:spec.viewId,defs:markers(c.slug,t),body:hdr.svg+out.join('')+legend.svg+(cards?.svg??'')+footerLine(footerParts(c),M,y+12,contentW,t)});
 }

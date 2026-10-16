@@ -5,9 +5,10 @@ import {waterfallTable} from './waterfall';
 import {flowRanks} from './flow';
 import {layersOf} from './layers';
 import {contextRoles} from './systemContext';
+import {FALLBACK_FIGURE,figureAvailability} from './availability';
 
 export type FigureType=Exclude<DesignType,'auto'>;
-export type FigureRecommendation={type:FigureType;score:number;reason:string};
+export type FigureRecommendation={type:FigureType;score:number;reason:string;available:boolean};
 const FIGURES=DESIGN_TYPES.filter((t):t is FigureType=>t!=='auto');
 const n=(k:number,one:string,many=`${one}s`)=>`${k} ${k===1?one:many}`;
 
@@ -16,7 +17,10 @@ const n=(k:number,one:string,many=`${one}s`)=>`${k} ${k===1?one:many}`;
  * public document and its ViewSpec, falling back to the root when the view is not public). Each entry names the fact
  * behind its score; a figure with no supporting fact still appears, scored low, saying what is missing. Table figures
  * are only recommended from a numeric table on a public component. Scores are 0–100 and only a ranking aid; ties keep
- * the DESIGN_TYPES order, so the result is deterministic.
+ * the DESIGN_TYPES order, so the result is deterministic. A figure whose required semantics the view lacks (connection
+ * quantities for the Sankey, public story steps for the story timeline, a connection for the sequence, a numeric table for
+ * the table figures, an atlas snapshot for the atlas) is `available: false`, scored at most 5 and ranked after every
+ * available figure; withheld measured figures name the fallback. The story timeline is never offered as a schedule.
  */
 export function recommendFigures(input:Project,viewId:string):FigureRecommendation[]{
  const c=designContext(input,viewId,'recommend'),{doc,spec}=c,ids=new Set(spec.nodes.map(x=>x.id)),edges=spec.edges.filter(e=>ids.has(e.from)&&ids.has(e.to)&&e.from!==e.to);
@@ -33,7 +37,7 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
  const repos=doc.atlas?.snapshots.find(x=>x.id===doc.atlas!.activeSnapshotId)?.repositories.length??0;
  const layers=layersOf(spec.nodes).length,count=spec.nodes.length,empty=!count;
  const numeric=table?.series.length??0,rows=table?.block.rows.length??0,on=table?` on ${owner??'a component'}`:'',noTable='no numeric table evidence on this view';
- const waterfall=waterfallTable(c);
+ const waterfall=waterfallTable(c),withheld=`withheld, fallback: ${FALLBACK_FIGURE}`,measured=(k:'sankey'|'timeline'|'sequence')=>figureAvailability(c,k).available;
  const r:Record<FigureType,[number,string]>={
   architecture:[empty?10:50,empty?'no public components in this view':`a sound default for ${n(count,'component')} and ${n(edges.length,'connection')}`],
   layers:layers>=3?[55,`${layers} layers of component kinds`]:[layers===2?30:12,layers===2?'only 2 layers of component kinds':'fewer than 2 layers of component kinds'],
@@ -41,8 +45,8 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
   tree:children?[Math.min(80,62+children*3),`${n(children,'child view')} below this one`]:parent?[30,'no child view below this one, only a parent']:[8,'no drilldown from this view'],
   treemap:children>=2?[Math.min(72,56+children*3),`${n(children,'child view')} below this one`]:children?[40,'only 1 child view below this one']:[8,'no drilldown from this view'],
   swimlane:count>=5&&depth>=3?[spec.groups.length>=2?72:62,`${n(count,'component')} on a flow ${depth} steps deep${spec.groups.length>=2?` across ${spec.groups.length} repositories`:''}`]:[count>=3&&depth>=2?30:12,count<5?`only ${n(count,'component')}, no clear flow`:`flow only ${depth} step(s) deep`],
-  sequence:edges.length>=2&&edges.length<=18&&count<=10?[48,`${n(edges.length,'connection')} between ${n(count,'component')} (order from connections, not timing)`]:[edges.length>18||count>10?20:8,edges.length>18||count>10?'too many connections or components for a sequence':'fewer than 2 connections'],
-  timeline:steps.length?[here?62:50,`${n(steps.length,'public story step')}${here?`, ${here} on this view`:''}`]:[5,'no public story steps'],
+  sequence:!measured('sequence')?[5,`no connection to order; ${withheld}`]:edges.length>=2&&edges.length<=18&&count<=10?[48,`${n(edges.length,'connection')} between ${n(count,'component')} (order from connections, not timing)`]:[edges.length>18||count>10?20:8,edges.length>18||count>10?'too many connections or components for a sequence':'fewer than 2 connections'],
+  timeline:steps.length?[here?62:50,`${n(steps.length,'public story step')}${here?`, ${here} on this view`:''} in presentation order; a scheduled timeline (Gantt) is withheld: no dates, durations or labelled estimates`]:[5,`no public story steps; ${withheld}`],
   chart:table?[90,`a numeric table${on}`]:[3,noTable],
   waterfall:waterfall?[waterfall.incrementLabel?84:26,waterfall.incrementLabel?`supplied signed increments in ${waterfall.block.columns[waterfall.column]}; sums are derived in table order, not observed or causal totals`:`numeric evidence can be interpreted as increments by a reviewed choice; the source does not explicitly label deltas`]:[3,noTable],
   line:table?[rows>=3?82:68,`a numeric table${on} with ${n(rows,'row')}`]:[3,noTable],
@@ -53,9 +57,10 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
   radial:hubDeg>=3&&depth>=3?[Math.min(68,52+hubDeg*2),`${hubLabel} has ${hubDeg} connections on a flow ${depth} steps deep`]:[hubDeg>=3?40:12,hubDeg>=3?`${hubLabel} has ${hubDeg} connections, short reach`:'no component with 3 or more connections'],
   context:entries&&sinks&&inner?[60,`${n(entries,'entry point')}, ${n(sinks,'sink')} and ${inner} inside`]:[entries&&sinks?28:10,entries&&sinks?'no component between entry points and sinks':'no clear sources and sinks'],
   status:statuses>1?[Math.min(62,46+statuses*4),`${statuses} distinct designed statuses`]:[10,'one designed status for every component'],
-  sankey:perUnit>=2?[86,`${n(perUnit,'connection')} with quantities in ${unit}${synth?' (synthetic)':''}`]:perUnit?[30,'only 1 connection with a quantity']:[3,'no connection quantities on this view'],
+  sankey:perUnit>=2?[86,`${n(perUnit,'connection')} with quantities in ${unit}${synth?' (synthetic)':''}`]:perUnit?[30,'only 1 connection with a quantity']:[3,`no connection quantities on this view; ${withheld}`],
   atlas:repos>=2?(spec.viewId===doc.rootViewId?[76,`${n(repos,'repository')} at their own revisions in the atlas snapshot`]:[30,`an atlas of ${n(repos,'repository')}; its revisions read best from the root view`]):repos?[24,'an atlas with only 1 repository']:[4,'not an atlas document (npm run atlas)'],
   lineage:count>=5&&depth>=3?[66,`${n(count,'component')} on a flow ${depth} steps deep`]:[count>=3&&depth>=2?28:10,count<5?`only ${n(count,'component')}, no clear flow`:`flow only ${depth} step(s) deep`]};
- return FIGURES.map((type,i)=>({type,score:r[type][0],reason:r[type][1],i})).sort((a,b)=>b.score-a.score||a.i-b.i).map(({type,score,reason})=>({type,score,reason}));
+ const available:Record<FigureType,boolean>={...Object.fromEntries(FIGURES.map(x=>[x,true])) as Record<FigureType,boolean>,sankey:measured('sankey'),timeline:measured('timeline'),sequence:measured('sequence'),chart:!!table,line:!!table,heatmap:!!table,waterfall:!!waterfall,atlas:repos>0};
+ return FIGURES.map((type,i)=>({type,score:available[type]?r[type][0]:Math.min(5,r[type][0]),reason:r[type][1],available:available[type],i})).sort((a,b)=>+b.available-+a.available||b.score-a.score||a.i-b.i).map(({type,score,reason,available})=>({type,score,reason,available}));
 }
 export const recommendedType=(input:Project,viewId:string):FigureType=>recommendFigures(input,viewId)[0].type;
