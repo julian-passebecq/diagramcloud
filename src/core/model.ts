@@ -87,6 +87,32 @@ export const learningMappingSchema=z.object({id,conceptId:z.string().regex(/^[a-
  evidence:z.object({sourceIds:refs,blockIds:refs}).strict().default({sourceIds:[],blockIds:[]}),
  state:z.enum(MAPPING_STATES).default('suggested'),origin:z.enum(MAPPING_ORIGINS).default('author'),suggestedBy:z.string().min(1).max(160).optional(),reviewedBy:z.string().min(1).max(160).optional(),reviewedAt:instant.optional(),note:z.string().max(500).optional(),visibility}).strict();
 export type LearningMapping=z.infer<typeof learningMappingSchema>;
+/**
+ * Baseline-bound variant: a named change set (JSON Patch operations, `@id` addressing) against one view at a recorded
+ * baseline (project revision + content fingerprint of the view, its members and every addressed item). It is a candidate,
+ * never a fact: selecting it compares only, and Apply goes through the reviewed, revision-guarded patch path as one
+ * undoable revision. A changed baseline makes it stale until the author explicitly rebases. Items it adds use IDs in
+ * its own namespace (`<variant id>.<local>`), so candidate-local IDs never collide with canonical ones. Authoring only:
+ * publicDocument drops every variant. Local/test/prod instances are delivery declarations, never variants.
+ */
+const variantPath=z.string().max(512).regex(/^\/(?:(?:nodes|edges)\/(?:-|@[a-z][a-z0-9_.-]{0,79})|views\/@[a-z][a-z0-9_.-]{0,79}\/[^/]+)(?:\/[^/]+)*$/,'A variant changes components (/nodes/@id), connections (/edges/@id) or its own view (/views/@id/...); use - (never an index) to add');
+export const variantOperationSchema=z.discriminatedUnion('op',[
+ z.object({op:z.literal('add'),path:variantPath,value:z.unknown()}).strict(),z.object({op:z.literal('remove'),path:variantPath}).strict(),
+ z.object({op:z.literal('replace'),path:variantPath,value:z.unknown()}).strict(),z.object({op:z.literal('test'),path:variantPath,value:z.unknown()}).strict()]);
+const fingerprint=z.string().regex(/^[0-9a-f]{16}$/,'A fingerprint is 16 hexadecimal characters');
+export const variantSchema=z.object({id,title:short,summary:z.string().max(1000).default(''),viewId:id,base:z.object({revision:z.number().int().nonnegative(),fingerprint}).strict(),
+ operations:z.array(variantOperationSchema).min(1).max(200),origin:z.enum(CHOICE_ORIGINS).default('author'),suggestedBy:z.string().min(1).max(160).optional()}).strict();
+export type Variant=z.infer<typeof variantSchema>;
+/**
+ * Tour: a presented sequence of stops, never timing and never a run. Each stop stores its selected view, the stable IDs
+ * of its subjects, a content fingerprint of them taken when recorded, and narration; the tour records the project
+ * revision it was authored at. Anchors are not checked here: a missing or changed anchor is derived on reading and fails
+ * visibly when played. In public output a hidden subject or view is omitted and the stop says so (`omitted`).
+ */
+export const tourStopSchema=z.object({viewId:id.optional(),subjects:z.array(z.object({kind:z.enum(['node','edge']),id}).strict()).max(20).default([]),fingerprint:fingerprint.optional(),narration:z.string().max(2000).default(''),omitted:z.enum(['subjects','stop']).optional()}).strict();
+export const tourSchema=z.object({id,title:short,sourceRevision:z.number().int().nonnegative(),stops:z.array(tourStopSchema).min(1).max(50),visibility}).strict();
+export type Tour=z.infer<typeof tourSchema>;
+export type TourStop=z.infer<typeof tourStopSchema>;
 export const portfolioSchema=z.object({projectRef:z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/,'Use a stable project reference such as a DATAPASSCONTROL entity_id').optional(),openUri:openUri.optional(),lastReviewedAt:instant.optional(),indexVisibility:z.enum(['private','shareable']).default('private')}).strict();
 const stepSchema=z.object({title:short,viewId:id,nodeId:id.optional(),narration:z.string().max(2000),highlightEdgeIds:refs,observationIds:z.array(id).max(20).optional()}).strict();
 /**
@@ -119,7 +145,7 @@ export const deliverySchema=z.object({
  configurations:z.array(z.object({...deliveryBase,componentId:id,environmentId:id,kind:z.enum(['flag','configuration']),name:short,valueState:z.enum(['declared-enabled','declared-disabled','configured','unknown'])}).strict()).max(300).optional()
 }).strict();
 export type ProjectDelivery=z.infer<typeof deliverySchema>;
-export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([]),observations:z.array(observationSchema).max(500).default([]),portfolio:portfolioSchema.optional(),experience:packSchema.optional(),atlas:atlasSchema.optional(),delivery:deliverySchema.optional(),learningMappings:z.array(learningMappingSchema).max(500).optional()}).strict();
+export const documentSchema=z.object({schemaVersion:z.literal(1),id,revision:z.number().int().nonnegative().default(0),title:short,summary:z.string().max(3000).default(''),author:z.string().max(160).default(''),category:z.enum(['Portfolio','Reference','Blank']).default('Blank'),tags:z.array(z.string().max(80)).max(30).default([]),rootViewId:id,provenance:z.string().max(3000).default(''),privateNotes:z.string().max(10000).optional(),nodes:z.array(nodeSchema).max(500),edges:z.array(edgeSchema).max(1500),views:z.array(viewSchema).min(1).max(80),blocks:z.array(blockSchema).max(1500).default([]),assets:z.array(assetSchema).max(30).default([]),sources:z.array(sourceSchema).max(200).default([]),story:z.array(stepSchema).max(100).default([]),observations:z.array(observationSchema).max(500).default([]),portfolio:portfolioSchema.optional(),experience:packSchema.optional(),atlas:atlasSchema.optional(),delivery:deliverySchema.optional(),learningMappings:z.array(learningMappingSchema).max(500).optional(),variants:z.array(variantSchema).max(50).optional(),tours:z.array(tourSchema).max(30).optional()}).strict();
 export type Project=z.infer<typeof documentSchema>;
 export type ProjectNode=z.infer<typeof nodeSchema>;
 export type ProjectEdge=z.infer<typeof edgeSchema>;
@@ -183,6 +209,20 @@ export function validateDocument(input:unknown):Project {
   if(m.origin==='ai'&&m.state==='source-declared')errors.push(`${m.id}: an AI suggestion is not a source declaration`);
   if(m.origin==='ai'&&!m.suggestedBy)errors.push(`${m.id}: an AI suggestion records suggestedBy`);
   if(m.origin!=='author'&&m.state==='reviewed'&&sameAgent(m.reviewedBy,m.suggestedBy))errors.push(`${m.id}: an ${m.origin==='ai'?'AI':'imported'} suggestion cannot review itself; a person other than ${m.suggestedBy} reviews it in Edit mode`);}
+ // Variants: candidate-local IDs live in the variant's namespace and no canonical ID may enter it. Baselines are checked on reading.
+ ids(d.variants??[],'variant');const canonicalIds=[...d.nodes,...d.edges,...d.views,...d.blocks].map(x=>x.id);
+ for(const v of d.variants??[]){const local=v.id+'.';for(const c of canonicalIds)if(c.startsWith(local))errors.push(`${c}: this canonical ID is inside variant ${v.id}'s local namespace (${local}…)`);
+  v.operations.forEach((o,n)=>{const where=`${v.id} operation ${n+1}`,view=/^\/views\/@([^/]+)/.exec(o.path);if(view&&view[1]!==v.viewId)errors.push(`${where}: a variant changes only its own view ${v.viewId}`);
+   const item=/^\/(nodes|edges)\/(-|@[^/]+)$/.exec(o.path),value='value' in o?o.value:undefined,valueId=value&&typeof value==='object'?(value as {id?:unknown}).id:undefined,what=item?.[1]==='nodes'?'component':'connection';
+   if(item&&o.op==='add'&&item[2]!=='-')errors.push(`${where}: add a ${what} at /${item[1]}/-`);
+   else if(item&&o.op==='add'&&!(typeof valueId==='string'&&valueId.startsWith(local)&&valueId.length>local.length))errors.push(`${where}: an added ${what} takes a candidate-local ID starting with “${local}”, so it never collides with a canonical ID`);
+   if(item&&o.op==='replace'&&valueId!==item[2].slice(1))errors.push(`${where}: a replaced ${what} keeps its stable ID ${item[2].slice(1)}`);});}
+ // Tours: anchors are derived on reading (a stale or missing one fails visibly when played); only the stop shape is checked here.
+ ids(d.tours??[],'tour');
+ for(const t of d.tours??[])t.stops.forEach((s,n)=>{const where=`${t.id} stop ${n+1}`;
+  if(s.omitted==='stop'){if(s.viewId||s.subjects.length||s.narration||s.fingerprint)errors.push(`${where}: an omitted stop keeps no view, subjects, fingerprint or narration`);}
+  else if(!s.viewId||!s.fingerprint)errors.push(`${where}: a stop records its selected view and a content fingerprint`);
+  if(new Set(s.subjects.map(x=>x.kind+'\0'+x.id)).size!==s.subjects.length)errors.push(`${where}: duplicate subject`);});
  // Data-flow cycles are legal. Recursive view expansion is not.
  const done=new Set<string>(),visiting=new Set<string>();
  function visit(viewId:string){if(visiting.has(viewId)){errors.push(`Recursive drilldown cycle at ${viewId}`);return;}if(done.has(viewId))return;visiting.add(viewId);const v=d.views.find(v=>v.id===viewId);for(const n of d.nodes.filter(n=>v?.nodeIds.includes(n.id)))if(n.childViewId)visit(n.childViewId);visiting.delete(viewId);done.add(viewId);}
