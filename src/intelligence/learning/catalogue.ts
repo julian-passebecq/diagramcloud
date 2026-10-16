@@ -2,7 +2,7 @@ import {z} from 'zod';
 import {patternSchema,recipeSchema,patternCatalog,recipeRegistry,type ViewRecipe,type CatalogueFamilyFilter} from '../recipes';
 import {R4_LEARNING_SOURCES} from './sources';
 import {R4_LEARNING_CARDS} from './cards';
-import {AUTHORED_FAILURE_MODES,CASE_STUDIES,LEARNING_ADOPTED_ON} from './content';
+import {AUTHORED_FAILURE_MODES,CASE_STUDIES,LEARNING_ADOPTED_ON} from './content';import {lessonContentProblems} from './guards';
 /** Optional typed catalogue entries. Editorial lesson content is separate from recognition rules: nothing here reads a Project or changes a match. */
 export const CATALOGUE_ENTRY_KINDS=['concept','pattern','procedure','technology','case-study','view-recipe'] as const;
 export type CatalogueEntryKind=typeof CATALOGUE_ENTRY_KINDS[number];
@@ -61,7 +61,7 @@ export function decodeCatalogueEntry(input:unknown):CatalogueRow{
  if(tag===undefined||tag==='view-recipe'){const parsed=recipeSchema.safeParse(legacy);if(parsed.success)return {state:'legacy-recipe',kind:'view-recipe',id:parsed.data.id,title:parsed.data.title,recipe:parsed.data};if(tag==='view-recipe')return {state:'invalid',kind:'view-recipe',id,title:null,reason:firstIssue(parsed.error)};}
  return {state:'invalid',kind:typeof tag==='string'?tag:null,id,title:null,reason:tag===undefined?'Untagged entry is neither a legacy pattern nor a legacy view recipe':'A '+tag+' entry needs authored lesson content; it is not coerced into a pattern or view recipe'};
 }
-/** Catalogue-wide references: unique IDs (also against legacy registries), known prerequisites without cycles, resolvable sources and native reuse links. */
+/** Catalogue-wide references: unique IDs (also against legacy registries), known prerequisites without cycles, resolvable sources, native reuse links and the content guards (`./guards`). */
 export function validateLearningCatalogue(input:unknown,sources:readonly LearningSource[]=learningSources){
  const entries=z.array(learningEntrySchema).max(200).parse(input),problems:string[]=[],ids=new Set<string>(),sourceIds=new Set(sources.map(source=>source.id));
  const legacyIds=new Set<string>([...patternCatalog.map(row=>row.id),...recipeRegistry.map(row=>row.id)]);
@@ -69,7 +69,7 @@ export function validateLearningCatalogue(input:unknown,sources:readonly Learnin
  for(const entry of entries){
   for(const prerequisite of entry.lesson.prerequisites){if(prerequisite===entry.id)problems.push(entry.id+': prerequisite refers to itself');else if(!ids.has(prerequisite))problems.push(entry.id+': unknown prerequisite '+prerequisite);}
   const refs=[...entry.editorial.sourceRefs,...entry.lesson.sourceRefs,...entry.lesson.definition.flatMap(row=>row.sourceRefs),...(entry.lesson.failureModes??[]).flatMap(row=>row.sourceRefs),...(entry.caseStudy?[entry.caseStudy.sourceRef,...entry.caseStudy.distinctFrom.flatMap(row=>row.sourceRef?[row.sourceRef]:[])]:[])];
-  for(const ref of new Set(refs))if(!sourceIds.has(ref))problems.push(entry.id+': unknown source reference '+ref);
+  for(const ref of new Set(refs))if(!sourceIds.has(ref))problems.push(entry.id+': unknown source reference '+ref);problems.push(...lessonContentProblems(entry));
   if(entry.related.nativePatternId){const pattern=patternCatalog.find(row=>row.id===entry.related.nativePatternId);if(!pattern)problems.push(entry.id+': unknown native pattern '+entry.related.nativePatternId);else if(pattern.guidance?.topicKey!==entry.related.canonicalTopicId)problems.push(entry.id+': canonical topic does not match native pattern guidance');}
   if(entry.related.nativeRecipeId){const recipe=recipeRegistry.find(row=>row.id===entry.related.nativeRecipeId);if(!recipe)problems.push(entry.id+': unknown native recipe '+entry.related.nativeRecipeId);else if(recipe.guidance?.topicKey!==entry.related.canonicalTopicId)problems.push(entry.id+': canonical topic does not match native recipe guidance');}
  }
