@@ -1,2 +1,4 @@
 # Vendor artwork must stay byte-identical to upstream (the build checks its git blob): never convert line endings.
 public/icons/** -text
+# Supplied briefs are checked by their SHA-256: keep their bytes (LF) on every checkout.
+examples/workflows/** -text
