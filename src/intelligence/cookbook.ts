@@ -17,3 +17,5 @@ export function referenceCookbook():Project[]{return archetypes.map(a=>{
 export const cookbookManifest={format:'diagramcloud.reference-cookbook/1',version:1,recipeVersions:recipeRegistry.map(r=>({id:r.id,version:r.version})),patternVersions:patternCatalog.map(p=>({id:p.id,version:p.version})),fixtures:archetypes.map(a=>({projectId:'recipe-'+a.id,archetype:a.id,expectedViews:a.perspectives.map((p,i)=>i===0?'overview':'detail-'+p),provenance:'synthetic'}))};
 /** Labelled synthetic learning examples, compiled from authored ProjectBriefs through the native compiler. Separate from referenceCookbook so existing fixtures and the manifest stay unchanged. */
 export function learningCookbook():Project[]{return LEARNING_EXAMPLES.map(row=>compileLearningExample(row.id));}
+/** Three adoption journeys (self-description, one Galaxy process, one FOIL environment slice), registered in the gallery; they open with no project, Git or AI. */
+export {adoptionJourneys} from './learning/journeys';
