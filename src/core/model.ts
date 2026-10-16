@@ -37,8 +37,16 @@ export const CHOICE_STATUSES=['candidate','accepted'] as const;
 export const CHOICE_ORIGINS=['author','ai','imported'] as const;
 const choiceLine=z.string().min(1).max(500),choiceLines=z.array(choiceLine).max(20).default([]);
 export const choiceOptionSchema=z.object({id,label:short,summary:z.string().max(1000).default('')}).strict();
-export const choiceSchema=z.object({id,title:short,goal:z.string().min(1).max(1000),options:z.array(choiceOptionSchema).min(1).max(12),recommendedOptionId:id.optional(),chosenOptionId:id.optional(),reasons:choiceLines,tradeoffs:choiceLines,assumptions:choiceLines,revisitWhen:z.string().max(500).optional(),status:z.enum(CHOICE_STATUSES).default('candidate'),origin:z.enum(CHOICE_ORIGINS).default('author'),decidedBy:z.string().min(1).max(160).optional(),decidedAt:z.string().regex(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2}))?$/,'Use a date such as 2026-10-16 or an ISO 8601 timestamp with a time zone').optional(),sourceIds:refs,visibility}).strict();
+export const choiceSchema=z.object({id,title:short,goal:z.string().min(1).max(1000),options:z.array(choiceOptionSchema).min(1).max(12),recommendedOptionId:id.optional(),chosenOptionId:id.optional(),reasons:choiceLines,tradeoffs:choiceLines,assumptions:choiceLines,revisitWhen:z.string().max(500).optional(),status:z.enum(CHOICE_STATUSES).default('candidate'),origin:z.enum(CHOICE_ORIGINS).default('author'),suggestedBy:z.string().min(1).max(160).optional(),decidedBy:z.string().min(1).max(160).optional(),decidedAt:z.string().regex(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2}))?$/,'Use a date such as 2026-10-16 or an ISO 8601 timestamp with a time zone').optional(),sourceIds:refs,visibility}).strict();
 const choices=z.array(choiceSchema).max(20).optional();
+/** Words of a person or agent name, ignoring case, accents, spacing and punctuation. */
+export const agentWords=(name:string|undefined)=>(name??'').normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+/** True when two names designate the same reviewer: equal after normalization, or every word of one appears in the other
+ * ("Claude" and "claude-opus 5.5"). Used to refuse the self-review of a suggestion or recommendation. */
+export function sameAgent(a:string|undefined,b:string|undefined):boolean{
+ const x=agentWords(a),y=agentWords(b);if(!x.length||!y.length)return false;
+ const [few,many]=x.length<=y.length?[x,y]:[y,x];return few.every(w=>many.includes(w));
+}
 export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),customIconAssetId:id.optional(),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),basis,choices,visibility}).strict();
 /** An optional amount carried by a connection (rows/day, GB, events/s…), with its provenance; drawn by the Sankey figure. Never inferred by an importer. */
 export const quantitySchema=z.object({value:z.number().finite().min(0).max(1e15),unit:z.string().min(1).max(24),provenance:z.enum(PROVENANCES),note:z.string().max(200).optional()}).strict();
@@ -164,7 +172,8 @@ export function validateDocument(input:unknown):Project {
  for(const {owner,c} of allChoices){const where=`${owner}/${c.id}`,options=ids(c.options,`option in ${where}`);c.sourceIds.forEach(r=>check(r,sources,where));
   for(const ref of [c.recommendedOptionId,c.chosenOptionId])if(ref)check(ref,options,where);
   if(c.status==='candidate'&&c.chosenOptionId)errors.push(`${where}: a candidate has no chosen option; use recommendedOptionId, or accept it with chosenOptionId, decidedBy and decidedAt`);
-  if(c.status==='accepted'&&!(c.chosenOptionId&&c.decidedBy&&c.decidedAt))errors.push(`${where}: an accepted decision records chosenOptionId, decidedBy and decidedAt`);}
+  if(c.status==='accepted'&&!(c.chosenOptionId&&c.decidedBy&&c.decidedAt))errors.push(`${where}: an accepted decision records chosenOptionId, decidedBy and decidedAt`);
+  if(c.status==='accepted'&&sameAgent(c.decidedBy,c.suggestedBy))errors.push(`${where}: a recommendation cannot accept itself; decidedBy must be a person other than suggestedBy (an AI recommendation is not a decision)`);}
  // Concept mappings: an unknown or changed target is stale (derived), not invalid; establishing a mapping needs evidence and a human reviewer.
  ids(d.learningMappings??[],'concept mapping');const mappingPairs=new Set<string>();
  for(const m of d.learningMappings??[]){const pair=m.conceptId+'\0'+m.target.kind+'\0'+m.target.id;if(mappingPairs.has(pair))errors.push(`${m.id}: duplicate mapping of ${m.conceptId} to ${m.target.kind} ${m.target.id}`);mappingPairs.add(pair);
@@ -173,7 +182,7 @@ export function validateDocument(input:unknown):Project {
   if((m.state==='suggested'||m.state==='source-declared')&&(m.reviewedBy||m.reviewedAt))errors.push(`${m.id}: only a reviewed or rejected mapping records a reviewer`);
   if(m.origin==='ai'&&m.state==='source-declared')errors.push(`${m.id}: an AI suggestion is not a source declaration`);
   if(m.origin==='ai'&&!m.suggestedBy)errors.push(`${m.id}: an AI suggestion records suggestedBy`);
-  if(m.origin==='ai'&&m.state==='reviewed'&&m.reviewedBy?.trim().toLowerCase()===m.suggestedBy?.trim().toLowerCase())errors.push(`${m.id}: an AI suggestion cannot review itself; a person reviews it in Edit mode`);}
+  if(m.origin!=='author'&&m.state==='reviewed'&&sameAgent(m.reviewedBy,m.suggestedBy))errors.push(`${m.id}: an ${m.origin==='ai'?'AI':'imported'} suggestion cannot review itself; a person other than ${m.suggestedBy} reviews it in Edit mode`);}
  // Data-flow cycles are legal. Recursive view expansion is not.
  const done=new Set<string>(),visiting=new Set<string>();
  function visit(viewId:string){if(visiting.has(viewId)){errors.push(`Recursive drilldown cycle at ${viewId}`);return;}if(done.has(viewId))return;visiting.add(viewId);const v=d.views.find(v=>v.id===viewId);for(const n of d.nodes.filter(n=>v?.nodeIds.includes(n.id)))if(n.childViewId)visit(n.childViewId);visiting.delete(viewId);done.add(viewId);}

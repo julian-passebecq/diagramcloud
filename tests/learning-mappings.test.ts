@@ -7,6 +7,7 @@ import {targetFingerprint} from '../src/core/learningMapping';
 import {learningCatalogue} from '../src/intelligence/learning/catalogue';
 import {conceptsExplaining,lessonInstanceFacts,mappingCandidates,mappingStatus,rejectMapping,reviewMapping,savedExplanation,suggestMapping,CANDIDATE_LABEL} from '../src/intelligence/learning/mappings';
 
+const AUTHOR={origin:'author',suggestedBy:'Julian'} as const;
 const star=learningCatalogue.find(e=>e.id==='star-grain')!;
 const base=():Project=>validateDocument({schemaVersion:1,id:'mapping-fixture',title:'Mapping fixture',rootViewId:'overview',author:'Julian',
  sources:[{id:'src-pub',title:'Warehouse model doc',location:'docs/model.md'},{id:'src-priv',title:'Private sizing notes',location:'notes/secret.md',visibility:'private'}],
@@ -17,7 +18,7 @@ const base=():Project=>validateDocument({schemaVersion:1,id:'mapping-fixture',ti
   {id:'mixed',label:'Orders',kind:'table',sourceIds:['src-pub','src-priv']},
   {id:'inner',label:'Inner step',kind:'process',sourceIds:['src-pub']}],
  edges:[],views:[{id:'overview',title:'Overview',nodeIds:['facts','named','hidden','mixed']},{id:'detail',title:'Detail',nodeIds:['inner']},{id:'private-view',title:'Private view',nodeIds:['inner'],visibility:'private'}]});
-const suggested=(doc:Project,id:string,kind:'node'|'view'='node')=>suggestMapping(doc,{conceptId:star.id,target:{kind,id}});
+const suggested=(doc:Project,id:string,kind:'node'|'view'='node')=>suggestMapping(doc,{conceptId:star.id,target:{kind,id}},AUTHOR);
 const reviewed=(doc:Project,id:string,kind:'node'|'view'='node')=>{const d=suggested(doc,id,kind);const m=d.learningMappings!.at(-1)!;return reviewMapping(d,m.id,{reviewedBy:'Julian',reviewedAt:'2026-10-16T10:00:00Z',evidence:{sourceIds:['src-pub'],blockIds:[]}});};
 
 test('a basic document stays valid without mappings and publishes none',()=>{
@@ -29,10 +30,10 @@ test('a suggestion binds exact revisions and cannot arrive reviewed',()=>{
  const d=suggested(base(),'facts'),m=d.learningMappings![0];
  assert.deepEqual({state:m.state,origin:m.origin,concept:m.conceptId,rev:m.contentRevision,project:m.target.projectId,docRev:m.target.projectRevision},{state:'suggested',origin:'author',concept:'star-grain',rev:star.editorial.contentRevision,project:'mapping-fixture',docRev:0});
  assert.equal(m.target.fingerprint,targetFingerprint(d,{kind:'node',id:'facts'}));
- for(const extra of [{state:'reviewed'},{reviewedBy:'assistant'},{reviewedAt:'2026-10-16T10:00:00Z'}])
-  assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'},...extra}));
- assert.throws(()=>suggestMapping(base(),{conceptId:'not-a-concept',target:{kind:'node',id:'facts'}}),/Unknown concept/);
- assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'nope'}}),/Unknown node/);
+ for(const extra of [{state:'reviewed'},{reviewedBy:'assistant'},{reviewedAt:'2026-10-16T10:00:00Z'},{origin:'author'},{suggestedBy:'Julian'}])
+  assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'},...extra},AUTHOR));
+ assert.throws(()=>suggestMapping(base(),{conceptId:'not-a-concept',target:{kind:'node',id:'facts'}},AUTHOR),/Unknown concept/);
+ assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'nope'}},AUTHOR),/Unknown node/);
  assert.throws(()=>suggested(d,'facts'),/already mapped/);
  assert.equal(mappingStatus(d,m).state,'suggested');
  const facts=lessonInstanceFacts(d,star);assert.equal(facts.established.length,0);assert.equal(facts.suggested.length,1);assert.match(facts.gap!,/1 suggestion awaits review/);
@@ -49,8 +50,8 @@ test('a name-only match stays a candidate: no evidence, no review',()=>{
 });
 
 test('no self-review: an AI suggestion is reviewed only by a person',()=>{
- const d=suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'},origin:'ai',suggestedBy:'assistant',evidence:{sourceIds:['src-pub'],blockIds:[]}}),id=d.learningMappings![0].id;
- assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'},origin:'ai'}),/suggestedBy/);
+ const d=suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'},evidence:{sourceIds:['src-pub'],blockIds:[]}},{origin:'ai',suggestedBy:'assistant'}),id=d.learningMappings![0].id;
+ assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'}},{origin:'ai',suggestedBy:'  '}),/suggestedBy/);
  assert.throws(()=>reviewMapping(d,id,{reviewedBy:' Assistant '}),/cannot review itself/);
  const forged=clone(d);Object.assign(forged.learningMappings![0],{state:'reviewed',reviewedBy:'assistant',reviewedAt:'2026-10-16T10:00:00Z'});assert.throws(()=>validateDocument(forged),/cannot review itself/);
  const declared=clone(d);declared.learningMappings![0].state='source-declared';assert.throws(()=>validateDocument(declared),/not a source declaration/);
@@ -91,8 +92,8 @@ test('reviewed mapping opens the exact component in a reachable view; Explained 
 
 test('public projection first: hidden components, views and private evidence never appear in lists, counts, search or exports',()=>{
  let d=reviewed(base(),'facts');d=reviewed(d,'hidden');d=reviewed(d,'private-view','view');d=suggested(d,'named');
- const mixed=suggestMapping(d,{conceptId:star.id,target:{kind:'node',id:'mixed'}});d=reviewMapping(mixed,mixed.learningMappings!.at(-1)!.id,{reviewedBy:'Julian',evidence:{sourceIds:['src-pub','src-priv'],blockIds:[]}});
- const onlyPrivate=suggestMapping(d,{conceptId:'oltp-olap',target:{kind:'node',id:'mixed'}});d=reviewMapping(onlyPrivate,onlyPrivate.learningMappings!.at(-1)!.id,{reviewedBy:'Julian',evidence:{sourceIds:['src-priv'],blockIds:[]}});
+ const mixed=suggestMapping(d,{conceptId:star.id,target:{kind:'node',id:'mixed'}},AUTHOR);d=reviewMapping(mixed,mixed.learningMappings!.at(-1)!.id,{reviewedBy:'Julian',evidence:{sourceIds:['src-pub','src-priv'],blockIds:[]}});
+ const onlyPrivate=suggestMapping(d,{conceptId:'oltp-olap',target:{kind:'node',id:'mixed'}},AUTHOR);d=reviewMapping(onlyPrivate,onlyPrivate.learningMappings!.at(-1)!.id,{reviewedBy:'Julian',evidence:{sourceIds:['src-priv'],blockIds:[]}});
  assert.equal(lessonInstanceFacts(d,star).established.length,4);
  const pub=publicDocument(d),text=JSON.stringify(pub);
  assert.deepEqual(pub.learningMappings!.map(m=>[m.conceptId,m.target.id,m.evidence.sourceIds]),[['star-grain','facts',['src-pub']],['star-grain','mixed',['src-pub']]]);
@@ -109,4 +110,27 @@ test('public projection first: hidden components, views and private evidence nev
  assert.deepEqual({format:saved.format,rev:saved.contentRevision,depth:saved.depth,targets:saved.instances.map(i=>i.target.id)},{format:'diagramcloud.saved-explanation/1',rev:star.editorial.contentRevision,depth:'architecture',targets:['facts','mixed']});
  assert.equal(saved.explanation,star.lesson.levels.architecture);assert.equal(JSON.stringify(saved).includes('hidden'),false);
  const privateMapping=clone(d);(privateMapping.learningMappings as LearningMapping[]).forEach(m=>m.visibility='private');assert.equal(publicDocument(validateDocument(privateMapping)).learningMappings,undefined);
+});
+
+test('the calling path sets origin and suggestedBy; a proposal cannot claim to be the author',()=>{
+ for(const smuggled of [{origin:'author'},{origin:'ai'},{suggestedBy:'Julian'}])
+  assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'},...smuggled},{origin:'ai',suggestedBy:'claude'}),/Unrecognized key/,JSON.stringify(smuggled));
+ assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'}},undefined as never),/origin/);
+ assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'}},{origin:'source' as never,suggestedBy:'claude'}),/origin/);
+ for(const origin of ['author','ai','imported'] as const){const m=suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'}},{origin,suggestedBy:' claude '}).learningMappings![0];
+  assert.deepEqual([m.origin,m.suggestedBy],[origin,'claude'],'suggestedBy is recorded for every origin');}
+ assert.throws(()=>suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'}},{origin:'author',suggestedBy:''}),/suggestedBy/);
+});
+
+test('no self-review, robustly: normalized names, and imported suggestions too',()=>{
+ const evidence={sourceIds:['src-pub'],blockIds:[]};
+ for(const origin of ['ai','imported'] as const){
+  const d=suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'},evidence},{origin,suggestedBy:'Claude Opus'}),id=d.learningMappings![0].id;
+  for(const reviewedBy of ['claude opus','CLAUDE-OPUS','  Claude_Opus ','Claude','Claude Opus 5.5','Cláude'])assert.throws(()=>reviewMapping(d,id,{reviewedBy,evidence}),/cannot review itself/,origin+' '+reviewedBy);
+  const forged=clone(d);Object.assign(forged.learningMappings![0],{state:'reviewed',reviewedBy:'claude-opus',reviewedAt:'2026-10-16T10:00:00Z'});assert.throws(()=>validateDocument(forged),/cannot review itself/);
+  assert.equal(reviewMapping(d,id,{reviewedBy:'Julian',evidence}).learningMappings![0].state,'reviewed');
+ }
+ // The author's own suggestion, made in Edit mode, is reviewed by that author against ticked evidence.
+ const own=suggestMapping(base(),{conceptId:star.id,target:{kind:'node',id:'facts'}},AUTHOR);
+ assert.equal(reviewMapping(own,own.learningMappings![0].id,{reviewedBy:'Julian',evidence}).learningMappings![0].reviewedBy,'Julian');
 });

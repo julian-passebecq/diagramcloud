@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {clone,validateDocument,type Choice,type Project} from '../src/core/model';
 import {commitHistory,publicDocument,undo,type History} from '../src/core/operations';
+import {describeChanges} from '../src/core/changeDetail';
 import {applyDraft,checkDraft,createLatestValidator,draftText,DRAFT_NO_COMPONENT,type DraftBase} from '../src/core/jsonDraft';
 import {contosoForecasting} from '../src/data/contosoForecasting';
 
@@ -39,6 +40,25 @@ test('choices: publicDocument keeps public choices only and never publishes a pr
  const none=publicDocument(withChoices([choice({visibility:'private'})]));assert.ok(!('choices' in none.nodes.find(n=>n.id==='planner')!),'an emptied list is dropped');
  const hidden=clone(withChoices([choice()]));hidden.nodes.find(n=>n.id==='planner')!.visibility='private';
  assert.ok(!JSON.stringify(publicDocument(validateDocument(hidden))).includes('store-choice'),'choices of a private component never leave');
+});
+
+test('choices: a recommendation never accepts itself, and an incoming accepted choice is cautioned',()=>{
+ const accepted={status:'accepted' as const,chosenOptionId:'lakehouse',decidedAt:'2026-10-16'};
+ // Legacy accepted choices without suggestedBy stay valid.
+ assert.equal(withChoices([choice({...accepted,origin:'imported',decidedBy:'Architecture board'})]).nodes.find(n=>n.id==='planner')!.choices![0].suggestedBy,undefined);
+ for(const decidedBy of ['claude','Claude','  CLAUDE ','claude-opus 5.5','Claudé'])assert.throws(()=>withChoices([choice({...accepted,suggestedBy:'Claude',decidedBy})]),/cannot accept itself/,decidedBy);
+ assert.equal(withChoices([choice({...accepted,suggestedBy:'claude',decidedBy:'Julian'})]).nodes.find(n=>n.id==='planner')!.choices![0].decidedBy,'Julian');
+ assert.ok(withChoices([choice({suggestedBy:'claude'})]),'a candidate records who recommended it');
+ // Import preview: arriving accepted, changing to accepted, and changing the decision are each cautioned.
+ const before=withChoices([choice({suggestedBy:'claude'})]);
+ const arrives=describeChanges(withChoices([]),withChoices([choice({...accepted,origin:'ai',decidedBy:'claude-bot',suggestedBy:'assistant'})])).cautions;
+ assert.ok(arrives.some(c=>c==='Choice “Where forecasts are stored” arrives accepted (decidedBy claude-bot, suggestedBy assistant, origin ai); an AI recommendation is not a decision. Accept it yourself in Edit mode.'),arrives.join('\n'));
+ const changes=describeChanges(before,withChoices([choice({...accepted,suggestedBy:'claude',decidedBy:'Julian'})])).cautions;
+ assert.ok(changes.some(c=>c.startsWith('Choice “Where forecasts are stored” changes to accepted (decidedBy Julian, suggestedBy claude, origin ai)')),changes.join('\n'));
+ const decided=withChoices([choice({...accepted,origin:'author',decidedBy:'Julian'})]);
+ assert.deepEqual(describeChanges(decided,decided).cautions,[],'an unchanged accepted decision is not cautioned');
+ assert.ok(describeChanges(decided,withChoices([choice({...accepted,origin:'author',chosenOptionId:'warehouse',decidedBy:'Julian'})])).cautions.some(c=>c.startsWith('Changes the accepted decision of choice')));
+ assert.ok(!describeChanges(withChoices([]),before).cautions.some(c=>c.includes('accepted')),'a candidate is not a decision and needs no caution');
 });
 
 test('draft: invalid JSON or an invalid document is a result, and the applied project is never mutated',()=>{

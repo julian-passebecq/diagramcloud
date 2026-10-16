@@ -109,11 +109,22 @@ export function describePackChanges(current:ExperiencePack,incoming:ExperiencePa
  return out;
 }
 
+/** Choices live inside components and views, so their decisions are compared by stable choice ID across the whole document.
+ * An accepted choice is a person's decision; one that arrives accepted (often written by an AI) is flagged for review. */
+function choiceCautions(current:Project,incoming:Project,out:ChangeDetail){
+ const all=(p:Project)=>new Map([...p.nodes,...p.views].flatMap(owner=>(owner.choices??[]).map(c=>[c.id,c] as const))),before=all(current);
+ for(const [id,c] of all(incoming)){if(c.status!=='accepted')continue;const was=before.get(id);
+  const who=`decidedBy ${c.decidedBy??'nobody'}${c.suggestedBy?`, suggestedBy ${c.suggestedBy}`:''}${c.origin!=='author'?`, origin ${c.origin}`:''}`;
+  if(!was||was.status!=='accepted')out.cautions.push(`Choice “${c.title}” ${was?'changes to':'arrives'} accepted (${who}); an AI recommendation is not a decision. Accept it yourself in Edit mode.`);
+  else if(was.chosenOptionId!==c.chosenOptionId||was.decidedBy!==c.decidedBy)out.cautions.push(`Changes the accepted decision of choice “${c.title}” (${who}); an AI recommendation is not a decision.`);}
+}
+
 export function describeChanges(current:Project,incoming:Project):ChangeDetail{
  const out:ChangeDetail={changes:[],cautions:[]};
  const meta=fieldChanges(Object.fromEntries(PROJECT_FIELDS.map(k=>[k,current[k]])),Object.fromEntries(PROJECT_FIELDS.map(k=>[k,incoming[k]])));
  if(meta.length)out.changes.push({kind:'changed',group:'project',id:incoming.id,name:incoming.title,fields:meta});
  for(const g of ['nodes','edges','views','blocks','assets','sources','observations'] as const)diffGroup(g,current[g] as unknown as Rec[],incoming[g] as unknown as Rec[],out);
+ choiceCautions(current,incoming,out);
  diffGroup('story',steps(current.story),steps(incoming.story),out);
  diffGroup('learningMappings',(current.learningMappings??[]) as unknown as Rec[],(incoming.learningMappings??[]) as unknown as Rec[],out);
  if(current.experience&&incoming.experience)describePackChanges(current.experience,incoming.experience,out);

@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {clone,learningMappingSchema,validateDocument,type LearningMapping,type Project} from '../../core/model';
+import {clone,learningMappingSchema,sameAgent,validateDocument,type LearningMapping,type Project} from '../../core/model';
 import {publicDocument} from '../../core/operations';
 import {pathTo} from '../../core/viewspec';
 import {targetFingerprint} from '../../core/learningMapping';
@@ -68,19 +68,23 @@ export function conceptsExplaining(input:Project,nodeId:string,{publicMode=false
   .filter(r=>r.state!=='rejected'&&(!publicMode||r.state!=='suggested'));
 }
 const proposalSchema=z.object({conceptId:learningMappingSchema.shape.conceptId,target:z.object({kind:z.enum(['node','view']),id:learningMappingSchema.shape.target.shape.id}).strict(),evidence:learningMappingSchema.shape.evidence.optional(),
- origin:z.enum(['author','ai','imported']).default('author'),suggestedBy:z.string().min(1).max(160).optional(),note:z.string().max(500).optional(),visibility:z.enum(['public','private']).default('public')}).strict();
+ note:z.string().max(500).optional(),visibility:z.enum(['public','private']).default('public')}).strict();
 const nextId=(doc:Project,conceptId:string,targetId:string)=>{const base=('map-'+conceptId+'-'+targetId).slice(0,72).replace(/[^a-z0-9_.-]/g,'-');let id=base,i=2;while((doc.learningMappings??[]).some(m=>m.id===id))id=base+'-'+i++;return id;};
+/** Who suggests: set by the calling path (Edit-mode UI, an agent tool, an importer), never read from the proposal itself. */
+export type SuggestionOrigin={origin:'author'|'ai'|'imported';suggestedBy:string};
 /**
- * Records a suggestion. Strict input: a proposal that tries to carry a state, reviewer or review time is refused, so an AI
- * or automatic suggestion can never arrive reviewed. Binds the current lesson revision and target fingerprint.
+ * Records a suggestion. Strict input: a proposal that tries to carry a state, reviewer, review time, origin or suggester is
+ * refused, so an AI or automatic suggestion can never arrive reviewed or pass itself off as the author's. The calling path
+ * supplies origin and suggestedBy (recorded for every origin). Binds the current lesson revision and target fingerprint.
  */
-export function suggestMapping(input:Project,proposal:unknown,catalogue:Catalogue=learningCatalogue):Project{
- const p=proposalSchema.parse(proposal),concept=conceptOf(p.conceptId,catalogue);
+export function suggestMapping(input:Project,proposal:unknown,by:SuggestionOrigin,catalogue:Catalogue=learningCatalogue):Project{
+ const p=proposalSchema.parse(proposal),concept=conceptOf(p.conceptId,catalogue),suggestedBy=by?.suggestedBy?.trim()??'';
+ if(!by||!['author','ai','imported'].includes(by.origin))throw new Error('The calling path sets the suggestion origin: author, ai or imported');
+ if(!suggestedBy||suggestedBy.length>160)throw new Error('A suggestion records suggestedBy');
  if(!concept)throw new Error(`Unknown concept ${p.conceptId}`);
  const fingerprint=targetFingerprint(input,p.target);if(!fingerprint)throw new Error(`Unknown ${p.target.kind} ${p.target.id}`);
- if(p.origin==='ai'&&!p.suggestedBy)throw new Error('An AI suggestion records suggestedBy');
  if((input.learningMappings??[]).some(m=>m.conceptId===p.conceptId&&m.target.kind===p.target.kind&&m.target.id===p.target.id))throw new Error(`${p.conceptId} is already mapped to ${p.target.kind} ${p.target.id}; review or reject that mapping instead`);
- const d=clone(input),mapping=learningMappingSchema.parse({id:nextId(d,p.conceptId,p.target.id),conceptId:p.conceptId,contentRevision:concept.editorial.contentRevision,target:{projectId:d.id,kind:p.target.kind,id:p.target.id,projectRevision:d.revision,fingerprint},evidence:p.evidence??{sourceIds:[],blockIds:[]},state:'suggested',origin:p.origin,...(p.suggestedBy?{suggestedBy:p.suggestedBy}:{}),...(p.note?{note:p.note}:{}),visibility:p.visibility});
+ const d=clone(input),mapping=learningMappingSchema.parse({id:nextId(d,p.conceptId,p.target.id),conceptId:p.conceptId,contentRevision:concept.editorial.contentRevision,target:{projectId:d.id,kind:p.target.kind,id:p.target.id,projectRevision:d.revision,fingerprint},evidence:p.evidence??{sourceIds:[],blockIds:[]},state:'suggested',origin:by.origin,suggestedBy,...(p.note?{note:p.note}:{}),visibility:p.visibility});
  d.learningMappings=[...(d.learningMappings??[]),mapping];return validateDocument(d);
 }
 /**
@@ -91,7 +95,7 @@ export function suggestMapping(input:Project,proposal:unknown,catalogue:Catalogu
 export function reviewMapping(input:Project,mappingId:string,{reviewedBy,reviewedAt=new Date().toISOString(),evidence}:{reviewedBy:string;reviewedAt?:string;evidence?:{sourceIds:string[];blockIds:string[]}},catalogue:Catalogue=learningCatalogue):Project{
  const d=clone(input),m=d.learningMappings?.find(m=>m.id===mappingId);if(!m)throw new Error(`Unknown concept mapping ${mappingId}`);
  const reviewer=reviewedBy.trim(),concept=conceptOf(m.conceptId,catalogue);if(!reviewer)throw new Error('A review records who reviewed it');
- if(m.origin==='ai'&&reviewer.toLowerCase()===m.suggestedBy?.trim().toLowerCase())throw new Error('An AI suggestion cannot review itself; a person reviews it in Edit mode');
+ if(m.origin!=='author'&&sameAgent(reviewer,m.suggestedBy))throw new Error(`An ${m.origin==='ai'?'AI':m.origin} suggestion cannot review itself; a person other than ${m.suggestedBy} reviews it in Edit mode`);
  if(!concept)throw new Error(`Concept ${m.conceptId} is not in this catalogue version`);
  const fingerprint=targetFingerprint(d,m.target);if(!fingerprint)throw new Error(`The mapped ${m.target.kind} ${m.target.id} no longer exists; reject this mapping instead`);
  const cited=evidence??m.evidence,sources=new Set(d.sources.map(s=>s.id)),blocks=new Set(d.blocks.map(b=>b.id));

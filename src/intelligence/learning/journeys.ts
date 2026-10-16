@@ -13,7 +13,7 @@ import {learningCatalogue} from './catalogue';
 export const JOURNEY_TAG='Adoption journey';
 /** Every self-description citation: a real file of this repository, the line, and a token that must stay on that line (tests/adoption-journeys.test.ts). */
 export const SELF_CITATIONS=[
- {id:'src-model-validate',title:'validateDocument',path:'src/core/model.ts',line:125,token:'export function validateDocument'},
+ {id:'src-model-validate',title:'validateDocument',path:'src/core/model.ts',line:133,token:'export function validateDocument'},
  {id:'src-json-draft',title:'JSON drawer applyDraft',path:'src/core/jsonDraft.ts',line:70,token:'export function applyDraft'},
  {id:'src-brief-compile',title:'ProjectBrief compiler',path:'src/intelligence/brief.ts',line:77,token:'export function compileProjectBrief'},
  {id:'src-patch-guard',title:'JSON Patch revision guard',path:'src/core/patch.ts',line:113,token:'Stale patch'},
@@ -22,9 +22,9 @@ export const SELF_CITATIONS=[
  {id:'src-export-project',title:'exportProject',path:'src/app/exports.ts',line:19,token:'const safe=publicDocument(project)'},
  {id:'src-ci-receipt',title:'CI verification receipt step',path:'.github/workflows/ci.yml',line:43,token:'if: always()'},
  {id:'src-learning-catalogue',title:'learningCatalogue',path:'src/intelligence/learning/catalogue.ts',line:96,token:'export const learningCatalogue'},
- {id:'src-lesson-ui',title:'LearningCatalogue panel',path:'src/ui/LearningCatalogue.tsx',line:81,token:'export function LearningCatalogue'},
- {id:'src-suggest-mapping',title:'suggestMapping',path:'src/intelligence/learning/mappings.ts',line:77,token:'export function suggestMapping'},
- {id:'src-review-mapping',title:'reviewMapping',path:'src/intelligence/learning/mappings.ts',line:91,token:'export function reviewMapping'}
+ {id:'src-lesson-ui',title:'LearningCatalogue panel',path:'src/ui/LearningCatalogue.tsx',line:100,token:'export function LearningCatalogue'},
+ {id:'src-suggest-mapping',title:'suggestMapping',path:'src/intelligence/learning/mappings.ts',line:80,token:'export function suggestMapping'},
+ {id:'src-review-mapping',title:'reviewMapping',path:'src/intelligence/learning/mappings.ts',line:95,token:'export function reviewMapping'}
 ] as const;
 const cite=(d:Project,ids:string[])=>{for(const id of ids){const c=SELF_CITATIONS.find(c=>c.id===id)!;if(!d.sources.some(s=>s.id===id))d.sources.push({id,title:c.title,location:`${c.path}:${c.line}`,visibility:'public'});}return ids;};
 /** A source-declared mapping bound to the current lesson revision and the target's evidence fingerprint. */

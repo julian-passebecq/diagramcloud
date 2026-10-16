@@ -56,3 +56,25 @@ test('learning catalogue opens a warehouse lesson and the RAG lesson, changes de
  await page.getByRole('button',{name:'JSON / AI',exact:true}).click();
  expect(await page.getByLabel('Project JSON',{exact:true}).inputValue()).toBe(source);
 });
+
+test('learning catalogue opens from the gallery without a project: no sample, saved workspace, AI or network',async({page,baseURL})=>{
+ const errors:string[]=[],foreign:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ page.on('request',request=>{if(!request.url().startsWith(baseURL!)&&!request.url().startsWith('data:'))foreign.push(request.url());});
+ // A fresh browser opening the catalogue entry never mounts the studio: no project and no IndexedDB workspace is created.
+ await page.goto('/?catalogue');
+ const catalogue=page.getByRole('region',{name:'Learning catalogue',exact:true});
+ await expect(catalogue.getByRole('status',{name:'Learning catalogue results'})).toHaveText('Showing 24 of 24 catalogue entries.');
+ await expect(page.getByRole('note').first()).toContainText('No project is open.');
+ await expect(page.locator('.project-hero')).toHaveCount(0);await expect(page.getByRole('tablist',{name:'Workspace mode'})).toHaveCount(0);
+ expect(await page.evaluate(async()=>(await indexedDB.databases()).length)).toBe(0);
+ await catalogue.getByRole('button',{name:'Open lesson Fact grain, dimensions and joins',exact:true}).click();
+ await expect(catalogue.getByRole('region',{name:'In my project'})).toContainText('No reviewed mapping. No project is open.');
+ // The gallery entry leads to the same project-less page.
+ await page.goto('/');const sample=(await page.locator('.project-hero h1').textContent())!;expect(sample.length).toBeGreaterThan(0);
+ await page.getByRole('link',{name:'Learning catalogue',exact:true}).click();
+ await expect(page).toHaveURL(/\?catalogue$/);
+ await expect(page.getByRole('region',{name:'Learning catalogue',exact:true})).toBeVisible();
+ await expect(page.getByText(sample,{exact:true})).toHaveCount(0);await expect(page.locator('.project-hero')).toHaveCount(0);
+ await page.getByRole('link',{name:'Back to the studio',exact:true}).click();await expect(page.locator('.project-hero h1')).toBeVisible();
+ expect(foreign).toEqual([]);expect(errors).toEqual([]);
+});
