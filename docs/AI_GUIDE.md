@@ -120,6 +120,12 @@ RFC 6902 JSON Patch inside an envelope. `baseRevision` must equal the document's
 
 Rename labels freely, keep IDs. To add a drilldown: create the child view (its `nodeIds`, `edgeIds`, `positions`), then set `childViewId` on the parent component. One level per component, no recursion.
 
+### Choices: optional rationale on a component or view
+
+A node or view may carry `choices` (defined in `src/core/model.ts`, checked by `validateDocument`). Each choice has a stable `id`, `title`, `goal`, one to twelve `options` (`id`, `label`, optional `summary`), optional `recommendedOptionId`, `reasons`, `tradeoffs`, `assumptions`, `revisitWhen`, `sourceIds`, `visibility`, an `origin` (`author`, `ai` or `imported`) and a `status`. A `candidate` (the default, and what an AI writes) never carries `chosenOptionId` and is never shown as accepted. An `accepted` decision must record `chosenOptionId`, `decidedBy` and `decidedAt`; keep an imported decision's author, date and sources unchanged. There are no numeric scores or savings. Documents without `choices` stay valid; public export keeps only public choices whose sources are public. Add or change choices with a `diagramcloud.patch` (for example `add /nodes/@<id>/choices`) or in the Edit-mode **JSON drawer**.
+
+The **JSON drawer** (`src/ui/JsonDrawer.tsx`, logic in `src/core/jsonDraft.ts`) edits the whole project or one component by its exact stable ID. It shows the applied model, the current draft and the last valid preview separately; keystrokes never save, an invalid draft keeps the last valid preview and disables Apply, and Apply revalidates against the live revision as one undoable revision. A draft written before a newer edit is refused without mutation. It is absent in Portfolio and Present.
+
 ## 5. Choosing a figure
 
 Run `npm run design -- doc.json --out figures/` and read `figures/suggestions.json` (`diagramcloud.design-suggestions/1`): for each public view, the five best figure types with the fact behind each ("a numeric table on Input rows", "6 child views below this one"). Then choose by the question the figure must answer:
