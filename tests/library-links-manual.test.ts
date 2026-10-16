@@ -26,3 +26,35 @@ test('full handbook embeds only public image evidence with escaped caption and r
  assert.ok(html.includes('<img src="'+customIconData()+'"'));assert.ok(html.includes('Synthetic caption &lt;img onerror=&quot;bad&quot;&gt;'));assert.ok(html.includes('Recorded rights: Original synthetic &lt;rights&gt;; MIT fixture.'));assert.ok(html.includes('object-fit:contain'));assert.ok(!html.includes('PRIVATE_IMAGE_'));assert.ok(!html.includes('not in the manual'));assert.deepEqual(ledger.views[0].evidence.shown,['image']);assert.equal(ledger.views[0].evidence.omitted,0);assert.equal(JSON.stringify(doc),before);
  const overview={...brief,detail:'overview' as const};assert.ok(!technicalManualHtml(doc,{brief:overview}).includes(customIconData()));assert.equal(publicationFidelity(doc,overview).views[0].evidence.omitted,1);
 });
+
+
+import {documentSchema,validateDocument,type Project} from '../src/core/model';
+import {WORKSPACE_VIEW_UNAVAILABLE,workspaceViewPage,resolveWorkspaceView,WORKSPACE_VIEW_PAGE_SIZE} from '../src/intelligence/library';
+function workspaceViewFixture(id='workspace-alpha'){
+ return validateDocument(documentSchema.parse({schemaVersion:1,id,title:'Synthetic workspace '+id,rootViewId:'root',privateNotes:'SYNTHETIC_PRIVATE_WORKSPACE',nodes:[{id:'portal',label:'Synthetic portal',childViewId:'detail'},{id:'leaf',label:'Synthetic leaf'},{id:'private-portal',label:'SYNTHETIC_PRIVATE_PORTAL',childViewId:'secret',visibility:'private'},{id:'private-leaf',label:'SYNTHETIC_PRIVATE_LEAF',visibility:'private'},{id:'orphan-leaf',label:'Synthetic unplaced scope'}],edges:[],views:[{id:'root',title:'Synthetic overview',description:'Stated root purpose',nodeIds:['portal','private-portal'],edgeIds:[]},{id:'detail',title:'Synthetic detail',description:'Stated detail purpose',nodeIds:['leaf'],edgeIds:[]},{id:'secret',title:'SYNTHETIC_PRIVATE_VIEW',visibility:'private',nodeIds:['private-leaf'],edgeIds:[]},{id:'orphan',title:'Synthetic orphan view',nodeIds:['orphan-leaf'],edgeIds:[]}]}));
+}
+test('workspace view retrieval uses compound identity and actual retained parents without rewriting canonical content',()=>{
+ const a=workspaceViewFixture(),b=workspaceViewFixture('workspace-beta'),before=JSON.stringify([a,b]),target={projectId:b.id,viewId:'detail',revision:b.revision};
+ const result=resolveWorkspaceView([a,b],target);assert.equal(result.state,'available');if(result.state!=='available')assert.fail();assert.equal(result.project,b);assert.deepEqual(result.path,['root','detail']);assert.equal(result.row.projectTitle,b.title);assert.equal(result.row.target.projectId,b.id);
+ result.path[0]='changed';result.row.target.viewId='changed';result.row.title='changed';assert.deepEqual(resolveWorkspaceView([a,b],target).state,'available');assert.equal(JSON.stringify([a,b]),before);
+ const sameId=structuredClone(b);assert.equal(resolveWorkspaceView([b,sameId],target).state,'unavailable');
+});
+test('workspace view page accounts for every reachable view and returned mutations never alter the next page or Project',()=>{
+ const projects=[workspaceViewFixture(),workspaceViewFixture('workspace-beta'),workspaceViewFixture('workspace-gamma')],before=JSON.stringify(projects),first=workspaceViewPage(projects),last=workspaceViewPage(projects,{page:999});
+ assert.equal(first.total,9);assert.equal(first.displayed,WORKSPACE_VIEW_PAGE_SIZE);assert.equal(first.omitted,1);assert.equal(first.pages,2);assert.equal(last.page,1);assert.equal(last.displayed,1);assert.equal(last.omitted,8);assert.equal(new Set([...first.rows,...last.rows].map(r=>r.target.projectId+':'+r.target.viewId)).size,9);assert.ok(![...first.rows,...last.rows].some(r=>r.target.viewId==='orphan'));
+ first.rows[0].target.projectId='changed';last.rows.pop();assert.equal(workspaceViewPage(projects).rows[0].target.projectId,projects[0].id);assert.equal(JSON.stringify(projects),before);assert.equal(workspaceViewPage([]).pages,0);assert.equal(workspaceViewPage(projects,{page:NaN}).page,0);
+});
+test('workspace exact target rejects missing, stale, malformed, extra-command and newly unreachable identities without retargeting',()=>{
+ const p=workspaceViewFixture(),target={projectId:p.id,viewId:'detail',revision:p.revision},before=JSON.stringify(p);
+ for(const candidate of [null,{...target,projectId:'missing'},{...target,viewId:'orphan'},{...target,viewId:'missing'},{...target,revision:target.revision+1},{...target,revision:-1},{...target,viewId:'../SYNTHETIC_PRIVATE_PATH'},{...target,command:'open-source'},{...target,revision:NaN}])assert.deepEqual(resolveWorkspaceView([p],candidate),{state:'unavailable'});
+ const removed=structuredClone(p);delete removed.nodes.find(n=>n.id==='portal')!.childViewId;validateDocument(removed);assert.deepEqual(resolveWorkspaceView([removed],target),{state:'unavailable'});assert.equal(JSON.stringify(p),before);assert.ok(!WORKSPACE_VIEW_UNAVAILABLE.includes('SYNTHETIC_PRIVATE'));
+});
+test('public workspace browsing returns a constant before authoring rows or target getters, independent of private counts',()=>{
+ const poison=new Proxy([] as Project[],{get(){throw new Error('Authoring collection must not be read');}}),target=new Proxy({},{get(){throw new Error('Private target must not be read');},ownKeys(){throw new Error('Private target must not be enumerated');}});
+ const baseline=workspaceViewPage([],{publicMode:true});assert.deepEqual(workspaceViewPage(poison,{publicMode:true,page:999}),baseline);assert.deepEqual(workspaceViewPage([workspaceViewFixture(),workspaceViewFixture('workspace-beta')],{publicMode:true}),baseline);assert.deepEqual(resolveWorkspaceView(poison,target,{publicMode:true}),{state:'unavailable'});assert.ok(!JSON.stringify(baseline).includes('SYNTHETIC_PRIVATE'));
+});
+test('explicit workspace view URLs reject malformed/ambiguous fields while retaining project-only and valid native links',()=>{
+ for(const query of ['?project=valid&view=../secret','?project=valid&view=','?project=valid&view=root&node=%3Cscript%3E','?project=valid&view=root&view=other','?project=valid&project=other&view=root','?project=valid&view=root&publication=frozen'])assert.equal(readDeepLink(query),null);
+ assert.deepEqual(readDeepLink('?project=valid&node=%3Cscript%3E'),{project:'valid'});
+ assert.deepEqual(readDeepLink('?project=valid'),{project:'valid'});assert.deepEqual(readDeepLink('?project=valid&view=detail'),{project:'valid',view:'detail'});const url=deepLink('https://example.invalid/studio/?token=SYNTHETIC_PRIVATE_TOKEN#old',{project:'workspace-alpha',view:'detail'});assert.deepEqual(readDeepLink(new URL(url).search),{project:'workspace-alpha',view:'detail'});assert.ok(!url.includes('SYNTHETIC_PRIVATE'));assert.ok(!url.includes('revision'));
+});

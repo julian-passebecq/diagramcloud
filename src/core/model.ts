@@ -52,7 +52,14 @@ const openUri=z.string().max(2000).refine(isOpenUri,'Only http(s) or vscode link
  * lets a presented card appear in the portfolio index.
  */
 export const OBSERVATION_CLAIMS=['observed','verified','partial','not-observed'] as const;
-export const observationSchema=z.object({id,nodeId:id,sourceApp:z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/,'Source app is a lowercase Galaxy/app name such as datapass_vscode or datapass-vscode'),authority:short,observedAt:instant,sourceRevision:z.string().min(1).max(120),claim:z.enum(OBSERVATION_CLAIMS),summary:z.string().min(1).max(500),link:openUri.optional(),blockIds:refs,caveat:z.string().max(1000).default(''),visibility:z.enum(['public','private']).default('private'),reviewedAt:instant.optional(),shareable:z.boolean().default(false)}).strict();
+/** Independent, source-owned state axes. Values retain the producer's vocabulary: a lifecycle FROZEN may
+ * coexist with distribution DEPLOYED. Scope is supplied by that producer, never inferred from a folder or Git.
+ * Provenance, claim, review and visibility belong to the enclosing observation; no parallel state store. */
+export const STATE_FACETS=['lifecycle','selection','implementation','verification','distribution','runtime'] as const;
+export type StateFacet=typeof STATE_FACETS[number];
+const stateText=short.refine(s=>s.trim().length>0,'State value and scope must be explicit, nonblank source text');
+export const stateFacetSchema=z.object({facet:z.enum(STATE_FACETS),value:stateText,scope:stateText}).strict();
+export const observationSchema=z.object({id,nodeId:id,sourceApp:z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/,'Source app is a lowercase Galaxy/app name such as datapass_vscode or datapass-vscode'),authority:short,observedAt:instant,sourceRevision:z.string().min(1).max(120),claim:z.enum(OBSERVATION_CLAIMS),summary:z.string().min(1).max(500),link:openUri.optional(),blockIds:refs,caveat:z.string().max(1000).default(''),visibility:z.enum(['public','private']).default('private'),reviewedAt:instant.optional(),shareable:z.boolean().default(false),stateFacet:stateFacetSchema.optional()}).strict();
 export const portfolioSchema=z.object({projectRef:z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$/,'Use a stable project reference such as a DATAPASSCONTROL entity_id').optional(),openUri:openUri.optional(),lastReviewedAt:instant.optional(),indexVisibility:z.enum(['private','shareable']).default('private')}).strict();
 const stepSchema=z.object({title:short,viewId:id,nodeId:id.optional(),narration:z.string().max(2000),highlightEdgeIds:refs,observationIds:z.array(id).max(20).optional()}).strict();
 /**

@@ -69,3 +69,7 @@ button.perspective-chip{cursor:pointer}.perspective-chip.state-available{border-
 @media(max-width:760px){.workspace.with-context{display:flex;flex-direction:column}.workspace.with-context>.main-workspace{display:none}.context-drawer{position:static;max-height:none;width:100%;border-left:0}.analysis-sheet{padding:16px}.canvas-toolbar>.toolbar{gap:5px}.table-scroll{max-width:100%;overflow:auto}}
 .pi-tabs button{font-size:11px;word-break:normal}.pi-tabs{flex-wrap:nowrap}
 .project-navigator .pi-tabs button:nth-child(2){flex:1.45;white-space:nowrap}.project-navigator .pi-tabs button{padding:8px 4px}
+
+.state-facets ul{margin:0;padding-left:14px;display:grid;gap:8px}.state-facets li{min-width:0}
+
+.hero-title>div{min-width:0;overflow-wrap:anywhere}

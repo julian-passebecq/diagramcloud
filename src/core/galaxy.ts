@@ -282,7 +282,9 @@ export function publicationSnapshot(input:Project,options:{
   locator:{project_id:d.id,source_id:s.id,title:s.title,...(s.location?{location:s.location}:{}),...(s.url?{url:s.url}:{})},
   captured_at:createdAt,observed_revision:revision,visibility:'public',synthetic:false,review_state:'reviewed',producer_app:'diagramcloud'
  }));
- const realization_claims:PublicationSnapshot['realization_claims']=d.observations.map(o=>({
+ // Galaxy's general realization claim has no state axis/scope fields. Never flatten a scoped
+ // verified lifecycle/distribution claim into verification of the whole component.
+ const realization_claims:PublicationSnapshot['realization_claims']=d.observations.filter(o=>!o.stateFacet).map(o=>({
   claim_id:o.id,subject_entity_id:entityIdFor('diagramcloud','node',o.nodeId),
   state:o.claim==='not-observed'?'not_observed':o.claim,observed_at:o.observedAt,producer_app:o.sourceApp,authority:o.authority,
   summary:o.summary,...(o.caveat?{caveat:o.caveat}:{}),...(o.link?{open_uri:o.link}:{}),
@@ -296,6 +298,7 @@ export function publicationSnapshot(input:Project,options:{
   review:{state:'reviewed' as const,reviewed_at:iso(options.reviewedAt),...(options.reviewedBy?{reviewed_by:options.reviewedBy}:{}),human_confirmed:options.humanConfirmed,intended_visibility:options.intendedVisibility},
   entities,relationships,evidence_refs:[...blockEvidence,...sourceEvidence],realization_claims,
   presentation_hints:{root_view_id:d.rootViewId,story_steps:d.story.length},
+  ...(d.observations.some(o=>o.stateFacet)?{extensions:{'diagramcloud.omissions':{state_facet_claims:d.observations.filter(o=>o.stateFacet).length,reason:'Scoped state claims are not general realization claims. Retain the public Project JSON for their typed values, scopes and history.'}}}:{}),
   contract_versions:[...GALAXY_V1G_CONTRACTS]
  };
  return validatePublicationSnapshot(snapshot);

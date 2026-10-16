@@ -69,7 +69,8 @@ export function lineageSvg(input:Project,viewId:string,options:DesignOptions={})
   else{const x1=laneX.get(`${p.e.id}:1`)!,x2=laneX.get(`${p.e.id}:2`)!,cy=laneY.get(p.e.id)!;routes.set(p.e.id,[{x:x0,y:s},{x:x1,y:s},{x:x1,y:cy},{x:x2,y:cy},{x:x2,y:d},{x:x9,y:d}]);}}
  // Connectors first, then boxes, then labels on masks. Muted elements sit at reduced opacity with a dashed outline.
  const out:string[]=[],used=new Set<string>(),count=(r:LineageRole)=>[...roles.values()].filter(x=>x===r).length;
- if(rows&&spec.nodes.length){const heads=column.map((ns,i)=>ns.length?txt(`STEP ${i+1}`,colX(i),top-36,{size:8,fill:t.soft,font:MONO,tracking:0.14}):'');out.push(...heads);}
+ // Keep headings above the top corridor's fanned tracks and their label masks, in the header-to-row gap.
+ if(rows&&spec.nodes.length){const heads=column.map((ns,i)=>ns.length?txt(`STEP ${i+1}`,colX(i),M+hdr.height+10,{size:8,fill:t.soft,font:MONO,tracking:0.14}):'');out.push(...heads);}
  for(const p of plans){const e=p.e,role=subject?edgeRole(e,roles):'other',muted=role==='other',link=e.kind==='query',dashed=muted||e.kind==='control'||e.kind==='dependency'||e.basis==='unknown';
   used.add(muted?'other':link?'link':'muted');if(!muted&&dashed)used.add('dashed');
   out.push(`<path data-edge-id="${xml(e.id)}" data-dd-lineage="${role}"${back.includes(e)?' data-dd-cycle="true"':''} d="${elbowPath(routes.get(e.id)!)}" fill="none" stroke="${link&&!muted?t.link:t.muted}" stroke-width="1.2"${muted?' stroke-opacity="0.4"':''}${dashed?' stroke-dasharray="5,4"':''} marker-end="url(#${c.slug}-${link&&!muted?'link':'arrow'})"><title>${xml(`${byId.get(e.from)?.label??e.from} → ${byId.get(e.to)?.label??e.to}${e.label?`: ${e.label}`:''} (${e.kind}${muted?', not on the lineage':''})`)}</title></path>`);}

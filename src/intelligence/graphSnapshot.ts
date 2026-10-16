@@ -1,5 +1,5 @@
 /** Data-only GraphSnapshot -> existing Project candidate. No new persistent graph.
- * Spec: galaxy-prompt-spec@92d256f, datapass.graph/1.
+ * Spec: datapass.graph/1 (owner-held external specification).
  * File import is user-selected, inert and PRIVATE. Nothing here grants scope or observation review.
  */
 import {z} from 'zod';
@@ -374,4 +374,26 @@ export function selectGraphNodes(raw:unknown,selected:string[]):GraphSnapshot{
  return validateGraphSnapshot({...g,nodes,assertions,source_refs,groups:g.groups.map(group=>({...group,node_ids:group.node_ids.filter(id=>ids.has(id))})).filter(group=>group.node_ids.length),
   scope:{...g.scope,organization_ids:[...new Set(nodes.map(n=>n.organization_id))],privacy_domain_ids:[...new Set([...nodes.map(n=>n.privacy_domain_id),...source_refs.map(s=>s.privacy_domain_id)])]},
   complete_scope:false,omitted:[...g.omitted.slice(0,9999),{reason:'Explicit consumer projection: '+(g.nodes.length-nodes.length)+' source components outside selection. Absence is not deletion.'}],removed_assertion_ids:[]});
+}
+
+
+/** A read-only projection of the retained generation receipt, never a claim about live runtime. */
+export type GraphAssertionTableRow={id:string;externalId:string;from:{id:string;label:string};to:{id:string;label:string};family:string;origin:string;sources:{id:string;title:string|null;location:string|null;state:'available'|'unavailable'}[]};
+export type GraphAssertionTableFacts={state:'available'|'unavailable'|'private-unavailable';projectId:string|null;revision:number|null;graphId:string|null;generationId:string|null;capturedAt:string|null;synthetic:boolean|null;complete:boolean|null;sourceVector:{repo_id:string;revision:string}[];producerOmissions:{reason:string;source_id?:string}[];total:number;page:{index:number;pages:number;start:number;end:number;remaining:number};rows:GraphAssertionTableRow[]};
+export function graphAssertionTable(input:Project,options:{publicMode?:boolean;filter?:GraphFilter;page?:number}={}):GraphAssertionTableFacts{
+ const empty=(state:GraphAssertionTableFacts['state']):GraphAssertionTableFacts=>({state,projectId:null,revision:null,graphId:null,generationId:null,capturedAt:null,synthetic:null,complete:null,sourceVector:[],producerOmissions:[],total:0,page:{index:0,pages:0,start:0,end:0,remaining:0},rows:[]});
+ // This branch precedes Project, filter, page, validity, history and count access.
+ if(options.publicMode)return empty('private-unavailable');
+ const filter=options.filter??{},queried=graphRows(input,filter),generation=queried.generation;
+ if(!generation)return empty('unavailable');
+ // An explicit unknown scope is unavailable, never a project-wide fallback.
+ if((filter.organization!==undefined&&!generation.nodes.some(n=>n.organization===filter.organization))||
+  (filter.project!==undefined&&!generation.nodes.some(n=>n.kind==='project'&&n.externalId===filter.project))||
+  (filter.family!==undefined&&!generation.assertions.some(a=>a.family===filter.family))||
+  (filter.origin!==undefined&&!generation.assertions.some(a=>a.origin===filter.origin))||
+  (filter.state!==undefined&&!generation.nodes.some(n=>n.state===filter.state)))return empty('unavailable');
+ const total=queried.assertions.length,pages=Math.ceil(total/50),requested=options.page??0,index=total?Math.min(pages-1,Math.max(0,Number.isFinite(requested)?Math.floor(requested):0)):0,start=index*50;
+ const nodes=new Map(input.nodes.map(n=>[n.id,n])),sources=new Map(input.sources.map(s=>[s.id,s]));
+ const rows=queried.assertions.slice(start,start+50).map((a):GraphAssertionTableRow=>({id:a.localId,externalId:a.externalId,from:{id:a.from,label:nodes.get(a.from)!.label},to:{id:a.to,label:nodes.get(a.to)!.label},family:a.family,origin:a.origin,sources:a.sourceIds.map(id=>{const s=sources.get(id);return {id,title:s?.title??null,location:s?.location??null,state:s?'available':'unavailable'};})}));
+ return {state:'available',projectId:input.id,revision:input.revision,graphId:generation.graphId,generationId:generation.generationId,capturedAt:generation.capturedAt,synthetic:generation.synthetic,complete:generation.complete,sourceVector:generation.sourceVector.map(r=>({...r})),producerOmissions:generation.omitted.map(r=>({...r})),total,page:{index,pages,start:total?start+1:0,end:start+rows.length,remaining:Math.max(0,total-start-rows.length)},rows};
 }

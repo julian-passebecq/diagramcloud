@@ -4,7 +4,7 @@
 
 **Release baseline:** [`v1.24.0`](https://github.com/julian-passebecq/diagramcloud/releases/tag/v1.24.0), `main`/tag `309099ef8b4fcaa8e6f836f2b40a39b148b5a6c1`, [CI run 37731465431](https://github.com/julian-passebecq/diagramcloud/actions/runs/37731465431). Release facts remain in [`docs/release-1.24/`](../release-1.24/), not in these matrices.
 
-**NIGHT4 scope:** [`NIGHT4_CROSSWALK.md`](./NIGHT4_CROSSWALK.md) relates existing F IDs to the **17 selected DG**; normative acceptance remains [the pinned Galaxy NIGHT4 source](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/92d256f75e334b685fb327ab552e718fbb51f001/workstreams/COCKPIT-20261008-NIGHT4/features.csv). No Galaxy-owned roadmap is copied here.
+**NIGHT4 scope:** [`NIGHT4_CROSSWALK.md`](./NIGHT4_CROSSWALK.md) relates existing F IDs to the **17 selected DG**; normative acceptance remains the pinned Galaxy NIGHT4 source (the owner-held external `datapass.graph/1` specification (not public)). No Galaxy-owned roadmap is copied here.
 
 ## Recovered source artifacts (not reconstructed)
 
@@ -30,7 +30,7 @@ Provenance: files recovered from previous user-visible local pre-Pro/code-lead a
 - [`docs/release-1.24/RELEASE_CONTRACT.md`](../release-1.24/RELEASE_CONTRACT.md), [`RELEASE_NOTES.md`](../release-1.24/RELEASE_NOTES.md), [`CODEX_WORK.md`](../release-1.24/CODEX_WORK.md): release 1.24 scope, implementation handoff and existing proof.
 - [`docs/pro-pass/START_HERE.md`](../pro-pass/START_HERE.md) and related handoffs: older Pro guidance and design history; do not treat as current runtime.
 - [`docs/contracts/galaxy-v1g.md`](../contracts/galaxy-v1g.md), [`src/core/galaxy.ts`](../../src/core/galaxy.ts): shipped baseline integration that NIGHT4 must preserve.
-- External [GraphSnapshot schema/CONTRACTS.md](https://github.com/julian-passebecq/galaxy-prompt-spec/tree/92d256f75e334b685fb327ab552e718fbb51f001/workstreams/COCKPIT-20261008-NIGHT4) are normative for the **input adapter** only; they do not replace the `Project` model.
+- External GraphSnapshot schema/CONTRACTS.md (the owner-held external `datapass.graph/1` specification (not public)) are normative for the **input adapter** only; they do not replace the `Project` model.
 
 ## Preservation, selected work, and deferrals
 

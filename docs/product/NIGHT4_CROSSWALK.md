@@ -2,7 +2,7 @@
 
 **Owner:** DiagramCloud product repo. **Purpose:** a read-only relationship from recovered pre-Pro F IDs to selected NIGHT4 DG acceptance. It is **not a second acceptance CSV or an editable copy of the 17 criteria**.
 
-**Sources:** [recovered F001-F115](./FEATURES_PREPRO_20261008.csv), [historical pre-1.24 dispositions](./FEATURE_DISPOSITION_PRE124_20261008.csv), [release 1.24](../release-1.24/RELEASE_NOTES.md), [NIGHT4 selected DG criteria (pinned spec)](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/92d256f75e334b685fb327ab552e718fbb51f001/workstreams/COCKPIT-20261008-NIGHT4/features.csv), and [DiagramCloud lane contract](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/92d256f75e334b685fb327ab552e718fbb51f001/workstreams/COCKPIT-20261008-NIGHT4/DIAGRAMCLOUD.md).
+**Sources:** [recovered F001-F115](./FEATURES_PREPRO_20261008.csv), [historical pre-1.24 dispositions](./FEATURE_DISPOSITION_PRE124_20261008.csv), [release 1.24](../release-1.24/RELEASE_NOTES.md), NIGHT4 selected DG criteria (pinned spec) (the owner-held external `datapass.graph/1` specification (not public)), and DiagramCloud lane contract (the owner-held external `datapass.graph/1` specification (not public)).
 
 **Status rule:** 1.24.0 is shipped at `309099ef8b4fcaa8e6f836f2b40a39b148b5a6c1`; all rows below are **NIGHT4 SELECTED, NOT YET QUALIFIED at this documentary checkpoint**. Code tests/receipts on an exact future NIGHT4 SHA must determine implemented/qualified status. F targets are *historical pre-release intent*, **not** acceptance or a binding release schedule. NIGHT4 selection moves the intersecting bounded capability into V1_SELECTED_INCREMENT; it does not accelerate unrelated parts of a large F epic.
 
@@ -13,7 +13,7 @@ The links are **conceptual intersections, not formal equivalences**: for example
 
 ## Boundaries and future work
 
-- **V1 NIGHT4:** implement all DG-001..017 as selected, preserving 1.24 features. Source acceptance remains [the pinned spec](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/92d256f75e334b685fb327ab552e718fbb51f001/workstreams/COCKPIT-20261008-NIGHT4/features.csv).
+- **V1 NIGHT4:** implement all DG-001..017 as selected, preserving 1.24 features. Source acceptance remains the pinned spec (the owner-held external `datapass.graph/1` specification (not public)).
 - **Unselected roadmap:** environment DeploymentInstance/promotion/drift, full Project Evolution, richer document/knowledge extraction, advanced IsoSVG/Trace/Visual Lab, R2 assets and general agentic/MCP remain outside DG acceptance unless explicitly covered by a bounded DG clause.
 - **Source/version boundaries:** Galaxys' external GraphSnapshot and real private source packs are not public repo content; the generic DiagramCloud Project and renderer remain canonical. Import is staged/private; no runtime status is invented.
 - **Evidence:** PRs, commit SHAs, CI and test evidence for NIGHT4 are added to product delivery records only when they exist. Do not edit the DG source criteria here.

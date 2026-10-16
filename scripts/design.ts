@@ -8,6 +8,8 @@
  * with Playwright's chromium, offline (any non-file request aborts the run); needs `npx playwright install chromium`.
  */
 import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
+const fail=(e:unknown)=>{process.stderr.write(`design: ${e instanceof Error?e.message.split('\n')[0]:String(e)}\n`);process.exit(1);};
+process.on('uncaughtException',fail);process.on('unhandledRejection',fail);
 import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {recommendFigures} from '../src/export/design/recommend';

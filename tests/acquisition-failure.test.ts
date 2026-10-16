@@ -14,3 +14,18 @@ test('read rejection during cancellation still rejects the whole request without
  const browserAbort={...failed,arrayBuffer:async()=>{throw new DOMException('Read aborted','AbortError');}} as unknown as File;
  await assert.rejects(()=>analyzePickedFolder([browserAbort],{depth:'quick'}),{name:'AbortError'});
 });
+
+test('explicit folder permission denial retains actionable private advice through save/reopen; generic failures stay unclassified',async()=>{
+ const bad=(name:string,error:Error)=>({name,webkitRelativePath:'synthetic/'+name,size:1,arrayBuffer:async()=>{throw error;}} as unknown as File);
+ const denied=bad('denied.py',new DOMException('PRIVATE_DENIAL_DETAIL','NotAllowedError'));
+ const missing=bad('missing.py',new DOMException('PRIVATE_MISSING_DETAIL','NotFoundError'));
+ const generic=bad('generic.py',new Error('PRIVATE_GENERIC_DETAIL'));
+ const result=await analyzePickedFolder([denied,missing,generic],{depth:'quick'});
+ const diagnostics=result.analysis.documentMap.diagnostics;
+ const advice=diagnostics.find(d=>d.path==='denied.py');assert.equal(advice?.cause,'access-denied');assert.equal(advice?.action?.kind,'request-access');
+ for(const path of ['missing.py','generic.py'])assert.equal(diagnostics.find(d=>d.path===path)?.cause,undefined);
+ const reopened=readAcquisitionAnalysis(JSON.parse(JSON.stringify(result.document)));
+ assert.equal(reopened?.documentMap.diagnostics.find(d=>d.path==='denied.py')?.cause,'access-denied');
+ const publicText=JSON.stringify(publicDocument(result.document));for(const text of ['denied.py','missing.py','generic.py','PRIVATE_DENIAL_DETAIL','PRIVATE_MISSING_DETAIL','PRIVATE_GENERIC_DETAIL'])assert(!publicText.includes(text));
+ assert(!JSON.stringify(result).includes('PRIVATE_DENIAL_DETAIL'));assert(!JSON.stringify(result).includes('PRIVATE_MISSING_DETAIL'));assert(!JSON.stringify(result).includes('PRIVATE_GENERIC_DETAIL'));assert.equal(result.document.observations.length,0);
+});

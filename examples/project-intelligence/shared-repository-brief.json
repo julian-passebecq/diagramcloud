@@ -1,0 +1,17 @@
+{
+  "format": "diagramcloud.project-brief",
+  "version": 1,
+  "project": {
+    "id": "shared-repository-example",
+    "title": "Synthetic shared repository declarations",
+    "summary": "Synthetic author declarations only. No repository has been read and no runtime or deployment is established."
+  },
+  "scope": [
+    {"id": "orders", "title": "Order workflow", "kind": "workstream", "summary": "Synthetic authored explanation of order admission.", "repositoryIds": ["shared-api"]},
+    {"id": "reports", "title": "Reporting workflow", "kind": "workstream", "summary": "Synthetic authored explanation of reporting.", "repositoryIds": ["shared-api", "other-api"]}
+  ],
+  "repositories": [
+    {"id": "shared-api", "title": "Shared API", "host": "github", "locator": "https://github.com/example/shared-api", "role": "service", "ref": "main", "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+    {"id": "other-api", "title": "Shared API", "host": "gitlab", "locator": "https://gitlab.com/example/shared-api", "role": "service", "ref": "main", "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+  ]
+}

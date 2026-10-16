@@ -330,13 +330,13 @@ export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPa
     else if(/^[@~#]\//.test(spec))target=resolveRel(`${root}/x`,spec.slice(2));
     if(target){
      const owner=ownerOf(target);
-     if(owner===d){const to=moduleOf(target);if(to&&to!==from)link(mkey(from),mkey(to),'imports','component',ev(p,line,`import ${spec}`,'confirmed'));
-      else if(to&&sourceSet.has(target)&&target!==p&&baseOf(target)!=='__init__.py')link(`f:${p}`,`f:${target}`,'imports','file',ev(p,line,`import ${spec}`,'confirmed'));}
-     else if(owner!==undefined)link(container,containerKey(owner),'imports','container',ev(p,line,`import ${spec}`,'confirmed'));
+     if(owner===d){const to=moduleOf(target);if(to&&to!==from)link(mkey(from),mkey(to),'imports','component',ev(p,line,`import ${spec}`,'confirmed'),'dependency');
+      else if(to&&sourceSet.has(target)&&target!==p&&baseOf(target)!=='__init__.py')link(`f:${p}`,`f:${target}`,'imports','file',ev(p,line,`import ${spec}`,'confirmed'),'dependency');}
+     else if(owner!==undefined)link(container,containerKey(owner),'imports','container',ev(p,line,`import ${spec}`,'confirmed'),'dependency');
      continue;
     }
     const pkgName=spec.startsWith('@')?spec.split('/').slice(0,2).join('/'):spec.split('/')[0].split('.')[0];
-    const ws=packageNames.get(pkgName);if(ws!==undefined&&ws!==d){link(container,containerKey(ws),'imports','container',ev(p,line,`import ${spec}`,'confirmed'));continue;}
+    const ws=packageNames.get(pkgName);if(ws!==undefined&&ws!==d){link(container,containerKey(ws),'imports','container',ev(p,line,`import ${spec}`,'confirmed'),'dependency');continue;}
     const tech=techOfPackage(pkgName)??techOfPackage(spec);
     if(tech){linkTech(mkey(from),tech,ev(p,line,`import ${spec}`,'confirmed'),'imports');linkTech(container,tech,ev(p,line,`import ${spec}`,'confirmed'),`uses (${pkgName})`);}
    }

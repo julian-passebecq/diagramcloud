@@ -7,14 +7,17 @@ import type {ScanFile} from '../core/scan/scanner';
 import {SECRET_FILE,IGNORED_DIR,outsideNestedRepositories} from '../core/scan/scanner';
 import {secretInText} from '../core/secrets';
 import {GENERATED_PATH,GENERATED_HEADER,VENDOR_PATH} from '../core/scan/inventory';
-import {analyzeAzure,analyzeDatabricks,analyzeDotnetSource,analyzeFabric,analyzeKubernetesPackaging} from './nativeAdapters';
+import {analyzeAzure,analyzeDatabricks,analyzeDotnetSource,analyzeFabric,analyzeKubernetesPackaging,type NativeDiagnosticAdvice} from './nativeAdapters';
 import {analyzeAsyncApi} from './eventDeclarations';
+import type {DocumentDiagnostic} from './types';
+import {gapAdvice} from './gapDetails';
+import {documentDiagnosticSchema} from './profile';
 
 export type Domain='fabric'|'databricks'|'dbt'|'dotnet'|'azure'|'kubernetes'|'packages'|'events';
 export type DomainFact={key:string;domain:Domain;label:string;kind:Project['nodes'][number]['kind'];path:string;line:number;summary:string};
 export type DomainLink={from:string;to:string;label:string;path:string;line:number};
 export type DomainContract={role:'producer'|'consumer';scheme:'openapi-contract'|'nuget-package'|'npm-package';identity:string;version:string;nodeKey:string;path:string;line:number;digest?:string};
-export type DomainResult={facts:DomainFact[];links:DomainLink[];capabilities:Domain[];diagnostics:string[];analyzerVersion:'diagramcloud-domain/3';contracts:DomainContract[];
+export type DomainResult={facts:DomainFact[];links:DomainLink[];capabilities:Domain[];diagnostics:string[];diagnosticDetails?:DocumentDiagnostic[];analyzerVersion:'diagramcloud-domain/3';contracts:DomainContract[];
  sources:{path:string;contentIdentity:string;parserVersion:string}[];
  limits:{facts:number;links:number;diagnostics:number};};
 type Obj=Record<string,unknown>;
@@ -42,9 +45,12 @@ export function analyzeDomainFiles(files:ScanFile[],options:{domains?:Domain[]}=
  const inputCount=files.length;
  files=outsideNestedRepositories(files).filter(f=>f.path.length<=512&&!/^(?:\/|[a-z]:)/i.test(f.path)&&!f.path.includes('\\')&&!f.path.split('/').some(s=>s==='..'||s==='.'||!s)&&!SECRET_FILE.test(f.path)&&!VENDOR_PATH.test(f.path)&&((!IGNORED_DIR.test(f.path)&&!GENERATED_PATH.test(f.path))||/(^|\/)target\/manifest\.json$/i.test(f.path))&&!GENERATED_HEADER.test(f.text.slice(0,2048))&&!secretInText(f.text)&&new TextEncoder().encode(f.text).length<=512*1024).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0).slice(0,1500);
  if(new Set(files.map(f=>f.path)).size!==files.length)throw new Error('Duplicate selected artifact paths refused');
- const facts=new Map<string,DomainFact>(),links=new Map<string,DomainLink>(),capabilities=new Set<Domain>(),diagnostics:string[]=[];
+ const facts=new Map<string,DomainFact>(),links=new Map<string,DomainLink>(),capabilities=new Set<Domain>(),diagnostics:string[]=[],diagnosticDetails:DocumentDiagnostic[]=[];
  if(inputCount!==files.length)diagnostics.push('Input selection: '+(inputCount-files.length)+' files omitted by path, sensitive-content, size or file budget; absence is not deletion.');
- const diag=(path:string,message:string)=>{if(diagnostics.length<MAX_DIAGNOSTICS)diagnostics.push(path+': '+message);};
+ const diag=(path:string,message:string,advice?:NativeDiagnosticAdvice)=>{
+  if(diagnostics.length>=MAX_DIAGNOSTICS)return;diagnostics.push(path+': '+message);
+  if(advice){const parsed=documentDiagnosticSchema.safeParse({path,message:message.slice(0,1000),...advice});if(parsed.success)diagnosticDetails.push(parsed.data);}
+ };
  const add=(fact:DomainFact)=>{
   if(!fact.key||!fact.label)return;
   if(facts.size>=MAX_FACTS&&!facts.has(fact.key)){diag(fact.path,'Domain fact budget reached; select a smaller source.');return;}
@@ -68,7 +74,7 @@ export function analyzeDomainFiles(files:ScanFile[],options:{domains?:Domain[]}=
   if(enabled('dbt')&&name==='manifest.json'){
    const data=parsed(f,true);
    if(!object(data)||!object(data.nodes)||!object(data.metadata)||!str(data.metadata.dbt_schema_version))continue;
-   if(!/\/manifest\/v(?:[4-9]|1[0-2])\.json$/.test(str(data.metadata.dbt_schema_version))){diag(f.path,'Unsupported dbt manifest version; supported v4–v12 only.');continue;}
+   if(!/\/manifest\/v(?:[4-9]|1[0-2])\.json$/.test(str(data.metadata.dbt_schema_version))){diag(f.path,'Unsupported dbt manifest version; supported v4–v12 only.',{code:'unsupported',line:line(f.text,'dbt_schema_version'),...gapAdvice('unsupported-analyzer')});continue;}
    const candidates=[...entries(data.nodes),...entries(data.sources),...entries(data.exposures)];
    for(const [key,raw] of candidates){
     if(!object(raw)||!/^(model|source|test|snapshot|seed|exposure)\./.test(key))continue;
@@ -84,7 +90,7 @@ export function analyzeDomainFiles(files:ScanFile[],options:{domains?:Domain[]}=
   }
   if(enabled('fabric')&&(name==='definition.pbir'||name.endsWith('.pbip'))){
    const data=parsed(f,true);if(!object(data))continue;
-   if(data.version&&!/^[1-4](?:\.|$)/.test(str(data.version))){diag(f.path,'Unsupported PBIP/PBIR version; supported major 1–4.');continue;}
+   if(data.version&&!/^[1-4](?:\.|$)/.test(str(data.version))){diag(f.path,'Unsupported PBIP/PBIR version; supported major 1–4.',{code:'unsupported',line:line(f.text,'version'),...gapAdvice('unsupported-analyzer')});continue;}
    const key='fabric:report:'+f.path;
    add({key,domain:'fabric',kind:'report',label:dir(f.path).split('/').at(-1)||base(f.path),
     path:f.path,line:1,summary:'Power BI project/report definition; static artifact only.'});
@@ -92,7 +98,7 @@ export function analyzeDomainFiles(files:ScanFile[],options:{domains?:Domain[]}=
   if(enabled('dotnet')&&(/(?:^|\/)(openapi|swagger)(?:\.[^/]*)?\.(json|ya?ml)$/.test(p)||name==='openapi.yaml'||name==='openapi.json')){
    const data=parsed(f,/\.json$/.test(name));
    if(!object(data)||!((typeof data.openapi==='string')||(typeof data.swagger==='string'))||!object(data.paths))continue;
-   if(!(str(data.swagger)==='2.0'||/^3\.[01]\./.test(str(data.openapi)))){diag(f.path,'Unsupported OpenAPI version; supported Swagger 2.0 and OpenAPI 3.0/3.1.');continue;}
+   if(!(str(data.swagger)==='2.0'||/^3\.[01]\./.test(str(data.openapi)))){diag(f.path,'Unsupported OpenAPI version; supported Swagger 2.0 and OpenAPI 3.0/3.1.',{code:'unsupported',line:line(f.text,str(data.openapi)?'openapi':'swagger'),...gapAdvice('unsupported-analyzer')});continue;}
    const api='dotnet:api:'+f.path;
    add({key:api,domain:'dotnet',kind:'app',label:str(object(data.info)&&data.info.title)||'OpenAPI interface',
     path:f.path,line:1,summary:'Supplied OpenAPI contract; no server implementation inferred.'});
@@ -142,7 +148,7 @@ export function analyzeDomainFiles(files:ScanFile[],options:{domains?:Domain[]}=
     const dependencyValue=object(raw.depends_on)?raw.depends_on.nodes:undefined,parentMap=object(data.parent_map)?data.parent_map:null,hasParents=parentMap&&Object.hasOwn(parentMap,key),parentValue=hasParents?parentMap[key]:undefined;
     if((parentValue!==undefined&&(!Array.isArray(parentValue)||parentValue.some(id=>typeof id!=='string'||!id)))||(dependencyValue!==undefined&&(!Array.isArray(dependencyValue)||dependencyValue.some(id=>typeof id!=='string'||!id)))){diag(f.path,'Invalid dbt structured dependency list for '+key+'; no relationships guessed.');continue;}
     const dependencies=array(dependencyValue).map(str),parents=hasParents?array(parentValue).map(str):null;
-    if(parents&&object(raw.depends_on)&&Array.isArray(raw.depends_on.nodes)&&JSON.stringify([...new Set(dependencies)].sort())!==JSON.stringify([...new Set(parents)].sort())){diag(f.path,'dbt parent_map contradicts depends_on for '+key+'; conflicting relationships omitted.');continue;}
+    if(parents&&object(raw.depends_on)&&Array.isArray(raw.depends_on.nodes)&&JSON.stringify([...new Set(dependencies)].sort())!==JSON.stringify([...new Set(parents)].sort())){diag(f.path,'dbt parent_map contradicts depends_on for '+key+'; conflicting relationships omitted.',{code:'ambiguous',line:declarationLine(f,['parent_map',key],'"'+key+'"'),...gapAdvice('conflicting-evidence')});continue;}
     for(const [index,id] of (parents??dependencies).entries()){
      const sourcePath:(string|number)[]=parents?['parent_map',key,index]:[section,key,'depends_on','nodes',index];
      if(facts.has('dbt:'+id)&&facts.get('dbt:'+id)?.path===f.path)edge({from:'dbt:'+id,to:'dbt:'+key,label:parents?'dbt manifest parent_map':'dbt declared depends_on',path:f.path,line:declarationLine(f,sourcePath,'"'+key+'"')});
@@ -204,7 +210,7 @@ export function analyzeDomainFiles(files:ScanFile[],options:{domains?:Domain[]}=
   }
  }
  return {facts:[...facts.values()],links:[...links.values()].filter(l=>facts.has(l.from)&&facts.has(l.to)),contracts:contracts.filter(c=>facts.has(c.nodeKey)),
-  capabilities:[...capabilities].sort(),diagnostics,analyzerVersion:'diagramcloud-domain/3',
+  capabilities:[...capabilities].sort(),diagnostics,...(diagnosticDetails.length?{diagnosticDetails}:{}),analyzerVersion:'diagramcloud-domain/3',
   sources:files.filter(f=>[...facts.values()].some(x=>x.path===f.path)).map(f=>({path:f.path,contentIdentity:'fnv-pair:'+hash(f.text)+'-'+hash(f.text.split('').reverse().join('')),parserVersion:'diagramcloud-domain/3'})),
   limits:{facts:MAX_FACTS,links:MAX_LINKS,diagnostics:MAX_DIAGNOSTICS}};
 }
@@ -214,7 +220,7 @@ export function extendWithDomainFacts(input:Project,report:DomainResult,budget:{
  const root=doc.views.find(v=>v.id===doc.rootViewId);
  if(!root)return input;
  const nodeLimit=Math.min(500,budget.nodes??500),edgeLimit=Math.min(1500,budget.edges??1500),viewLimit=Math.min(80,budget.views??80),sourceLimit=Math.min(200,budget.sources??200);
- const receipt=JSON.stringify({analyzerVersion:report.analyzerVersion,repositoryRevision:budget.sourceRevision??null,capabilities:report.capabilities,sources:report.sources,contracts:report.contracts,diagnostics:report.diagnostics,limits:report.limits});
+ const receipt=JSON.stringify({analyzerVersion:report.analyzerVersion,repositoryRevision:budget.sourceRevision??null,capabilities:report.capabilities,sources:report.sources,contracts:report.contracts,diagnostics:report.diagnostics,...(report.diagnosticDetails?.length?{diagnosticDetails:report.diagnosticDetails}:{}),limits:report.limits});
  const rootNode=doc.nodes.find(n=>root.nodeIds.includes(n.id));
  if(rootNode&&receipt.length<=48000&&doc.blocks.length<1490){const id='domain-analysis-receipt';doc.blocks=doc.blocks.filter(b=>b.id!==id);doc.blocks.push({id,title:'Static analyzer capabilities and limits',type:'code',language:'json',code:receipt,provenance:'source-derived',sourceIds:[],visibility:'private'});rootNode.blockIds=[...new Set([...rootNode.blockIds,id])];}
  const sources=new Map<string,string>(),nodes=new Map<string,string>(),blocks=new Set<string>(doc.blocks.map(x=>x.id));

@@ -43,7 +43,12 @@ export function publicationPageProject(input:Project,plan:PublicationPages,index
  const doc=publicDocument(validateDocument(input)),page=plan.pages[index];if(!page)throw new Error('Publication page is unavailable');
  const source=doc.views.find(v=>v.id===plan.viewId);if(!source)throw new Error('Publication page source view is unavailable');
  if(!plan.dense)return doc;
- const projected={...doc,rootViewId:plan.viewId,views:doc.views.map(v=>v.id!==plan.viewId?v:{...v,design:undefined,nodeIds:page.nodeIds,edgeIds:page.edgeIds,positions:Object.fromEntries(page.nodeIds.map((id,i)=>[id,{x:(i%2)*330,y:Math.floor(i/2)*160}]))})};
+ // This disposable renderer input narrows one view, so its story pointers must
+ // follow that same membership. The handbook renders selected authored story
+ // separately from the complete canonical document, never from this projection.
+ const pageNodes=new Set(page.nodeIds),pageEdges=new Set(page.edgeIds),pageObservations=new Set(doc.observations.filter(o=>pageNodes.has(o.nodeId)).map(o=>o.id));
+ const story=doc.story.filter(s=>s.viewId!==plan.viewId||!s.nodeId||pageNodes.has(s.nodeId)).map(s=>s.viewId!==plan.viewId?s:{...s,highlightEdgeIds:s.highlightEdgeIds.filter(id=>pageEdges.has(id)),...(s.observationIds?{observationIds:s.observationIds.filter(id=>pageObservations.has(id))}:{})});
+ const projected={...doc,story,rootViewId:plan.viewId,views:doc.views.map(v=>v.id!==plan.viewId?v:{...v,design:undefined,nodeIds:page.nodeIds,edgeIds:page.edgeIds,positions:Object.fromEntries(page.nodeIds.map((id,i)=>[id,{x:(i%2)*330,y:Math.floor(i/2)*160}]))})};
  return validateDocument(projected);
 }
 

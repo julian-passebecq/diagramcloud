@@ -1,6 +1,6 @@
 {
   "name": "diagramcloud",
-  "version": "1.24.0",
+  "version": "1.25.0",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -18,7 +18,9 @@
     "design": "tsx scripts/design.ts",
     "intelligence": "tsx scripts/intelligence.ts",
     "intelligence:mcp": "tsx scripts/intelligence-mcp.ts",
-    "package:candidate": "tsx scripts/package-campaign.ts"
+    "package:candidate": "tsx scripts/package-campaign.ts",
+    "concept:preview": "tsx scripts/concept-preview.ts",
+    "concept:host": "tsx scripts/concept-host.ts"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.60.0",

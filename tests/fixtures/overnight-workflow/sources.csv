@@ -1,0 +1,4 @@
+id,title,path
+input,Synthetic order admission,src/input/index.ts
+normalize,Synthetic normalization,src/normalize/index.ts
+report,Synthetic report shape,src/report/index.ts

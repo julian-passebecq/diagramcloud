@@ -2,7 +2,7 @@ import {z} from 'zod';
 import {publicDocument} from '../core/operations';
 import type {Project} from '../core/model';
 import {isOpenUri,secretFindings} from '../core/secrets';
-import {day} from '../core/realization';
+import {day,stateFacetLine} from '../core/realization';
 
 /**
  * `diagramcloud.portfolio-index/1`: a small, user-triggered snapshot for Mongoku's read-only projection view
@@ -33,7 +33,7 @@ export function portfolioIndex(input:Project,{generatedAt=new Date()}:{generated
  const d=publicDocument(input),root=d.views.find(v=>v.id===d.rootViewId)!,label=(id:string)=>d.nodes.find(n=>n.id===id)?.label??id;
  const shareable=d.observations.filter(o=>o.shareable).sort((a,b)=>Date.parse(b.observedAt)-Date.parse(a.observedAt));
  const cards=shareable.slice(0,INDEX_LIMITS.items);
- const observed=new Set(d.observations.map(o=>o.nodeId));
+ const observed=new Set(d.observations.filter(o=>!o.stateFacet).map(o=>o.nodeId));
  const latest=cards[0]?.observedAt,p=input.portfolio;
  return {
   format:PORTFOLIO_INDEX_FORMAT,projectRef:p?.projectRef??d.id,sourceApp:'diagramcloud',sourceObjectId:d.id,sourceRevision:String(d.revision),
@@ -47,7 +47,7 @@ export function portfolioIndex(input:Project,{generatedAt=new Date()}:{generated
    observed_components:observed.size,designed_only_components:d.nodes.filter(n=>!observed.has(n.id)).length,
    shareable_realization_cards:shareable.length
   },
-  items:cards.map(o=>({id:o.id,title:clip(`${label(o.nodeId)}: ${o.summary} (${o.sourceApp} @ ${o.sourceRevision}, ${day(o.observedAt)})${o.caveat?` Caveat: ${o.caveat}`:''}`),kind:'realization',status:o.claim,...(o.link?{openUri:o.link}:{})}))
+  items:cards.map(o=>({id:o.id,title:clip(`${label(o.nodeId)}: ${o.stateFacet?stateFacetLine(o)+'. ':''}${o.summary} (${o.sourceApp} @ ${o.sourceRevision}, ${day(o.observedAt)})${o.caveat?` Caveat: ${o.caveat}`:''}`),kind:'realization',status:o.claim,...(o.link?{openUri:o.link}:{})}))
  };
 }
 

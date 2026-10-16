@@ -1,6 +1,8 @@
 import {z} from 'zod';
 import {secretFindings} from '../core/secrets';
+import {SECRET_FILE} from '../core/scan/scanner';
 import {PURPOSES} from './types';
+import {gapCauseSchema,gapActionSchema,actionForGapCause} from './gapDetails';
 
 const id=z.string().regex(/^[a-z][a-z0-9_.-]{0,79}$/);
 export const ANALYZERS=['inventory','imports','documents','dbt','fabric','databricks','azure','dotnet','tree-sitter'] as const;
@@ -28,12 +30,21 @@ export function analysisProfile(depth:AnalysisProfile['depth']='standard',overri
 /** Key order is irrelevant, array order remains semantic unless the validator sorts selectors. */
 export function canonicalJson(value:unknown):string{if(Array.isArray(value))return '['+value.map(canonicalJson).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonicalJson((value as Record<string,unknown>)[k])).join(',')+'}';return JSON.stringify(value);}
 export async function sha256(value:string){const bytes=new TextEncoder().encode(value);return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(n=>n.toString(16).padStart(2,'0')).join('');}
+/** Private diagnostic metadata only. Imported messages remain inert and never establish their own cause. */
+export const documentDiagnosticSchema=z.object({
+ path:z.string().min(1).max(500).refine(path=>path==='(excluded)'||(!/[:\\\u0000-\u001f]/.test(path)&&!path.startsWith('/')&&!path.split('/').some(p=>!p||p==='.'||p==='..')&&!/(^|\/)(?:\.git|node_modules)(\/|$)/i.test(path)&&!SECRET_FILE.test(path)),'Unsafe diagnostic source path'),
+ line:z.number().int().positive().max(10000000).optional(),code:z.enum(['unresolved','ambiguous','unsupported','limited','unsafe','invalid']),message:z.string().min(1).max(1000),
+ cause:gapCauseSchema.optional(),action:gapActionSchema.optional(),
+}).strict().superRefine((detail,ctx)=>{
+ if(secretFindings(detail).length)ctx.addIssue({code:z.ZodIssueCode.custom,message:'Diagnostic contains a credential-bearing value'});
+ if(detail.cause&&detail.action&&detail.action.kind!==actionForGapCause(detail.cause).kind)ctx.addIssue({code:z.ZodIssueCode.custom,message:'Diagnostic action differs from the explicit cause'});
+});
 export const analysisBundleSchema=z.object({format:z.literal('diagramcloud.analysis-bundle'),version:z.literal(1),parserVersion:z.string().min(1).max(100),profile:profileSchema,
  revisions:z.array(z.object({repositoryId:id,revision:z.string().min(1).max(120),contentDigest:z.string().regex(/^[a-f0-9]{64}$/)}).strict()).max(60),
  sources:z.array(z.object({id,path:z.string().min(1).max(500),repositoryId:id,revision:z.string().min(1).max(120),line:z.number().int().positive(),endLine:z.number().int().positive().optional(),contentDigest:z.string().regex(/^[a-f0-9]{64}$/)}).strict()).max(20000),
  items:z.array(z.object({id,label:z.string().min(1).max(160),kind:z.string().min(1).max(80),sourceIds:z.array(id).min(1).max(100),confidence:z.enum(['confirmed','inferred','possible'])}).strict()).max(10000),
  links:z.array(z.object({id,from:id,to:id,kind:z.string().min(1).max(80),sourceIds:z.array(id).min(1).max(100),confidence:z.enum(['confirmed','inferred','possible'])}).strict()).max(50000),
- diagnostics:z.array(z.string().max(1000)).max(2000),omitted:z.object({items:z.number().int().nonnegative(),links:z.number().int().nonnegative(),sources:z.number().int().nonnegative()}).strict()}).strict();
+ diagnostics:z.array(z.string().max(1000)).max(2000),diagnosticDetails:z.array(documentDiagnosticSchema).max(2000).optional(),omitted:z.object({items:z.number().int().nonnegative(),links:z.number().int().nonnegative(),sources:z.number().int().nonnegative()}).strict()}).strict();
 export type AnalysisBundle=z.infer<typeof analysisBundleSchema>;
 /** Generated analysis only: no positions, author text, visibility, observations or review decision. */
 export function validateAnalysisBundle(input:unknown):AnalysisBundle{

@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Button} from '@fluentui/react-components';
 import type {Project} from '../core/model';
-import {CLAIM_LABEL,day} from '../core/realization';
+import {CLAIM_LABEL,day,stateFacetLine} from '../core/realization';
 import {NARRATION_MAX,TITLE_MAX,citableObservations,draftStep,draftStory,insertStep,moveStep,removeStep,replaceStep,retarget,stepNotes,type StoryStep} from '../core/story';
 
 type Props={doc:Project;activeViewId:string;selectedNodeId:string|null;current:number;
@@ -48,7 +48,7 @@ function StepForm(p:{doc:Project;step:StoryStep;index:number;onSave:(s:StoryStep
   <label>View<select aria-label="Step view" value={draft.viewId} onChange={e=>setDraft(retarget(p.doc,draft,e.target.value))}>{p.doc.views.map(v=><option key={v.id} value={v.id}>{v.title}</option>)}</select></label>
   <label>Focus component<select aria-label="Focus component" value={draft.nodeId??''} onChange={e=>setFocus(e.target.value)}><option value="">None: whole view</option>{nodes.map(n=><option key={n.id} value={n.id}>{n.label}</option>)}</select></label>
   {edges.length>0&&<fieldset><legend>Highlighted connections</legend>{edges.map(e=><label key={e.id} className="story-edge"><input type="checkbox" checked={draft.highlightEdgeIds.includes(e.id)} onChange={()=>toggleEdge(e.id)}/>{label(e.source)} → {label(e.target)}{e.label?` (${e.label})`:''}</label>)}</fieldset>}
-  {citable.length>0&&<fieldset><legend>Reviewed evidence to show</legend>{citable.map(o=><label key={o.id} className="story-edge"><input type="checkbox" checked={!!draft.observationIds?.includes(o.id)} onChange={()=>toggleObservation(o.id)}/>{label(o.nodeId)}: {CLAIM_LABEL[o.claim]} · {o.sourceApp} · {day(o.observedAt)}</label>)}<small className="micro">Shown as cited evidence. The claim and its authority stay the source app’s.</small></fieldset>}
+  {citable.length>0&&<fieldset><legend>Reviewed evidence to show</legend>{citable.map(o=><label key={o.id} className="story-edge"><input type="checkbox" checked={!!draft.observationIds?.includes(o.id)} onChange={()=>toggleObservation(o.id)}/>{label(o.nodeId)}: {o.stateFacet&&<>{stateFacetLine(o)} · </>}{CLAIM_LABEL[o.claim]} · {o.sourceApp} · {day(o.observedAt)}</label>)}<small className="micro">Shown as cited evidence. The claim and its authority stay the source app’s.</small></fieldset>}
   <label>Narration<textarea aria-label="Narration" rows={5} value={draft.narration} maxLength={NARRATION_MAX} onChange={e=>setDraft({...draft,narration:e.target.value})}/><small className="micro">{draft.narration.length} / {NARRATION_MAX}</small></label>
   {notes.length>0&&<ul className="story-notes" aria-label="Step notes">{notes.map(n=><li key={n}>{n}</li>)}</ul>}
   <div className="story-actions">

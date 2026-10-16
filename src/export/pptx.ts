@@ -9,7 +9,7 @@ import {rasterDimensions} from './rasterDimensions';
 import {assetFidelity} from './assetFidelity';
 import type {IconEntry} from '../core/icons';
 import {TRANSFORM_LABEL} from '../core/transform';
-import {CLAIM_LABEL,REALIZATION_EXPORT_NOTE,day,observationLine,presentedObservations} from '../core/realization';
+import {CLAIM_LABEL,REALIZATION_EXPORT_NOTE,day,observationLine,presentedObservations,stateFacetLine} from '../core/realization';
 /** Largest scale (inches per layout pixel): small views are not blown up past a readable size. */
 const MAX_SCALE=.0165;
 function textOf(b:EvidenceBlock):string{return b.type==='text'?b.text:b.type==='code'?b.code:b.type==='metrics'?b.items.map(i=>`${i.label}: ${i.value}\n${i.note}`).join('\n\n'):'';}
@@ -105,7 +105,7 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
 /** Rows of the realization appendix: one per Presented observation, with its owner, revision and date. */
 export function realizationRows(d:Project):string[][]{
  const label=(id:string)=>d.nodes.find(n=>n.id===id)?.label??id;
- return presentedObservations(d).map(o=>[label(o.nodeId),CLAIM_LABEL[o.claim],`${o.sourceApp} · ${o.authority}`,o.sourceRevision,day(o.observedAt),o.summary+(o.caveat?` Caveat: ${o.caveat}`:'')]);
+ return presentedObservations(d).map(o=>[label(o.nodeId),CLAIM_LABEL[o.claim],`${o.sourceApp} · ${o.authority}`,o.sourceRevision,day(o.observedAt),(o.stateFacet?stateFacetLine(o)+'. ':'')+o.summary+(o.caveat?` Caveat: ${o.caveat}`:'')]);
 }
 /** Realization appendix: what other apps observed, reviewed and made public. Nothing when no observation is Presented. */
 export function addRealizationSlides(pptx:Pptx,d:Project,frame:(title:string,subtitle:string)=>ReturnType<Pptx['addSlide']>):number{

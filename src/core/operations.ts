@@ -1,4 +1,4 @@
-import {clone,validateDocument,type Project,type ProjectView} from './model';
+import {clone,validateDocument,viewSchema,type Project,type ProjectView} from './model';
 import {publicPack} from '../experience/model';
 export function positionFor(view:ProjectView,nodeId:string){const i=Math.max(0,view.nodeIds.indexOf(nodeId));return view.positions[nodeId]??{x:(i%3)*290,y:Math.floor(i/3)*170};}
 export function traceNodes(doc:Project,viewId:string,start:string,direction:'upstream'|'downstream'):Set<string>{const view=doc.views.find(v=>v.id===viewId),edges=doc.edges.filter(e=>view?.edgeIds.includes(e.id)),seen=new Set([start]),queue=[start];while(queue.length){const current=queue.shift();for(const e of edges){const next=direction==='downstream'?(e.source===current?e.target:null):(e.target===current?e.source:null);if(next&&!seen.has(next)){seen.add(next);queue.push(next);}}}return seen;}
@@ -9,7 +9,7 @@ export function publicDocument(input:Project):Project{
  const d=clone(input);delete d.privateNotes;delete d.portfolio;
  // Import receipts contain private scope and historical counts, never publication
  // content. Visibility edits cannot accidentally publish this internal context.
- for(const b of d.blocks)if(b.id.startsWith('analysis-graph-state-')||b.id.startsWith('analysis-evolution-'))b.visibility='private';
+ for(const b of d.blocks)if(b.id.startsWith('analysis-graph-state-')||b.id.startsWith('analysis-evolution-')||b.id.startsWith('analysis-galaxy-import-'))b.visibility='private';
  // A public component does not publish the text of a still-private cited source.
  // Authors can explicitly detach the citation when approving their own caption.
  const privateSources=new Set(input.sources.filter(s=>s.visibility!=='public').map(s=>s.id));
@@ -53,3 +53,34 @@ export type History={past:Project[];present:Project;future:Project[]};
 export function commitHistory(h:History,input:Project):History{return{past:[...h.past,h.present].slice(-25),present:validateDocument({...input,revision:h.present.revision+1}),future:[]};}
 export function undo(h:History):History{return h.past.length?{past:h.past.slice(0,-1),present:h.past[h.past.length-1],future:[h.present,...h.future]}:h;}
 export function redo(h:History):History{return h.future.length?{past:[...h.past,h.present],present:h.future[0],future:h.future.slice(1)}:h;}
+
+/** Explicit authored placement of an existing canonical component, not a clone or a source association. */
+export const VIEW_MEMBERSHIP_UNAVAILABLE='This component placement is unavailable in the current authoring context. Reopen the chooser.';
+export function addExistingComponentToView(input:Project,viewId:string,nodeId:string,position:{x:number;y:number}):Project{
+ try{
+  const next=validateDocument(input),view=next.views.find(view=>view.id===viewId);
+  if(!view||!next.nodes.some(node=>node.id===nodeId))throw new Error(VIEW_MEMBERSHIP_UNAVAILABLE);
+  if(view.nodeIds.includes(nodeId))return input;
+  const placed=viewSchema.parse({...view,nodeIds:[...view.nodeIds,nodeId],positions:{...view.positions,[nodeId]:position}});
+  next.views=next.views.map(existing=>existing.id===viewId?placed:existing);
+  return validateDocument(next);
+ }catch{throw new Error(VIEW_MEMBERSHIP_UNAVAILABLE);}
+}
+
+/** Remove presentation membership only. Never delete a canonical component or rewrite authored dependencies. */
+export const VIEW_REMOVAL_UNAVAILABLE='This component cannot be removed from this view. Review story or focal choices and child paths, or reopen the review.';
+export function removeComponentFromView(input:Project,viewId:string,nodeId:string):Project{
+ try{
+  const next=validateDocument(input),view=next.views.find(row=>row.id===viewId);
+  if(!view||!next.nodes.some(node=>node.id===nodeId))throw new Error(VIEW_REMOVAL_UNAVAILABLE);
+  if(!view.nodeIds.includes(nodeId))return input;
+  // Derived guard only: canonical childViewId traversal, one visit per view, no persisted graph.
+  const reachableFromRoot=(doc:Project)=>{const seen=new Set<string>(),pending=[doc.rootViewId],views=new Map(doc.views.map(row=>[row.id,row])),nodes=new Map(doc.nodes.map(row=>[row.id,row]));while(pending.length){const id=pending.pop()!;if(seen.has(id))continue;seen.add(id);for(const nodeId of views.get(id)?.nodeIds??[]){const child=nodes.get(nodeId)?.childViewId;if(child&&!seen.has(child))pending.push(child);}}return seen;};
+  const reachable=reachableFromRoot(next),publicViewsBefore=new Set(publicDocument(next).views.map(view=>view.id));
+  const incident=new Set(next.edges.filter(edge=>view.edgeIds.includes(edge.id)&&(edge.source===nodeId||edge.target===nodeId)).map(edge=>edge.id));
+  if(view.design?.focal.includes(nodeId)||next.story.some(step=>step.viewId===viewId&&(step.nodeId===nodeId||step.highlightEdgeIds.some(id=>incident.has(id))||(step.observationIds??[]).some(id=>next.observations.some(observation=>observation.id===id&&observation.nodeId===nodeId)))))throw new Error(VIEW_REMOVAL_UNAVAILABLE);
+  view.nodeIds=view.nodeIds.filter(id=>id!==nodeId);view.edgeIds=view.edgeIds.filter(id=>!incident.has(id));delete view.positions[nodeId];
+  const after=reachableFromRoot(next),publicViewsAfter=new Set(publicDocument(next).views.map(view=>view.id));if([...reachable].some(id=>!after.has(id))||[...publicViewsBefore].some(id=>!publicViewsAfter.has(id)))throw new Error(VIEW_REMOVAL_UNAVAILABLE);
+  return validateDocument(next);
+ }catch{throw new Error(VIEW_REMOVAL_UNAVAILABLE);}
+}
