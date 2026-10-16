@@ -219,13 +219,16 @@ Every import shows a report of what was kept and what was not, then becomes a **
 | Microsoft Fabric | Medallion architecture, ingestion, Silver transformation | Independently authored reference with official documentation links |
 | Databricks | Medallion architecture, contracts, deduplication | Independently authored reference with official documentation links |
 
-The gallery filters to **Portfolio**, **Cloud architectures** (every reference above) and **Your projects** (blank, imported and your own).
+The gallery filters to **Portfolio**, **Cloud architectures** (every reference above), **Reference recipes**, **Adoption journeys** (the last three rows: open them with no project, Git or AI; the Details panel's Gaps tab says *what is missing to explain this?* when timing, quantities or concept mappings are absent, instead of drawing a misleading figure) and **Your projects** (blank, imported and your own).
 | AWS serverless web application | CDN, API, functions, table; request path with idempotency | Independently authored reference citing AWS documentation |
 | Azure web app with private data | Front Door, App Service, Key Vault, private SQL; private networking path | Independently authored reference citing the Azure Architecture Center |
 | Google Cloud streaming analytics | Pub/Sub, Dataflow, BigQuery, dead-letter; windowing detail | Independently authored reference citing Google Cloud documentation |
 | Microservices on Kubernetes | Ingress, services, config, autoscaling detail | Independently authored reference citing Kubernetes documentation |
 | Event-driven orders with an outbox | Outbox relay, broker, idempotent consumers, dead-letter queue | Independently authored, cloud-agnostic pattern reference |
 | Blank project | One component to start editing | Author-created |
+| DiagramCloud describes itself | Author, validate, review, export; catalogue, lesson, mapping; two source-declared concept mappings | Read from this repository's own files, each component citing file:line; static source, never observed |
+| Galaxy agent process | Session, worktree, pull request, CI, merge, handoff; procedure, attempt, lesson and live process kept apart | Partly cited from AGENTS.md and the CI workflow; the attempt and unsourced steps are synthetic |
+| FOIL local and environments | Logical capability, local and cloud realization, DEV/TEST/PROD instances, bronze/silver/gold refinement | Synthetic; no private FOIL source read |
 
 Illustrative financial scenarios are not combined or presented as employer achievements. The original PDFs and any confidential employer files are not stored in this repository.
 
