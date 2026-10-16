@@ -67,3 +67,43 @@ test('curated Business handbook retains compact quantity fields and excludes unr
  const offline=await browser.newContext({offline:true,viewport:{width:816,height:1056}});try{const reader=await offline.newPage(),requests:string[]=[];await reader.route('**/*',r=>{requests.push(r.request().url());return r.abort();});await reader.setContent(html);const ledger=reader.getByRole('table',{name:'Connections of Compact supplied flow',exact:true});await expect(ledger).toContainText(fixture.edgeId);await expect(ledger).toContainText('Amount: 0');await expect(ledger).toContainText('Provenance: synthetic');await expect(ledger).toContainText(fixture.note);await expect(ledger).toContainText('Not supplied');await expect(reader.locator('[data-publication-page]')).toHaveCount(0);await reader.emulateMedia({media:'print'});await expect(reader.locator('body')).toHaveAttribute('data-publication-paper','letter');await expect(ledger).toContainText('Amount: 0');await expect(ledger).toContainText(fixture.note);expect(await reader.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await ledger.screenshot({path:info.outputPath('compact-business-print.png')});expect(requests).toEqual([]);
  }finally{await offline.close();}
 });
+
+/* Print legibility of a dense classic manual (paginated figures) at A4 and Letter content widths, print media emulated:
+ * every figure line inside its own figure with the real font (a cut footer is a lost fact), every heading kept with what
+ * follows it, every publication page and figure short enough to stay whole on one sheet. */
+test('dense classic manual prints legibly on A4 and Letter: figure text inside each figure, headings kept with their content',async({browser},info)=>{
+ const {technicalManualHtml}=await import('../../src/export/manual');
+ const {validatePublicationBrief}=await import('../../src/intelligence/publicationBrief');
+ const {denseFixture,DENSE_LONG_ID,DENSE_NOTE}=await import('../helpers/denseFixture');
+ const d=denseFixture(),before=JSON.stringify(d),mm=(v:number)=>v*96/25.4;
+ for(const [paper,w,h] of [['A4',210,297],['letter',215.9,279.4]] as const){
+  const brief=validatePublicationBrief({format:'diagramcloud.publication-brief/1',title:'Synthetic dense print handbook',audience:'Synthetic reviewer',viewIds:['root'],profile:'classic',paper,detail:'full'},d);
+  const html=technicalManualHtml(d,{brief,now:new Date('2026-10-16T00:00:00Z')}),contentW=Math.floor(mm(w-28)),contentH=Math.floor(mm(h-32));
+  const ctx=await browser.newContext({offline:true,viewport:{width:contentW,height:contentH}});
+  try{
+   const page=await ctx.newPage();await page.setContent(html);await page.emulateMedia({media:'print'});
+   await expect(page.locator('.publication-page')).toHaveCount(2);
+   const ledger=page.getByRole('table',{name:'Keyed connection context of Synthetic dense supplied flow',exact:true}).getByRole('row').filter({has:page.getByRole('cell',{name:DENSE_LONG_ID,exact:true})});
+   for(const fact of ['0','rows/day','synthetic',DENSE_NOTE])await expect(ledger.getByRole('cell',{name:fact,exact:true})).toHaveCount(1);
+   const report=await page.evaluate(({contentH})=>{
+    const cut:string[]=[];
+    for(const svg of document.querySelectorAll<SVGSVGElement>('figure > svg')){
+     const vb=svg.viewBox.baseVal,r=svg.getBoundingClientRect(),s=Math.min(r.width/vb.width,r.height/vb.height),x0=r.left+(r.width-vb.width*s)/2,y0=r.top+(r.height-vb.height*s)/2;
+     for(const t of svg.querySelectorAll('text')){const b=t.getBoundingClientRect();if(b.left<x0-1||b.right>x0+vb.width*s+1||b.top<y0-1||b.bottom>y0+vb.height*s+1)cut.push(`${(t.textContent??'').slice(0,60)} [${Math.round(b.left)}..${Math.round(b.right)}] figure [${Math.round(x0)}..${Math.round(x0+vb.width*s)}]`);}
+    }
+    const loose=[...document.querySelectorAll('h1,h2,h3,h4')].filter(e=>getComputedStyle(e).breakAfter!=='avoid').map(e=>e.textContent);
+    const split=[...document.querySelectorAll('.publication-page,figure')].filter(e=>getComputedStyle(e).breakInside!=='avoid').map(e=>e.className||e.tagName);
+    const tall=[...document.querySelectorAll('.publication-page,figure')].map(e=>({e:e.className||e.tagName,h:e.getBoundingClientRect().height})).filter(x=>x.h>contentH);
+    return {cut,loose,split,tall,figures:document.querySelectorAll('figure > svg').length};
+   },{contentH});
+   expect(report.figures).toBe(2);
+   expect(report.cut,`${paper}: figure text cut by its figure`).toEqual([]);
+   expect(report.loose,`${paper}: headings that may sit alone at a page foot`).toEqual([]);
+   expect(report.split,`${paper}: figures or publication pages that may split`).toEqual([]);
+   expect(report.tall,`${paper}: blocks taller than one ${paper} sheet`).toEqual([]);
+   const pdf=info.outputPath(`dense-classic-${paper}.pdf`);await page.pdf({path:pdf,format:paper==='A4'?'A4':'Letter',preferCSSPageSize:true,printBackground:true});
+   expect(readFileSync(pdf).subarray(0,5).toString()).toBe('%PDF-');
+  }finally{await ctx.close();}
+ }
+ expect(JSON.stringify(d)).toBe(before);
+});

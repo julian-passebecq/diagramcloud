@@ -5,7 +5,10 @@ import {noIcons,type IconData} from './iconData';
 import type {IconEntry} from '../core/icons';
 import {glyphSvg} from '../core/iconGlyph';
 import {assetFidelity} from './assetFidelity';
+import {measureLines,textWidth} from './measure';
 import {CLAIM_LABEL,REALIZATION_EXPORT_NOTE,presentedObservation} from '../core/realization';
+/** Classic figure frame: text inset, and the widest a narrow scene is widened to fit its header and footer lines. */
+const FRAME_PAD=30,FRAME_MAX=640;
 export const xml=(value:unknown)=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]!));
 export function bounds(view:ProjectView){return sceneBounds(view.nodeIds.map(id=>positionFor(view,id)));}
 /** SVG text for a scene text block: one tspan per measured line, so no renderer re-wraps it. */
@@ -29,8 +32,16 @@ export function svgDiagram(input:Project,viewId=input.rootViewId,metadata=true,i
   return `<g data-node-id="${xml(n.id)}"><rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="12" fill="#ffffff" stroke="#cbd5e1"/><rect x="${n.x}" y="${n.y+12}" width="4" height="28" rx="2" fill="#2563eb"/>${icon}${svgText(n.provider)}${svgText(n.label)}${svgText(n.summary)}${svgText(n.footer)}${n.realization?`<g data-realization="${xml(n.realization.claim)}"><title>${xml(n.realization.title)}</title><rect x="${n.realization.x}" y="${n.realization.y}" width="${n.realization.w}" height="${n.realization.h}" rx="4" fill="#${n.realization.fill}" stroke="#${n.realization.stroke}"/>${svgText(n.realization.text)}</g>`:''}</g>`;
  }).join('');
  const fidelity=assetFidelity(d,v.id,'classic',icons),credit=iconCredit(embedded),notes=['Static explanatory view · No live telemetry · Details retained in DiagramCloud metadata',...(scene.nodes.some(n=>n.realization)?[REALIZATION_EXPORT_NOTE]:[]),...(scene.nodes.some(n=>n.customIcon)?['Project artwork: embedded with recorded rights; aspect ratio preserved.']:[]),...(fidelity.entries.some(e=>e.origin==='vendor'&&e.rendered==='semantic-symbol')?['Unavailable registry artwork: original semantic symbols used. See artwork fidelity metadata.']:[]),...(credit?[credit]:[])];
- const footY=b.height+offsetY+16,height=b.height+offsetY+18+14*notes.length;
- return`<svg xmlns="http://www.w3.org/2000/svg" width="${b.width}" height="${height}" viewBox="0 0 ${b.width} ${height}" role="img" aria-label="${xml(v.title)}"><title>${xml(v.title)}</title><metadata id="diagramcloud-asset-fidelity">${xml(JSON.stringify(fidelity))}</metadata>${metadata?`<metadata id="diagramcloud-document">${xml(JSON.stringify(d))}</metadata>`:''}<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6d7f96"/></marker></defs><rect width="100%" height="100%" fill="#f8fafc"/><g font-family="${SCENE_FONT}, Helvetica, 'Liberation Sans', sans-serif"><text x="30" y="30" fill="#64748b" font-size="11">DIAGRAMCLOUD / ${xml(d.category.toUpperCase())}</text><text x="30" y="59" fill="#16263d" font-size="20" font-weight="600">${xml(v.title.slice(0,75))}</text><g transform="translate(${-b.x},${offsetY-b.y})">${lines}${boxes}${labels}</g>${notes.map((t,i)=>`<text x="30" y="${footY+14*i}" fill="#64748b" font-size="10">${xml(t)}</text>`).join('')}</g></svg>`;
+ // Header and footer text is measured, never cut by the viewBox: a narrow scene (one component on a publication
+ // page) widens the figure to its longest header or footer line, up to FRAME_MAX, and anything longer wraps.
+ const category=`DIAGRAMCLOUD / ${d.category.toUpperCase()}`,need=Math.max(textWidth(category,11),textWidth(v.title,20,true),...notes.map(t=>textWidth(t,10)))+2*FRAME_PAD;
+ const width=Math.ceil(Math.max(b.width,Math.min(FRAME_MAX,need))),inner=width-2*FRAME_PAD,shiftX=(width-b.width)/2;
+ const wrap=(t:string,size:number,bold=false)=>measureLines(t,inner,{size,bold}).lines;
+ const catLines=wrap(category,11),titleLines=wrap(v.title,20,true),noteLines=notes.flatMap(t=>wrap(t,10));
+ const titleY=30+14*(catLines.length-1)+29,top=offsetY+14*(catLines.length-1)+24*(titleLines.length-1);
+ const footY=b.height+top+16,height=b.height+top+18+14*noteLines.length;
+ const block=(ls:string[],y:number,size:number,lh:number,attrs:string)=>`<text x="${FRAME_PAD}" y="${y}" font-size="${size}"${attrs}>${ls.map((l,i)=>`<tspan x="${FRAME_PAD}"${i?` dy="${lh}"`:''}>${xml(l)}</tspan>`).join('')}</text>`;
+ return`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${xml(v.title)}"><title>${xml(v.title)}</title><metadata id="diagramcloud-asset-fidelity">${xml(JSON.stringify(fidelity))}</metadata>${metadata?`<metadata id="diagramcloud-document">${xml(JSON.stringify(d))}</metadata>`:''}<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6d7f96"/></marker></defs><rect width="100%" height="100%" fill="#f8fafc"/><g font-family="${SCENE_FONT}, Helvetica, 'Liberation Sans', sans-serif">${block(catLines,30,11,14,' fill="#64748b"')}${block(titleLines,titleY,20,24,' fill="#16263d" font-weight="600"')}<g transform="translate(${shiftX-b.x},${top-b.y})">${lines}${boxes}${labels}</g>${noteLines.map((t,i)=>`<text x="${FRAME_PAD}" y="${footY+14*i}" fill="#64748b" font-size="10">${xml(t)}</text>`).join('')}</g></svg>`;
 }
 /** Only our own metadata is a diagram document; arbitrary SVG is not a graph import. */
 export function documentFromSvg(raw:string):Project{

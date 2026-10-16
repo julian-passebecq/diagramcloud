@@ -65,7 +65,9 @@ test('vendor icons are embedded byte-identical, square, and credited; without ic
  const svg=svgDiagram(fabric,fabric.rootViewId,false,icons),ms=[...svg.matchAll(/<image href="data:image\/svg\+xml;base64,([^"]+)" x="[\d.]+" y="[\d.]+" width="([\d.]+)" height="([\d.]+)"/g)];
  assert.equal(ms.length,4,'pipeline, two lakehouse layers and the semantic model embedded');for(const m of ms)assert.equal(m[2],m[3],'square, not distorted');
  assert.deepEqual(ms.map(m=>gitBlobId(Buffer.from(m[1],'base64'))),[vendorBlobs[0],vendorBlobs[1],vendorBlobs[1],vendorBlobs[2]],'the embedded bytes are the unmodified upstream files');
- assert.match(svg,/Icons: Microsoft Fabric Pipeline \(Microsoft artwork, Microsoft Fabric icons usage terms\); Microsoft Fabric Lakehouse \(Microsoft artwork, Microsoft Fabric icons usage terms\); Microsoft Fabric Semantic model \(Microsoft artwork, Microsoft Fabric icons usage terms\)\. Not covered by the DiagramCloud MIT licence\./);
+ // The credit is printed whole in the figure footer; a credit wider than the figure wraps over several footer lines.
+ const footer=[...svg.matchAll(/<text x="30" y="[\d.]+" fill="#64748b" font-size="10">([^<]*)<\/text>/g)].map(m=>m[1]).join(' ');
+ assert.match(footer,/Icons: Microsoft Fabric Pipeline \(Microsoft artwork, Microsoft Fabric icons usage terms\); Microsoft Fabric Lakehouse \(Microsoft artwork, Microsoft Fabric icons usage terms\); Microsoft Fabric Semantic model \(Microsoft artwork, Microsoft Fabric icons usage terms\)\. Not covered by the DiagramCloud MIT licence\./);
  assert.doesNotMatch(svgDiagram(fabric,fabric.rootViewId,false),/<image|Icons:/);
  assert.match(portfolioHtml(fabric,icons),/data:image\/svg\+xml;base64,/);
  const {pptx}=await buildDeck(PptxGenJS,projectPlan(fabric),icons),zip=await JSZip.loadAsync(await pptx.write({outputType:'nodebuffer'}) as Buffer);
