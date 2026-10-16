@@ -36,3 +36,27 @@ export function scdExercise(input:unknown=syntheticTables){
  return {provenance:tables.provenance,rows:tables.sales.length,sales:total,salesAsExpected:total===tables.expectedSales,matches,
   regionsAsExpected:matches.length===tables.expectedRegions.length&&matches.every((m,i)=>m.state==='matched'&&m.region===tables.expectedRegions[i]),intervalSemantics:tables.intervalSemantics};
 }
+export type GrainFact={line:string;customer:string;date:string;amount:number};
+export type GrainDimensionRow={customer:string;region:string;from:string;to:string};
+export type GrainCheck={provenance:'authored-synthetic';grain:string;join:string;factRows:number;joinedRows:number;before:number;after:number;state:'clean'|'double-counting'|'dropped-rows';multiplied:{line:string;matches:number}[];dropped:string[];report:string};
+/** Grain check: each fact row must keep exactly one dimension row. A join that returns several rows for one fact multiplies the measure
+ * (double counting) and is reported with the totals before and after; a fact with none is reported as dropped. Never silently deduplicated. */
+export function grainCheck(facts:readonly GrainFact[],dimension:readonly GrainDimensionRow[],join:{label:string;matches:(fact:GrainFact,row:GrainDimensionRow)=>boolean},grain='order line'):GrainCheck{
+ const per=facts.map(fact=>({fact,rows:dimension.filter(row=>join.matches(fact,row))})),sum=(rows:readonly GrainFact[])=>rows.reduce((total,row)=>total+row.amount,0);
+ const before=sum(facts),after=sum(per.flatMap(p=>p.rows.map(()=>p.fact))),joinedRows=per.reduce((n,p)=>n+p.rows.length,0);
+ const multiplied=per.filter(p=>p.rows.length>1).map(p=>({line:p.fact.line,matches:p.rows.length})),dropped=per.filter(p=>!p.rows.length).map(p=>p.fact.line);
+ const state=multiplied.length?'double-counting':dropped.length?'dropped-rows':'clean',head=`Joining ${facts.length} ${grain} rows ${join.label} returns ${joinedRows} rows`;
+ const report=state==='double-counting'?`Double counting: ${head}; the total changes from ${before} to ${after}. ${multiplied.map(m=>m.line+' matches '+m.matches+' dimension rows').join('; ')}.`
+  :state==='dropped-rows'?`Dropped rows: ${head}; the total changes from ${before} to ${after}. No dimension row for ${dropped.join(', ')}.`:`Grain kept: ${head}; the total stays ${before}.`;
+ return {provenance:'authored-synthetic',grain,join:join.label,factRows:facts.length,joinedRows,before,after,state,multiplied,dropped,report};
+}
+/** The packet order-line fixture under two joins: on the customer key alone (the SCD dimension has two versions of C1, so every line is
+ * counted twice) and on the key plus the half-open validity interval (one version per line, total 35). Fixture arithmetic, not business evidence. */
+export function grainExercise(input:unknown=syntheticTables){
+ const tables=tablesSchema.parse(input),customers=[...new Set(tables.customerVersions.map(v=>v.customer))];
+ if(customers.length!==1||tables.salesDates.length!==tables.sales.length)throw new Error('The synthetic grain exercise needs one customer and one sale date per order line');
+ const facts=tables.sales.map((row,i)=>({line:row.line,customer:customers[0],date:tables.salesDates[i],amount:row.quantity*row.unitPrice}));
+ return {expectedSales:tables.expectedSales,
+  naive:grainCheck(facts,tables.customerVersions,{label:'to the customer dimension on the customer key alone',matches:(fact,row)=>fact.customer===row.customer}),
+  temporal:grainCheck(facts,tables.customerVersions,{label:'to the customer dimension on the customer key and the sale date within the validity interval',matches:(fact,row)=>fact.customer===row.customer&&row.from<=fact.date&&fact.date<row.to})};
+}
