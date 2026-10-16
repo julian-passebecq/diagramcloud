@@ -5,6 +5,7 @@ import {summaryCards} from './architecture';
 import {flowRanks} from './flow';
 import {f,footerLine,header,legendStrip,lines,markers,monoWidth,MONO,sansLines,svgDocument,txt,type LegendItem} from './kit';
 import {xml} from '../diagram';
+import {figureAvailability,withheldSvg} from './availability';
 
 type Quantity=NonNullable<SpecEdge['quantity']>;
 type Band=SpecEdge&{quantity:Quantity};
@@ -27,21 +28,23 @@ export function sankeyUnit(edges:SpecEdge[]):string|undefined{
  * its value, in one unit (the most common; connections in other units are listed, never summed). Columns follow the
  * reading order from connections (not timing); a component is as tall as the larger of what enters and what leaves it.
  * The quantities' provenance is printed before the bands, and synthetic bands are outlined when provenance is mixed.
- * Without quantities, the figure says how to add one rather than inventing amounts.
+ * Without a drawable quantity, the figure is withheld (availability.ts): it names what is missing, how to add it and the
+ * fallback relationship diagram, rather than inventing amounts.
  */
 export function sankeySvg(input:Project,viewId:string,options:DesignOptions={}):string{
  const c=designContext(input,viewId,'sankey',options),{spec,t}=c,unit=sankeyUnit(spec.edges);
  const byId=new Map(spec.nodes.map(n=>[n.id,n]));
  const bands=spec.edges.filter((e):e is Band=>!!e.quantity&&e.quantity.unit===unit&&e.from!==e.to&&byId.has(e.from)&&byId.has(e.to));
  const otherUnit=spec.edges.filter(e=>e.quantity&&e.quantity.unit!==unit),selfLoops=spec.edges.filter(e=>e.quantity&&e.quantity.unit===unit&&e.from===e.to),unquantified=spec.edges.filter(e=>!e.quantity);
+ if(!bands.length){const a=figureAvailability(c,'sankey');return withheldSvg(c,a.available?{...a,available:false,missing:[{input:'Connection quantities with units',reason:`No connection between two different components states a quantity in ${unit}; ${selfLoops.length} from a component to itself.`,needs:'A quantity with a unit and provenance on a connection between two components.'}]}:a,{label:'Sankey'});}
  const provs=[...new Set(bands.map(b=>b.quantity.provenance))].sort(),mixed=provs.length>1;
  // Columns from the reading order, compacted so empty ranks leave no gap.
  const ranks=flowRanks(spec.nodes,spec.edges),members=spec.nodes.filter(n=>bands.some(b=>b.from===n.id||b.to===n.id));
  const used=[...new Set(members.map(n=>ranks.get(n.id)??0))].sort((a,b)=>a-b),col=new Map(members.map(n=>[n.id,used.indexOf(ranks.get(n.id)??0)])),cols=used.length;
  const colW=Math.max(150,Math.min(220,Math.floor(960/Math.max(1,cols-1)))),contentW=Math.max(720,(cols-1)*colW+BAR+8+LAST_W);
- const hdr=header(eyebrowOf(c,'Sankey'),spec.title,bands.length?`How much moves along each connection of ${spec.title}, in ${unit}.`:'This view has no connection quantities: nothing to draw as bands.',M,M,contentW,t,c.editorial);
+ const hdr=header(eyebrowOf(c,'Sankey'),spec.title,`How much moves along each connection of ${spec.title}, in ${unit}.`,M,M,contentW,t,c.editorial);
  const out:string[]=[];let bottom=M+hdr.height+24;
- if(bands.length){
+ {
   const top=M+hdr.height+28,p=mixed?{tag:'MIXED PROVENANCE',note:`${bands.filter(b=>b.quantity.provenance==='synthetic').length} of ${bands.length} band(s) synthetic (dashed outline): illustrative, not measured. Others: ${provs.filter(x=>x!=='synthetic').join(', ')}.`}:PROVENANCE[provs[0] as EvidenceBlock['provenance']];
   const tw=Math.ceil(monoWidth(p.tag,8,0.12))+14,noteLs=sansLines(p.note,contentW-tw-10,10,2);
   out.push(`<g data-provenance="${mixed?'mixed':provs[0]}"><rect x="${M}" y="${top}" width="${tw}" height="16" rx="2" fill="${t.accentTint}" stroke="${t.accent}" stroke-width="0.8"/>${txt(p.tag,M+7,top+11.5,{size:8,fill:t.accent,font:MONO,tracking:0.12})}${lines(noteLs,M+tw+10,top+12,13,{size:10,fill:t.muted,italic:true})}</g>`);
@@ -81,12 +84,9 @@ export function sankeySvg(input:Project,viewId:string,options:DesignOptions={}):
   for(const note of notes){const ls=sansLines(note,contentW,10,2);out.push(`<g data-dd-note="">${lines(ls,M,bottom+12,14,{size:10,fill:t.muted,italic:true})}</g>`);bottom+=ls.length*14+4;}
   const items:LegendItem[]=[{kind:'swatch',fill:/^#[0-9a-f]{6}$/i.test(t.muted)?`${t.muted}48`:t.muted,label:`Band · ${unit}`},{kind:'swatch',fill:t.ink,label:'Component'},...(mixed?[{kind:'line' as const,stroke:'accent' as const,dashed:true,label:'Synthetic quantity'}]:[])];
   const legend=legendStrip(items,M,bottom+14,contentW,t);out.push(legend.svg);bottom+=14+legend.height;
- }else{
-  const msg=['No connection on this view states a quantity, so there are no bands to draw.','To add one, give a connection a "quantity" field in the JSON: {"value": 1200, "unit": "rows/day", "provenance": "author"}. The provenance (source-derived, synthetic, reference or author) is printed on the figure.'];
-  const ls=msg.flatMap(m=>sansLines(m,contentW,11,3));out.push(`<g data-dd-empty="">${lines(ls,M,bottom+8,16,{size:11,fill:t.muted})}</g>`);bottom+=8+ls.length*16;
  }
  let y=bottom+12;const cards=c.editorial?summaryCards(c,M,y+8,contentW):undefined;if(cards)y+=cards.height+24;
  return svgDocument({slug:c.slug,width:contentW+2*M,height:y+M,title:`${spec.title} · sankey`,
-  desc:bands.length?`Sankey of ${bands.length} connection quantit${bands.length===1?'y':'ies'} in ${unit} (${mixed?'mixed provenance':PROVENANCE[provs[0] as EvidenceBlock['provenance']].tag.toLowerCase()}) on the public view ${spec.viewId}.`:`No connection quantities on the public view ${spec.viewId}.`,
+  desc:`Sankey of ${bands.length} connection quantit${bands.length===1?'y':'ies'} in ${unit} (${mixed?'mixed provenance':PROVENANCE[provs[0] as EvidenceBlock['provenance']].tag.toLowerCase()}) on the public view ${spec.viewId}.`,
   t,theme:c.theme,type:'sankey',viewId:spec.viewId,defs:markers(c.slug,t),body:hdr.svg+out.join('')+(cards?.svg??'')+footerLine(footerParts(c),M,y+12,contentW,t)});
 }
