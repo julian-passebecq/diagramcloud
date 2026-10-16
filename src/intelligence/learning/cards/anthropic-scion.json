@@ -1,0 +1,80 @@
+{
+  "proposalFormat": "diagramcloud.learning-proposal",
+  "proposalVersion": 1,
+  "id": "anthropic-scion",
+  "entryKind": "case-study",
+  "title": "Case study: Anthropic Scion, not a migration recommendation",
+  "domain": "case-studies",
+  "contentStatus": "AUTHORED_DRAFT_NATIVE_ADOPTION_NOT_RUN",
+  "contentRevision": "2026-10-16.1",
+  "applicability": "UNKNOWN_NOT_ASSESSED",
+  "summary": "Study a workload-specific design choice without copying its scale assumptions.",
+  "claims": [
+    {
+      "text": "Anthropic reported moving its monorepo to the in-house Scion system and explicitly said it is not a general-purpose Git replacement.",
+      "basis": "provider-reported",
+      "sourceRefs": [
+        "S-SCION"
+      ]
+    }
+  ],
+  "levels": {
+    "overview": "State the reported problem and the bounds of the comparison.",
+    "architecture": "Compare the source-control client/server split and the resulting review/CI obligations.",
+    "detail": "Ask which original constraints apply to our own repositories before suggesting any change."
+  },
+  "prerequisites": [
+    "worktrees-ci"
+  ],
+  "example": {
+    "provenance": "authored-synthetic",
+    "input": "An authored comparison checklist for our present Git workflow.",
+    "steps": [
+      "Identify the observed local bottleneck.",
+      "Compare a small change to existing Git tooling.",
+      "Retain the status quo unless evidence justifies more."
+    ],
+    "output": "An explicit no-migration default for this campaign.",
+    "limits": [
+      "No Scion software, benchmark, connector or repository migration is supplied.",
+      "Do not confuse it with GoogleCloudPlatform Scion, SCION networking, or Scion Asset Management."
+    ]
+  },
+  "alternatives": [
+    {
+      "label": "Existing Git plus focused improvements",
+      "whenToConsider": "The default here unless a measured bottleneck warrants change.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    },
+    {
+      "label": "Study specialized source-control designs",
+      "whenToConsider": "Research only; no assumption that an internal implementation is available or suitable.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    }
+  ],
+  "interview": {
+    "question": "Which assumptions would have to hold before you copied this case study?",
+    "answerHints": [
+      "Identify scale and workflow differences.",
+      "Separate reported results from your own measurements.",
+      "Account for ecosystem migration cost."
+    ],
+    "assessment": "SELF_EXPLANATION_NOT_CERTIFICATION"
+  },
+  "sourceRefs": [
+    "S-SCION"
+  ],
+  "instanceMappings": [],
+  "instanceMappingPolicy": "An explicit source-pinned link is required; names, icons and tags are not evidence.",
+  "legacyMapping": {
+    "status": "RECONCILE_WITH_ORIGINAL_64_TOPIC_TABLE",
+    "canonicalTopicId": null
+  },
+  "displayDefaults": {
+    "overviewFirst": true,
+    "showDetails": false,
+    "requiresGit": false,
+    "requiresAI": false,
+    "requiresCloud": false
+  }
+}

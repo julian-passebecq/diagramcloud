@@ -1,0 +1,79 @@
+{
+  "proposalFormat": "diagramcloud.learning-proposal",
+  "proposalVersion": 1,
+  "id": "batch-stream-cdc",
+  "entryKind": "concept",
+  "title": "Batch, streaming and change data capture",
+  "domain": "data-engineering",
+  "contentStatus": "AUTHORED_DRAFT_NATIVE_ADOPTION_NOT_RUN",
+  "contentRevision": "2026-10-16.1",
+  "applicability": "UNKNOWN_NOT_ASSESSED",
+  "summary": "Explain how changes arrive and how processing handles duplicates, order and restart.",
+  "claims": [
+    {
+      "text": "Debezium captures database changes; Spark Structured Streaming expresses incremental stream processing on the Spark SQL engine.",
+      "basis": "primary-source-summary",
+      "sourceRefs": [
+        "S-CDC",
+        "S-STREAM"
+      ]
+    }
+  ],
+  "levels": {
+    "overview": "Contrast a daily file, a continuous event feed and a database-change feed.",
+    "architecture": "Show source, position/checkpoint, transport, transform and sink as separate responsibilities.",
+    "detail": "Inspect duplicate event IDs, out-of-order arrival, replay and idempotent output assumptions."
+  },
+  "prerequisites": [],
+  "example": {
+    "provenance": "authored-synthetic",
+    "input": "Events E1, E2 and a repeated E1 arrive in a fictional ingestion exercise.",
+    "steps": [
+      "Declare the event identity and deduplication window.",
+      "Apply the exercise rule.",
+      "Show retained and duplicate records."
+    ],
+    "output": "Two unique records under the stated rule.",
+    "limits": [
+      "No universal exactly-once claim.",
+      "Source, engine, checkpoint and sink semantics require separate evidence."
+    ]
+  },
+  "alternatives": [
+    {
+      "label": "Batch ingestion",
+      "whenToConsider": "Consider when periodic freshness is sufficient.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    },
+    {
+      "label": "Streaming or CDC",
+      "whenToConsider": "Consider when the change/freshness requirements justify the operational contract.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    }
+  ],
+  "interview": {
+    "question": "Does using streaming guarantee exactly-once business effects?",
+    "answerHints": [
+      "Separate engine guarantees from external side effects.",
+      "Discuss replay, identity and the sink."
+    ],
+    "assessment": "SELF_EXPLANATION_NOT_CERTIFICATION"
+  },
+  "sourceRefs": [
+    "S-CDC",
+    "S-STREAM"
+  ],
+  "instanceMappings": [],
+  "instanceMappingPolicy": "An explicit source-pinned link is required; names, icons and tags are not evidence.",
+  "legacyMapping": {
+    "status": "RECONCILE_WITH_ORIGINAL_64_TOPIC_TABLE",
+    "canonicalTopicId": null
+  },
+  "displayDefaults": {
+    "overviewFirst": true,
+    "showDetails": false,
+    "requiresGit": false,
+    "requiresAI": false,
+    "requiresCloud": false
+  }
+}

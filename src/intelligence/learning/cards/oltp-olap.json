@@ -1,0 +1,77 @@
+{
+  "proposalFormat": "diagramcloud.learning-proposal",
+  "proposalVersion": 1,
+  "id": "oltp-olap",
+  "entryKind": "concept",
+  "title": "Transactional systems versus analytical systems",
+  "domain": "warehousing",
+  "contentStatus": "AUTHORED_DRAFT_NATIVE_ADOPTION_NOT_RUN",
+  "contentRevision": "2026-10-16.1",
+  "applicability": "UNKNOWN_NOT_ASSESSED",
+  "summary": "Start from the question and workload, not the database logo.",
+  "claims": [
+    {
+      "text": "OLAP serves analytical exploration and aggregation rather than the short transactional operations that motivate OLTP.",
+      "basis": "primary-source-summary",
+      "sourceRefs": [
+        "S-OLAP"
+      ]
+    }
+  ],
+  "levels": {
+    "overview": "Explain an order being recorded versus an analyst studying orders over time.",
+    "architecture": "Show operational inputs, integration, analytic model and consumer separately. A logical role need not be a separate deployed service.",
+    "detail": "Ask about concurrent writes, consistency, row grain, query shape, retention and refresh boundaries."
+  },
+  "prerequisites": [],
+  "example": {
+    "provenance": "authored-synthetic",
+    "input": "Two fictional orders and a request for monthly sales.",
+    "steps": [
+      "Record each order once.",
+      "Prepare a defined analytic slice.",
+      "Group the retained sales by month."
+    ],
+    "output": "A transaction path and an analysis path with different responsibilities.",
+    "limits": [
+      "No throughput, cost or latency result is supplied."
+    ]
+  },
+  "alternatives": [
+    {
+      "label": "Single-store reporting",
+      "whenToConsider": "Small selected workloads may justify avoiding another store.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    },
+    {
+      "label": "Separate analytical serving",
+      "whenToConsider": "Consider when workload or historical requirements justify separation.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    }
+  ],
+  "interview": {
+    "question": "Why is a transactional schema not automatically the best reporting model?",
+    "answerHints": [
+      "Describe different workloads.",
+      "Explain grain and historical requirements.",
+      "Avoid claiming one physical design fits every case."
+    ],
+    "assessment": "SELF_EXPLANATION_NOT_CERTIFICATION"
+  },
+  "sourceRefs": [
+    "S-OLAP"
+  ],
+  "instanceMappings": [],
+  "instanceMappingPolicy": "An explicit source-pinned link is required; names, icons and tags are not evidence.",
+  "legacyMapping": {
+    "status": "RECONCILE_WITH_ORIGINAL_64_TOPIC_TABLE",
+    "canonicalTopicId": null
+  },
+  "displayDefaults": {
+    "overviewFirst": true,
+    "showDetails": false,
+    "requiresGit": false,
+    "requiresAI": false,
+    "requiresCloud": false
+  }
+}

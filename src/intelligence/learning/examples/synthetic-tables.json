@@ -1,0 +1,39 @@
+{
+  "provenance": "authored-synthetic",
+  "sales": [
+    {
+      "line": "L1",
+      "quantity": 2,
+      "unitPrice": 10
+    },
+    {
+      "line": "L2",
+      "quantity": 1,
+      "unitPrice": 15
+    }
+  ],
+  "expectedSales": 35,
+  "customerVersions": [
+    {
+      "customer": "C1",
+      "region": "North",
+      "from": "2026-01-01",
+      "to": "2026-07-01"
+    },
+    {
+      "customer": "C1",
+      "region": "South",
+      "from": "2026-07-01",
+      "to": "2027-01-01"
+    }
+  ],
+  "salesDates": [
+    "2026-06-15",
+    "2026-08-15"
+  ],
+  "expectedRegions": [
+    "North",
+    "South"
+  ],
+  "intervalSemantics": "from inclusive; to exclusive; exactly one matching version required"
+}

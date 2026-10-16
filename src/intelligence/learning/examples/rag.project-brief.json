@@ -1,0 +1,98 @@
+{
+  "format": "diagramcloud.project-brief",
+  "version": 1,
+  "project": {
+    "id": "learn-rag",
+    "title": "Synthetic RAG paths",
+    "summary": "Authored synthetic teaching declaration. No deployment, observed execution or owner project mapping is claimed."
+  },
+  "scope": [
+    {
+      "id": "source",
+      "title": "Allowed sources",
+      "kind": "component",
+      "summary": "Selected source scope.",
+      "repositoryIds": []
+    },
+    {
+      "id": "index",
+      "title": "Retrieval index",
+      "kind": "component",
+      "summary": "Derived data, not canonical truth.",
+      "repositoryIds": []
+    },
+    {
+      "id": "query",
+      "title": "Question",
+      "kind": "component",
+      "summary": "An illustrative user question.",
+      "repositoryIds": []
+    },
+    {
+      "id": "retrieve",
+      "title": "Retrieve",
+      "kind": "component",
+      "summary": "Return relevant permitted material.",
+      "repositoryIds": []
+    },
+    {
+      "id": "context",
+      "title": "Supplied context",
+      "kind": "component",
+      "summary": "Record exactly what is provided.",
+      "repositoryIds": []
+    },
+    {
+      "id": "answer",
+      "title": "Answer candidate",
+      "kind": "component",
+      "summary": "Requires support checking.",
+      "repositoryIds": []
+    }
+  ],
+  "relationships": [
+    {
+      "id": "rel-1",
+      "from": "index",
+      "to": "source",
+      "label": "Derived from selected sources",
+      "kind": "dependency"
+    },
+    {
+      "id": "rel-2",
+      "from": "retrieve",
+      "to": "query",
+      "label": "Uses question",
+      "kind": "dependency"
+    },
+    {
+      "id": "rel-3",
+      "from": "retrieve",
+      "to": "index",
+      "label": "Reads derived index",
+      "kind": "dependency"
+    },
+    {
+      "id": "rel-4",
+      "from": "context",
+      "to": "retrieve",
+      "label": "Contains selected results",
+      "kind": "dependency"
+    },
+    {
+      "id": "rel-5",
+      "from": "answer",
+      "to": "context",
+      "label": "Generated with supplied context",
+      "kind": "dependency"
+    }
+  ],
+  "repositories": [],
+  "repositoryRelationships": [],
+  "teams": [],
+  "ownership": [],
+  "environments": [],
+  "questions": [
+    "What is declared here, and what evidence would a real instance need?"
+  ]
+}

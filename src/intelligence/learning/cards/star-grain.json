@@ -1,0 +1,82 @@
+{
+  "proposalFormat": "diagramcloud.learning-proposal",
+  "proposalVersion": 1,
+  "id": "star-grain",
+  "entryKind": "concept",
+  "title": "Fact grain, dimensions and joins",
+  "domain": "warehousing",
+  "contentStatus": "AUTHORED_DRAFT_NATIVE_ADOPTION_NOT_RUN",
+  "contentRevision": "2026-10-16.1",
+  "applicability": "UNKNOWN_NOT_ASSESSED",
+  "summary": "State what one fact row represents before drawing the star.",
+  "claims": [
+    {
+      "text": "A star schema organizes measures in fact tables and descriptive context in dimensions. Fact grain must be defined.",
+      "basis": "primary-source-summary",
+      "sourceRefs": [
+        "S-STAR",
+        "S-FACT"
+      ]
+    }
+  ],
+  "levels": {
+    "overview": "Explain sales by customer and date.",
+    "architecture": "Draw FactSales, DimCustomer and DimDate, with keys and one declared fact grain.",
+    "detail": "Inspect two order-line rows, key uniqueness and a join that accidentally multiplies totals."
+  },
+  "prerequisites": [
+    "oltp-olap"
+  ],
+  "example": {
+    "provenance": "authored-synthetic",
+    "input": "Synthetic lines L1: 2 units at 10; L2: 1 unit at 15.",
+    "steps": [
+      "Declare one row per order line.",
+      "Calculate each line amount.",
+      "Join to one matching customer version and one date."
+    ],
+    "output": "Two rows and sales of 35 synthetic currency units.",
+    "limits": [
+      "The value is fixture arithmetic, not business evidence.",
+      "A missing or nonunique dimension match must remain visible."
+    ]
+  },
+  "alternatives": [
+    {
+      "label": "Flat export",
+      "whenToConsider": "Useful for a bounded one-off analysis.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    },
+    {
+      "label": "Star schema",
+      "whenToConsider": "Useful when explicit dimensions and reusable aggregation are justified.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    }
+  ],
+  "interview": {
+    "question": "What is the grain of your fact table, and how would you detect a double-counting join?",
+    "answerHints": [
+      "Name one row precisely.",
+      "Check key cardinality.",
+      "Compare row counts and sums before and after joining."
+    ],
+    "assessment": "SELF_EXPLANATION_NOT_CERTIFICATION"
+  },
+  "sourceRefs": [
+    "S-STAR",
+    "S-FACT"
+  ],
+  "instanceMappings": [],
+  "instanceMappingPolicy": "An explicit source-pinned link is required; names, icons and tags are not evidence.",
+  "legacyMapping": {
+    "status": "RECONCILE_WITH_ORIGINAL_64_TOPIC_TABLE",
+    "canonicalTopicId": null
+  },
+  "displayDefaults": {
+    "overviewFirst": true,
+    "showDetails": false,
+    "requiresGit": false,
+    "requiresAI": false,
+    "requiresCloud": false
+  }
+}

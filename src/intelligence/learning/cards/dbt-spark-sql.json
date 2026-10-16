@@ -1,0 +1,81 @@
+{
+  "proposalFormat": "diagramcloud.learning-proposal",
+  "proposalVersion": 1,
+  "id": "dbt-spark-sql",
+  "entryKind": "concept",
+  "title": "SQL, dbt, Spark and orchestration have different roles",
+  "domain": "data-engineering",
+  "contentStatus": "AUTHORED_DRAFT_NATIVE_ADOPTION_NOT_RUN",
+  "contentRevision": "2026-10-16.1",
+  "applicability": "UNKNOWN_NOT_ASSESSED",
+  "summary": "Avoid drawing different kinds of technology as if they were interchangeable products.",
+  "claims": [
+    {
+      "text": "dbt models transformation logic and its dependency graph; Spark provides a processing engine with SQL and DataFrame interfaces.",
+      "basis": "primary-source-summary",
+      "sourceRefs": [
+        "S-DBT",
+        "S-STREAM"
+      ]
+    }
+  ],
+  "levels": {
+    "overview": "Explain the transformation goal before naming a tool.",
+    "architecture": "Separate language, transformation project, compute engine, orchestrator and storage.",
+    "detail": "Inspect a model definition, compiled artifact, job configuration, attempt and output receipt as distinct objects."
+  },
+  "prerequisites": [],
+  "example": {
+    "provenance": "authored-synthetic",
+    "input": "A synthetic aggregation is expressed as a SQL model.",
+    "steps": [
+      "Identify the SQL logic.",
+      "Identify the transformation project and dependencies.",
+      "Identify the selected engine and orchestration route."
+    ],
+    "output": "A role-based architecture with unsupported choices left unknown.",
+    "limits": [
+      "No new dbt or Spark process is started.",
+      "A source model is not a successful run."
+    ]
+  },
+  "alternatives": [
+    {
+      "label": "Direct SQL",
+      "whenToConsider": "Consider a small supported transformation with simple ownership.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    },
+    {
+      "label": "Managed transformation project",
+      "whenToConsider": "Consider when dependency management and tests justify the project machinery.",
+      "status": "CANDIDATE_NOT_SELECTED"
+    }
+  ],
+  "interview": {
+    "question": "Is dbt versus SQL a like-for-like comparison?",
+    "answerHints": [
+      "Separate language and tooling.",
+      "Identify the actual execution backend.",
+      "Name the orchestration boundary."
+    ],
+    "assessment": "SELF_EXPLANATION_NOT_CERTIFICATION"
+  },
+  "sourceRefs": [
+    "S-DBT",
+    "S-STREAM"
+  ],
+  "instanceMappings": [],
+  "instanceMappingPolicy": "An explicit source-pinned link is required; names, icons and tags are not evidence.",
+  "legacyMapping": {
+    "status": "EXISTING_NATIVE_TOPIC_REUSE",
+    "canonicalTopicId": "spark-production",
+    "nativeRecipeId": "jobs"
+  },
+  "displayDefaults": {
+    "overviewFirst": true,
+    "showDetails": false,
+    "requiresGit": false,
+    "requiresAI": false,
+    "requiresCloud": false
+  }
+}
