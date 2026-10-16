@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.26.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.26.1 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,6 +44,7 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
+| 1.26.1 | head of the `fix/r4-verifier-corrections` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | R4 verifier corrections: accepted-choice caution and no self-accepted recommendation (`suggestedBy`), mapping origin set by the calling path with normalized no-self-review, ticked citations for Mark reviewed, custom-catalogue return context, project-less catalogue entry (R4-AC-01 implemented); Chromium only |
 | 1.26.0 | head of the `release/1.26.0-r4` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [learning milestone notes](release-1.26/RELEASE_NOTES.md), [R4 crosswalk](product/R4_CROSSWALK.md); Chromium only |
 | 1.25.0 | `f230ae0` (PR #59); no tag | 38449161237 | exact-head CI, private package receipt in `outcome.json` | Vercel production from `main` | full-product campaign integration; Chromium only |
 | 1.24.0 | tag `v1.24.0`; exact commit in release receipt | [PR #56](https://github.com/julian-passebecq/diagramcloud/pull/56) and release artifact | exact-head receipt | Vercel production from `main`; state/smoke recorded separately | [Project Intelligence journeys and limits](release-1.24/RELEASE_NOTES.md); Chromium only |

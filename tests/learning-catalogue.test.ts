@@ -9,7 +9,8 @@ import {learningCatalogue,learningSources,catalogueRows,decodeCatalogueEntry,val
 import {compileLearningExample,scdExercise,temporalJoin,LEARNING_EXAMPLES} from '../src/intelligence/learning/examples';
 import {learningCookbook,referenceCookbook} from '../src/intelligence/cookbook';
 import {samples} from '../src/data/samples';
-import {LearningCatalogue} from '../src/ui/LearningCatalogue';
+import {LearningCatalogue,lessonContextFor,reviewCitations,tickedEvidence} from '../src/ui/LearningCatalogue';
+import {lessonInstanceFacts,suggestMapping} from '../src/intelligence/learning/mappings';
 import {matcherSnapshot} from './helpers/matcherSnapshot';
 import {R4_LEARNING_CARDS} from '../src/intelligence/learning/cards';
 const ragCard=R4_LEARNING_CARDS.find(card=>(card as {id:string}).id==='rag-pipeline') as Record<string,unknown>;
@@ -116,4 +117,25 @@ test('SCD temporal join arithmetic: June maps to North, August to South, sales t
  assert.deepEqual(temporalJoin([...versions,{region:'East',from:'2026-06-01',to:'2026-08-01'}],['2026-06-15'])[0],{date:'2026-06-15',state:'ambiguous',regions:['North','East']});
  assert.deepEqual(temporalJoin(versions,['2025-12-31'])[0],{date:'2025-12-31',state:'no-version',regions:[]});
  assert.throws(()=>scdExercise({provenance:'observed'}));
+});
+
+test('review needs ticked citations: none preselected, and a custom catalogue keeps its own return context',()=>{
+ const star=learningCatalogue.find(e=>e.id==='star-grain')!;
+ const base=validateDocument({schemaVersion:1,id:'tick-fixture',title:'Tick fixture',rootViewId:'root',author:'Synthetic author',
+  sources:[{id:'model-doc',title:'Synthetic model notes',location:'synthetic/model.md:1'}],blocks:[{id:'grain-note',type:'text',title:'Grain note',text:'Synthetic',provenance:'synthetic'}],
+  nodes:[{id:'facts',label:'Star grain facts',kind:'table',sourceIds:['model-doc'],blockIds:['grain-note']}],edges:[],views:[{id:'root',title:'Root',nodeIds:['facts']}]});
+ const d=suggestMapping(base,{conceptId:star.id,target:{kind:'node',id:'facts'}},{origin:'ai',suggestedBy:'claude'}),row=lessonInstanceFacts(d,star).suggested[0];
+ assert.deepEqual(row.evidence,[],'the suggestion cites nothing');
+ assert.deepEqual(reviewCitations(d,row).map(c=>c.kind+':'+c.id),['source:model-doc','block:grain-note'],'the target citations are offered, not applied');
+ assert.deepEqual(tickedEvidence([]),{sourceIds:[],blockIds:[]});
+ assert.deepEqual(tickedEvidence(['block:grain-note']),{sourceIds:[],blockIds:['grain-note']});
+ const html=renderToStaticMarkup(createElement(LearningCatalogue,{host:{project:d,initial:{lessonId:star.id,depth:'overview',contentRevision:star.editorial.contentRevision},onEdit:()=>{},reviewer:'Julian'}}));
+ assert.match(html,/Tick the citations you checked for Star grain facts/);
+ assert.equal((html.match(/type="checkbox"/g)??[]).length,2);assert.equal(/type="checkbox"[^>]*checked/.test(html),false,'no citation is preselected');
+ assert.match(html,/<button type="button" disabled="" aria-label="Mark mapping to Star grain facts reviewed"/);
+ // A custom entry (not in the built-in catalogue) keeps its return context.
+ const custom={...structuredClone(star),id:'custom-grain',title:'Custom grain lesson',editorial:{...star.editorial,contentRevision:'2026-12-01.1'}};
+ assert.equal(learningCatalogue.some(e=>e.id==='custom-grain'),false);
+ assert.deepEqual(lessonContextFor([custom],'custom-grain'),{lessonId:'custom-grain',depth:'overview',contentRevision:'2026-12-01.1'});
+ assert.equal(lessonContextFor([custom],null),null);assert.equal(lessonContextFor([custom],'star-grain'),null);
 });

@@ -35,7 +35,11 @@ test('lesson -> In my project -> exact component -> back to the same lesson, dep
  await expect(mine.getByRole('list',{name:'Suggested mappings'})).toContainText('Suggested · candidate, not evidence');
  await expect(mine.getByRole('button',{name:'Mark mapping to Grain dashboard reviewed',exact:true})).toBeDisabled();
  await mine.getByRole('button',{name:'Suggest mapping to Sales fact table',exact:true}).click();
- await mine.getByRole('button',{name:'Mark mapping to Sales fact table reviewed',exact:true}).click();
+ // The suggestion cites nothing: the target's citations are shown, none ticked, and review waits for a ticked one.
+ const markSales=mine.getByRole('button',{name:'Mark mapping to Sales fact table reviewed',exact:true}),cite=mine.getByRole('checkbox',{name:'Cite Synthetic model notes (source model-doc)',exact:true});
+ await expect(cite).not.toBeChecked();await expect(markSales).toBeDisabled();
+ await cite.check();await expect(markSales).toBeEnabled();await cite.uncheck();await expect(markSales).toBeDisabled();
+ await cite.check();await markSales.click();
  const mapped=mine.getByRole('list',{name:'Mapped instances'});
  await expect(mapped).toContainText('Sales fact table');await expect(mapped).toContainText('Reviewed by the author (Synthetic author');await expect(mapped).toContainText('Synthetic model notes (source model-doc)');
 
