@@ -3,7 +3,7 @@ import type {Project} from '../core/model';
 import {download as downloadFile} from '../export/browser';
 import {lessonInstanceFacts,mappingCandidates,suggestMapping,reviewMapping,rejectMapping,savedExplanation,MAPPING_STATE_LABELS,CANDIDATE_LABEL,type LessonContext,type MappingRow} from '../intelligence/learning/mappings';
 import {catalogueRows,learningCatalogue,learningSource,lessonsForNativeEntry,matchesCatalogueRow,CATALOGUE_ENTRY_KINDS,CATALOGUE_ENTRY_KIND_LABELS,LEARNING_DOMAINS,type CatalogueKindFilter,type CatalogueRow,type LearningDomainFilter,type LearningEntry} from '../intelligence/learning/catalogue';
-import {compileLearningExample,learningExamplesForLesson,scdExercise} from '../intelligence/learning/examples';
+import {compileLearningExample,learningExamplesForLesson,scdExercise} from '../intelligence/learning/examples';import {lessonPlayback} from '../intelligence/learning/playback';import {LessonDiagram,StepPlayback} from './LessonDiagram';
 import {CATALOGUE_REFERENCE_FAMILIES,type CatalogueFamilyFilter} from '../intelligence/recipes';
 /** Static learning catalogue. It calls no AI or network and never creates a view or observation. "In my project" reads the
  * host's project after public projection; a mapping is created, reviewed or rejected only by an explicit Edit-mode action. */
@@ -18,7 +18,7 @@ function ExampleSection({entry}:{entry:LearningEntry}){
  if(!example&&!compiled.length&&!scd)return null;
  const download=(id:string)=>{const doc=compileLearningExample(id),u=URL.createObjectURL(new Blob([JSON.stringify(doc,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=doc.id+'.json';a.click();URL.revokeObjectURL(u);};
  return <section aria-label="Example"><h5>Example</h5>
-  {example&&<><p>Authored synthetic example · provenance {example.provenance}. Not an owner project, run or result.</p><p><strong>Input:</strong> {example.input}</p><ol>{example.steps.map((step,i)=><li key={i}>{step}</li>)}</ol><p><strong>Output:</strong> {example.output}</p><p className="micro">Limits: {example.limits.join(' ')}</p></>}
+  {example&&<><p>Authored synthetic example · provenance {example.provenance}. Not an owner project, run or result.</p><p><strong>Input:</strong> {example.input}</p>{(()=>{const steps=lessonPlayback(entry);return steps&&<StepPlayback source={steps}/>;})()}<p><strong>Output:</strong> {example.output}</p><p className="micro">Limits: {example.limits.join(' ')}</p></>}
   {scd&&<div><h6>Synthetic table exercise</h6><p>{scd.rows} order lines · sales {scd.sales} synthetic currency units. Interval rule: {scd.intervalSemantics}.</p><ul aria-label="Temporal join result">{scd.matches.map(m=><li key={m.date}>{m.date} → {m.state==='matched'?m.region:m.state+' ('+(m.regions.join(', ')||'none')+')'}</li>)}</ul><p className="micro">Computed here from the labelled synthetic tables; fixture arithmetic, not business evidence.</p></div>}
   {compiled.map(id=>{const doc=compileLearningExample(id);return <div key={id}><h6>Synthetic cookbook example</h6><p>{doc.title} · {doc.nodes.length} declared components · {doc.edges.length} declared connections. Compiled through the native ProjectBrief compiler and document validation; synthetic, no deployment or observed execution.</p><button type="button" onClick={()=>download(id)}>Download synthetic example JSON</button><p className="micro">A new candidate: import it through JSON / AI so it is previewed and reviewed like any other document.</p></div>;})}
  </section>;
@@ -76,7 +76,7 @@ function Lesson({entry,onOpen,onClose,host,initial,catalogue}:{entry:LearningEnt
   {lesson.prerequisites.length>0&&<section aria-label="Prerequisites"><h5>Prerequisites</h5><ul>{lesson.prerequisites.map(id=><li key={id}><button type="button" onClick={()=>onOpen(id)}>{title(id)}</button></li>)}</ul></section>}
   <fieldset style={{minWidth:0}}><legend>Explanation depth</legend>{DEPTHS.map(d=><label key={d.id} style={{marginRight:12}}><input type="radio" name={'depth-'+entry.id} value={d.id} checked={depth===d.id} onChange={()=>setDepth(d.id)}/> {d.label}</label>)}</fieldset>
   <p role="status" aria-label="Explanation at selected depth"><strong>{DEPTHS.find(d=>d.id===depth)!.label}:</strong> {lesson.levels[depth]}</p>
-  <p className="micro">Depth changes the explanation only; it changes no environment, variant, run or audience.</p>
+  <p className="micro">Depth changes the explanation and the containment level the lesson diagram shows; it changes no environment, variant, run, audience or camera zoom.</p><LessonDiagram entry={entry} depth={depth}/>
   {lesson.alternatives&&<section aria-label="Alternatives"><h5>Alternatives</h5><ul>{lesson.alternatives.map((row,i)=><li key={i}><strong>{row.label}</strong>: {row.whenToConsider} <span className="micro">Candidate, not selected.</span></li>)}</ul></section>}
   <ExampleSection entry={entry}/>
   {lesson.failureModes&&<section aria-label="Failure modes"><h5>Failure modes</h5><ul>{lesson.failureModes.map((row,i)=><li key={i}>{row.text}</li>)}</ul><p className="micro">Authored teaching reasoning, not observed incidents.</p></section>}
