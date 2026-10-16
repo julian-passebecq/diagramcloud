@@ -107,3 +107,31 @@ test('dense classic manual prints legibly on A4 and Letter: figure text inside e
  }
  expect(JSON.stringify(d)).toBe(before);
 });
+/* Dense connection ledgers at real print widths: the 16mm x 14mm @page margins leave 182mm (A4) and 187.9mm (Letter) of
+ * content, i.e. 688 and 710 CSS px. Every word and header stays whole (only opaque ID cells may wrap mid-token), nothing
+ * overflows its cell and every cell keeps visible padding, so neighbouring facts such as "planned" and "0" never touch. */
+async function denseQuantityManual(paper:'A4'|'letter'){
+ const {documentSchema,validateDocument}=await import('../../src/core/model');const {technicalManualHtml}=await import('../../src/export/manual');const {validatePublicationBrief}=await import('../../src/intelligence/publicationBrief');const {publicationPages}=await import('../../src/export/publicationPages');
+ const longId='zero-'+'z'.repeat(75),note='Synthetic supplied zero across a publication page; no measured result.',ids=Array.from({length:9},(_,i)=>'n'+i);if(longId.length!==80)throw new Error('Synthetic fixture must use an 80-character stable ID');
+ const project=validateDocument(documentSchema.parse({schemaVersion:1,id:'synthetic-dense-quantity-print',title:'Synthetic dense quantity print',rootViewId:'root',privateNotes:'PRIVATE_DENSE_PRINT_NOTES',nodes:[...ids.map(id=>({id,label:'Synthetic '+id,basis:'planned'})),{id:'secret',label:'PRIVATE_DENSE_PRINT_NODE',visibility:'private'}],edges:[{id:longId,source:'n7',target:'n8',label:'Supplied zero boundary',basis:'planned',quantity:{value:0,unit:'rows/day',provenance:'synthetic',note}},{id:'missing-edge',source:'n0',target:'n1',label:'No supplied amount',basis:'unknown'},{id:'private-edge',source:'n0',target:'secret',quantity:{value:9,unit:'PRIVATE_DENSE_PRINT_UNIT',provenance:'author',note:'PRIVATE_DENSE_PRINT_QUANTITY'}}],views:[{id:'root',title:'Synthetic dense supplied flow',nodeIds:[...ids,'secret'],edgeIds:[longId,'missing-edge','private-edge'],positions:Object.fromEntries([...ids.map((id,i)=>[id,{x:i*300,y:0}]),['secret',{x:0,y:300}]])}]}));
+ const brief=validatePublicationBrief({format:'diagramcloud.publication-brief/1',title:'Synthetic dense quantity handbook',audience:'Synthetic reviewer',viewIds:['root'],profile:'classic',paper,detail:'full'},project);
+ const plan=publicationPages(project,'root',['root'],{profile:brief.profile,paper:brief.paper});if(!plan.dense||!plan.contextEdges.some(e=>e.id===longId))throw new Error('Synthetic fixture must take the dense paginated path with the long ID in the context table');
+ return {html:technicalManualHtml(project,{brief,now:new Date(1792023600*1000)}),longId,note};
+}
+for(const [paper,width] of [['A4',688],['letter',710]] as const)test(`dense manual connection ledgers stay legible in ${paper} print: whole words and headers, padded cells, every fact`,async({browser},info)=>{
+ const {html,longId,note}=await denseQuantityManual(paper);expect(html).not.toContain('PRIVATE_DENSE_PRINT_');expect(html).not.toContain('private-edge');
+ const context=await browser.newContext({offline:true,viewport:{width,height:1100}});try{const reader=await context.newPage(),requests:string[]=[];await reader.route('**/*',r=>{requests.push(r.request().url());return r.abort();});await reader.setContent(html);await reader.emulateMedia({media:'print'});
+  for(const name of ['Keyed connection context of Synthetic dense supplied flow','Connections of Synthetic dense supplied flow']){const row=reader.getByRole('table',{name,exact:true}).getByRole('row').filter({has:reader.getByRole('cell',{name:longId,exact:true})});const cells=await row.locator('td').allTextContents();expect(cells).toHaveLength(10);for(const fact of [longId,'Supplied zero boundary','planned','0','rows/day','synthetic',note])expect(cells).toContain(fact);}
+  await expect(reader.getByRole('table',{name:'Connections of Synthetic dense supplied flow',exact:true}).getByRole('row').filter({has:reader.getByRole('cell',{name:'missing-edge',exact:true})})).toContainText('Not supplied');
+  const problems=await reader.evaluate(()=>{const out:string[]=[],page=document.documentElement.clientWidth,tables=[...document.querySelectorAll<HTMLTableElement>('table.connection-facts')];if(tables.length<2)out.push(`expected two dense ledgers, found ${tables.length}`);
+   for(const table of tables){const box=table.getBoundingClientRect();if(getComputedStyle(table.tHead!).display!=="table-header-group")out.push(`${table.getAttribute("aria-label")}: header does not repeat on continued print pages`);if(box.right>page+0.5||table.scrollWidth>table.clientWidth)out.push(`${table.getAttribute('aria-label')}: wider than the printable width`);
+    for(const cell of table.querySelectorAll<HTMLElement>('th,td')){const where=`${table.getAttribute('aria-label')} / ${cell.tagName} "${cell.textContent?.slice(0,30)}"`,style=getComputedStyle(cell),rect=cell.getBoundingClientRect(),pl=parseFloat(style.paddingLeft),pr=parseFloat(style.paddingRight);
+     if(pl<4||pr<4)out.push(`${where}: horizontal padding below 4px`);if(cell.scrollWidth>cell.clientWidth)out.push(`${where}: overflows its cell`);
+     const walker=document.createTreeWalker(cell,NodeFilter.SHOW_TEXT);for(let text=walker.nextNode() as Text|null;text;text=walker.nextNode() as Text|null){for(const word of text.data.matchAll(/\S+/g)){const range=document.createRange();range.setStart(text,word.index!);range.setEnd(text,word.index!+word[0].length);const rects=[...range.getClientRects()].filter(r=>r.width>0&&r.height>0);
+      if(!cell.classList.contains('opaque-id')&&new Set(rects.map(r=>Math.round(r.top))).size>1)out.push(`${where}: word "${word[0]}" broken across lines`);
+      for(const r of rects)if(r.left<rect.left+pl-0.5||r.right>rect.right-pr+0.5)out.push(`${where}: "${word[0]}" touches or crosses the cell padding`);}}}}
+   return out;});
+  expect(problems).toEqual([]);
+  const pdf=await reader.pdf({path:info.outputPath(`dense-classic-${paper}.pdf`),preferCSSPageSize:true,printBackground:true});expect(pdf.subarray(0,5).toString()).toBe('%PDF-');expect(requests).toEqual([]);
+ }finally{await context.close();}
+});
