@@ -1,6 +1,7 @@
 import type {DocumentInput, DocumentMap, DocumentDiagnostic, DocumentLink} from './types';
 import {secretInText} from '../core/secrets';
 import {mapStructuredDocuments,wantedStructuredDocument} from './structuredDocuments';
+import {actionForGapCause,gapAdvice} from './gapDetails';
 
 /** Application boundary for already-authorized inventory text. Filtering remains
  * mandatory even when metadata was accepted; document instructions stay inert. */
@@ -105,8 +106,8 @@ export function mapDocuments(input: readonly DocumentInput[], isSafeText: (text:
           const toPath = targetPath(path, target);
           if (toPath && files.has(toPath)) {
             addLink({fromPath: path, fromLine: index + 1, toPath, kind: 'document-link'});
-            if (target.includes('#')) diagnostic({path, line: index + 1, code: 'unsupported', message: 'File resolved; heading-fragment resolution is not implemented.'});
-          } else diagnostic({path, line: index + 1, code: 'unresolved', message: 'Relative link has no authorized target in the selected document set.'});
+            if (target.includes('#')) diagnostic({path, line: index + 1, code: 'unsupported', message: 'File resolved; heading-fragment resolution is not implemented.',...gapAdvice('unsupported-analyzer')});
+          } else diagnostic({path, line: index + 1, code: 'unresolved', message: 'Relative link has no authorized target in the selected document set.',...(toPath&&wantedDocument(toPath)?{action:actionForGapCause('missing-source')}:{})});
         }
       });
     } else {
@@ -139,7 +140,7 @@ export function mapDocuments(input: readonly DocumentInput[], isSafeText: (text:
   for (const row of pending) for (const id of new Set(row.ids)) {
     const matches = sourceRecords.get(id) || [];
     if (matches.length === 1) addLink({fromPath: row.path, fromLine: row.line, toPath: matches[0].path, toLine: matches[0].line, kind: 'source-record'});
-    else diagnostic({path: row.path, line: row.line, code: matches.length ? 'ambiguous' : 'unresolved', message: matches.length ? 'Source ID has multiple records; no relationship created.' : 'Source ID has no authorized source record.'});
+    else diagnostic({path: row.path, line: row.line, code: matches.length ? 'ambiguous' : 'unresolved', message: matches.length ? 'Source ID has multiple records; no relationship created.' : 'Source ID has no authorized source record.',action:actionForGapCause(matches.length?'conflicting-evidence':'missing-source')});
   }
   const unique = new Map(links.map(link => [JSON.stringify(link), link]));
   return {format: 'diagramcloud.document-map', version: 1, documents, links: [...unique.values()], diagnostics, omitted,

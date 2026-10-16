@@ -1,3 +1,5 @@
+import type {GapAction,GapCause} from './gapDetails';
+
 /** Generated, point-in-time reports. These are not a replacement for core/Project.
  * Functions consuming Project require the existing validateDocument boundary first.
  * No model call, filesystem access, execution, or publication approval is implicit.
@@ -22,6 +24,8 @@ export type Gap = {
   reason: string;
   resolution: string;
   affects: string[];
+  cause?: GapCause;
+  action?: GapAction;
 };
 export type ViewRecommendation = {
   id: string;
@@ -84,6 +88,8 @@ export type DocumentDiagnostic = {
   path: string; line?: number;
   code: 'unresolved' | 'ambiguous' | 'unsupported' | 'limited' | 'unsafe' | 'invalid';
   message: string;
+  cause?: GapCause;
+  action?: GapAction;
 };
 export type DocumentMap = {
   format: 'diagramcloud.document-map'; version: 1;

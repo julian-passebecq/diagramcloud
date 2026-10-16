@@ -2,7 +2,7 @@ import {documentSchema,validateDocument,type EvidenceBlock,type Project,type Pro
 import {layeredPositions,type ImportResult} from '../interchange/graph';
 import {documentFromScan,SCAN_LIMITS} from '../scan/document';
 import type {ScanModel} from '../scan/scanner';
-import {REPO_ID,type ManifestRepository,type ProjectManifest} from './manifest';
+import {REPO_ID,GALAXY_IMPORT_PROVENANCE_PREFIX,GALAXY_IMPORT_PROVENANCE_BLOCK,prepareGalaxyImportProvenance,type ManifestRepository,type ProjectManifest} from './manifest';
 import {extendWithDomainFacts,type DomainResult} from '../../intelligence/domainAdapters';
 
 /**
@@ -136,4 +136,25 @@ export function addRepository(input:Project,repo:{id:string;title:string;host:Sn
  const xs=Object.values(root.positions);root.nodeIds.push(repoNodeId(repo.id));root.positions[repoNodeId(repo.id)]={x:xs.length?Math.max(...xs.map(p=>p.x))+300:0,y:xs.length?Math.min(...xs.map(p=>p.y)):0};
  appendSnapshot(doc,[...snap.repositories,s],now,doc.atlas);
  return validateDocument(doc);
+}
+
+export const GALAXY_PROVENANCE_CAPTURED='Private Galaxy import provenance captured. No namespace binding or ID reuse.';
+export const GALAXY_PROVENANCE_UNAVAILABLE='Galaxy provenance capture unavailable. The normal import is unchanged; no IDs were reused.';
+/** Attach only to a newly composed candidate. No prior receipt reader, namespace inference or identity reassignment. */
+export async function attachGalaxyImportProvenance(input:Project,raw:string,options:{now?:Date}={}):Promise<{document:Project;captured:boolean;message:string}>{
+ const unavailable=()=>({document:input,captured:false,message:GALAXY_PROVENANCE_UNAVAILABLE});
+ try{
+  const snapshot=input.atlas?.snapshots.find(s=>s.id===input.atlas!.activeSnapshotId);
+  if(!snapshot||input.blocks.some(b=>b.id.startsWith(GALAXY_IMPORT_PROVENANCE_PREFIX)))return unavailable();
+  const prepared=await prepareGalaxyImportProvenance(raw,input.id,snapshot.id,options.now);
+  if(!prepared||input.id!==`atlas-${prepared.manifest.project.id}`||snapshot.repositories.length!==prepared.receipt.mappings.length)return unavailable();
+  for(const row of prepared.receipt.mappings){
+   const repository=snapshot.repositories.find(r=>r.id===row.repositoryId),declared=prepared.manifest.repositories.find(r=>r.id===row.repositoryId);
+   if(!repository||!declared||repository.nodeId!==row.nodeId||repository.locator!==declared.locator||repository.host!==declared.host||!input.nodes.some(n=>n.id===row.nodeId))return unavailable();
+  }
+  const doc=structuredClone(input),code=JSON.stringify(prepared.receipt);
+  doc.blocks.push({id:GALAXY_IMPORT_PROVENANCE_BLOCK,title:'Private Galaxy import provenance',type:'code',language:'json',code,visibility:'private',sourceIds:[],provenance:'source-derived'});
+  for(const row of prepared.receipt.mappings)doc.nodes.find(n=>n.id===row.nodeId)!.blockIds.push(GALAXY_IMPORT_PROVENANCE_BLOCK);
+  return {document:validateDocument(doc),captured:true,message:GALAXY_PROVENANCE_CAPTURED};
+ }catch{return unavailable();}
 }

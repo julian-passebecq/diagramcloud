@@ -35,7 +35,7 @@ test('generated bundles keep source revisions and stable IDs; cache refuses nond
  await assert.rejects(()=>cache.put({...b,items:[{...b.items[0],label:'Other result'}]}),/different result/);assert.throws(()=>validateAnalysisBundle({...b,sources:[{...b.sources[0],revision:'different'}]}),/revision/);assert.throws(()=>validateAnalysisBundle({...b,links:[{id:'bad',from:'node',to:'missing',kind:'dependency',sourceIds:['source'],confidence:'inferred'}]}),/endpoint/);
 });
 test('registry requirements and contextual views explain missing data; pattern names never deploy facts',()=>{
- assert.equal(recipeRegistry.length,7);assert.throws(()=>validateRecipeRegistry([...recipeRegistry,recipeRegistry[0]]),/Duplicate/);
+ assert.equal(recipeRegistry.length,7);assert.deepEqual(recipeRegistry.filter(row=>row.guidance).map(row=>row.id),['jobs']);assert.equal(contextualRecipes(project(),DEFAULT_OPTIONS).find(row=>row.id==='jobs')?.guidance?.applicability,'UNKNOWN_NOT_ASSESSED');assert.throws(()=>validateRecipeRegistry([...recipeRegistry,recipeRegistry[0]]),/Duplicate/);
  const doc=project();assert.equal(contextualRecipes(doc,DEFAULT_OPTIONS).find(r=>r.id==='data')!.state,'unavailable');assert.ok(contextualRecipes(doc,DEFAULT_OPTIONS).some(r=>r.state==='recommended'));
  doc.nodes[0].label='Bronze Silver Gold';assert.equal(classifyPatterns(doc).find(p=>p.id==='medallion')!.state,'not-established');assert.equal(learningPath(doc)[0].viewId,'root');assert.ok(architectureAudit(doc).missingSources.some(g=>g.nodeId==='data'));
 });

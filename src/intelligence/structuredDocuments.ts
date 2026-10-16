@@ -1,5 +1,6 @@
 import {parseAllDocuments,isMap,isSeq,isScalar,isAlias,type Node} from 'yaml';
 import type {DocumentInput,DocumentMap,DocumentDiagnostic,DocumentLink} from './types';
+import {actionForGapCause,gapAdvice} from './gapDetails';
 
 /** These files belong to domain/configuration analyzers. A lexical document map
  * must not reinterpret a deployment manifest or dependency lock as architecture. */
@@ -63,7 +64,7 @@ export function mapStructuredDocuments(input:readonly DocumentInput[],isSafeText
       const value=pair.value as Node|null;
       if(REF_KEYS.has(key)&&value){
        const values=isSeq(value)?value.items:[value];
-       if(values.some(v=>!isScalar(v)||typeof v.value!=='string'))diag({path,line:line(pair.key.range?.[0]??0),code:'unsupported',message:'Explicit references require a string path or list of string paths.'});
+       if(values.some(v=>!isScalar(v)||typeof v.value!=='string'))diag({path,line:line(pair.key.range?.[0]??0),code:'unsupported',message:'Explicit references require a string path or list of string paths.',...gapAdvice('unsupported-analyzer')});
        else for(const v of values)if(isScalar(v))staged.push({path,line:line(v.range?.[0]??pair.key.range?.[0]??0),target:String(v.value)});
       }
       if(value)stack.push({node:value,pointer:current.pointer+'/'+pointerKey(key),depth:current.depth+1,start:pair.key.range?.[0]});
@@ -80,11 +81,11 @@ export function mapStructuredDocuments(input:readonly DocumentInput[],isSafeText
  const usable=new Set([...available].filter(p=>!files.has(p)||accepted.has(p)));
  for(const r of pending){
   const target=targetPath(r.path,r.target);
-  if(!target||!usable.has(target.path)){diag({path:r.path,line:r.line,code:'unresolved',message:'Explicit reference has no safe authorized selected target.'});continue;}
+  if(!target||!usable.has(target.path)){diag({path:r.path,line:r.line,code:'unresolved',message:'Explicit reference has no safe authorized selected target.',...(target?{action:actionForGapCause('missing-source')}:{})});continue;}
   if(links.length>=LIMITS.links){omitted.links++;continue;}
   const candidate:DocumentLink={fromPath:r.path,fromLine:r.line,toPath:target.path,toLine:1,kind:'structured-reference'};
   if(!links.some(l=>l.fromPath===candidate.fromPath&&l.fromLine===candidate.fromLine&&l.toPath===candidate.toPath))links.push(candidate);
-  if(target.fragment)diag({path:r.path,line:r.line,code:'unsupported',message:'File resolved; JSON Pointer or heading fragment resolution is not implemented.'});
+  if(target.fragment)diag({path:r.path,line:r.line,code:'unsupported',message:'File resolved; JSON Pointer or heading fragment resolution is not implemented.',...gapAdvice('unsupported-analyzer')});
  }
  return {format:'diagramcloud.document-map',version:1,documents,links,diagnostics,omitted,limitations:[
   'Selected JSON/YAML records are lexical JSON Pointers with source ranges; no scalar values or runtime architecture are inferred.',

@@ -1,8 +1,10 @@
+import {applyDocumentPatch} from '../src/core/patch';
+import {observationPatch} from '../src/core/realization';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {samples} from '../src/data/samples';
-import {clone,parseDocument,validateDocument,MAX_DOCUMENT_BYTES,nodeSchema,blockSchema,viewSchema,edgeSchema} from '../src/core/model';
-import {publicDocument,removeNode,traceNodes,pathToView,commitHistory,undo,redo,type History} from '../src/core/operations';
+import {clone,parseDocument,validateDocument,MAX_DOCUMENT_BYTES,documentSchema,nodeSchema,blockSchema,viewSchema,edgeSchema} from '../src/core/model';
+import {publicDocument,removeNode,traceNodes,pathToView,commitHistory,undo,redo,type History,addExistingComponentToView,VIEW_MEMBERSHIP_UNAVAILABLE,removeComponentFromView,VIEW_REMOVAL_UNAVAILABLE} from '../src/core/operations';
 import {svgDiagram,documentFromSvg,mermaidDiagram,xml} from '../src/export/diagram';
 import {portfolioHtml} from '../src/export/html';
 const total=samples.find(d=>d.id==='total-project-controls')!;
@@ -41,3 +43,64 @@ test('HTML export escapes script termination and uses public payload',()=>{const
 test('Mermaid is a scoped view export, not evidence serialization',()=>{const out=mermaidDiagram(total);assert.ok(out.startsWith('flowchart LR'));assert.ok(out.includes('Oracle project database'));assert.ok(!out.includes('forecast_cost_eur'));});
 test('Mermaid escapes pipe characters in labels',()=>{const d=clone(total);d.edges[0].label='raw | curated';const out=mermaidDiagram(d);assert.ok(out.includes('raw &#124; curated'));assert.ok(!out.includes('|raw | curated|'));});
 test('stable IDs have bounded safe syntax',()=>{assert.throws(()=>nodeSchema.parse({id:'<script>',label:'Bad'}));assert.throws(()=>nodeSchema.parse({id:'a'.repeat(90),label:'Bad'}));});
+
+
+function componentReuseProject(){return validateDocument(documentSchema.parse({schemaVersion:1,id:'synthetic-reuse-unit',revision:7,title:'Synthetic canonical reuse',rootViewId:'root',
+ nodes:[{id:'left-portal',label:'Left',childViewId:'left'},{id:'right-portal',label:'Right',childViewId:'right'},{id:'shared',label:'Same label',summary:'Canonical authored explanation',blockIds:['example'],sourceIds:['source']},{id:'other',label:'Same label'},{id:'private',label:'SYNTHETIC_REUSE_PRIVATE',visibility:'private'}],
+ edges:[{id:'native-link',source:'shared',target:'other',kind:'dependency',basis:'planned',quantity:{value:0,unit:'items/day',provenance:'synthetic'}}],
+ views:[{id:'root',title:'Root',nodeIds:['left-portal','right-portal'],positions:{'left-portal':{x:0,y:0},'right-portal':{x:400,y:0}}},{id:'left',title:'Left existing view',nodeIds:['shared','other','private'],edgeIds:['native-link'],positions:{shared:{x:0,y:0},other:{x:400,y:0}}},{id:'right',title:'Right existing view',nodeIds:['other'],positions:{other:{x:700,y:0}},design:{type:'auto',focal:['other']}}],
+ blocks:[{id:'example',type:'text',title:'Synthetic example',text:'Input, work and output are authored illustration.',sourceIds:['source'],provenance:'synthetic'}],sources:[{id:'source',title:'Synthetic declared reference',location:'Synthetic fixture'}],story:[{title:'Existing story',narration:'Authored order only',viewId:'left',nodeId:'shared',highlightEdgeIds:['native-link']}]}));}
+test('component reuse adds only exact existing membership and authored position, with one ordinary Undo and no fact clones',()=>{
+ const input=componentReuseProject(),raw=JSON.stringify(input),point={x:123.5,y:-40.25},out=addExistingComponentToView(input,'right','shared',point),expected=clone(input),right=expected.views.find(view=>view.id==='right')!;right.nodeIds.push('shared');right.positions.shared={...point};
+ assert.deepEqual(out,expected);assert.equal(out.revision,input.revision);assert.equal(out.nodes.filter(node=>node.id==='shared').length,1);assert.equal(JSON.stringify(input),raw);assert.equal(out.views.find(view=>view.id==='right')!.edgeIds.length,0,'incident edges are not implicitly added');
+ const h:History={past:[],present:input,future:[]},committed=commitHistory(h,out);assert.equal(committed.past.length,1);assert.equal(committed.present.revision,input.revision+1);assert.deepEqual(undo(committed).present,input);assert.deepEqual(redo(undo(committed)).present,committed.present);
+ point.x=999;out.nodes.find(node=>node.id==='shared')!.summary='Caller copy only';assert.equal(input.nodes.find(node=>node.id==='shared')!.summary,'Canonical authored explanation');assert.equal(out.views.find(view=>view.id==='right')!.positions.shared.x,123.5);
+});
+test('already present component reuse is an exact no-op rather than a new position, revision or history candidate',()=>{
+ const input=componentReuseProject(),raw=JSON.stringify(input),same=addExistingComponentToView(input,'left','shared',{x:999,y:888});assert.equal(same,input);assert.equal(JSON.stringify(input),raw);const after=addExistingComponentToView(input,'right','shared',{x:40,y:20});assert.equal(addExistingComponentToView(after,'right','shared',{x:500,y:500}),after);
+});
+test('component reuse rejects unknown scope, invalid positions and recursive expansion atomically with a fixed refusal',()=>{
+ const input=componentReuseProject(),raw=JSON.stringify(input),invalids=[['missing','shared',{x:0,y:0}],['right','missing',{x:0,y:0}],['right','right-portal',{x:0,y:0}],['right','shared',{x:Infinity,y:0}],['right','shared',{x:0,y:NaN}],['right','shared',{x:100001,y:0}],['right','shared',{x:0,y:0,unknown:'SYNTHETIC_UNTRUSTED_VALUE'}]] as const;
+ for(const [view,node,position] of invalids){assert.throws(()=>addExistingComponentToView(input,view,node,position),{message:VIEW_MEMBERSHIP_UNAVAILABLE});assert.equal(JSON.stringify(input),raw);}
+ const invalid=clone(input);invalid.views[0].nodeIds.push('right-portal');assert.throws(()=>addExistingComponentToView(invalid,'right','shared',{x:0,y:0}),{message:VIEW_MEMBERSHIP_UNAVAILABLE});assert.equal(JSON.stringify(input),raw);
+});
+test('reusing a private component never relabels visibility, publishes it or changes source/runtime facts',()=>{
+ const input=componentReuseProject(),before=JSON.stringify(input),out=addExistingComponentToView(input,'right','private',{x:-300,y:140});assert.equal(out.nodes.find(node=>node.id==='private')!.visibility,'private');assert.deepEqual(publicDocument(out),publicDocument(input));assert.ok(!JSON.stringify(publicDocument(out)).includes('SYNTHETIC_REUSE_PRIVATE'));assert.deepEqual(out.nodes,input.nodes);assert.deepEqual(out.edges,input.edges);assert.deepEqual(out.blocks,input.blocks);assert.deepEqual(out.sources,input.sources);assert.deepEqual(out.observations,input.observations);assert.equal(JSON.stringify(input),before);
+});
+
+function componentRemovalProject(){
+ const input=componentReuseProject(),right=input.views.find(view=>view.id==='right')!;right.nodeIds.push('shared');right.edgeIds=['native-link'];right.positions.shared={x:150,y:25};return validateDocument(input);
+}
+test('one-view removal changes only exact view membership position and incident membership retaining canonical facts and ordinary Undo',()=>{
+ let input=componentRemovalProject();
+ // Synthetic unreviewed fixture enters through the patch path; no review/shareability decision is authored.
+ input=applyDocumentPatch(input,observationPatch(input,{id:'fixture-not-observed',nodeId:'shared',sourceApp:'synthetic-fixture',authority:'Synthetic unit fixture only',observedAt:'2026-10-15T00:00:00Z',sourceRevision:'fixture-1',claim:'not-observed',summary:'Synthetic fixture: no runtime verification is asserted.'})).result;
+ const raw=JSON.stringify(input),out=removeComponentFromView(input,'right','shared'),expected=clone(input),view=expected.views.find(view=>view.id==='right')!;view.nodeIds=view.nodeIds.filter(id=>id!=='shared');view.edgeIds=[];delete view.positions.shared;
+ assert.deepEqual(out,expected);assert.equal(out.revision,input.revision);assert.equal(JSON.stringify(input),raw);assert.deepEqual(out.observations,input.observations);assert.equal(out.observations[0].reviewedAt,undefined);assert.equal(out.observations[0].shareable,false);assert.equal(out.edges[0].quantity!.value,0);assert.equal(out.edges[0].quantity!.provenance,'synthetic');
+ const history:History={past:[],present:input,future:[]},h=commitHistory(history,out);assert.equal(h.past.length,1);assert.deepEqual(undo(h).present,input);assert.deepEqual(redo(undo(h)).present,h.present);
+});
+test('one-view removal has exact no-op identity and constant atomic refusal for unknown or invalid scope',()=>{
+ const input=componentRemovalProject(),raw=JSON.stringify(input);assert.equal(removeComponentFromView(input,'root','shared'),input);
+ for(const [view,node] of [['missing','shared'],['right','missing']]){assert.throws(()=>removeComponentFromView(input,view,node),{message:VIEW_REMOVAL_UNAVAILABLE});assert.equal(JSON.stringify(input),raw);}
+ const invalid=clone(input);invalid.nodes.find(node=>node.id==='right-portal')!.childViewId='root';const before=JSON.stringify(invalid);assert.throws(()=>removeComponentFromView(invalid,'right','shared'),{message:VIEW_REMOVAL_UNAVAILABLE});assert.equal(JSON.stringify(invalid),before);
+});
+test('one-view removal refuses authored focal and story node or highlighted-edge dependencies without rewriting them',()=>{
+ const base=componentRemovalProject();
+ for(const kind of ['focal','story-node','story-edge'] as const){const input=clone(base),right=input.views.find(view=>view.id==='right')!;if(kind==='focal')right.design!.focal=['shared'];else input.story.push({...input.story[0],viewId:'right',nodeId:kind==='story-node'?'shared':undefined,highlightEdgeIds:kind==='story-edge'?['native-link']:[]});validateDocument(input);const raw=JSON.stringify(input);assert.throws(()=>removeComponentFromView(input,'right','shared'),{message:VIEW_REMOVAL_UNAVAILABLE});assert.equal(JSON.stringify(input),raw);}
+});
+test('one-view removal refuses newly unreachable child views but permits a still-reachable alternate parent without deleting facts',()=>{
+ const input=componentRemovalProject(),raw=JSON.stringify(input);assert.throws(()=>removeComponentFromView(input,'root','right-portal'),{message:VIEW_REMOVAL_UNAVAILABLE});assert.equal(JSON.stringify(input),raw);
+ const alternate=clone(input);alternate.nodes.push(nodeSchema.parse({id:'backup-portal',label:'Synthetic alternate portal',childViewId:'right'}));alternate.views[0].nodeIds.push('backup-portal');validateDocument(alternate);const out=removeComponentFromView(alternate,'root','right-portal');assert.ok(!out.views[0].nodeIds.includes('right-portal'));assert.deepEqual(out.nodes,alternate.nodes);assert.deepEqual(out.edges,alternate.edges);assert.deepEqual(out.views.find(view=>view.id==='right'),alternate.views.find(view=>view.id==='right'));assert.deepEqual(pathToView(out,'right'),['root','right']);
+});
+test('removing private membership leaves the public projection identical and all visibility sources evidence and observations intact',()=>{
+ const input=addExistingComponentToView(componentRemovalProject(),'right','private',{x:0,y:200}),raw=JSON.stringify(input),out=removeComponentFromView(input,'right','private');assert.deepEqual(publicDocument(out),publicDocument(input));assert.ok(!JSON.stringify(publicDocument(out)).includes('SYNTHETIC_REUSE_PRIVATE'));assert.deepEqual(out.nodes,input.nodes);assert.deepEqual(out.edges,input.edges);assert.deepEqual(out.blocks,input.blocks);assert.deepEqual(out.sources,input.sources);assert.deepEqual(out.observations,input.observations);assert.equal(JSON.stringify(input),raw);
+});
+
+test('one-view removal filters every incident parallel membership while retaining unrelated and other-view memberships',()=>{
+ const input=componentRemovalProject(),right=input.views.find(view=>view.id==='right')!;input.nodes.push(nodeSchema.parse({id:'spare',label:'Synthetic unaffected endpoint'}));right.nodeIds.push('spare');right.positions.spare={x:800,y:0};input.edges.push(edgeSchema.parse({...input.edges[0],id:'parallel-link'}),edgeSchema.parse({id:'unrelated-link',source:'other',target:'spare',kind:'dependency'}));right.edgeIds.push('parallel-link','unrelated-link');validateDocument(input);const raw=JSON.stringify(input),out=removeComponentFromView(input,'right','shared');assert.deepEqual(out.views.find(view=>view.id==='right')!.edgeIds,['unrelated-link']);assert.deepEqual(out.edges,input.edges);assert.deepEqual(out.views.find(view=>view.id==='left'),input.views.find(view=>view.id==='left'));assert.deepEqual(out.views.find(view=>view.id==='right')!.positions.spare,right.positions.spare);assert.equal(JSON.stringify(input),raw);
+});
+
+test('private alternate parent cannot conceal loss of a previously reachable public child view while a public alternate remains valid',()=>{
+ const input=componentRemovalProject();input.nodes.push(nodeSchema.parse({id:'backup-portal',label:'SYNTHETIC_PRIVATE_ALTERNATE_PORTAL',visibility:'private',childViewId:'right'}));input.views[0].nodeIds.push('backup-portal');validateDocument(input);const raw=JSON.stringify(input),publicBefore=publicDocument(input);assert.ok(publicBefore.views.some(view=>view.id==='right'));assert.throws(()=>removeComponentFromView(input,'root','right-portal'),{message:VIEW_REMOVAL_UNAVAILABLE});assert.equal(JSON.stringify(input),raw);assert.deepEqual(publicDocument(input),publicBefore);
+ const publicAlternate=clone(input);publicAlternate.nodes.find(node=>node.id==='backup-portal')!.visibility='public';validateDocument(publicAlternate);const out=removeComponentFromView(publicAlternate,'root','right-portal');assert.ok(!out.views[0].nodeIds.includes('right-portal'));assert.ok(publicDocument(out).views.some(view=>view.id==='right'));assert.deepEqual(out.nodes,publicAlternate.nodes);assert.deepEqual(out.edges,publicAlternate.edges);assert.deepEqual(out.views.find(view=>view.id==='right'),publicAlternate.views.find(view=>view.id==='right'));
+});

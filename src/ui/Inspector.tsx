@@ -7,6 +7,8 @@ import {CLAIM_LABEL,MEANING,STATUS_NOTE,day,isPresented,observationsFor} from '.
 import {TRANSFORM_LABEL,transformationTemplate} from '../core/transform';
 import {MetricsEditor} from './MetricsEditor';
 import {ContentEditor,TableEditor} from './BlockEditor';
+import {StateFacets} from './StateFacets';
+import {connectionInspectionFacts,CONNECTION_INSPECTION_UNAVAILABLE,type ConnectionInspectionTarget} from '../intelligence/navigation';
 const kinds=['source','process','storage','model','report','app','control','physics','function','table'];
 type Props={doc:Project;node:ProjectNode;edit:boolean;onUpdate:(node:ProjectNode)=>void;onDelete:()=>void;onChild:()=>void;onBlock:(block:EvidenceBlock,previousId?:string)=>void;onBlocks:(blocks:EvidenceBlock[])=>void;onReorder:(blockIds:string[])=>void;onDetach:(id:string)=>void;onImage:(asset:Asset,block:EvidenceBlock)=>void;onError:(error:string)=>void;onWorkspace?:()=>void};
 
@@ -23,8 +25,8 @@ export function ComponentSummary({doc,node,onWorkspace}:{doc:Project;node:Projec
  const views=doc.views.filter(v=>v.nodeIds.includes(node.id)),child=doc.views.find(v=>v.id===node.childViewId);
  const label=(id:string)=>doc.nodes.find(n=>n.id===id)?.label??id;
  const edges=doc.edges.filter(e=>views.some(v=>v.edgeIds.includes(e.id))&&(e.source===node.id||e.target===node.id));
- const blocks=doc.blocks.filter(b=>node.blockIds.includes(b.id)),obs=observationsFor(doc,node.id),latest=obs[0];
- const verified=obs.find(o=>o.claim==='verified');
+ const blocks=doc.blocks.filter(b=>node.blockIds.includes(b.id)),obs=observationsFor(doc,node.id),general=obs.filter(o=>!o.stateFacet),latest=general[0];
+ const verified=general.find(o=>o.claim==='verified');
  const provenance=Object.entries(blocks.reduce<Record<string,number>>((m,b)=>({...m,[b.provenance]:(m[b.provenance]??0)+1}),{})).map(([k,v])=>`${v} ${k}`).join(' · ');
  const sources=new Set([...node.sourceIds,...blocks.flatMap(b=>b.sourceIds)]),steps=doc.story.filter(s=>s.nodeId===node.id);
  const transform=blocks.filter(b=>b.transform);
@@ -42,10 +44,10 @@ export function ComponentSummary({doc,node,onWorkspace}:{doc:Project;node:Projec
   </Group>
   <Group title="Realization"><dl className="grammar-list">
    <Row k="Designed"><span title={STATUS_NOTE}>{node.status} <span className="muted">(illustrative design state)</span></span></Row>
-   <Row k="Observed">{latest?<>{CLAIM_LABEL[latest.claim]} · {latest.sourceApp} · {day(latest.observedAt)}</>:<span className="muted">No external observation</span>}</Row>
+   <Row k="Observed">{latest?<>{CLAIM_LABEL[latest.claim]} · {latest.sourceApp} · {day(latest.observedAt)}</>:<span className="muted">{obs.length?'No general component observation':'No external observation'}</span>}</Row>
    <Row k="Verified">{verified?<>By {verified.sourceApp} at <span className="stable-id">{verified.sourceRevision}</span></>:<span className="muted">Not verified by a source app</span>}</Row>
-   <Row k="Review">{latest?(obs.some(isPresented)?'Presented (reviewed, public)':obs.some(o=>o.reviewedAt)?'Reviewed · private':'Awaiting author review'):'—'}</Row>
-  </dl><p className="micro">{MEANING.designed.label} ≠ {MEANING.observed.label} ≠ {MEANING.presented.label}. Details are under Realization below the diagram.</p></Group>
+   <Row k="Review">{latest?(general.some(isPresented)?'Presented (reviewed, public)':general.some(o=>o.reviewedAt)?'Reviewed · private':'Awaiting author review'):'—'}</Row>
+  </dl><StateFacets doc={doc} nodeId={node.id}/><p className="micro">{MEANING.designed.label} ≠ {MEANING.observed.label} ≠ {MEANING.presented.label}. Details are under Realization below the diagram.</p></Group>
   <Group title="Evidence"><dl className="grammar-list">
    <Row k="Blocks">{blocks.length?`${blocks.length} · ${provenance}`:'None yet'}</Row>
    {transform.length>0&&<Row k="Transformation">{transform.map(b=>TRANSFORM_LABEL[b.transform!]).join(' → ')}</Row>}
@@ -89,6 +91,7 @@ export function Inspector(p:Props){
   <fieldset className="form-group"><legend>Realization</legend>
    <label>Design status (illustrative)<select name="status" defaultValue={n.status}>{['idle','running','complete','warning','failed'].map(k=><option key={k}>{k}</option>)}</select></label>
    <p className="micro">{STATUS_NOTE} Observations from other apps are reviewed under Realization below the diagram.</p>
+   <StateFacets doc={p.doc} nodeId={n.id}/>
   </fieldset>
   <fieldset className="form-group"><legend>Evidence</legend>
    {p.doc.sources.length?<div className="metric-sources" role="group" aria-label="Component sources">{p.doc.sources.map(s=><label key={s.id} className="check"><input type="checkbox" name="sourceIds" value={s.id} defaultChecked={n.sourceIds.includes(s.id)}/>{s.title}</label>)}</div>:<p className="micro">No project sources yet. Add them in the project details (deselect the component).</p>}
@@ -124,4 +127,17 @@ const QUANTITY_PROVENANCE:Record<NonNullable<ProjectEdge['quantity']>['provenanc
 /** The connection's optional quantity from the form: none when the value is empty; a value needs a unit. */
 function quantityOf(f:FormData):ProjectEdge['quantity']{const raw=String(f.get('qvalue')??'').trim();if(!raw)return undefined;const note=String(f.get('qnote')??'').trim();
  return {value:Number(raw),unit:String(f.get('qunit')).trim(),provenance:String(f.get('qprovenance')) as NonNullable<ProjectEdge['quantity']>['provenance'],...(note?{note}:{})};}
+/** Current permitted connection facts only. No authoring or source-opening callbacks. */
+export function ConnectionSummary({doc,target,publicMode=false}:{doc:Project;target:ConnectionInspectionTarget;publicMode?:boolean}){
+ const facts=connectionInspectionFacts(doc,target,{publicMode});
+ if(facts.state==='unavailable')return <section className="inspector" aria-label="Connection details"><div className="eyebrow">CONNECTION DETAILS</div><p role="status">{CONNECTION_INSPECTION_UNAVAILABLE}</p></section>;
+ const {row}=facts;
+ return <section className="inspector" aria-label="Connection details"><div className="eyebrow">CONNECTION DETAILS</div><h2 style={{overflowWrap:'anywhere'}}>{row.label||'Connection'}</h2><p className="micro">Read-only · document revision {facts.revision}</p>
+  <Group title="Identity"><dl className="grammar-list"><Row k="Stable ID"><span className="stable-id">{row.id}</span></Row><Row k="Active view">{facts.view.title}<br/><span className="stable-id">{facts.view.id}</span></Row></dl></Group>
+  <Group title="Meaning"><dl className="grammar-list"><Row k="From">{row.source.label}<br/><span className="stable-id">{row.source.id}</span></Row><Row k="To">{row.target.label}<br/><span className="stable-id">{row.target.id}</span></Row><Row k="Native type">{row.kind}</Row><Row k="Basis">{row.basis==='unspecified'?'Not supplied (UNKNOWN)':row.basis}</Row></dl><p className="micro">A declared plan or static source connection is not observed runtime traffic. Illustrative speed does not establish timing.</p></Group>
+  <Group title="Quantity">{row.quantity?<><p>{row.quantity.value} {row.quantity.unit}</p><p>Provenance: <code>{row.quantity.provenance}</code></p>{row.quantity.note&&<p style={{overflowWrap:'anywhere'}}>{row.quantity.note}</p>}{row.quantity.provenance==='synthetic'&&<p className="micro">Synthetic quantity: illustrative, never a measured result.</p>}</>:<p>Quantity not supplied (UNKNOWN)</p>}</Group>
+  <Group title="View memberships"><ul>{row.views.map(view=><li key={view.id} style={{overflowWrap:'anywhere'}}>{view.title}<br/><span className="stable-id">{view.id}</span></li>)}</ul></Group>
+  <Group title="Endpoint source context"><p className="micro">Endpoint citations are context, not independent proof of a connection.</p>{row.endpointSources.length?<ul>{row.endpointSources.map(source=><li key={source.id} style={{overflowWrap:'anywhere'}}>{source.title}<br/><span className="stable-id">{source.id}</span><br/><span className="stable-id">{source.location||'Location not supplied'}</span></li>)}</ul>:<p>No endpoint source context attached.</p>}<p className="micro">Connection-level evidence, confidence, cardinality and asynchronous semantics are not supplied (UNKNOWN). No component observation verifies this connection.</p></Group>
+ </section>;
+}
 export function EdgeInspector({edge,onUpdate,onDelete}:{edge:ProjectEdge;onUpdate:(edge:ProjectEdge)=>void;onDelete:()=>void}){const [qvalue,setQvalue]=useState(edge.quantity?String(edge.quantity.value):'');return <section className="inspector"><div className="eyebrow">CONNECTION EDITOR</div><h2>{edge.label||'Connection'}</h2><p className="micro">{edge.source} → {edge.target}</p><form className="property-form" key={edge.id} onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);const {quantity:_old,...rest}=edge,quantity=quantityOf(f);onUpdate({...rest,label:String(f.get('label')),kind:String(f.get('kind')) as ProjectEdge['kind'],speed:String(f.get('speed')) as ProjectEdge['speed'],visibility:String(f.get('visibility')) as ProjectEdge['visibility'],...(quantity?{quantity}:{})});}}><label>Label<input name="label" defaultValue={edge.label} maxLength={160}/></label><label>Flow type<select name="kind" defaultValue={edge.kind}>{['batch','stream','query','control','dependency'].map(v=><option key={v}>{v}</option>)}</select></label><label>Illustrative speed<select name="speed" defaultValue={edge.speed}>{['slow','medium','fast'].map(v=><option key={v}>{v}</option>)}</select></label><label>Visibility<select name="visibility" defaultValue={edge.visibility}><option>public</option><option>private</option></select></label><fieldset className="quantity-fields"><legend>Quantity (optional, for the Sankey figure)</legend><label>Value<input name="qvalue" type="number" min={0} max={1e15} step="any" value={qvalue} onChange={e=>setQvalue(e.target.value)} aria-describedby="quantity-help"/></label><label>Unit<input name="qunit" defaultValue={edge.quantity?.unit??''} maxLength={24} required={qvalue.trim()!==''} placeholder="rows/day"/></label><label>Where it comes from<select name="qprovenance" defaultValue={edge.quantity?.provenance??'author'}>{Object.entries(QUANTITY_PROVENANCE).map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></label><label>Note<input name="qnote" defaultValue={edge.quantity?.note??''} maxLength={200}/></label><p className="micro" id="quantity-help">Leave the value empty for no quantity. Figures print where it comes from; a synthetic value stays labelled synthetic and is never a measured result.</p></fieldset><Button appearance="primary" type="submit">Apply connection</Button><Button onClick={onDelete}>Delete connection</Button></form><p className="muted">Speed is an authored visual cue. It does not measure, benchmark or compare engines.</p></section>;}

@@ -1,0 +1,15 @@
+# Private Guided workflow templates
+
+Guided offers one descriptive catalogue entry: the original r3 **Petit client sans outils**. It states the supplied problem, declared input/output roles, constraints and all three original unknowns. Labels remain **Synthetic**, **Source-declared**, **PRIVATE_DRAFT** and **Occurrence UNKNOWN**. No actor, gate, retry, asynchronous behavior, timing, receipt or observed result is invented.
+
+`Load private workflow template` replaces only the ProjectBrief text in the existing editor. It does not open a project, collect sources, validate an external run, apply a proposal or publish anything. Previous JSON text or a filled small-project form is retained in component memory. `Restore previous draft` restores the exact JSON bytes, or reopens the unchanged form when its JSON text was empty. This is a direct editing action, without another confirmation step. The ordinary **Preview project → review → Apply imported document** path remains necessary.
+
+Every load calls `instantiateWorkflowTemplate('01-petit-client')` and creates a fresh local `client-<32 UUID hex characters>` ProjectBrief project ID. The original scope IDs, parent IDs, relationships and questions remain unchanged. The instance ID is visible and editable in the native JSON editor. The native project summary records the original reference/project ID, archive entry and source SHA-256; no additional ProjectBrief key or global instance registry is introduced. Compiling still uses `compileProjectBrief`, which produces private draft components, evidence, sources and relationships with zero observations.
+
+The exact original file is [01-petit-client.project-brief.json](../../examples/workflows/01-petit-client.project-brief.json), SHA-256 `d1c33ff28eea2584d9125b433e3891fdcf373ed6de202ab1c7f552508202f8a8`, from `DiagramCloud_V2_Delivery_r3_2026-10-14.zip`, archive SHA-256 `bab1150ea6c19d3ee85dba9d1db60c01fb83bc94c975688941cbe890eb163c73`. The adjacent source card preserves its original `SYNTHETIC`, `PRIVATE_DRAFT`, `runtime_claim: NONE` and `native_validation: NOT_RUN` fields. Adoption tests do not rewrite those historical assertions.
+
+ProjectStart bounds selected JSON reads, blocks preview while a read is pending, and discards late results after another file, manual JSON or small-project form edit, template load/restore, source-mode change or unmount. A failed read retains the previous draft and uses a fixed error without underlying exception text. There is no new store, runtime engine, public cookbook/sample, command or network fetch.
+
+This adopts one teaching document only. The other seven r3 workflows, complete workflow occurrence semantics, inherited pattern/reference-instance criteria and real-client qualification remain open. Source labels and an illustrative diagram are not certification of a real customer implementation.
+
+Focused unit tests are in `tests/workflow-templates.test.ts`; real Preview/Apply, draft restoration and late-read browser journeys are in `tests/e2e/workflow-template.spec.ts`. Browser/build qualification remains central; test definitions alone are not evidence of PASS.
