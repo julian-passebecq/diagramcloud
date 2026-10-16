@@ -115,9 +115,11 @@ export function DiagramCanvas(input:Props){
  const liveKey=nodes.filter(n=>{const q=positionFor(p.view,n.id);return n.dragging||n.position.x!==q.x||n.position.y!==q.y;}).map(n=>n.id).sort().join('|');
  // Optional Studio label action: current canonical input/view and visible projection only.
  const labelCapture=useMemo(()=>({inputDoc:input.doc,inputView:input.view,project:p.doc,view:p.view,onEdge:input.onEdge,strict:!!input.strictControlledSelection,liveNodes:new Set(liveKey?liveKey.split('|'):[]),alive:true}),[input.doc,input.view,input.onEdge,input.strictControlledSelection,p.doc,p.view,liveKey]);
- const currentLabelCapture=useRef(labelCapture);currentLabelCapture.current=labelCapture;
- useLayoutEffect(()=>{labelCapture.alive=true;return()=>{labelCapture.alive=false;};},[labelCapture]);
- const activateLabel=(id:string)=>{const current=labelCapture;if(currentLabelCapture.current!==current||!current.alive||current.strict)return;
+ // A label rendered before React Flow received the newest edges still acts on the committed capture, so an
+ // equal-content document replacement never drops a native click or key; unmount and removal still refuse.
+ const currentLabelCapture=useRef(labelCapture);
+ useLayoutEffect(()=>{labelCapture.alive=true;currentLabelCapture.current=labelCapture;return()=>{labelCapture.alive=false;};},[labelCapture]);
+ const activateLabel=(id:string)=>{const current=currentLabelCapture.current;if(!current.alive||current.strict)return;
   const canonical=current.inputDoc.edges.find(edge=>edge.id===id),shown=current.project.edges.find(edge=>edge.id===id);
   if(!canonical||!shown||!current.inputView.edgeIds.includes(id)||!current.view.edgeIds.includes(id)||!current.inputView.nodeIds.includes(canonical.source)||!current.inputView.nodeIds.includes(canonical.target)||!current.view.nodeIds.includes(shown.source)||!current.view.nodeIds.includes(shown.target)||current.liveNodes.has(shown.source)||current.liveNodes.has(shown.target))return;
   current.onEdge(id,current.inputView.id);
