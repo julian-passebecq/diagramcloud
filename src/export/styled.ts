@@ -75,8 +75,10 @@ export function blueprintSvg(input:Project,viewId=input.rootViewId,now=new Date(
   `<rect width="100%" height="100%" fill="${BP.paper}"/><rect width="100%" height="100%" fill="url(#bp-major)"/>`,
   `<rect x="${frame}" y="${frame}" width="${width-2*frame}" height="${height-2*frame}" fill="none" stroke="${BP.ink}" stroke-width="2"/><rect x="${frame+6}" y="${frame+6}" width="${width-2*frame-12}" height="${height-2*frame-12}" fill="none" stroke="${BP.line}" stroke-width=".7"/>`];
  const cols=Math.ceil((width-2*frame)/zone),rows=Math.ceil((height-2*frame)/zone);
- for(let i=0;i<cols;i++){const x=frame+i*zone+zone/2;grid.push(text([zoneCol(i)],x,frame+15,10,BP.muted,{anchor:'middle'}),text([zoneCol(i)],x,height-frame-5,10,BP.muted,{anchor:'middle'}));if(i)grid.push(`<line x1="${frame+i*zone}" y1="${frame}" x2="${frame+i*zone}" y2="${frame+6}" stroke="${BP.ink}"/><line x1="${frame+i*zone}" y1="${height-frame-6}" x2="${frame+i*zone}" y2="${height-frame}" stroke="${BP.ink}"/>`);}
- for(let j=0;j<rows;j++){const y=frame+j*zone+zone/2+4;grid.push(text([String(j+1)],frame+3,y,10,BP.muted),text([String(j+1)],width-frame-9,y,10,BP.muted));}
+ // The last column and row are usually partial zones: their reference sits in the middle of what is left, inside the frame.
+ const mid=(i:number,span:number)=>frame+i*zone+Math.min(zone,span-i*zone)/2;
+ for(let i=0;i<cols;i++){const x=mid(i,width-2*frame);grid.push(text([zoneCol(i)],x,frame+15,10,BP.muted,{anchor:'middle'}),text([zoneCol(i)],x,height-frame-5,10,BP.muted,{anchor:'middle'}));if(i)grid.push(`<line x1="${frame+i*zone}" y1="${frame}" x2="${frame+i*zone}" y2="${frame+6}" stroke="${BP.ink}"/><line x1="${frame+i*zone}" y1="${height-frame-6}" x2="${frame+i*zone}" y2="${height-frame}" stroke="${BP.ink}"/>`);}
+ for(let j=0;j<rows;j++){const y=mid(j,height-2*frame)+4;grid.push(text([String(j+1)],frame+3,y,10,BP.muted),text([String(j+1)],width-frame-9,y,10,BP.muted));}
  const zoneOf=(x:number,y:number)=>`${zoneCol(Math.floor((x-frame)/zone))}${Math.floor((y-frame)/zone)+1}`;
  // Title strip.
  const head=[text([spec.projectTitle.toUpperCase().slice(0,90)],margin,margin+4,11,BP.muted),text(lines(spec.title,diagramW,22,1,true),margin,margin+32,22,BP.ink,{bold:true}),
@@ -107,11 +109,13 @@ export function blueprintSvg(input:Project,viewId=input.rootViewId,now=new Date(
 const ED={paper:'#fbf8f2',ink:'#1f1d1a',muted:'#6b645a',rule:'#d9d1c3',accent:'#b4441c'};
 export function editorialSvg(input:Project,viewId=input.rootViewId,now=new Date()):string{
  const {spec,scene,byId,edgeById}=prepare(input,viewId,now),b=scene.bounds;
- const margin=56,listW=300,gap=40,top=margin+110,width=Math.ceil(margin*2+b.width+gap+listW),ox=margin-b.x,oy=top-b.y;
+ const margin=56,listW=300,gap=40,width=Math.ceil(margin*2+b.width+gap+listW);
+ // The serif title wraps to the figure, measured with bold Arial advances (wider than Georgia regular), never cut.
+ const title=lines(spec.title,width-2*margin,30,Infinity,true),extra=36*(title.length-1),top=margin+110+extra,ox=margin-b.x,oy=top-b.y;
  const numbers=new Map(scene.nodes.map((n,i)=>[n.id,i+1]));
  const purpose=lines(spec.purpose||spec.projectTitle,b.width+gap+listW,14,2);
  const head=[text([spec.projectTitle.toUpperCase().slice(0,80)],margin,margin,10,ED.accent,{bold:true}),
-  `<text x="${margin}" y="${margin+38}" font-size="30" fill="${ED.ink}" font-family="Georgia, 'Times New Roman', serif">${xml(spec.title.slice(0,70))}</text>`,text(purpose,margin,margin+66,14,ED.muted,{lh:19}),
+  `<text x="${margin}" y="${margin+38}" font-size="30" fill="${ED.ink}" font-family="Georgia, 'Times New Roman', serif">${tspans(title,margin,margin+38,36)}</text>`,text(purpose,margin,margin+66+extra,14,ED.muted,{lh:19}),
   `<line x1="${margin}" y1="${top-24}" x2="${width-margin}" y2="${top-24}" stroke="${ED.ink}" stroke-width="1.2"/>`];
  const edges=scene.edges.map(e=>{const k=edgeById.get(e.id)?.kind??'batch';return `<path data-edge-id="${xml(e.id)}" d="${svgPolylinePath(e.points)}" transform="translate(${ox},${oy})" fill="none" stroke="${ED.ink}" stroke-width="1"${k==='dependency'?' stroke-dasharray="4 4"':''} marker-end="url(#ed-arrow)"/>`;}).join('');
  const nodes=scene.nodes.map(n=>{const s=byId.get(n.id);if(!s)return '';const x=n.x+ox,y=n.y+oy,no=numbers.get(n.id)!;
@@ -124,10 +128,11 @@ export function editorialSvg(input:Project,viewId=input.rootViewId,now=new Date(
  for(const n of scene.nodes){const s=byId.get(n.id);if(!s)continue;const title=lines(`${numbers.get(n.id)}. ${s.label}`,listW,12,2,true),meta=lines(`${KIND_LABEL[s.kind]}${s.basis!=='unspecified'?` · ${BASIS_LABEL[s.basis??'unspecified']}`:''}${s.confidence?` · ${s.confidence}`:''}${s.opens?' · has detail':''}`,listW,10,1);
   list.push(text(title,lx,ly,12,ED.ink,{bold:true,lh:15}),text(meta,lx,ly+15*title.length+1,10,ED.muted));ly+=15*title.length+24;}
  const footY=Math.max(top+b.height,ly)+36;
+ // Footer facts (identity, revisions, provenance, omissions) wrap to the figure width rather than being sliced.
+ const footA=lines(`${spec.projectId} · view ${spec.viewId} · ${vector(spec,4).join(' · ')}`,width-2*margin,10,Infinity),footB=lines(`${provenance(spec)} · ${spec.publication.generatedAt.slice(0,10)} · public content only${spec.omissions.length?` · ${spec.omissions.join(' ')}`:''}`,width-2*margin,10,Infinity);
  const foot=[`<line x1="${margin}" y1="${footY-18}" x2="${width-margin}" y2="${footY-18}" stroke="${ED.rule}"/>`,
-  text([`${spec.projectId} · view ${spec.viewId} · ${vector(spec,4).join(' · ')}`.slice(0,220)],margin,footY,10,ED.muted),
-  text([`${provenance(spec)} · ${spec.publication.generatedAt.slice(0,10)} · public content only${spec.omissions.length?` · ${spec.omissions.join(' ')}`:''}`.slice(0,240)],margin,footY+15,10,ED.muted)];
- const height=Math.ceil(footY+15+margin);
+  text(footA,margin,footY,10,ED.muted,{lh:15}),text(footB,margin,footY+15*footA.length,10,ED.muted,{lh:15})];
+ const height=Math.ceil(footY+15*(footA.length+footB.length-1)+margin);
  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${xml(`${spec.title} (editorial)`)}" data-style="editorial" data-view-id="${xml(spec.viewId)}"><title>${xml(`${spec.title} · ${spec.projectTitle}`)}</title><defs><marker id="ed-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="${ED.ink}" stroke-width="1.2"/></marker></defs><rect width="100%" height="100%" fill="${ED.paper}"/><g font-family="${FONT}">${head.join('')}${edges}${nodes}${labels}${list.join('')}${foot.join('')}</g></svg>`;
 }
 
