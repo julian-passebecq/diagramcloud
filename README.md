@@ -37,7 +37,7 @@ The next applied Manual quantity slice retains stable connection IDs, explicit z
 | | |
 |---|---|
 | Repository | `julian-passebecq/diagramcloud`, branch `main` (the only maintained line) |
-| Product version | **1.25.0** (`package.json`; shown in the header) |
+| Product version | **1.26.0** (`package.json`; shown in the header) |
 | Document schema | `schemaVersion: 1` (`src/core/model.ts`; additive changes only since V1) |
 | Galaxy maturity | **G0**, standalone (`public/galaxy/version-handshake.json`); contract support does not promote it |
 | Release verification | [docs/RELEASE.md](docs/RELEASE.md): commands, the `galaxy.verification-receipt/1` receipt and the release record |
@@ -47,6 +47,10 @@ The next applied Manual quantity slice retains stable connection IDs, explicit z
 **What it is:** React + TypeScript + Fluent UI + React Flow, Vite build, IndexedDB storage, no server, no account, no database. Optional integrations (Google Drive asset vault, DataPass repository folder bridge) stay optional.
 
 **What it is not:** a cloud runtime, an IDE, a notebook kernel, a SQL/Python/DAX/Spark engine, a Git or task authority, a MongoDB UI, live infrastructure monitoring, or a replacement for DataPass VS Code, Studio or Galaxy. Code and rows are displayed, never executed.
+
+## Learning milestone (1.26.0)
+
+1.26.0 adds the learning catalogue (typed lessons with depths, alternatives, interview questions and labelled synthetic examples), optional choices, the Edit-mode JSON drawer, reviewed concept-to-instance mappings with a return path, and three adoption journeys. It is a bounded milestone, not a complete V2. See the [release notes](docs/release-1.26/RELEASE_NOTES.md) and the [R4 crosswalk](docs/product/R4_CROSSWALK.md), which maps every R4 and inherited acceptance row to its test or its gap.
 
 ## Project Intelligence (1.24.0)
 
