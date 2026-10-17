@@ -81,3 +81,22 @@ test('JSON drawer: a concurrent visual edit makes Apply refuse visibly; public m
  await page.getByRole('tab',{name:'Edit',exact:true}).click();
  await expect(page.getByLabel('JSON draft')).toHaveValue(/Summary from the drawer/);
 });
+
+test('JSON drawer: an edited draft never lands in another project after a project switch, and still applies once back home',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ const drawer=await openDrawerOn(page,'SQL quality checks'),text=drawer.getByLabel('JSON draft'),apply=drawer.getByRole('button',{name:'Apply draft',exact:true});
+ const home=Number(await drawer.getByTestId('applied-revision').textContent()),node=JSON.parse(await text.inputValue());
+ await text.fill(JSON.stringify({...node,label:'Checks (draft)'},null,2));
+ await expect(drawer.getByTestId('draft-status')).toHaveText('Edited · valid · not applied yet');await expect(apply).toBeEnabled();
+ await page.getByRole('button',{name:'Project gallery',exact:true}).click();await page.locator('.project-card').filter({hasText:'Microsoft Fabric'}).click();
+ await expect(page.locator('.project-hero').getByRole('heading',{name:'Microsoft Fabric',exact:true})).toBeVisible();
+ await expect(drawer.getByRole('status').filter({hasText:'This draft belongs to project'})).toBeVisible();
+ await expect(apply).toBeDisabled();await expect(text).toHaveValue(/Checks \(draft\)/);
+ const other=Number(await drawer.getByTestId('applied-revision').textContent());
+ await page.locator('.project-card').filter({hasText:'TotalEnergies'}).click();
+ await expect(drawer.getByRole('status').filter({hasText:'This draft belongs to project'})).toHaveCount(0);await expect(apply).toBeEnabled();
+ await apply.click();await expect(drawer.getByTestId('draft-notice')).toHaveText(`Applied as revision ${home+1}. One Undo restores revision ${home}.`);
+ await page.locator('.project-card').filter({hasText:'Microsoft Fabric'}).click();await expect(drawer.getByTestId('applied-revision')).toHaveText(String(other));
+ await drawer.getByRole('button',{name:'Reload from applied model',exact:true}).click();await expect(text).not.toHaveValue(/Checks \(draft\)/);
+ expect(errors).toEqual([]);
+});
