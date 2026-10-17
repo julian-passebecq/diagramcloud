@@ -41,7 +41,7 @@ export function SavedContexts({projectId,projectRevision,audience,host,storage,c
  const problem=readNotice(read);
  return <section ref={root} className="saved-contexts" aria-label="Saved contexts" data-testid="saved-contexts">
   <div className="eyebrow">SAVED CONTEXTS</div>
-  <p className="micro">Saves where you are (path, view, selection, sheet) in this browser only. No project change, no Undo step; private objects never reach a public context.</p>
+  <p className="micro">Saves where you are (path, view, selection, sheet, environment) in this browser only. No project change, no Undo step; private objects never reach a public context.</p>
   {problem&&<p className="revision-warning" role="alert">{problem}</p>}
   {read.status==='corrupt'&&<Button size="small" onClick={clear}>Clear saved contexts</Button>}
   {read.status!=='corrupt'&&read.status!=='unavailable'&&<div className="toolbar"><Input size="small" data-focus="saved-context-name" aria-label="Saved context name" placeholder="Name (optional)" value={label} maxLength={120} onChange={(_,d)=>setLabel(d.value)} onKeyDown={e=>{if(e.key==='Enter')save();}}/><Button size="small" appearance="primary" onClick={save}>Save context</Button></div>}
