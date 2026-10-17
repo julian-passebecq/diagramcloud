@@ -31,18 +31,20 @@ import {deepAnalysisPatch} from '../src/intelligence/deepProposal';
 import {publicationFidelity} from '../src/intelligence/publicationBrief';
 import {nodeDeepRuntime} from './lib/deepRuntime';
 import {catalogueQuery,proposeMappingSuggestion} from '../src/intelligence/learning/query';
+import {validateProposal,parseAppliedLedger,proposalRefusal} from '../src/core/proposal';
 
 const args = process.argv.slice(2), mode = args.shift();
 const value = (flag: string) => {const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : undefined;};
 const fail = (message: string): never => {throw new Error(message);};
 try {
-  if (!mode || !['inspect', 'brief', 'docs', 'graph', 'analyze', 'delivery', 'query', 'evolution','profile','bundle','deep','verification-spec','verification-receipt','cockpit','entity-proposal','cross-repository','publication','catalogue','suggest-mapping'].includes(mode)) fail('Usage: npm run intelligence -- inspect|brief|docs|graph|analyze|delivery|query|evolution|profile|bundle|deep|verification-spec|verification-receipt|cockpit|entity-proposal|cross-repository|publication|catalogue|suggest-mapping --input <file.json> --out <new-directory> [--current <document.json>]');
+  if (!mode || !['inspect', 'brief', 'docs', 'graph', 'analyze', 'delivery', 'query', 'evolution','profile','bundle','deep','verification-spec','verification-receipt','cockpit','entity-proposal','cross-repository','publication','catalogue','suggest-mapping','validate-proposal'].includes(mode)) fail('Usage: npm run intelligence -- inspect|brief|docs|graph|analyze|delivery|query|evolution|profile|bundle|deep|verification-spec|verification-receipt|cockpit|entity-proposal|cross-repository|publication|catalogue|suggest-mapping|validate-proposal --input <file.json> --out <new-directory> [--current <document.json>]');
   const path = value('--input') || (mode === 'catalogue' ? undefined : fail('--input is required'));
   const directory = value('--out') || fail('--out is required (use a new directory)');
   const limit = mode === 'brief' ? 512 * 1024 : mode === 'graph' ? GRAPH_SNAPSHOT_MAX_BYTES : mode === 'docs' ? DOCUMENT_LIMITS.totalBytes * 2 : 12 * 1024 * 1024;
   if (path && statSync(path).size > limit) fail('Input exceeds the supported byte budget');
   const raw = path ? readFileSync(path, 'utf8') : '';
   const output: Record<string, string> = {};
+  let refused = '';
   const selectedJson=(flag:string)=>{const path=value(flag)||fail(flag+' is required');if(statSync(path).size>12*1024*1024)fail('Selected input exceeds 12 MiB');return JSON.parse(readFileSync(path,'utf8'));};
   const current=()=>parseDocument(JSON.stringify(selectedJson('--current')));
   const list=(flag:string)=>value(flag)?.split(',').filter(Boolean)??[];
@@ -56,6 +58,11 @@ try {
     const author=value('--author'),target=value('--target'),request={conceptId:value('--concept')||fail('--concept is required'),...(target?{target:{kind:value('--target-kind')||'node',id:target}}:{}),...(value('--sources')||value('--blocks')?{evidence:{sourceIds:list('--sources'),blockIds:list('--blocks')}}:{}),...(value('--note')?{note:value('--note')}:{}),...(value('--visibility')?{visibility:value('--visibility')}:{}),...(value('--limit')?{limit:Number(value('--limit'))}:{})};
     const proposal=proposeMappingSuggestion(parseDocument(raw),request,author?{origin:'author',suggestedBy:author}:{origin:'imported',suggestedBy:'diagramcloud intelligence CLI'});
     output['mapping-suggestion.json']=JSON.stringify(proposal,null,2);if('patch' in proposal)output['proposal.patch.json']=JSON.stringify(proposal.patch,null,2);
+  }else if(mode==='validate-proposal'){
+    // Validate only, with the same validator as the JSON / AI dialog and MCP. Origin is 'imported' unless a person names themself with --author.
+    const author=value('--author'),applied=value('--applied')?parseAppliedLedger(selectedJson('--applied')):[];
+    const validation=validateProposal(current(),JSON.parse(raw),author?{origin:'author',by:author}:{origin:'imported',by:'diagramcloud intelligence CLI'},applied);
+    output['proposal-validation.json']=JSON.stringify(validation,null,2);if(!validation.valid)refused=proposalRefusal(validation);
   }else if(mode==='profile'){
     const input=JSON.parse(raw);const profile=input.format?validateAnalysisProfile(input):analysisProfile(input.depth??'standard',input.overrides??{});output['analysis-profile.json']=JSON.stringify(profile,null,2);
   }else if(mode==='deep'){
@@ -113,4 +120,5 @@ try {
   mkdirSync(resolve(directory), {recursive: false});
   for (const [name, content] of Object.entries(output)) writeFileSync(join(directory, name), content.endsWith('\n') ? content : content + '\n', {flag: 'wx'});
   console.log(`Wrote ${Object.keys(output).length} local result files to ${resolve(directory)}. Nothing published or applied.`);
+  if (refused) {console.error(`Proposal refused: ${refused}`); process.exitCode = 1;}
 } catch (error) {console.error(error instanceof Error ? error.message : String(error)); process.exitCode = 1;}

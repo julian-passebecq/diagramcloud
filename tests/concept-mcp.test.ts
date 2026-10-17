@@ -19,6 +19,6 @@ test('MCP advertises source version and concept within the nine public tools',t=
  const processResult=spawnSync(process.execPath,['--import','tsx','scripts/intelligence-mcp.ts',input],{input:messages.map(m=>JSON.stringify(m)).join('\n')+'\n',encoding:'utf8',timeout:30000});
  assert.equal(processResult.status,0,processResult.stderr);const rows=processResult.stdout.trim().split('\n').map(row=>JSON.parse(row));
  assert.equal(rows.find(r=>r.id===1).result.serverInfo.version,JSON.parse(readFileSync('package.json','utf8')).version);
- const tools=rows.find(r=>r.id===2).result.tools;assert.equal(tools.length,9);assert.ok(tools.find((tool:{name:string})=>tool.name==='diagramcloud_render').inputSchema.properties.kind.enum.includes('concept'));
+ const tools=rows.find(r=>r.id===2).result.tools;assert.equal(tools.length,10);assert.ok(tools.find((tool:{name:string})=>tool.name==='diagramcloud_render').inputSchema.properties.kind.enum.includes('concept'));
  assert.ok(checkConceptSpec(JSON.parse(rows.find(r=>r.id===3).result.content[0].text).spec).ok);assert.equal(rows.find(r=>r.id===4).result.isError,true);assert.doesNotMatch(processResult.stdout,/PRIVATE_MCP/);
 });
