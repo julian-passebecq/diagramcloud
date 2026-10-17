@@ -30,7 +30,8 @@ export function JsonDrawer({visible,project,live,selectedNodeId,onApply,onClose,
  if(!visible||!loaded)return null;
  const scope=loaded.base.scope,otherProject=project.id!==loaded.base.projectId,stale=!otherProject&&loaded.applied!==project;
  const edit=(text:string)=>{setDraft(text);setNotice(null);if(text===loaded.text){validator.cancel();setStatus('unchanged');setError(loaded.error);setLastValid(null);return;}setStatus('validating');validator.submit(text);};
- const canApply=status==='valid'&&!!lastValid&&lastValid.text===draft;
+ // A draft never lands in another project: Apply is disabled while another project is open (applyDraft also refuses).
+ const canApply=status==='valid'&&!!lastValid&&lastValid.text===draft&&!otherProject;
  const apply=()=>{
   try{const before=live(),next=applyDraft(loaded.base,before,draft,loaded.applied);
    if(!onApply(next)){setNotice({kind:'refused',text:'Refused: the project did not accept this revision. Nothing was applied.'});return;}
