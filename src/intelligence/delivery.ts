@@ -4,10 +4,14 @@ import {applyDocumentPatch,type Patch} from '../core/patch';
 import {secretFindings} from '../core/secrets';
 export const deliveryBriefSchema=z.object({format:z.literal('diagramcloud.delivery-brief'),version:z.literal(1),
  projectId:z.string().max(120),baseRevision:z.number().int().nonnegative(),delivery:deliverySchema}).strict();
+export const DATA_LAYER_NOT_ENVIRONMENT='Bronze, Silver and Gold are data layers, not environments';
+/** A medallion data-layer name is never an environment identity or label (case and separators ignored). */
+export const isDataLayerName=(value:string)=>/^(bronze|silver|gold)(\s*(layer|tier|zone))?$/.test(value.trim().toLowerCase().replace(/[-_.]+/g,' '));
 /** Input only declares topology; it cannot create or review observations. */
 export function previewDeliveryBrief(current:Project,input:unknown){
  validateDocument(current);if(secretFindings(input).length)throw new Error('Sensitive delivery declaration refused');
  const brief=deliveryBriefSchema.parse(input);if(brief.projectId!==current.id||brief.baseRevision!==current.revision)throw new Error('Delivery brief identity / revision conflict');
+ for(const env of brief.delivery.environments)if(isDataLayerName(env.id)||isDataLayerName(env.label))throw new Error(DATA_LAYER_NOT_ENVIRONMENT+': '+env.label);
  const doc=structuredClone(current);doc.delivery=brief.delivery;
  // A new declaration is private. Existing author-reviewed visibility is retained.
  const preserve=(kind:'environments'|'artifacts'|'instances'|'promotions')=>{for(const row of doc.delivery![kind])row.visibility=current.delivery?.[kind].find(x=>x.id===row.id)?.visibility??'private';};
@@ -45,6 +49,7 @@ export function environmentMatrix(doc:Project,options:{at?:string;maxAgeHours?:n
    environment:d.environments.find(e=>e.id===i.environmentId)?.label??i.environmentId,
    artifact:d.artifacts.find(a=>a.id===i.artifactId),release:d.releases?.find(r=>r.id===i.releaseId),declaredRevision:i.declaredRevision??'UNKNOWN',
    observed:observation?{claim:observation.claim,capturedAt:observation.observedAt,revision:observation.sourceRevision,authority:observation.authority}:null,
+   observationId:observation?.id??null,citedBlockIds:observation?[...observation.blockIds]:[],
    freshness:observation?evidenceFreshness(observation.observedAt,options):'UNKNOWN',
    drift:!observation||!i.declaredRevision||!['observed','verified'].includes(observation.claim)?'UNKNOWN':observation.sourceRevision===i.declaredRevision?'same-revision':'revision-difference',sourceIds:i.sourceIds};});
 }
@@ -53,9 +58,10 @@ export function evidenceFreshness(capturedAt:string,options:{at?:string;maxAgeHo
  if(!Number.isFinite(now)||!Number.isFinite(captured)||!Number.isFinite(hours)||hours<0)return 'UNKNOWN';
  return captured>now?'future-timestamp':now-captured>hours*3600000?'stale':'within-selected-age';
 }
-export function deliveryGates(doc:Project,options:{at?:string;maxAgeHours?:number}={}){return (doc.delivery?.promotions??[]).map(p=>({...p,gates:p.gates.map(g=>{
+/** A linked reviewed claim is evidence about a source instance, never an executed gate, and no approval of the target is recorded. */
+export function deliveryGates(doc:Project,options:{at?:string;maxAgeHours?:number}={}){return (doc.delivery?.promotions??[]).map(p=>({...p,targetApproval:'not-approved' as const,gates:p.gates.map(g=>{
  const linked=g.observationId?doc.observations.find(o=>o.id===g.observationId):undefined,result=linked?.reviewedAt&&!linked.stateFacet?linked:undefined,artifact=doc.delivery?.artifacts.find(a=>a.id===p.artifactId);
- return {...g,result,...(linked?.stateFacet?{reason:'scoped-state-claim-not-general-gate' as const}:{}),freshness:result?evidenceFreshness(result.observedAt,options):'UNKNOWN',revisionMatch:!result||!artifact?.sourceRevision?'UNKNOWN':result.sourceRevision===artifact.sourceRevision?'exact-source-revision':'different-source-revision'};
+ return {...g,result,execution:'not-an-executed-gate' as const,...(linked?.stateFacet?{reason:'scoped-state-claim-not-general-gate' as const}:{}),freshness:result?evidenceFreshness(result.observedAt,options):'UNKNOWN',revisionMatch:!result||!artifact?.sourceRevision?'UNKNOWN':result.sourceRevision===artifact.sourceRevision?'exact-source-revision':'different-source-revision'};
  })}));}
 /** Sparse declarations are expanded only for selected logical components;
  * missing cells are UNKNOWN, never undeployed or implicitly applicable. */
@@ -93,12 +99,43 @@ export function deliveryPublicationPatch(current:Project,kind:DeliveryPublicatio
  const operations:Patch['operations']=(['delivery','nodes','edges','views','sources'] as const).filter(k=>JSON.stringify(current[k])!==JSON.stringify(doc[k])).map(k=>({op:'replace',path:'/'+k,value:doc[k]}));
  const patch:Patch={format:'diagramcloud.patch',version:1,target:'project',targetId:current.id,baseRevision:current.revision,summary:'Human-selected delivery publication visibility and optional declared reference closure; observation review/shareable state unchanged',operations:operations.length?operations:[{op:'test',path:'/revision',value:current.revision}]};applyDocumentPatch(current,patch);return patch;
 }
-/** Revisions are comparable values; no verdict about health or causality. */
+/**
+ * Revisions are comparable values; no verdict about health or causality. Instances are paired only by their explicit
+ * componentId, never by a label. Equivalence stays UNKNOWN unless each side has its own fresh reviewed claim with
+ * cited evidence blocks (two separate observations, each citing at least one block).
+ */
 export function compareEnvironments(doc:Project,from:string,to:string,options:{at?:string;maxAgeHours?:number}={}){
  if(!doc.delivery?.environments.some(e=>e.id===from)||!doc.delivery.environments.some(e=>e.id===to))throw new Error('Select two declared environment identities');
  const matrix=environmentMatrix(doc,options),ids=[...new Set(doc.delivery.instances.map(i=>i.componentId))];
  return ids.map(id=>{const instances=doc.delivery!.instances.filter(i=>i.componentId===id),a=instances.filter(i=>i.environmentId===from).map(i=>matrix.find(r=>r.id===i.id)!),b=instances.filter(i=>i.environmentId===to).map(i=>matrix.find(r=>r.id===i.id)!);
   const positive=(rows:typeof a)=>rows.length===1&&rows[0].observed&&['observed','verified'].includes(rows[0].observed.claim)&&rows[0].freshness==='within-selected-age';
-  return {componentId:id,component:doc.nodes.find(n=>n.id===id)?.label??id,from:a,to:b,declaredComparison:a.length===1&&b.length===1&&a[0].declaredRevision!=='UNKNOWN'&&b[0].declaredRevision!=='UNKNOWN'?(a[0].declaredRevision===b[0].declaredRevision?'same-declaration':'different-declarations'):'UNKNOWN',observedComparison:positive(a)&&positive(b)?a[0].observed!.revision===b[0].observed!.revision?'same-observed-revision':'different-observed-revisions':'UNKNOWN'};
+  const cited=(rows:typeof a)=>positive(rows)&&rows[0].citedBlockIds.length>0,separate=cited(a)&&cited(b)&&a[0].observationId!==b[0].observationId&&!a[0].citedBlockIds.some(x=>b[0].citedBlockIds.includes(x));
+  const equivalence=separate?a[0].observed!.revision===b[0].observed!.revision?'cited-same-revision' as const:'cited-different-revisions' as const:'UNKNOWN' as const;
+  return {componentId:id,equivalence,component:doc.nodes.find(n=>n.id===id)?.label??id,from:a,to:b,declaredComparison:a.length===1&&b.length===1&&a[0].declaredRevision!=='UNKNOWN'&&b[0].declaredRevision!=='UNKNOWN'?(a[0].declaredRevision===b[0].declaredRevision?'same-declaration':'different-declarations'):'UNKNOWN',observedComparison:positive(a)&&positive(b)?a[0].observed!.revision===b[0].observed!.revision?'same-observed-revision':'different-observed-revisions':'UNKNOWN'};
  });
+}
+
+export type EnvironmentCardState='reviewed-claim'|'declared'|'not-applicable'|'UNKNOWN'|'instance-elsewhere';
+export type EnvironmentCardNote={state:EnvironmentCardState;text:string};
+/**
+ * What one canvas card says under the selected environment: only declarations and reviewed claims of that exact
+ * environment identity. A claim recorded for another environment's instance never appears here. Navigation nodes get
+ * no note. Reads the document it is given (the permitted projection), never a private copy.
+ */
+export function environmentCardNotes(doc:Project,environmentId:string|null|undefined,options:{at?:string;maxAgeHours?:number}={}):Map<string,EnvironmentCardNote>{
+ const notes=new Map<string,EnvironmentCardNote>(),d=doc.delivery,env=d?.environments.find(e=>e.id===environmentId);
+ if(!d||!env)return notes;
+ const rows=new Map(environmentMatrix(doc,options).map(r=>[r.id,r])),instanceNodes=new Map(d.instances.map(i=>[i.nodeId,i]));
+ const claimText=(row:ReturnType<typeof environmentMatrix>[number]|undefined)=>row?.observed?`reviewed external claim ${row.observed.claim} by ${row.observed.authority} at ${row.observed.capturedAt} · ${row.freshness}`:'no reviewed claim';
+ for(const n of doc.nodes){
+  if(n.childViewId)continue;
+  const own=instanceNodes.get(n.id);
+  if(own){const label=d.environments.find(e=>e.id===own.environmentId)?.label??own.environmentId;
+   notes.set(n.id,own.environmentId===env.id?{state:rows.get(own.id)?.observed?'reviewed-claim':'declared',text:`Declared instance in ${env.label} · ${claimText(rows.get(own.id))}`}:{state:'instance-elsewhere',text:`Declared instance in ${label}, not ${env.label}`});continue;}
+  const instances=d.instances.filter(i=>i.componentId===n.id&&i.environmentId===env.id),excluded=d.applicability?.find(i=>i.componentId===n.id&&i.environmentId===env.id);
+  if(excluded){notes.set(n.id,{state:'not-applicable',text:`Declared not applicable in ${env.label}`});continue;}
+  if(instances.length){const row=instances.map(i=>rows.get(i.id)).find(r=>r?.observed)??rows.get(instances[0].id);notes.set(n.id,{state:row?.observed?'reviewed-claim':'declared',text:`Declared instance in ${env.label} · ${claimText(row)}`});continue;}
+  notes.set(n.id,{state:'UNKNOWN',text:`No declaration in ${env.label} · UNKNOWN`});
+ }
+ return notes;
 }
