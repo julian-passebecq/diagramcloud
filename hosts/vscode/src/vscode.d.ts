@@ -11,18 +11,22 @@ declare module 'vscode' {
  export interface TextDocument{readonly uri:Uri;readonly languageId:string;getText():string}
  export interface TextEditor{readonly document:TextDocument}
  export interface OpenDialogOptions{canSelectMany?:boolean;filters?:Record<string,string[]>;openLabel?:string}
+ export interface SaveDialogOptions{defaultUri?:Uri;filters?:Record<string,string[]>;saveLabel?:string}
+ export interface WorkspaceFolder{readonly uri:Uri;readonly name:string}
  export namespace window{
   const activeTextEditor:TextEditor|undefined;
   function createOutputChannel(name:string):OutputChannel;
   function createWebviewPanel(viewType:string,title:string,column:ViewColumn,options:{enableScripts?:boolean;localResourceRoots?:Uri[];retainContextWhenHidden?:boolean}):WebviewPanel;
   function showOpenDialog(options:OpenDialogOptions):Thenable<Uri[]|undefined>;
+  function showSaveDialog(options:SaveDialogOptions):Thenable<Uri|undefined>;
   function showErrorMessage(message:string):Thenable<unknown>;
   function showWarningMessage(message:string):Thenable<unknown>;
   function showInformationMessage(message:string):Thenable<unknown>;
   function showTextDocument(document:TextDocument,options?:{preview?:boolean;viewColumn?:ViewColumn}):Thenable<TextEditor>;
  }
  export namespace workspace{
-  const fs:{readFile(uri:Uri):Thenable<Uint8Array>};
+  const fs:{readFile(uri:Uri):Thenable<Uint8Array>;writeFile(uri:Uri,content:Uint8Array):Thenable<void>};
+  const workspaceFolders:readonly WorkspaceFolder[]|undefined;
   function getConfiguration(section:string):{get<T>(key:string,defaultValue:T):T};
   function openTextDocument(options:{language:string;content:string}):Thenable<TextDocument>;
  }

@@ -42,6 +42,15 @@ jobs:
       - name: Verification receipt
         if: always()
         run: npx tsx scripts/qualify.ts record typecheck=${{ steps.typecheck.outcome }} unit=${{ steps.unit.outcome }} build=${{ steps.build.outcome }} e2e=${{ steps.e2e.outcome }}
+      # Linux packaging dry run: the allowlisted package path with synthetic evidence (DRY-RUN.json, never READY.json),
+      # every archive listed back and checked for forbidden and required members. Not a release candidate.
+      - name: Packaging dry run (Linux)
+        id: package_dry_run
+        run: |
+          npx tsx scripts/package-campaign.ts --dry-run --out release/package-dry-run
+          test -f release/package-dry-run/DRY-RUN.json && test ! -e release/package-dry-run/READY.json
+          grep -c . release/package-dry-run/archive-listing.txt
+          (cd release/package-dry-run && sha256sum -c SHA256SUMS.txt)
       - name: Package source and build
         if: always()
         run: |

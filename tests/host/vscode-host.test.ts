@@ -1,7 +1,9 @@
 /**
- * Installed-host proof of the standalone DiagramCloud viewer VSIX in a real VS Code.
+ * Installed-host proof of the standalone DiagramCloud viewer VSIX in a real VS Code, or in Cursor.
  *
  *   npm run test:host:vscode
+ *   DIAGRAMCLOUD_HOST=cursor npm run test:host:vscode     (local Cursor; DIAGRAMCLOUD_CURSOR_EXECUTABLE overrides
+ *                                                          %LOCALAPPDATA%/Programs/cursor/Cursor.exe)
  *
  * Builds the VSIX with scripts/package-vsix.ts, downloads VS Code with @vscode/test-electron (cached in
  * .local/vscode-host/vscode-test; DIAGRAMCLOUD_VSCODE_VERSION picks a version, default stable, or
@@ -9,21 +11,25 @@
  * an isolated --extensions-dir / --user-data-dir under .local/vscode-host/<run>, never the person's own profile, then
  * drives the workbench and the viewer webview with Playwright's Electron driver: read-only default negotiation, host
  * selection, live selection return, return files (accepted once, replay and stale refused), dispose, reopen as a new
- * session (earlier session refused), explicit grants (render granted, apply refused) and uninstall.
+ * session (earlier session refused), a refused return kept unchanged and saved with "Download return file", a kind the
+ * host has no route for refused as unsupported-route, explicit grants (render granted, apply refused) and uninstall.
  * Outcomes are read from the extension's own "DiagramCloud viewer" output channel log. A receipt with the VS Code
  * version and VSIX hash is written to .local/vscode-host/<run>/receipt.json. Synthetic document only. Local only: it
- * is not part of `npm test` or CI (it needs a desktop session and a VS Code download). Cursor is not exercised.
+ * is not part of `npm test` or CI (it needs a desktop session and a VS Code download, or an installed Cursor).
+ * Cursor is the same VS Code workbench: the run installs the same VSIX with Cursor's own CLI (resources/app/bin).
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {existsSync,mkdirSync,readdirSync,readFileSync,statSync,writeFileSync} from 'node:fs';
-import {join,resolve} from 'node:path';
+import {dirname,join,resolve} from 'node:path';
 import {randomBytes} from 'node:crypto';
 import {_electron,type ElectronApplication,type Frame,type Page} from '@playwright/test';
 import {downloadAndUnzipVSCode,resolveCliPathFromVSCodeExecutablePath} from '@vscode/test-electron';
 
-const root=resolve('.'),base=join(root,'.local/vscode-host'),run=join(base,new Date().toISOString().replace(/[:.]/g,'-'));
+/** Host under test: VS Code (default, downloaded) or the locally installed Cursor (DIAGRAMCLOUD_HOST=cursor). */
+const HOST=process.env.DIAGRAMCLOUD_HOST==='cursor'?'cursor':'vscode',HOST_NAME=HOST==='cursor'?'Cursor':'VS Code';
+const root=resolve('.'),base=join(root,'.local/vscode-host'),run=join(base,`${HOST}-${new Date().toISOString().replace(/[:.]/g,'-')}`);
 const userData=join(run,'user-data'),extensions=join(run,'extensions'),workspace=join(run,'workspace');
 const EXTENSION_ID='diagramcloud-local.diagramcloud-viewer';
 const steps:{step:string;result:string}[]=[];
@@ -41,8 +47,14 @@ const intent=(sessionId:string,over:Record<string,unknown>={})=>({format:'diagra
  projectId:'synthetic-vsix',baseRevision:3,audience:'public',viewId:'root',nodeId:'b',...over});
 const writeReturn=(name:string,value:unknown)=>{const path=join(workspace,'returns',name);writeFileSync(path,JSON.stringify(value,null,2)+'\n');return path;};
 
+/** The host's own CLI: VS Code's bin/code(.cmd), or Cursor's resources/app/bin/cursor(.cmd). */
+const cliPath=(exe:string)=>HOST==='cursor'?join(dirname(exe),'resources','app','bin',process.platform==='win32'?'cursor.cmd':'cursor'):resolveCliPathFromVSCodeExecutablePath(exe);
+function cursorExecutable(){
+ const exe=process.env.DIAGRAMCLOUD_CURSOR_EXECUTABLE??join(process.env.LOCALAPPDATA??'','Programs','cursor','Cursor.exe');
+ assert.ok(existsSync(exe),`Cursor not found at ${exe}; set DIAGRAMCLOUD_CURSOR_EXECUTABLE`);return exe;
+}
 function cli(exe:string,...args:string[]){
- const command=resolveCliPathFromVSCodeExecutablePath(exe),quote=(s:string)=>'"'+s.replace(/"/g,'\\"')+'"';
+ const command=cliPath(exe),quote=(s:string)=>'"'+s.replace(/"/g,'\\"')+'"';
  const result=spawnSync(quote(command),[...args,'--extensions-dir',extensions,'--user-data-dir',userData].map(quote),{encoding:'utf8',shell:true,timeout:180000,env:cleanEnv()});
  assert.equal(result.status,0,`code ${args.join(' ')}: ${result.stderr}${result.stdout}`);return result.stdout.trim();
 }
@@ -62,9 +74,11 @@ async function logLine(pattern:RegExp,from:number,timeout=20000):Promise<string>
 }
 const lineCount=()=>viewerLog().split(/\r?\n/).length-1;
 
+/** The quick-input text box (Cursor's quick input also has "toggle all" and per-row checkboxes). */
+const QUICK_INPUT='.quick-input-widget input:not([type="checkbox"])';
 /** Run a command from the palette. A webview that is still taking focus can close the palette: open it again. */
 async function command(page:Page,title:string){
- const input=page.locator('.quick-input-widget input');
+ const input=page.locator(QUICK_INPUT);
  for(let attempt=1;;attempt++){
   try{await page.keyboard.press('F1');await input.waitFor({state:'visible',timeout:5000});await input.fill('>'+title,{timeout:5000});
    await page.locator('.quick-input-list .monaco-list-row',{hasText:title}).first().waitFor({timeout:5000});await input.press('Enter');return;}
@@ -72,15 +86,21 @@ async function command(page:Page,title:string){
  }
 }
 async function quickOpen(page:Page,name:string){
- await page.keyboard.press('Control+P');const input=page.locator('.quick-input-widget input');await input.waitFor({state:'visible'});
+ await page.keyboard.press('Control+P');const input=page.locator(QUICK_INPUT);await input.waitFor({state:'visible'});
  await input.fill(name);await page.locator('.quick-input-list .monaco-list-row',{hasText:name}).first().waitFor();await input.press('Enter');
  await page.locator('.tabs-container .tab.active',{hasText:name}).first().waitFor();
 }
 /** The viewer webview (VS Code nests it in a host iframe and an active-frame iframe). */
 async function viewerFrame(page:Page,timeout=30000):Promise<Frame>{
  const until=Date.now()+timeout;
- for(;;){for(const frame of page.frames()){try{if(await frame.locator('#diagramcloud-root .diagramcloud-viewer').count())return await withSelectionPanel(frame);}catch{/* detached */}}
-  if(Date.now()>until)throw new Error('Viewer webview not found');await page.waitForTimeout(250);}
+ let last='';
+ for(;;){for(const frame of page.frames()){try{if(await frame.locator('#diagramcloud-root .diagramcloud-viewer').count())return await withSelectionPanel(frame);}catch(error){last=String(error).slice(0,400);/* detached */}}
+  if(Date.now()>until){
+   await page.screenshot({path:join(run,'viewer-not-found.png')}).catch(()=>undefined);
+   if(last)throw new Error('Viewer webview not usable: '+last);
+   const seen=await Promise.all(page.frames().map(async f=>`${f.url().slice(0,100)} [${await f.locator('body').innerText({timeout:1000}).then(t=>t.slice(0,160).replace(/\s+/g,' ')).catch(()=>'unreadable')}]`));
+   throw new Error('Viewer webview not found. Frames: '+seen.join(' , '));}
+  await page.waitForTimeout(250);}
 }
 /** The permitted selection buttons sit in the collapsed "Selected public context" disclosure: open it as a person would. */
 async function withSelectionPanel(frame:Frame){
@@ -89,13 +109,13 @@ async function withSelectionPanel(frame:Frame){
 }
 async function loadReturnFile(page:Page,path:string){
  await command(page,'DiagramCloud: Load viewer return file');
- const input=page.locator('.quick-input-widget input');await input.waitFor({state:'visible'});await input.fill(path);await page.waitForTimeout(400);await input.press('Enter');
+ const input=page.locator(QUICK_INPUT);await input.waitFor({state:'visible'});await input.fill(path);await page.waitForTimeout(400);await input.press('Enter');
 }
 async function closeViewer(page:Page){
  await page.locator('.tabs-container .tab',{hasText:'DiagramCloud: Synthetic VSIX viewer'}).first().click();await command(page,'View: Close Editor');
 }
 
-test('installed VSIX in VS Code: negotiation, selection return, dispose/reopen, stale and replayed intents',{timeout:15*60000},async t=>{
+test(`installed VSIX in ${HOST_NAME}: negotiation, selection return, dispose/reopen, stale and replayed intents`,{timeout:15*60000},async t=>{
  mkdirSync(join(workspace,'returns'),{recursive:true});mkdirSync(join(userData,'User'),{recursive:true});mkdirSync(extensions,{recursive:true});
  writeFileSync(join(workspace,'synthetic.json'),JSON.stringify(doc,null,2)+'\n');
  const settings={'files.simpleDialog.enable':true,'security.workspace.trust.enabled':false,'workbench.startupEditor':'none','window.restoreWindows':'none','update.mode':'none',
@@ -108,9 +128,9 @@ test('installed VSIX in VS Code: negotiation, selection return, dispose/reopen, 
  const receipt=JSON.parse(readFileSync(join(pkg,'vsix-receipt.json'),'utf8')) as {vsix:string;sha256:string;sourceCommit:string;sourceDirty:boolean};
  const vsix=join(pkg,receipt.vsix);record('package',`built ${receipt.vsix} sha256 ${receipt.sha256}`);
 
- // 2. VS Code under test (downloaded by @vscode/test-electron unless an executable is given).
- const exe=process.env.DIAGRAMCLOUD_VSCODE_EXECUTABLE??await downloadAndUnzipVSCode({cachePath:join(base,'vscode-test'),version:process.env.DIAGRAMCLOUD_VSCODE_VERSION??'stable'});
- const vscodeVersion=cli(exe,'--version').split(/\r?\n/).slice(0,2).join(' ');record('vscode',`${exe} ${vscodeVersion}`);
+ // 2. Host under test: Cursor as installed, or VS Code (downloaded by @vscode/test-electron unless an executable is given).
+ const exe=HOST==='cursor'?cursorExecutable():process.env.DIAGRAMCLOUD_VSCODE_EXECUTABLE??await downloadAndUnzipVSCode({cachePath:join(base,'vscode-test'),version:process.env.DIAGRAMCLOUD_VSCODE_VERSION??'stable'});
+ const vscodeVersion=cli(exe,'--version').split(/\r?\n/).slice(0,2).join(' ');record(HOST,`${exe} ${vscodeVersion}`);
 
  // 3. Install with VS Code's own installer into the isolated extensions directory.
  cli(exe,'--install-extension',vsix,'--force');
@@ -121,6 +141,13 @@ test('installed VSIX in VS Code: negotiation, selection return, dispose/reopen, 
   app=await _electron.launch({executablePath:exe,env:cleanEnv(),timeout:120000,
    args:[workspace,`--user-data-dir=${userData}`,`--extensions-dir=${extensions}`,'--skip-welcome','--skip-release-notes','--disable-workspace-trust','--disable-telemetry','--disable-updates','--new-window']});
   const page=await app.firstWindow();await page.locator('.monaco-workbench').waitFor({timeout:120000});await page.waitForTimeout(1500);
+  if(HOST==='cursor'){
+   // A fresh Cursor profile covers the workbench with its account onboarding (log in / sign up for AI features). The
+   // viewer needs no Cursor account: the overlay is hidden for this isolated profile, nobody signs in, and the
+   // receipt says so.
+   await page.addStyleTag({content:'.onboarding-v2-overlay{display:none!important}'});await page.waitForTimeout(500);
+   record('cursor-onboarding','account onboarding overlay hidden in the isolated test profile; no sign-in, no AI feature used');
+  }
 
   let session1='';
   await t.test('activation and read-only default negotiation',async()=>{
@@ -151,6 +178,21 @@ test('installed VSIX in VS Code: negotiation, selection return, dispose/reopen, 
    record('return-file',`${accepted} | ${replayed} | ${staleLine}`);
   });
 
+  await t.test('a refused return is kept unchanged: Download return file saves the same intent',async()=>{
+   const frame=await viewerFrame(page),alert=frame.getByRole('alert',{name:'Host refused the return'});
+   await alert.getByText('Refused: the intent was made for another project, document revision or audience.',{exact:false}).waitFor({timeout:10000});
+   const saved=join(workspace,'returns','saved-stale.json'),from=lineCount();
+   await alert.getByRole('button',{name:'Download return file'}).click();
+   const input=page.locator(QUICK_INPUT);await input.waitFor({state:'visible'});await input.fill(saved);await page.waitForTimeout(400);await input.press('Enter');
+   const line=await logLine(/^Download return file: saved refused intent [a-f0-9]{32} unchanged to .*saved-stale\.json\. This host refuses it for the same reason\.$/,from);
+   assert.deepEqual(JSON.parse(readFileSync(saved,'utf8')),JSON.parse(readFileSync(stale,'utf8')),'the saved file is the refused intent, unchanged');
+   let at=lineCount();await loadReturnFile(page,saved);const again=await logLine(/^file: Refused: the intent was made for another project, document revision or audience\.$/,at);
+   const source=writeReturn('source.json',intent(session1,{kind:'source',sourceId:'s'}));
+   at=lineCount();await loadReturnFile(page,source);const unrouted=await logLine(/^file: Refused: this host has no route for this return kind\.$/,at);
+   await alert.getByText('Refused: this host has no route for this return kind.',{exact:false}).waitFor({timeout:10000});
+   record('refusal-retained',`${line} | ${again} | ${unrouted}`);
+  });
+
   let session2='';
   await t.test('dispose refuses returns; reopen is a new session that refuses the earlier one',async()=>{
    let from=lineCount();await closeViewer(page);const closed=await logLine(/^Viewer session closed\. Its returns and return files are now refused\.$/,from);
@@ -167,6 +209,8 @@ test('installed VSIX in VS Code: negotiation, selection return, dispose/reopen, 
 
   await t.test('explicit grants: render granted, apply refused',async()=>{
    writeFileSync(settingsPath,JSON.stringify({...settings,'diagramcloud.viewer.grants':['render','apply']},null,2));await page.waitForTimeout(2000);
+   // Start from one editor group so the viewer opened beside it has room (Cursor may also open its agent side bar).
+   await command(page,'View: Close All Editor Groups');if(HOST==='cursor')await command(page,'View: Close Secondary Side Bar').catch(()=>undefined);
    await quickOpen(page,'synthetic.json');let from=lineCount();await command(page,'DiagramCloud: Open in DiagramCloud viewer');
    const opened=await logLine(/^Opened synthetic-vsix@3 in session vscode-[a-f0-9]{24}; granted: render\.$/,from);
    const frame=await viewerFrame(page);const svg=frame.getByRole('button',{name:'Return public SVG of this view'});await svg.waitFor();
@@ -178,7 +222,7 @@ test('installed VSIX in VS Code: negotiation, selection return, dispose/reopen, 
  }finally{
   await app?.close().catch(()=>undefined);
   writeFileSync(join(run,'receipt.json'),JSON.stringify({format:'diagramcloud.vscode-host-proof/1',vsix:receipt.vsix,sha256:receipt.sha256,sourceCommit:receipt.sourceCommit,sourceDirty:receipt.sourceDirty,
-   host:'VS Code (installed from the VSIX, isolated user-data and extensions directories)',steps,notClaimed:['Cursor','VS Code Marketplace publication or signing','update and rollback']},null,2)+'\n');
+   host:`${HOST_NAME} (installed from the VSIX, isolated user-data and extensions directories)`,steps,notClaimed:[...(HOST==='cursor'?['VS Code']:['Cursor']),'Marketplace or Open VSX publication or signing','update and rollback']},null,2)+'\n');
  }
 
  // 4. Uninstall with the same CLI.
