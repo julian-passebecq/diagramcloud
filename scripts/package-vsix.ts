@@ -6,7 +6,8 @@
  *   npx tsx scripts/package-vsix.ts [--out <new directory>]     (default .local/vsix/<source commit>)
  *
  * It never installs, publishes or signs anything, never packages fonts, source maps, .local or node_modules, and is a
- * source-package proof only: installing it in VS Code or Cursor is a separate, unqualified host journey.
+ * source-package proof only: installing it in VS Code is the separate host proof
+ * `npm run test:host:vscode` (tests/host/vscode-host.test.ts, local only); Cursor is not qualified.
  * Integrity is checked by reading the archive back with the repository's own ZIP reader (src/core/interchange/zip.ts).
  */
 import {build,type Metafile} from 'esbuild';
