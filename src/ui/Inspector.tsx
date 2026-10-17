@@ -2,6 +2,7 @@ import {useState,type ReactNode} from 'react';
 import {Button} from '@fluentui/react-components';
 import {blockSchema,errorMessage,newId,type Project,type ProjectNode,type ProjectEdge,type EvidenceBlock,type Asset} from '../core/model';
 import {imageAsset} from '../export/browser';
+import {useImageDuplicates} from './ImageDuplicates';
 import {ICON_REGISTRY,isRegisteredIcon} from '../core/icons';
 import {CLAIM_LABEL,MEANING,STATUS_NOTE,day,isPresented,observationsFor} from '../core/realization';
 import {TRANSFORM_LABEL,transformationTemplate} from '../core/transform';
@@ -69,6 +70,8 @@ export function ComponentSummary({doc,node,onWorkspace}:{doc:Project;node:Projec
 
 export function Inspector(p:Props){
  const [type,setType]=useState('text'),[imageProvenance,setImageProvenance]=useState<EvidenceBlock['provenance']>('author'),[transformName,setTransformName]=useState('');
+ const [imageNote,setImageNote]=useState('');
+ const images=useImageDuplicates({doc:p.doc,attach:(asset,block)=>p.onImage(asset,block),reuse:block=>p.onBlocks([block]),onNote:setImageNote});
  const n=p.node,attached=n.blockIds.map(id=>p.doc.blocks.find(b=>b.id===id)).filter((b):b is EvidenceBlock=>!!b);
  const move=(i:number,delta:number)=>{const ids=[...n.blockIds],[x]=ids.splice(i,1);ids.splice(i+delta,0,x);p.onReorder(ids);};
  return <div className="inspector"><div className="eyebrow">{p.edit?'COMPONENT EDITOR':'SELECTED COMPONENT'}</div><h2>{n.label}</h2>
@@ -113,7 +116,8 @@ export function Inspector(p:Props){
  :type==='transformation'?<form className="property-form" aria-label="Transformation explainer" onSubmit={e=>{e.preventDefault();try{p.onBlocks(transformationTemplate(transformName,newId));setTransformName('');}catch(error){p.onError(errorMessage(error));}}}><label>Transformation name<input aria-label="Transformation name" required maxLength={100} value={transformName} onChange={e=>setTransformName(e.target.value)} placeholder="e.g. Deduplicate orders"/></label><p className="micro">Adds five linked blocks you then edit visually: input rows, logic (displayed, never run), output rows, column mapping, and grain/keys/quality rules. Example rows start as synthetic.</p><Button type="submit">Add transformation explainer</Button></form>
  :<form className="property-form" onSubmit={e=>{e.preventDefault();try{const f=new FormData(e.currentTarget),title=String(f.get('title')),body=String(f.get('body')??''),common={id:newId('block'),title,provenance:'author'};const value=type==='code'?{...common,type:'code',language:String(f.get('language')),code:body}:{...common,type:'text',text:body};p.onBlock(blockSchema.parse(value));e.currentTarget.reset();}catch(error){p.onError(errorMessage(error));}}}><label>Title<input name="title" aria-label="Evidence title" required maxLength={160}/></label>{type==='code'&&<label>Language<select name="language">{['sql','python','dax','json','text'].map(v=><option key={v}>{v}</option>)}</select></label>}<label>Content<textarea name="body" aria-label="Evidence content" rows={6} maxLength={50000} required placeholder="Explain what happens, why, and what the output means."/></label><Button type="submit">Attach evidence</Button></form>}
  <label>Image provenance<select value={imageProvenance} onChange={e=>setImageProvenance(e.target.value as EvidenceBlock['provenance'])}><option value="author">Author-created / supplied</option><option value="synthetic">Synthetic / AI-generated</option><option value="source-derived">Source-derived</option><option value="reference">Reference</option></select></label>
- <label className="file-button">+ PNG / JPEG / WebP / SVG image<input aria-label="Attach image" type="file" accept=".png,.jpg,.jpeg,.webp,.svg" onChange={async e=>{const file=e.target.files?.[0];if(!file)return;try{const asset=await imageAsset(file);p.onImage(asset,blockSchema.parse({id:newId('image'),title:file.name.slice(0,160),type:'image',assetId:asset.id,caption:imageProvenance==='synthetic'?'AI-generated / synthetic visual':'User-supplied image',provenance:imageProvenance}));}catch(error){p.onError(errorMessage(error));}e.target.value='';}}/></label>
+ <label className="file-button">+ PNG / JPEG / WebP / SVG image<input aria-label="Attach image" type="file" accept=".png,.jpg,.jpeg,.webp,.svg" onChange={async e=>{const file=e.target.files?.[0];if(!file)return;setImageNote('');try{const asset=await imageAsset(file);await images.offer(asset,blockSchema.parse({id:newId('image'),title:file.name.slice(0,160),type:'image',assetId:asset.id,caption:imageProvenance==='synthetic'?'AI-generated / synthetic visual':'User-supplied image',provenance:imageProvenance}));}catch(error){p.onError(errorMessage(error));}e.target.value='';}}/></label>
+ {images.prompt}{imageNote&&<p className="micro" role="status">{imageNote}</p>}
  <p className="micro">Imports up to 8 MiB are sanitized/rasterized and normalized for the project cache. Mark AI-created visuals as synthetic. Original icon artwork must not be distorted.</p>
  {attached.length>0&&<h3>Edit attached blocks</h3>}
  {attached.length>1&&<p className="micro">Order here is the reading order in the evidence panel, exports and decks.</p>}

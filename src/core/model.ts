@@ -10,7 +10,12 @@ const refs = z.array(id).max(1000).default([]);
 const point = z.object({x:z.number().finite().min(-100000).max(100000),y:z.number().finite().min(-100000).max(100000)}).strict();
 const sourceSchema = z.object({id,title:short,location:text.default(''),url:z.string().url().refine(s=>/^https?:\/\//i.test(s),'Only HTTP(S) source links').optional(),visibility}).strict();
 const remoteAssetSchema=z.object({provider:z.literal('google-drive'),fileId:z.string().regex(/^[A-Za-z0-9_-]{1,256}$/,'Invalid Google Drive file ID'),fileName:short,mimeType:z.enum(['image/png','image/jpeg','image/webp']),webViewLink:z.string().url().refine(s=>/^https:\/\//i.test(s),'Drive links must use HTTPS').optional(),modifiedTime:z.string().datetime({offset:true}).optional(),size:z.string().regex(/^\d+$/).optional(),savedAt:z.string().datetime({offset:true})}).strict();
-export const assetSchema = z.object({id,name:short,data:z.string().max(3*1024*1024).regex(/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/,'Embedded PNG, JPEG or WebP only'),rights:z.string().max(1000),visibility,remote:remoteAssetSchema.optional()}).strict();
+export const ASSET_DIGEST=/^sha256:[0-9a-f]{64}$/;
+export const assetSchema = z.object({id,name:short,data:z.string().max(3*1024*1024).regex(/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/,'Embedded PNG, JPEG or WebP only'),rights:z.string().max(1000),visibility,remote:remoteAssetSchema.optional(),
+ /** SHA-256 of the stored image bytes, computed locally when attached (never a Drive checksum or ETag). */
+ digest:z.string().regex(ASSET_DIGEST,'An asset digest is sha256: followed by 64 lowercase hexadecimal characters').optional(),
+ /** Assets the author chose to keep as distinct copies of this one ("keep both"); duplicate detection never asks about them again. */
+ keptDistinctFrom:z.array(id).max(50).optional()}).strict();
 export const PROVENANCES=['source-derived','synthetic','reference','author'] as const;
 const baseBlock = {id,title:short,visibility,sourceIds:refs,provenance:z.enum(PROVENANCES).default('author'),
  /** Optional step when the block is part of an explained transformation (input → logic → output); display only. */
@@ -217,6 +222,7 @@ export function validateDocument(input:unknown):Project {
  if(d.views.find(v=>v.id===d.rootViewId)?.visibility==='private')errors.push('Root view must be public');
  for(const n of d.nodes){if(n.customIconAssetId){check(n.customIconAssetId,assets,n.id);const asset=d.assets.find(a=>a.id===n.customIconAssetId);if(asset&&!asset.rights.trim())errors.push(n.id+': custom icon requires recorded rights');}n.blockIds.forEach(r=>check(r,blocks,n.id));n.sourceIds.forEach(r=>check(r,sources,n.id));if(n.childViewId)check(n.childViewId,views,n.id);}
  for(const e of d.edges){check(e.source,nodes,e.id);check(e.target,nodes,e.id);if(e.quantity?.window){const w=windowOf(e.quantity.window);if(isError(w))errors.push(`${e.id}: quantity ${w.error}`);}}
+ for(const a of d.assets){const kept=a.keptDistinctFrom??[];kept.forEach(r=>check(r,assets,a.id));if(kept.includes(a.id))errors.push(`${a.id}: an asset cannot be kept distinct from itself`);if(new Set(kept).size!==kept.length)errors.push(`${a.id}: duplicate keptDistinctFrom entry`);}
  for(const b of d.blocks){b.sourceIds.forEach(r=>check(r,sources,b.id));for(const e of timingErrors(b,nodes))errors.push(e);if(b.type==='image')check(b.assetId,assets,b.id);if(b.type==='table'&&b.rows.some(r=>r.length!==b.columns.length))errors.push(`${b.id}: each row must match the column count`);}
  for(const v of d.views){v.nodeIds.forEach(r=>check(r,nodes,v.id));v.edgeIds.forEach(r=>check(r,edges,v.id));if(new Set(v.nodeIds).size!==v.nodeIds.length||new Set(v.edgeIds).size!==v.edgeIds.length)errors.push(`${v.id}: duplicate view membership`);for(const key of Object.keys(v.positions))if(!v.nodeIds.includes(key))errors.push(`${v.id}: position for non-member ${key}`);for(const f of v.design?.focal??[])if(!v.nodeIds.includes(f))errors.push(`${v.id}: focal component ${f} is not in this view`);for(const e of d.edges.filter(e=>v.edgeIds.includes(e.id)))if(!v.nodeIds.includes(e.source)||!v.nodeIds.includes(e.target))errors.push(`${v.id}: edge ${e.id} has an endpoint outside this view`);}
  // External observations: no credentials or .env text, no synthetic backing, no self-promotion to shareable.

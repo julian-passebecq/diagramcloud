@@ -1,4 +1,6 @@
-import {MAX_DOCUMENT_BYTES,parseDocument,type Project} from '../core/model';
+import {MAX_DOCUMENT_BYTES,validateDocument,type Project} from '../core/model';
+import {withoutUnknownModules} from '../core/moduleCompat';
+import {digestErrors} from '../core/assetIdentity';
 import {applyDocumentPatch,isPatch,type Patch} from '../core/patch';
 import {isPublicationSnapshot,stagePublicationSnapshot,type StagedPublicationSnapshot} from '../core/galaxy';
 import {importDiagram,interchangeFormat,type ImportReport} from '../core/interchange';
@@ -9,7 +11,9 @@ import {isProviderRequest,parseAppliedLedger,proposalDigests,proposalRefusal,PRO
 
 export type StagedPatch={patch:Patch;result:Project;snapshot?:StagedPublicationSnapshot;validation?:ProposalValidation};
 /** What the JSON / AI review shows next. Nothing here is applied: Apply stays the reviewed, revision-guarded step. */
-export type StagedImport={staged:Project;patched:StagedPatch|null;report:ImportReport|null;importName?:string};
+export type StagedImport={staged:Project;patched:StagedPatch|null;report:ImportReport|null;importName?:string;
+ /** Unknown top-level modules the author confirmed dropping; they are not in `staged` and grant nothing. */
+ droppedModules?:string[]};
 
 /** The JSON / AI dialog is an import path: what is pasted there is a proposal from elsewhere, never the author's own review. */
 export const MANUAL_PROPOSAL_ORIGIN:ProposalContext={origin:'imported',by:'JSON / AI dialog'};
@@ -44,7 +48,9 @@ function validated(project:Project,obj:unknown,applied:readonly AppliedProposal[
  * diagramcloud.patch, a completion response, a publication snapshot, a GraphSnapshot, a delivery brief or a
  * draw.io / Mermaid diagram. Pure staging: throws with the user-facing reason, never mutates `project` or `library`.
  */
-export async function stageImportText(input:{project:Project;library:readonly Project[];raw:string;importName:string;completionRequest:CompletionRequest|null;applied?:readonly AppliedProposal[]}):Promise<StagedImport>{
+export async function stageImportText(input:{project:Project;library:readonly Project[];raw:string;importName:string;completionRequest:CompletionRequest|null;applied?:readonly AppliedProposal[];
+ /** Exactly the unknown modules the author agreed to drop; any other set throws UnknownModulesError again. */
+ acceptUnknownModules?:readonly string[]}):Promise<StagedImport>{
  const {project,library,raw,importName,completionRequest}=input,applied=input.applied??browserProposalLedger.read();
  if(new TextEncoder().encode(raw).byteLength>MAX_DOCUMENT_BYTES)throw new Error('Document exceeds the 12 MiB import limit');
  if(completionRequest&&!isPatch(JSON.parse(raw)))throw new Error('Completion responses must use the existing diagramcloud.patch format.');
@@ -57,5 +63,7 @@ export async function stageImportText(input:{project:Project;library:readonly Pr
  if(isGraphSnapshot(obj)){const compiled=compileGraphSnapshot(obj),existing=library.find(d=>d.id===compiled.document.id),proposal=existing?previewGraphReimport(existing,obj,existing.revision):null;return {staged:proposal?.document??compiled.document,patched:proposal?{patch:proposal.patch,result:proposal.document}:null,report:null,importName:'GraphSnapshot (offline)'};}
  if(obj&&typeof obj==='object'&&(obj as {format?:string}).format==='diagramcloud.delivery-brief'){const out=previewDeliveryBrief(project,obj);return {staged:out.document,patched:{patch:out.patch,result:out.document},report:null};}
  if(isProviderRequest(obj))throw new Error(PROVIDER_LAUNCH_MESSAGE);
- return {staged:parseDocument(raw),patched:null,report:null};
+ const {document,dropped}=withoutUnknownModules(obj,input.acceptUnknownModules),staged=validateDocument(document),digests=await digestErrors(staged);
+ if(digests.length)throw new Error(digests.join('\n'));
+ return {staged,patched:null,report:null,...(dropped.length?{droppedModules:dropped}:{})};
 }

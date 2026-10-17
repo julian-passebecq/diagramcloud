@@ -1,7 +1,9 @@
-import {useState,type FormEvent} from 'react';
+import {useEffect,useState,type FormEvent} from 'react';
 import {Button} from '@fluentui/react-components';
 import {blockSchema,newId,type Asset,type EvidenceBlock,type Project,type ProjectNode} from '../core/model';
 import {imageAsset} from '../export/browser';
+import {DUPLICATE_LABEL,duplicateFlags,withDigest,type DuplicateFlag} from '../core/assetIdentity';
+import {useImageDuplicates} from './ImageDuplicates';
 import {
  assetDriveStatus,clearDriveConfig,createDriveAssetFolder,currentDriveSession,dataUrlToBlob,
  downloadDriveImage,drivePickerConfigured,driveRemote,driveSessionValid,loadDriveConfig,
@@ -26,6 +28,9 @@ export function DriveAssetManager(p:Props){
  const [provenance,setProvenance]=useState<EvidenceBlock['provenance']>('synthetic');
  const connected=driveSessionValid(session);
  const imageAssets=p.doc.assets;
+ const images=useImageDuplicates({doc:p.doc,attach:p.onAttach,reuse:block=>p.onAttach(p.doc.assets.find(a=>block.type==='image'&&a.id===block.assetId)!,block),onNote:setStatus});
+ const [flags,setFlags]=useState<DuplicateFlag[]>([]);
+ useEffect(()=>{let live=true;duplicateFlags(p.doc).then(f=>{if(live)setFlags(f);},()=>{if(live)setFlags([]);});return()=>{live=false;};},[p.doc.assets]);
 
  const run=async(label:string,work:()=>Promise<void>)=>{setBusy(label);setStatus('');try{await work();}catch(error){p.onError(error instanceof Error?error.message:String(error));}finally{setBusy('');}};
  const ensureSession=async()=>{if(driveSessionValid(session))return session;const next=await requestDriveAccess(config);setSession(next);return next;};
@@ -41,7 +46,7 @@ export function DriveAssetManager(p:Props){
  const refresh=(asset:Asset)=>run(`refresh-${asset.id}`,async()=>{
   if(!asset.remote)throw new Error('This image is not linked to Google Drive');
   const active=await ensureSession(),downloaded=await downloadDriveImage(asset.remote.fileId,active.accessToken),normalized=await imageAsset(downloaded.file);
-  p.onUpdateAsset({...normalized,id:asset.id,name:asset.name,rights:asset.rights,visibility:asset.visibility,remote:driveRemote(downloaded.metadata)});
+  p.onUpdateAsset(await withDigest({...normalized,id:asset.id,name:asset.name,rights:asset.rights,visibility:asset.visibility,remote:driveRemote(downloaded.metadata),...(asset.keptDistinctFrom?{keptDistinctFrom:asset.keptDistinctFrom}:{})}));
   setStatus(`${asset.name} refreshed from Drive and cached locally.`);
  });
  const importFromDrive=()=>run('import',async()=>{
@@ -54,8 +59,8 @@ export function DriveAssetManager(p:Props){
    caption:provenance==='synthetic'?'AI-generated / synthetic visual cached from Google Drive':'Image evidence cached from Google Drive',
    provenance
   });
-  p.onAttach(asset,block);
-  setStatus(`${downloaded.metadata.name} attached to ${p.selectedNode.label}. The cached copy is available to PPTX and offline HTML.`);
+  setStatus(`${downloaded.metadata.name} cached locally for ${p.selectedNode.label}. The cached copy is available to PPTX and offline HTML.`);
+  await images.offer(asset,block);
  });
  const archiveProjectFile=(file:File)=>run('archive',async()=>{
   const active=await ensureSession(),folder=await ensureFolder(active.accessToken);
@@ -84,7 +89,8 @@ export function DriveAssetManager(p:Props){
   <hr/>
   <h3>Import image evidence</h3>
   <label>Provenance<select value={provenance} onChange={e=>setProvenance(e.target.value as EvidenceBlock['provenance'])}><option value="synthetic">Synthetic / AI-generated</option><option value="author">Author-created</option><option value="source-derived">Source-derived</option><option value="reference">Reference</option></select></label>
-  <Button appearance="primary" onClick={importFromDrive} disabled={!connected||!drivePickerConfigured(config)||!p.selectedNode||!!busy}>{busy==='import'?'Opening Drive…':'Choose image from Drive'}</Button>
+  <Button appearance="primary" onClick={importFromDrive} disabled={!connected||!drivePickerConfigured(config)||!p.selectedNode||!!busy||images.pending}>{busy==='import'?'Opening Drive…':'Choose image from Drive'}</Button>
+  {images.prompt}
   {!p.selectedNode&&<p className="micro">Select a component first; imported images become evidence on that component.</p>}
   {!drivePickerConfigured(config)&&<p className="micro">Picker import needs client ID + API key + project number. Upload/back-up only needs the OAuth client ID.</p>}
   <hr/>
@@ -96,7 +102,7 @@ export function DriveAssetManager(p:Props){
   <div className="drive-heading"><h3>Project image evidence</h3><span className="micro">{imageAssets.length} cached</span></div>
   {imageAssets.length===0?<p className="muted">No project images yet. Attach or import an image to create the first asset.</p>:<div className="drive-asset-list">{imageAssets.map(asset=><div className="drive-asset-row" key={asset.id}>
    <img src={asset.data} alt=""/>
-   <div><strong>{asset.name}</strong><small>{assetDriveStatus(asset)==='drive'?'Drive-backed · local cache retained':'Local only'}</small>{asset.remote?.webViewLink&&<a href={asset.remote.webViewLink} target="_blank" rel="noopener noreferrer">Open in Drive ↗</a>}</div>
+   <div><strong>{asset.name}</strong><small>{assetDriveStatus(asset)==='drive'?'Drive-backed · local cache retained':'Local only'}</small>{flags.filter(f=>f.assetId===asset.id).map(f=><small key={f.otherId} className="duplicate-flag" data-kind={f.kind}>{DUPLICATE_LABEL[f.kind]} · {p.doc.assets.find(a=>a.id===f.otherId)?.name??f.otherId}</small>)}{asset.remote?.webViewLink&&<a href={asset.remote.webViewLink} target="_blank" rel="noopener noreferrer">Open in Drive ↗</a>}</div>
    <div className="drive-actions">{asset.remote?<Button size="small" onClick={()=>refresh(asset)} disabled={!connected||!!busy}>{busy===`refresh-${asset.id}`?'Refreshing…':'Refresh cache'}</Button>:<Button size="small" onClick={()=>backup(asset)} disabled={!connected||!!busy}>{busy===`backup-${asset.id}`?'Uploading…':'Back up to Drive'}</Button>}</div>
   </div>)}</div>}
   {config.folderId&&<div className="toolbar drive-folder"><span className="micro">DiagramCloud Assets folder linked</span><Button appearance="subtle" size="small" onClick={()=>{const next={...config,folderId:''};saveDriveConfig(next);setConfig(next);setStatus('Folder link reset; the next upload will create a new DiagramCloud Assets folder.');}}>Reset folder link</Button></div>}
