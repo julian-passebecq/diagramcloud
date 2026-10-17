@@ -1,0 +1,7 @@
+/* Saved contexts: name field, Save, Restore and Remove wrap inside a narrow (390 px) sidebar. */
+.saved-contexts{min-width:0;max-width:100%}
+.saved-contexts>.toolbar>.fui-Input{flex:1 1 160px;min-width:0;max-width:100%}
+.saved-contexts .fui-Button{max-width:100%;min-width:0;height:auto;min-height:28px;white-space:normal;overflow-wrap:anywhere}
+.saved-context-list{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.saved-context-list>li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;min-width:0;overflow-wrap:anywhere}
+.saved-context-result{flex-basis:100%;margin:0;padding-left:18px}

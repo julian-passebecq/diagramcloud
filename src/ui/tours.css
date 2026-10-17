@@ -1,0 +1,9 @@
+/* Tours panel: every control wraps inside a narrow (390 px) sidebar; focus moved by the panel stays visible. */
+.tours-panel{min-width:0;max-width:100%}
+.tours-panel .variant-list{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.tours-panel .variant-list>li{min-width:0}
+.tours-panel .fui-Button{max-width:100%;min-width:0;height:auto;min-height:32px;white-space:normal;overflow-wrap:anywhere;text-align:center}
+.tours-panel .toolbar>.fui-Button{flex:0 1 auto}
+.tours-panel [data-focus]:focus{outline:none}
+.tours-panel [data-focus]:focus-visible{outline:3px solid #4c82e5;outline-offset:3px}
+.tours-panel .property-form select{white-space:normal;text-overflow:ellipsis}
