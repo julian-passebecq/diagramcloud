@@ -152,6 +152,8 @@ test('watched CLI host regenerates when the selected document is saved and serve
   const doc=join(dir,'doc.json'),owner=join(dir,'owner.html'),first=project();writeFileSync(doc,JSON.stringify(first));writeFileSync(owner,viewer);
   host=await runConceptHost([doc,'--view','root','--audience','public','--viewer',owner,'--viewer-sha256',viewerSha256],{watch:true,intervalMs:50});
   const served=async()=>(await get(host!.origin+'/packet.json'));
+  // watchFile takes its first reading asynchronously: let it settle so the first save is not missed.
+  await new Promise(r=>setTimeout(r,300));
   writeFileSync(doc,'{"not":"a document"}');await until(async()=>(await served()).status===503);assert.equal(host.failure,REGENERATION_FAILED);
   const next=structuredClone(first);next.revision=first.revision+3;writeFileSync(doc,JSON.stringify(next));
   await until(async()=>{const r=await served();return r.status===200&&JSON.parse(r.body).baseRevision===first.revision+3;});assert.equal(host.failure,undefined);

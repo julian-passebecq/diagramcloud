@@ -1,6 +1,18 @@
-# Now / Next (2026-10-17, 1.28.1)
+# Now / Next (2026-10-18, 1.29.0)
 
-**Now.** 1.28.1 ([notes](docs/release-1.28/RELEASE_NOTES-1.28.1.md)) adds an installed VSIX proof in VS Code (#86, `npm run test:host:vscode`, local desktop only), env-selectable e2e ports above 20000 (#85, `DIAGRAMCLOUD_E2E_PORT`, default 24173-24175), an evidence-only packaging inspection report with Windows tar (#85), and tour and saved-context controls checked at 390x844 with keyboard and reduced motion (#87). The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.28.1-<sha>/`.
+**Now.** 1.29.0 ([notes](docs/release-1.29/RELEASE_NOTES.md)) integrates eight V2 standalone packages: hierarchy rail and Choose parent with a real Tab walk at 390x844 (#89), schedule and measure forms with cited compatibility evidence (#90), host refusals that keep their input, Cursor proven locally and a Linux packaging dry run in CI (#91), one studio environment selection (#92), public noninterference and private-ID refusal (#93), uncertain writes, unknown-module imports and image digests (#94), instruction files as declared rules with bounded cancelable scans (#95), and artifact entry with declared-workflow playback (#96). Rows moved are in the [R4 crosswalk](docs/product/R4_CROSSWALK.md) and AGENTS.md "Current limits (1.29.0)". The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.29.0-<sha>/`.
+
+**Next.** These are still open:
+- Owner decisions: AC02 profile levels (L1 vs rich pack), AC09 run/attempt model, AC11 Brain format, and whether public figures may print omission counts (AC25 strict reading).
+- Small UI follow-ups: a completeness badge in the readiness panel, an AbortSignal from the folder picker to the scanner, a host that calls `acceptPublicReturn`, navigator/search/story steps honouring a chosen parent.
+- Host runs in CI, extension update, signing and Marketplace.
+- R4-W7 adapters (optional).
+
+V2 is not complete: all eight workstreams stay partial.
+
+## Previous: 1.28.1
+
+1.28.1 ([notes](docs/release-1.28/RELEASE_NOTES-1.28.1.md)) adds an installed VSIX proof in VS Code (#86, `npm run test:host:vscode`, local desktop only), env-selectable e2e ports above 20000 (#85, `DIAGRAMCLOUD_E2E_PORT`, default 24173-24175), an evidence-only packaging inspection report with Windows tar (#85), and tour and saved-context controls checked at 390x844 with keyboard and reduced motion (#87). The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.28.1-<sha>/`.
 
 1.28.0 integrates the DiagramCloud standalone V2 mission ([mission](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/missions/2026-10-17-diagramcloud-standalone-v2.md)). The packages are P1 evidence figures (#79), P2 saved contexts (#78), P3 visual variants (#77), P4 React host session and VSIX source package (#80), P6 decision review (#82), P5 tour Resume (#83), and P7 proposal parity with offline journeys (from #81, folded into the integration PR). The changes are in [release notes](docs/release-1.28/RELEASE_NOTES.md), the [R4 crosswalk](docs/product/R4_CROSSWALK.md) and AGENTS.md "Current limits (1.28.0)". The integration PR records the exact head, the CI run and the local candidate package with its hashes, under `.local/integration/DIAGRAM/1.28.0-<sha>/`.
 

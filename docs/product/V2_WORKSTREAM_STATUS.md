@@ -12,6 +12,18 @@ Planning snapshot: 2026-10-15, Europe/Zurich. DiagramCloud V2 is the complete se
 
 The R4 crosswalk cites the tests for each row. This adds no acceptance ID, and all eight workstreams stay PARTIAL.
 
+**1.29.0 (2026-10-18).** The V2 standalone continuation ([release notes](../release-1.29/RELEASE_NOTES.md), PRs #89-#96) adds bounded slices:
+- **Workstream 1:** unique components and repositories counted apart from memberships; uncertain writes, unknown-module imports and image digests.
+- **Workstream 2:** hierarchy rail with Choose parent, a real Tab walk at 390x844, one studio environment selection carried by saved contexts, and a no-Git independent journey that is complete for its purpose.
+- **Workstream 3:** Lens commit lists are never read.
+- **Workstream 4:** cited compatibility evidence read by the substitution check; declared-workflow playback with no run data.
+- **Workstream 5:** instruction files scanned as declared rules; bounded, cancelable scans; dbt/Spark/SQL roles.
+- **Workstream 6:** schedule and measure forms; "measured difference" only for measured, cited readings; artifact entry.
+- **Workstream 7:** host refusals keep their input with an unsupported-route reason; the VSIX proven in a local Cursor; a Linux packaging dry run in CI.
+- **Workstream 8:** public noninterference tests and private-ID refusal on public targets; failed concept regeneration serves an error.
+
+All eight workstreams stay PARTIAL. AC02 profile levels, AC09 runs and AC11 Brain evidence stay open as owner decisions.
+
 The [Studio membership / Perspective choice checkpoint](../../V2-STUDIO-MEMBERSHIP.md), source `d210f534ea7de8b3e1e3d65715fb24457dc9b76731ad3060ac66231589eb3002`, qualifies explicit reuse of an existing canonical component in another existing view and explicit choice among supplied reachable perspective views. TypeScript/build passed, 831 of 832 unit cases passed with 1 optional skip, and all 187 Chromium cases passed. Four fresh synthetic PNGs were inspected and its local review archive was integrity-verified. Reuse changes only one view membership and position, retains shared IDs and facts, and uses live Edit guards, Cancel and ordinary Undo/save. Perspective choice preserves permitted paths and public privacy. The separate chooser capture at390px uses a1100px-high viewport; full390x844 fit and durable semantic contexts remain open. Its verified local review archive SHA256 is `a4b1d883f55836a44ee58a3d7cdb46d5c62ef5c3f8f7a18f27cbc3626759dbeb`.
 
 The [Sources / Local publications checkpoint](../../V2-PUBLICATION-DIAGNOSTICS.md), source `2a8c9af1999bfeda6b241fc3bd12b00cad02c9dbdf6e9655ccf1768dd0d0f427`, qualifies author-only absent/unreadable source-context diagnostics and reviewed local restoration of narrow native immutable public publication snapshots. TypeScript/build passed, 825 of 826 unit cases passed with 1 optional skip, and all 183 Chromium cases passed. Four fresh synthetic PNGs were inspected and the local review archive was integrity-verified. Public source-summary output reveals no private receipt presence. Restore retains identity, refuses collisions and unsupported assets/workspaces/observations, and leaves the editable Project intact. Remote publication and original source-vector recovery remain open. Its verified local review archive SHA256 is `4684ea442cf38a3d9d5cc81a123ccc899fbb8fc12ea093db76c57228538552cb`.
