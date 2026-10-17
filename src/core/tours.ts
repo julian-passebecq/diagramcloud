@@ -27,18 +27,55 @@ export function recordStop(doc:Project,viewId:string,subjects:TourSubject[],narr
  const absent=subjects.filter(s=>!present(doc,viewId,s));if(absent.length)throw new Error(`Not in view ${viewId}: ${absent.map(s=>s.id).join(', ')}.`);
  return tourStopSchema.parse({viewId,subjects,fingerprint:stopFingerprint(doc,viewId,subjects),narration});
 }
+/**
+ * A stop ID unused in `stops`, derived from the stop's recorded content (view, subjects, fingerprint, narration), and
+ * stable once assigned: moving or editing a stop never renames it. A position counter is not used, so removing a stop
+ * and adding another never hands the removed stop's ID to different content.
+ */
+export function newStopId(stops:readonly TourStop[],stop:TourStop):string{
+ const used=new Set(stops.flatMap(s=>s.id?[s.id]:[])),base='stop-'+fnv64(canonical({viewId:stop.viewId??null,subjects:stop.subjects,fingerprint:stop.fingerprint??null,narration:stop.narration})).slice(0,10);
+ let id=base;for(let n=2;used.has(id);n++)id=`${base}-${n}`;return id;
+}
+const withId=(stops:readonly TourStop[],stop:TourStop):TourStop=>stop.id||stop.omitted==='stop'?stop:{id:newStopId(stops,stop),...stop};
 /** A new tour recorded at the document's current revision; one validated document, committed by the caller as one revision. */
 export function addTour(doc:Project,input:{id:string;title:string;visibility?:'public'|'private';stop:TourStop}):Project{
  if((doc.tours??[]).some(t=>t.id===input.id))throw new Error(`A tour ${input.id} already exists.`);
- const tour=tourSchema.parse({id:input.id,title:input.title,sourceRevision:doc.revision,stops:[input.stop],visibility:input.visibility??'private'});
+ const tour=tourSchema.parse({id:input.id,title:input.title,sourceRevision:doc.revision,stops:[withId([],input.stop)],visibility:input.visibility??'private'});
  return validateDocument({...doc,tours:[...(doc.tours??[]),tour]});
 }
 export function addTourStop(doc:Project,tourId:string,stop:TourStop):Project{
  if(!(doc.tours??[]).some(t=>t.id===tourId))throw new Error(`No tour ${tourId}.`);
- return validateDocument({...doc,tours:doc.tours!.map(t=>t.id===tourId?{...t,stops:[...t.stops,stop]}:t)});
+ return validateDocument({...doc,tours:doc.tours!.map(t=>t.id===tourId?{...t,stops:[...t.stops,withId(t.stops,stop)]}:t)});
 }
 export function removeTour(doc:Project,tourId:string):Project{
  const tours=(doc.tours??[]).filter(t=>t.id!==tourId),next:Project={...doc,tours};if(!tours.length)delete next.tours;return validateDocument(next);
+}
+
+/**
+ * Ordinary stop edits. Each returns one validated document the caller commits as one revision (one Undo). The caller
+ * names the stop by its position and the exact stop it saw (`expected`); when the live tour no longer has that stop at
+ * that position (another edit, another tab, an Undo) the edit is refused and nothing changes. A stop keeps its ID.
+ */
+export const TOUR_STOP_CHANGED='The tour changed since this stop was shown. Nothing was changed; reopen the stop and try again.';
+function editStops(doc:Project,tourId:string,index:number,expected:TourStop,f:(stops:TourStop[])=>TourStop[]):Project{
+ const tour=(doc.tours??[]).find(t=>t.id===tourId);if(!tour)throw new Error(`No tour ${tourId}.`);
+ if(!tour.stops[index]||canonical(tour.stops[index])!==canonical(expected))throw new Error(TOUR_STOP_CHANGED);
+ return validateDocument({...doc,tours:doc.tours!.map(t=>t.id===tourId?{...t,stops:f([...t.stops])}:t)});
+}
+/** Change a stop's narration, and optionally re-record its view and subjects on the current content (a new fingerprint). */
+export function updateTourStop(doc:Project,tourId:string,index:number,expected:TourStop,change:{narration?:string;rerecord?:{viewId:string;subjects:TourSubject[]}}):Project{
+ if(expected.omitted)throw new Error('An omitted stop cannot be edited.');
+ return editStops(doc,tourId,index,expected,stops=>{const s=stops[index],narration=change.narration??s.narration;
+  const next=change.rerecord?recordStop(doc,change.rerecord.viewId,change.rerecord.subjects,narration):tourStopSchema.parse({...s,narration});
+  stops[index]={...next,...(s.id?{id:s.id}:{})};return stops;});
+}
+/** Move a stop one place earlier (-1) or later (+1). */
+export function moveTourStop(doc:Project,tourId:string,index:number,expected:TourStop,delta:-1|1):Project{
+ return editStops(doc,tourId,index,expected,stops=>{const to=index+delta;if(to<0||to>=stops.length)throw new Error('This stop cannot move further.');[stops[index],stops[to]]=[stops[to],stops[index]];return stops;});
+}
+/** Remove one stop. A tour keeps at least one stop: remove the tour instead. */
+export function removeTourStop(doc:Project,tourId:string,index:number,expected:TourStop):Project{
+ return editStops(doc,tourId,index,expected,stops=>{if(stops.length<=1)throw new Error('A tour keeps at least one stop. Remove the tour instead.');stops.splice(index,1);return stops;});
 }
 
 /** Each stop's anchor state in this document (authoring, or a public copy). Pure: reading a tour changes nothing. */
@@ -60,6 +97,7 @@ export function tourStops(doc:Project,tour:Tour):StopState[]{
  * stop says some subjects are omitted, without naming or counting them. Its narration is omitted too, because
  * free text cannot be separated safely into public and private parts. A stop current in authoring carries the
  * fingerprint of its public content; a stale one keeps its recorded fingerprint, so it reads stale in the copy too.
+ * A shown stop keeps its stable ID, so a reader can resume it; an omitted stop keeps none.
  */
 export function publicTours(input:Project,pub:Project):Tour[]{
  return (input.tours??[]).filter(t=>t.visibility==='public').map(t=>({...t,stops:t.stops.map((s):TourStop=>{
@@ -69,6 +107,6 @@ export function publicTours(input:Project,pub:Project):Tour[]{
   // Every subject private: the narration is about hidden content, so the stop is omitted like one on a private view.
   if(!kept.length&&s.subjects.length)return {subjects:[],narration:'',omitted:'stop'};
   const current=stopFingerprint(input,s.viewId,s.subjects)===s.fingerprint;
-  return {viewId:s.viewId,subjects:kept,fingerprint:current?stopFingerprint(pub,s.viewId,kept)!:s.fingerprint,narration:lost?'':s.narration,...(lost?{omitted:'subjects' as const}:{})};
+  return {...(s.id?{id:s.id}:{}),viewId:s.viewId,subjects:kept,fingerprint:current?stopFingerprint(pub,s.viewId,kept)!:s.fingerprint,narration:lost?'':s.narration,...(lost?{omitted:'subjects' as const}:{})};
  })}));
 }

@@ -96,7 +96,8 @@ test('Variant editor: a concurrent edit of the same field shows a rebase conflic
  await expect(canvasNode(page,'Checks (edited by someone else)')).toBeVisible();
  await page.getByRole('button',{name:'Variants',exact:true}).click();
  await expect(panel.locator('[data-variant-status="stale"]')).toHaveText('Stale baseline');
- await panel.getByRole('button',{name:'Compare Rename checks',exact:true}).click();
+ // The selected variant is a semantic context dimension kept by the Studio, so it is still selected after the Inspector detour.
+ await expect(panel.getByRole('button',{name:'Compare Rename checks',exact:true})).toHaveAttribute('aria-pressed','true');
  const report=panel.getByTestId('rebase-report');
  await expect(report).toContainText('Rebase is refused so their edit is not overwritten');
  await expect(report.getByTestId('rebase-conflicts')).toContainText('/nodes/@checks/label: recorded "SQL quality checks", now "Checks (edited by someone else)"');
