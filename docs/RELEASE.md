@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.28.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.28.1 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,6 +44,7 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
+| 1.28.1 | head of the `claude/v2-1.28.1` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [1.28.1 notes](release-1.28/RELEASE_NOTES-1.28.1.md): installed VSIX proof in VS Code (local desktop test, not in CI), env-selectable e2e ports above 20000, tour and saved-context controls at 390x844 with keyboard and reduced motion, packaging inspection report from evidence only and Windows tar; Chromium only |
 | 1.28.0 | head of the `claude/v2-1.28.0-integration` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [V2 standalone notes](release-1.28/RELEASE_NOTES.md): evidence figures (Gantt, comparison, Sankey identity), saved contexts, visual variants, decision review, tour Resume, proposal parity and offline journeys, React host session and VSIX source package (not installed in a host); [R4 crosswalk](product/R4_CROSSWALK.md); Chromium only |
 | 1.27.1 | head of the `fix/1.27.1-tour-narration` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | R4 verifier corrections: a public tour stop whose subjects are all private is omitted with its narration, like a stop on a private view; the crosswalk test reads cited titles that contain quotes whole; Chromium only |
 | 1.27.0 | head of the `release/1.27.0-r4-remainder` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [R4 remainder notes](release-1.27/RELEASE_NOTES.md): CLI/MCP catalogue lookup, figure withholding, lesson depth and step playback, content guards, variants and tours; [R4 crosswalk](product/R4_CROSSWALK.md); Chromium only |

@@ -1,14 +1,16 @@
-# Now / Next (2026-10-17, 1.28.0)
+# Now / Next (2026-10-17, 1.28.1)
 
-**Now.** 1.28.0 integrates the DiagramCloud standalone V2 mission ([mission](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/missions/2026-10-17-diagramcloud-standalone-v2.md)). The packages are P1 evidence figures (#79), P2 saved contexts (#78), P3 visual variants (#77), P4 React host session and VSIX source package (#80), P6 decision review (#82), P5 tour Resume (#83), and P7 proposal parity with offline journeys (from #81, folded into the integration PR). The changes are in [release notes](docs/release-1.28/RELEASE_NOTES.md), the [R4 crosswalk](docs/product/R4_CROSSWALK.md) and AGENTS.md "Current limits (1.28.0)". The integration PR records the exact head, the CI run and the local candidate package with its hashes, under `.local/integration/DIAGRAM/1.28.0-<sha>/`.
+**Now.** 1.28.1 ([notes](docs/release-1.28/RELEASE_NOTES-1.28.1.md)) adds an installed VSIX proof in VS Code (#86, `npm run test:host:vscode`, local desktop only), env-selectable e2e ports above 20000 (#85, `DIAGRAMCLOUD_E2E_PORT`, default 24173-24175), an evidence-only packaging inspection report with Windows tar (#85), and tour and saved-context controls checked at 390x844 with keyboard and reduced motion (#87). The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.28.1-<sha>/`.
+
+1.28.0 integrates the DiagramCloud standalone V2 mission ([mission](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/missions/2026-10-17-diagramcloud-standalone-v2.md)). The packages are P1 evidence figures (#79), P2 saved contexts (#78), P3 visual variants (#77), P4 React host session and VSIX source package (#80), P6 decision review (#82), P5 tour Resume (#83), and P7 proposal parity with offline journeys (from #81, folded into the integration PR). The changes are in [release notes](docs/release-1.28/RELEASE_NOTES.md), the [R4 crosswalk](docs/product/R4_CROSSWALK.md) and AGENTS.md "Current limits (1.28.0)". The integration PR records the exact head, the CI run and the local candidate package with its hashes, under `.local/integration/DIAGRAM/1.28.0-<sha>/`.
 
 **Next.** These are still open:
-- An installed VS Code/Cursor run of the VSIX.
+- A Cursor run of the VSIX, and a host run in CI (the VS Code test is local only); extension update, signing and the webview "Download return file" button.
 - Form editors for schedules and measures.
 - An environment selection, so saved contexts can carry one.
 - Compatibility evidence for the substitution check.
-- Tour controls checked at 390x844 and with reduced motion.
-- An env-selectable Playwright port above 20000. 4173-4175 are pinned, so parallel lanes collide.
+- A full Tab walk to canvas cards, and the sidebar tabs and canvas at 390 px.
+- Packaging on Linux after the tar change.
 - R4-W7 adapters.
 
 V2 is not complete: all eight workstreams stay partial.
