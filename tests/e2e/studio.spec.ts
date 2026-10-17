@@ -1,6 +1,7 @@
 import {test,expect} from '@playwright/test';
 import {mkdirSync,readFileSync} from 'node:fs';
 import {samples} from '../../src/data/samples';
+import {appOrigin} from '../../scripts/lib/e2ePorts';
 import {clone} from '../../src/core/model';
 const total=samples.find(d=>d.id==='total-project-controls')!;
 
@@ -77,7 +78,7 @@ test('public portfolio omits private payload and escapes user content',async({pa
  await page.getByRole('button',{name:'Export & share',exact:true}).click();const promise=page.waitForEvent('download');await page.getByRole('button',{name:/^Interactive HTML/}).click();const download=await promise;const path=await download.path();const html=readFileSync(path!,'utf8');expect(html).not.toContain('PRIVATE_MARKER_42');expect(html).not.toContain('</script><script>');
 });
 test('reduced motion and Fabric icon loading',async({browser})=>{
- const context=await browser.newContext({reducedMotion:'reduce',viewport:{width:1440,height:1000}});const page=await context.newPage();await page.goto('http://127.0.0.1:4173');await expect(page.getByRole('button',{name:'Enable motion',exact:true})).toBeVisible();
+ const context=await browser.newContext({reducedMotion:'reduce',viewport:{width:1440,height:1000}});const page=await context.newPage();await page.goto(appOrigin);await expect(page.getByRole('button',{name:'Enable motion',exact:true})).toBeVisible();
  await page.locator('.project-card').filter({hasText:'Microsoft Fabric'}).click();await expect(page.getByRole('heading',{name:'Microsoft Fabric',exact:true})).toBeVisible();await expect(page.locator('.official-icon')).toHaveCount(4);
  await expect.poll(()=>page.locator('.official-icon').evaluateAll((imgs:HTMLImageElement[])=>imgs.every(img=>img.complete&&img.naturalWidth>0))).toBe(true);
  for(const [item,n] of [['Lakehouse',2],['Pipeline',1],['Semantic model',1]] as const){const icon=page.locator(`.official-icon[title="Microsoft Fabric ${item} · Microsoft artwork, used under the Microsoft Fabric icons usage terms"]`);await expect(icon).toHaveCount(n);await expect(icon.first()).toBeVisible();}await page.screenshot({path:'test-results/showcase-fabric.png',fullPage:true});await context.close();

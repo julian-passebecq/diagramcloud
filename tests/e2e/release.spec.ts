@@ -108,7 +108,7 @@ for(const v of [
  test(`visual qualification: ${v.name}`,async({browser})=>{
   const context=await browser.newContext({viewport:{width:v.width,height:v.height},colorScheme:v.scheme,reducedMotion:v.reduced?'reduce':'no-preference'});
   const page=await context.newPage(),errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('http://127.0.0.1:4173/?project=total-project-controls&view=validation&node=mandatory');
+  await page.goto('/?project=total-project-controls&view=validation&node=mandatory');
   await expect(page.getByTestId('view-validation')).toBeVisible();
   if(v.scheme==='dark')await page.getByRole('button',{name:'Toggle theme',exact:true}).click();
   await noOverflow(page);

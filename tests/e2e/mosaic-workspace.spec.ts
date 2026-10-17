@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import {documentSchema,validateDocument,type Project} from '../../src/core/model';
 import {startConceptHost,type LocalConceptHost} from '../../scripts/concept-host';
 import {checkConceptSpec} from '../contracts/mosaicstudio/schema';
+import {appOrigin} from '../../scripts/lib/e2ePorts';
 
 function fixture():Project{return validateDocument(documentSchema.parse({schemaVersion:1,id:'synthetic-mosaic-workspace',title:'Synthetic standalone workspace',rootViewId:'root',
  sources:[{id:'fixture-source',title:'Synthetic local source',location:'fixture.ts:1',visibility:'public'}],
@@ -29,7 +30,7 @@ test('native local host opens from the workspace and returns only the matching c
  const viewer=process.env.DIAGRAMCLOUD_MOSAIC_VIEWER;test.skip(!viewer,'Owner Mosaic standalone viewer was not selected for this host.');
  await importFixture(page);await page.getByRole('button',{name:'Mosaic preview',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Mosaic preview'});await dialog.getByRole('button',{name:'Prepare Mosaic preview',exact:true}).click();
  const downloading=page.waitForEvent('download');await dialog.getByRole('button',{name:'Download preview packet'}).click();const packet=JSON.parse(readFileSync(await(await downloading).path(),'utf8'));
- const host:LocalConceptHost=await startConceptHost({document:fixture(),viewId:'root',audience:'public',viewerHtml:readFileSync(viewer!),viewerSha256:process.env.DIAGRAMCLOUD_MOSAIC_VIEWER_SHA256??'62b451fd3e98a5303b88cca407be1eeff6f05c1c78eb166188df6bff0ac7670c',packet,diagramcloudOrigin:'http://127.0.0.1:4173'});
+ const host:LocalConceptHost=await startConceptHost({document:fixture(),viewId:'root',audience:'public',viewerHtml:readFileSync(viewer!),viewerSha256:process.env.DIAGRAMCLOUD_MOSAIC_VIEWER_SHA256??'62b451fd3e98a5303b88cca407be1eeff6f05c1c78eb166188df6bff0ac7670c',packet,diagramcloudOrigin:appOrigin});
  try{
   await dialog.getByText('Open the local viewer host',{exact:true}).click();await dialog.getByLabel('Local preview host URL').fill(host.url);
   const opening=page.waitForEvent('popup');await dialog.getByRole('button',{name:'Connect local preview host'}).click();const preview=await opening;
