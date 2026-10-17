@@ -10,7 +10,9 @@ const LOOPBACK=/^(?:https?|wss?):\/\/(?:127\.0\.0\.1|localhost|\[::1\])(?::\d+)?
 async function offline(context:BrowserContext){
  const attempted:string[]=[];
  await context.route('**/*',route=>{const url=route.request().url();if(LOOPBACK.test(url)||url.startsWith('data:')||url.startsWith('blob:'))return route.continue();attempted.push(url);return route.abort('internetdisconnected');});
- context.on('websocket',ws=>{if(!LOOPBACK.test(ws.url()))attempted.push(ws.url());});
+ // WebSocket events are per page: watch the pages already open and every page opened later.
+ const watch=(p:Page)=>p.on('websocket',ws=>{if(!LOOPBACK.test(ws.url()))attempted.push(ws.url());});
+ context.pages().forEach(watch);context.on('page',watch);
  return attempted;
 }
 const synthetic=(id:string)=>documentSchema.parse({schemaVersion:1,id,title:'Synthetic offline project',revision:0,rootViewId:'root',
