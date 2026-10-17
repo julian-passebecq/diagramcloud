@@ -12,8 +12,9 @@ import {z} from 'zod';
  *
  * Every return is a `diagramcloud.host-return/1` intent that carries the exact project, document revision, audience
  * and session, plus a one-time intent ID. The host checks it with createReturnGuard, which refuses a malformed,
- * foreign-session, stale (other project, revision or audience), ungranted or replayed intent, and everything after
- * the session is disposed. The same intent as a JSON file (returnFileText / parseReturnFile) is the fallback when no
+ * foreign-session, stale (other project, revision or audience), unrouted (a kind this host has no route for),
+ * ungranted or replayed intent, and everything after the session is disposed. Every refusal hands the original input
+ * back unchanged (`retained`), so the person can keep it as a return file (retainedReturnFile) for another host. The same intent as a JSON file (returnFileText / parseReturnFile) is the fallback when no
  * live channel exists. Nothing here transmits, applies or stores anything.
  */
 export const HOST_SESSION_FORMAT='diagramcloud.host-session/1' as const;
@@ -68,34 +69,48 @@ export function createReturnIntent(session:HostSession,kind:HostReturnKind,targe
  return parsed.success?parsed.data:undefined;
 }
 
-export type ReturnBinding={sessionId:string;projectId:string;baseRevision:number;audience:'public';granted:readonly HostCapability[]};
-export type ReturnRefusal='malformed'|'disposed'|'wrong-session'|'stale'|'not-granted'|'replayed';
-export type ReturnVerdict={ok:true;intent:HostReturnIntent}|{ok:false;reason:ReturnRefusal};
+/** `routes`: the return kinds this host can route (default: every kind). An unrouted kind is refused, never dropped. */
+export type ReturnBinding={sessionId:string;projectId:string;baseRevision:number;audience:'public';granted:readonly HostCapability[];routes?:readonly HostReturnKind[]};
+export type ReturnRefusal='malformed'|'disposed'|'wrong-session'|'stale'|'unsupported-route'|'not-granted'|'replayed';
+/** A refusal keeps the exact input it was given (`retained`, the same value, never parsed, stripped or mutated). */
+export type ReturnVerdict={ok:true;intent:HostReturnIntent}|{ok:false;reason:ReturnRefusal;retained:unknown};
 export const RETURN_REFUSAL_TEXT:Record<ReturnRefusal,string>={malformed:'Refused: not a diagramcloud.host-return/1 intent.',disposed:'Refused: this viewer session was closed.',
  'wrong-session':'Refused: the intent belongs to another viewer session.',stale:'Refused: the intent was made for another project, document revision or audience.',
- 'not-granted':'Refused: the session did not grant this capability.',replayed:'Refused: this intent was already received once.'};
+ 'unsupported-route':'Refused: this host has no route for this return kind.','not-granted':'Refused: the session did not grant this capability.',replayed:'Refused: this intent was already received once.'};
 
 /** Host-side guard. Accepts each intent at most once, only for the current binding; rebind on a revision change. */
 export function createReturnGuard(initial:ReturnBinding){
- let binding={...initial,granted:[...initial.granted]},disposed=false;const seen=new Set<string>();
+ const copy=(b:ReturnBinding):ReturnBinding=>({...b,granted:[...b.granted],...(b.routes?{routes:[...b.routes]}:{})});
+ let binding=copy(initial),disposed=false;const seen=new Set<string>();
  return {
   accept(input:unknown):ReturnVerdict{
-   if(disposed)return {ok:false,reason:'disposed'};
-   const parsed=intentSchema.safeParse(input);if(!parsed.success)return {ok:false,reason:'malformed'};const intent=parsed.data;
-   if(intent.sessionId!==binding.sessionId)return {ok:false,reason:'wrong-session'};
-   if(seen.has(intent.intentId))return {ok:false,reason:'replayed'};
-   if(intent.projectId!==binding.projectId||intent.baseRevision!==binding.baseRevision||intent.audience!==binding.audience)return {ok:false,reason:'stale'};
-   const needs=RETURN_KINDS[intent.kind];if(needs&&!binding.granted.includes(needs))return {ok:false,reason:'not-granted'};
+   const refuse=(reason:ReturnRefusal):ReturnVerdict=>({ok:false,reason,retained:input});
+   if(disposed)return refuse('disposed');
+   const parsed=intentSchema.safeParse(input);if(!parsed.success)return refuse('malformed');const intent=parsed.data;
+   if(intent.sessionId!==binding.sessionId)return refuse('wrong-session');
+   if(seen.has(intent.intentId))return refuse('replayed');
+   if(intent.projectId!==binding.projectId||intent.baseRevision!==binding.baseRevision||intent.audience!==binding.audience)return refuse('stale');
+   if(binding.routes&&!binding.routes.includes(intent.kind))return refuse('unsupported-route');
+   const needs=RETURN_KINDS[intent.kind];if(needs&&!binding.granted.includes(needs))return refuse('not-granted');
    seen.add(intent.intentId);return {ok:true,intent};
   },
   /** The document moved on (new revision or project) in the same session: earlier intents become stale. */
-  rebind(next:Omit<ReturnBinding,'sessionId'>){if(!disposed)binding={...next,sessionId:binding.sessionId,granted:[...next.granted]};},
+  rebind(next:Omit<ReturnBinding,'sessionId'>){if(!disposed)binding=copy({...next,sessionId:binding.sessionId});},
   dispose(){disposed=true;},
-  get binding(){return {...binding,granted:[...binding.granted]};},
+  get binding(){return copy(binding);},
   get disposed(){return disposed;}};
 }
 export type ReturnGuard=ReturnType<typeof createReturnGuard>;
 
+/**
+ * A refused input as a return file, unchanged, when it is shaped like a `diagramcloud.host-return/1` intent (whatever
+ * the refusal); undefined for a malformed input, which is not a return file. Saving it changes nothing: the host that
+ * refused it will refuse the file for the same reason.
+ */
+export function retainedReturnFile(verdict:ReturnVerdict):string|undefined{
+ if(verdict.ok||verdict.reason==='malformed'||!intentSchema.safeParse(verdict.retained).success)return undefined;
+ const text=JSON.stringify(verdict.retained,null,2)+'\n';return new TextEncoder().encode(text).byteLength<=MAX_RETURN_BYTES+4096?text:undefined;
+}
 /** File fallback: the same intent as JSON text, and its bounded parse (the guard still decides). */
 export const returnFileText=(intent:HostReturnIntent)=>JSON.stringify(intent,null,2)+'\n';
 export function parseReturnFile(text:string):unknown{
