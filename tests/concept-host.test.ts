@@ -23,6 +23,15 @@ test('host regenerates selected packet with its exact timestamp and explicit aud
  const tampered=structuredClone(a);tampered.projection.spec.title='Untrusted';await assert.rejects(()=>prepareConceptHostPacket(p,'root','public',tampered));
  p.nodes[0].label='Changed without revision';await assert.rejects(()=>prepareConceptHostPacket(p,'root','public',a));
 });
+test('concept preview packet names its own format and never claims datapass.preview/1',async()=>{
+ for(const audience of ['public','author'] as const){
+  const a=await packet(project(),audience);
+  assert.equal(a.format,'diagramcloud.concept-preview');assert.equal(a.version,1);
+  assert.equal(a.projection.spec.format,'datapass.concept-spec');assert.equal(a.projection.spec.version,1);
+  assert.doesNotMatch(JSON.stringify(a),/datapass\.preview/);
+  await assert.rejects(()=>prepareConceptHostPacket(project(),'root',audience,{...a,format:'datapass.preview'} as never));
+ }
+});
 test('navigation rejects ambiguous mappings while inspection preserves them',async()=>{
  const a=await packet(project(true)),msg={format:'diagramcloud.concept-pick',version:1,projectionSha256:a.projectionSha256,kind:'flow',targetId:a.projection.spec.flows[0].id};
  const inspection=resolveConceptPick(a,msg);assert.ok(inspection.ok&&inspection.ambiguous);assert.deepEqual(resolveUniqueConceptPick(a,msg),{ok:false,reason:'ambiguous-target'});
