@@ -7,7 +7,7 @@ import {designContext} from '../export/design/context';
 import {chartableTable} from '../export/design/chart';
 import {heatmapColumns} from '../export/design/heatmap';
 import {treemapHierarchy} from '../export/design/treemap';
-import {sankeyUnit} from '../export/design/sankey';
+import {sankeyBands} from '../export/design/measures';
 import {waterfallTable,waterfallValues} from '../export/design/waterfall';
 import {recommendFigures} from '../export/design/recommend';
 import {defects} from '../export/design/quality';
@@ -25,8 +25,8 @@ export function semanticVisualQuality(input:Project,viewId:string,figure:string,
  const spec=viewSpec(doc,viewId),root=elements.find(e=>e.name==='svg');check('figure-identity',root?.attrs['data-design-type']===type,'Actual figure metadata must match the chosen encoding.');
  check('offline',!/<(?:script|foreignObject)\b|(?:href|src)="https?:/i.test(svg),'Only generated offline content is accepted.');
  if(type==='sankey'){
-  const unit=sankeyUnit(spec.edges),bands=elements.filter(e=>e.attrs['data-dd-edge']&&Object.hasOwn(e.attrs,'data-dd-value'));
-  const expected=spec.edges.filter(e=>e.quantity&&e.quantity.unit===unit&&e.from!==e.to);
+  const bands=elements.filter(e=>e.attrs['data-dd-edge']&&Object.hasOwn(e.attrs,'data-dd-value'));
+  const {bands:expected,unit}=sankeyBands(spec);
   check('sankey-source-quantities',bands.length===expected.length&&new Set(bands.map(e=>e.attrs['data-dd-edge'])).size===expected.length&&bands.every(e=>{const edge=expected.find(x=>x.id===e.attrs['data-dd-edge']);return edge&&Number(e.attrs['data-dd-value'])===edge.quantity!.value&&e.attrs['data-dd-unit']===unit&&e.attrs['data-dd-provenance']===edge.quantity!.provenance;}),'Every band must preserve its exact supplied amount, unit and provenance; other units are never summed.');
   check('sankey-synthetic',!expected.some(e=>e.quantity!.provenance==='synthetic')||/synthetic/i.test(text),'Synthetic quantities must remain visibly labelled.');
   check('sankey-order',!bands.length||/not timing/i.test(text),'Connection-derived columns must not claim measured timing.');

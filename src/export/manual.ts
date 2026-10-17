@@ -10,6 +10,7 @@ import {editorialSvg} from './styled';
 import {DESIGN_TYPE_LABEL,designSvg,resolveDesignType} from './design';
 import {publicationPages,publicationPageProject,scopePublicationSvg} from './publicationPages';
 import {rasterAvailable} from './rasterDimensions';
+import {measureText} from '../core/schedule';
 
 /**
  * Technical Manual publication preset: one static HTML file that reads on screen and prints to PDF (one section per
@@ -36,7 +37,8 @@ function block(b:EvidenceBlock,d:Project):string{
   case 'text':return `${head}<p>${xml(b.text)}</p>`;
   case 'code':return `${head}<pre><code data-language="${xml(b.language)}">${xml(b.code)}</code></pre><p class="muted">Displayed code, not executed.</p>`;
   case 'table':return head+table(b.columns,b.rows,b.title||b.id);
-  case 'metrics':return head+table(['Measure','Value','Note'],b.items.map(i=>[i.label,i.value,i.note]),b.title||b.id);
+  case 'metrics':return head+(b.items.some(i=>i.measure)?table(['Measure','Value','Note','Reading'],b.items.map(i=>[i.label,i.value,i.note,i.measure?measureText(i.measure):'']),b.title||b.id):table(['Measure','Value','Note'],b.items.map(i=>[i.label,i.value,i.note]),b.title||b.id));
+  case 'schedule':return head+table(['Item','Start','End or duration','Basis','Components'],b.items.map(i=>[i.label,i.start,[i.end,i.duration].filter(Boolean).join(' · '),i.basis,i.nodeIds.map(id=>d.nodes.find(n=>n.id===id)?.label??id).join(', ')]),b.title||b.id)+`<p class="muted">Dated evidence (${xml(b.timezone)}), not a run or observed timing.</p>`;
   case 'image':{const asset=d.assets.find(a=>a.id===b.assetId);return asset?`${head}<figure class="evidence-image">${rasterAvailable(asset.data)?`<img src="${xml(asset.data)}" alt="${xml(b.caption||asset.name)}">`:'<p class="muted">Image unavailable: raster container or dimensions are invalid. Caption and recorded rights retained.</p>'}<figcaption>${b.caption?`${xml(b.caption)} · `:''}${xml(asset.name)}<br>Recorded rights: ${xml(asset.rights||'Not supplied.')}</figcaption></figure>`:`${head}<p class="muted">Image unavailable in this public projection.</p>`;}
  }
 }

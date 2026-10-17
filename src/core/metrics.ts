@@ -5,7 +5,7 @@ import {blockSchema,type EvidenceBlock} from './model';
  * Kept free of React so the rules are unit-tested and shared by the add and edit paths.
  */
 export type MetricsBlock=Extract<EvidenceBlock,{type:'metrics'}>;
-export type MetricRow={label:string;value:string;note:string};
+export type MetricRow={label:string;value:string;note:string;measure?:NonNullable<MetricsBlock['items'][number]['measure']>};
 export type MetricsDraft={title:string;provenance:EvidenceBlock['provenance'];sourceIds:string[];items:MetricRow[]};
 export const MAX_METRICS=12;
 export const emptyMetric=():MetricRow=>({label:'',value:'',note:''});
@@ -16,7 +16,8 @@ export function draftOf(block:MetricsBlock):MetricsDraft{
 
 /** Trims every field and drops rows left completely empty; a row with a value or note but no label is an error. */
 export function metricsBlock(draft:MetricsDraft,base:Pick<MetricsBlock,'id'>&Partial<Pick<MetricsBlock,'visibility'>>):MetricsBlock{
- const items=draft.items.map(i=>({label:i.label.trim(),value:i.value.trim(),note:i.note.trim()})).filter(i=>i.label||i.value||i.note);
+ // A structured reading (measure) is carried unchanged: the form edits the label, value and note only.
+ const items=draft.items.map(i=>({label:i.label.trim(),value:i.value.trim(),note:i.note.trim(),...(i.measure?{measure:i.measure}:{})})).filter(i=>i.label||i.value||i.note);
  items.forEach((i,n)=>{if(!i.label)throw new Error(`Metric ${n+1}: add a label (what the number measures).`);});
  if(!items.length)throw new Error('Add at least one metric with a label.');
  if(items.length>MAX_METRICS)throw new Error(`A metrics block holds at most ${MAX_METRICS} metrics.`);

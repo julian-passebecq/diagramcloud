@@ -12,7 +12,10 @@ export function explanationGaps(input:Project,viewId:string,{publicMode=false}:{
  const doc=publicMode?publicDocument(input):input,view=doc.views.find(v=>v.id===viewId);if(!view)return null;
  const nodes=new Set(view.nodeIds),edges=doc.edges.filter(e=>view.edgeIds.includes(e.id));
  const dated=doc.observations.filter(o=>nodes.has(o.nodeId)&&(!publicMode||o.reviewedAt)).length;
- const timing:ExplanationGap={key:'timing',label:'Timing',state:dated?'partial':'missing',withheld:'Scheduled timeline (Gantt)',
+ const blockIds=new Set(doc.nodes.filter(n=>nodes.has(n.id)).flatMap(n=>n.blockIds)),items=doc.blocks.filter(b=>blockIds.has(b.id)).flatMap(b=>b.type==='schedule'?b.items:[]),estimates=items.filter(i=>i.basis==='estimate').length;
+ const timing:ExplanationGap=items.length?{key:'timing',label:'Timing',state:'supplied',withheld:null,
+  reason:`${items.length} schedule item${items.length>1?'s':''} with dates on this view's components${estimates?`, ${estimates} declared as estimate${estimates>1?'s':''}`:''}.`,
+  needs:'Supplied dates or durations per step, or estimates labelled as estimates.'}:{key:'timing',label:'Timing',state:dated?'partial':'missing',withheld:'Scheduled timeline (Gantt)',
   reason:dated?`${dated} dated claim${dated>1?'s':''} on this view, but no start, end or duration for any step.`:'No dates, durations or declared estimates for this view.'+(doc.story.some(s=>s.viewId===viewId)?' The story order is a presentation sequence, not timing.':''),
   needs:'Supplied dates or durations per step, or estimates labelled as estimates.'};
  const quantified=edges.filter(e=>e.quantity).length;
