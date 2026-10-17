@@ -1,7 +1,7 @@
 import {readAcquisitionAnalysis} from './materialize';
 import type {Project} from '../core/model';
 import {DEFAULT_OPTIONS, PURPOSES} from './types';
-import type {AnalysisOptions, Capability, Gap, ReadinessReport, ViewRecommendation} from './types';
+import type {AnalysisOptions, Capability, Gap, Purpose, ReadinessReport, ViewRecommendation} from './types';
 import {perspectiveOf} from '../core/viewspec';
 import {gapAdvice} from './gapDetails';
 
@@ -79,4 +79,19 @@ export function projectReadiness(project: Project, input: Partial<AnalysisOption
       'No model calls, tests, deployments, data queries, source refreshes or review approvals occur.',
       'No project-wide completeness percentage or calibrated probability is claimed.'],
   };
+}
+
+/** "Complete for the selected purpose" has one definition: the readiness report for that purpose names no
+ * `missing-required` gap. Optional, unsupported, ambiguous, conflicting and stale gaps stay listed for review but do not
+ * block it. It is never a project-wide completeness percentage, a runtime certificate or a review approval.
+ */
+export type PurposeCompleteness = {purpose: Purpose; complete: boolean; requiredGapIds: string[]; openGapIds: string[]};
+export function completeForPurpose(report: ReadinessReport): PurposeCompleteness {
+  const required = report.gaps.filter(g => g.state === 'missing-required').map(g => g.id);
+  return {purpose: report.options.purpose, complete: required.length === 0, requiredGapIds: required,
+    openGapIds: report.gaps.filter(g => g.state !== 'missing-required').map(g => g.id)};
+}
+/** projectReadiness for one purpose, then completeForPurpose. */
+export function projectCompleteFor(project: Project, purpose: Purpose, input: Partial<Omit<AnalysisOptions, 'purpose'>> = {}): PurposeCompleteness {
+  return completeForPurpose(projectReadiness(project, {...input, purpose}));
 }
