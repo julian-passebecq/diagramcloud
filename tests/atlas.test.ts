@@ -147,6 +147,17 @@ test('Lens minimap: observed Git and delivery pointers in a new snapshot; compon
 });
 
 
+test('Lens minimap whose commits have no parents produces no commit edges, nodes or pointers and says the commits were not read',()=>{
+ const {document:d}=atlas(),raw=JSON.parse(readFileSync('tests/fixtures/atlas/lens.minimap.json','utf8'));
+ raw.repositories[0].commits=[{sha:'e'.repeat(40),message:'COMMIT_SENTINEL root'},{sha:'f'.repeat(40),parents:[],message:'COMMIT_SENTINEL orphan'}];
+ const plain=applyLensMinimap(d,parseLensMinimap(readFileSync('tests/fixtures/atlas/lens.minimap.json','utf8')),{now:LATER}),out=applyLensMinimap(d,parseLensMinimap(JSON.stringify(raw)),{now:LATER});
+ assert.deepEqual({n:out.document.nodes,e:out.document.edges,v:out.document.views},{n:d.nodes,e:d.edges,v:d.views});
+ const refs=(r:typeof out)=>r.document.atlas!.snapshots.at(-1)!.runtimeRefs;
+ assert.deepEqual(refs(out),refs(plain),'commits add no runtime pointer');assert.ok(!refs(out).some(r=>/commit/i.test(r.kind)));
+ assert.doesNotMatch(JSON.stringify(out.document),/COMMIT_SENTINEL|f{40}/);
+ assert.match(out.report.lost.join(' '),/2 commit\(s\) in the Lens file were not read: DiagramCloud never draws a commit graph/);
+ assert.doesNotMatch(plain.report.lost.join(' '),/commit\(s\) in the Lens file/);
+});
 test('Galaxy consumer refuses duplicate exact source app IDs before guessing endpoints, without echoing private input',()=>{
  const privateId='SYNTHETIC_PRIVATE_DUPLICATE_APP_ID',first={id:privateId,name:'SYNTHETIC_PRIVATE_FIRST_NAME',path:'SYNTHETIC_PRIVATE_FIRST_PATH'},second={id:privateId,name:'SYNTHETIC_PRIVATE_SECOND_NAME',repo:'SYNTHETIC_PRIVATE_REMOTE'};
  for(const duplicateRows of [[first,second],[second,first],[first,{...first}]]){

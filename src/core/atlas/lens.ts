@@ -45,6 +45,9 @@ export function applyLensMinimap(input:Project,minimap:LensMinimap,options:{now?
  const observedAt=new Date(minimap.observedAt).toISOString(),refs:NonNullable<typeof snap.runtimeRefs>=[];
  if(minimap.refreshing)lost.push('Lens was still refreshing when it exported: some facts may be partial.');
  if(minimap.omittedRepositories)lost.push(`${minimap.omittedRepositories} repositor(ies) beyond the Lens export limit were not in the file.`);
+ // A commit list (with or without parent links) is never read: no commit node, edge or pointer, whatever its parents say.
+ const commits=minimap.repositories.reduce((sum,lr)=>sum+(Array.isArray((lr as Record<string,unknown>).commits)?((lr as Record<string,unknown>).commits as unknown[]).length:0),0);
+ if(commits)lost.push(`${commits} commit(s) in the Lens file were not read: DiagramCloud never draws a commit graph (Lens owns Git history).`);
  const matched=new Map<string,LensMinimap['repositories'][number]>();
  for(const lr of minimap.repositories){
   const name=lr.name.toLowerCase(),hits=snap.repositories.filter(r=>(r.id===name||base(r.locator)===name||r.title.toLowerCase()===name)&&!(lr.gitHost&&HOST[r.host]&&!HOST[r.host]!.test(lr.gitHost)));
