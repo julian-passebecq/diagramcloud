@@ -1,6 +1,6 @@
 {
   "name": "diagramcloud",
-  "version": "1.27.1",
+  "version": "1.28.0",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -19,6 +19,7 @@
     "intelligence": "tsx scripts/intelligence.ts",
     "intelligence:mcp": "tsx scripts/intelligence-mcp.ts",
     "package:candidate": "tsx scripts/package-campaign.ts",
+    "package:vsix": "tsx scripts/package-vsix.ts",
     "concept:preview": "tsx scripts/concept-preview.ts",
     "concept:host": "tsx scripts/concept-host.ts"
   },

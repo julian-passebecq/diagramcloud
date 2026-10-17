@@ -4,6 +4,11 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 
 The selected r3/r4 V2 scope is the complete standalone architectural Studio: general core, Studio UX, Galaxy/external projects, IT catalogue, source analyses/bridges, visualizations, integrations and publication. The [eight-workstream status and original acceptance crosswalk](product/V2_WORKSTREAM_STATUS.md) is a navigation/status view of those contracts, not a replacement roadmap or permission grant. Mosaic/T3 remains one integration; its owner-side limits do not block independent authorized DiagramCloud work. All unfinished criteria remain open.
 
+## Current state (2026-10-17): 1.28.0 V2 standalone
+
+- **Shipped on `main`:** 1.28.0 ([release notes](release-1.28/RELEASE_NOTES.md), [mission](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/missions/2026-10-17-diagramcloud-standalone-v2.md)). It adds evidence figures (Gantt, comparison, Sankey measurement identity), saved contexts, visual variants with a three-axis delta, decision review with an UNKNOWN substitution check, tour Resume and editing, proposal parity across import, CLI and MCP with offline journeys, and the React host session with a VSIX source package. Rows are in the [R4 crosswalk](product/R4_CROSSWALK.md). It is not a complete V2.
+- **Not qualified:** an installed VS Code/Cursor host; R4-W7 external adapters; browsers other than Chromium.
+
 ## Current product and NIGHT4 source linkage (2026-10-08)
 
 - **Shipped product:** 1.24.0 Project Intelligence, [release evidence](release-1.24/RELEASE_NOTES.md), [tag](https://github.com/julian-passebecq/diagramcloud/releases/tag/v1.24.0). The historical **Shipped in 1.23.0** section below remains version history, not the current version.
