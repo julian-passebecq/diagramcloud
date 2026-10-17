@@ -33,14 +33,25 @@ export function scheduleOf(c:DesignContext):ScheduleEvidence{
 }
 
 // ---- Baseline / current comparison -------------------------------------------------------------------------------
-export type Reading={metric:string;value:number;unit:string;scope:string;from:string;to:string;length:number;basis:'measured'|'estimate'|'derived';role:'baseline'|'current';label:string;block:string;provenance:EvidenceBlock['provenance']};
-export type ComparisonRow={metric:string;scope:string;unit:string;baseline:Reading;current:Reading;difference:number;relative?:number;relativeNote?:string;basis:string;windowLength:string};
+export type Reading={metric:string;value:number;unit:string;scope:string;from:string;to:string;length:number;basis:'measured'|'estimate'|'derived';role:'baseline'|'current';label:string;block:string;provenance:EvidenceBlock['provenance'];cited:boolean};
+export type ComparisonRow={metric:string;scope:string;unit:string;baseline:Reading;current:Reading;difference:number;relative?:number;relativeNote?:string;basis:string;windowLength:string;measured:boolean;notMeasured?:string};
 export type ComparisonEvidence={rows:ComparisonRow[];unavailable:{metric:string;reason:string}[];readings:number;blocks:Metrics[]};
 const fmtValue=(r:Reading)=>`${r.value} ${r.unit}`;
+/**
+ * A difference is a measured difference only when both readings are `measured` and each comes from a non-synthetic block
+ * that cites a source; otherwise it is "not a measured saving", with the first reason that applies.
+ */
+export function measuredDifference(b:Reading,k:Reading):{measured:true}|{measured:false;notMeasured:string}{
+ for(const r of [b,k]){const which=r.role==='baseline'?'the baseline':'the current reading';
+  if(r.provenance==='synthetic')return {measured:false,notMeasured:`${which} is synthetic: it illustrates, it does not measure`};
+  if(r.basis!=='measured')return {measured:false,notMeasured:`${which} is ${r.basis==='estimate'?'an estimate':'derived'}, not measured`};
+  if(!r.cited)return {measured:false,notMeasured:`${which} (${r.block}) cites no source`};}
+ return {measured:true};
+}
 export function comparisonOf(c:DesignContext):ComparisonEvidence{
  const blocks=blocksOf(c,'metrics').filter(b=>b.items.some(i=>i.measure)),readings:Reading[]=[];
  for(const b of blocks)for(const i of b.items){const m=i.measure;if(!m)continue;const w=windowOf(m.window);if(isError(w))continue;
-  readings.push({metric:m.metric,value:m.value,unit:m.unit,scope:m.scope,from:m.window.from,to:m.window.to,length:w.end-w.start,basis:m.basis,role:m.role,label:i.label,block:b.title,provenance:b.provenance});}
+  readings.push({metric:m.metric,value:m.value,unit:m.unit,scope:m.scope,from:m.window.from,to:m.window.to,length:w.end-w.start,basis:m.basis,role:m.role,label:i.label,block:b.title,provenance:b.provenance,cited:b.sourceIds.length>0});}
  const rows:ComparisonRow[]=[],unavailable:ComparisonEvidence['unavailable']=[];
  for(const metric of [...new Set(readings.map(r=>r.metric))]){
   const of=readings.filter(r=>r.metric===metric),bScopes=new Set(of.filter(r=>r.role==='baseline').map(r=>r.scope)),cScopes=new Set(of.filter(r=>r.role==='current').map(r=>r.scope));
@@ -55,7 +66,7 @@ export function comparisonOf(c:DesignContext):ComparisonEvidence{
    if(b.length!==k.length){unavailable.push({metric:name,reason:`baseline window ${b.from} → ${b.to} (${spanText(b.length)}) and current window ${k.from} → ${k.to} (${spanText(k.length)}) differ in length: not comparable`});continue;}
    const difference=k.value-b.value,bases=new Set([b.basis,k.basis]);
    rows.push({metric,scope,unit:b.unit,baseline:b,current:k,difference,...(b.value===0?{relativeNote:'Relative change unavailable: the baseline is zero.'}:{relative:difference/Math.abs(b.value)}),
-    basis:bases.has('estimate')?'estimate-based':bases.has('derived')?'from derived inputs':'measured inputs',windowLength:spanText(b.length)});}}
+    basis:bases.has('estimate')?'estimate-based':bases.has('derived')?'from derived inputs':'measured inputs',windowLength:spanText(b.length),...measuredDifference(b,k)});}}
  return {rows,unavailable,readings:readings.length,blocks};
 }
 export const readingText=fmtValue;

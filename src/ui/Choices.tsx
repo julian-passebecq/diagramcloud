@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {Button} from '@fluentui/react-components';
 import {errorMessage,type Choice,type Project} from '../core/model';
-import {acceptChoice,choiceReview,reviewChoice,type ChoiceOwner} from '../core/decisionReview';
-import {substitutionCheck} from '../intelligence/learning/substitution';
+import {acceptChoice,choiceReview,recordCompatibility,removeCompatibility,reviewChoice,type ChoiceOwner} from '../core/decisionReview';
+import {substitutionCheck,substitutionRequirements} from '../intelligence/learning/substitution';
 
 const ORIGIN:Record<Choice['origin'],string>={author:'Author',ai:'AI recommendation',imported:'Imported record'};
 const today=()=>new Date().toISOString().slice(0,10);
@@ -34,8 +34,12 @@ function ChoiceCard({c,edit,doc,owner,onCommit,onError}:{c:Choice}&Omit<Props,'c
   {c.revisitWhen&&<p><b>Revisit when:</b> {c.revisitWhen}</p>}
   {c.status==='candidate'&&c.recommendedOptionId&&<p className="micro">“{option(c.recommendedOptionId)}” is recommended, not decided. Acceptance records who decided and when.</p>}
   {doc&&node&&selectedId&&alternatives.length>0&&<section aria-label={`Alternatives to ${option(selectedId)}`}><h4>Alternatives</h4><ul>{alternatives.map(o=>{const s=substitutionCheck(doc,node.id,{label:o.label,choiceId:c.id,optionId:o.id});
-   return <li key={o.id}><span>“{o.label}” instead of “{option(selectedId)}”: </span><b data-substitution={s.verdict}>{s.label}</b>
-    <details><summary>Substitution check · {s.requirements.length} requirement{s.requirements.length===1?'':'s'}</summary><ul>{s.requirements.map(r=><li key={r.id}>{r.text} <span className="muted">· {r.state}</span></li>)}</ul>{[...s.reasons,...s.notProof].map((r,i)=><p key={i} className="micro">{r}</p>)}</details></li>;})}</ul></section>}
+   const cite=(id:string)=>doc.sources.find(x=>x.id===id)?.title??doc.blocks.find(b=>b.id===id)?.title??id;
+   return <li key={o.id} data-option={o.id}><span>“{o.label}” instead of “{option(selectedId)}”: </span><b data-substitution={s.verdict}>{s.label}</b>
+    <details><summary>Substitution check · {s.requirements.length} requirement{s.requirements.length===1?'':'s'}</summary><ul>{s.requirements.map(r=><li key={r.id} data-requirement={r.id} data-requirement-state={r.state}>{r.text} <span className="muted">· {r.state}{r.citations.length>0&&<> per {r.citations.map(cite).join(', ')}</>}{r.recordedBy&&<> · recorded by {r.recordedBy}{r.recordedAt&&<> on {r.recordedAt}</>}</>}</span></li>)}</ul>
+     {s.ignored.length>0&&<><h4>Evidence not counted</h4><ul aria-label={`Ignored compatibility evidence for ${o.label}`}>{s.ignored.map((x,i)=><li key={i} data-ignored-requirement={x.requirementId} className="micro">{x.reason}{edit&&onCommit&&o.compatibility?.some(e=>e.requirementId===x.requirementId)&&<> <Button size="small" appearance="subtle" onClick={()=>run(()=>removeCompatibility(doc,c.id,o.id,x.requirementId))}>Remove record</Button></>}</li>)}</ul></>}
+     {[...s.reasons.filter(r=>!s.ignored.some(x=>x.reason===r)),...s.notProof].map((r,i)=><p key={i} className="micro">{r}</p>)}
+     {edit&&onCommit&&<CompatibilityForm doc={doc} choice={c} optionId={o.id} optionLabel={o.label} nodeId={node.id} run={run}/>}</details></li>;})}</ul></section>}
   {edit&&doc&&onCommit&&<ChoiceActions c={c} doc={doc} run={run}/>}
  </section>;
 }
@@ -49,5 +53,27 @@ function ChoiceActions({c,doc,run}:{c:Choice;doc:Project;run:(f:()=>Project)=>vo
    <label>Decided on<input aria-label={`Decision date for ${c.title}`} value={date} maxLength={40} onChange={e=>setDate(e.target.value)}/></label>
    <Button size="small" type="button" appearance="primary" onClick={()=>run(()=>acceptChoice(doc,c.id,option,{decidedBy:who,decidedAt:date}))}>Accept as my decision</Button></>}
   <p className="micro">Reviewing records the facts it was checked against; it changes neither the decision nor who made it. {c.status==='accepted'?'An accepted decision is not rewritten here.':'Accepting records your name and the date; a recommendation cannot accept itself.'}</p>
+ </div>;
+}
+/**
+ * Edit-mode only: record, under a named author, whether a cited source or non-synthetic evidence block shows that an
+ * alternative satisfies or violates one current requirement. Synthetic blocks are listed but cannot be cited.
+ */
+function CompatibilityForm({doc,choice,optionId,optionLabel,nodeId,run}:{doc:Project;choice:Choice;optionId:string;optionLabel:string;nodeId:string;run:(f:()=>Project)=>void}){
+ const requirements=substitutionRequirements(doc,nodeId,choice.id);
+ const [requirementId,setRequirement]=useState(requirements[0]?.id??''),[verdict,setVerdict]=useState<'satisfied'|'violated'>('satisfied'),[sourceIds,setSources]=useState<string[]>([]),[blockIds,setBlocks]=useState<string[]>([]);
+ const [who,setWho]=useState(doc.author??''),[date,setDate]=useState(today());
+ const toggle=(list:string[],id:string,on:boolean)=>on?[...list,id]:list.filter(x=>x!==id);
+ const label=`compatibility of ${optionLabel}`;
+ return <div className="choice-actions compatibility-form" role="group" aria-label={`Record ${label}`}>
+  <h4>Record compatibility evidence</h4>
+  <label>Requirement<select aria-label={`Requirement for ${label}`} value={requirementId} onChange={e=>setRequirement(e.target.value)}>{requirements.map(r=><option key={r.id} value={r.id}>{r.text}</option>)}</select></label>
+  <label>Verdict<select aria-label={`Verdict for ${label}`} value={verdict} onChange={e=>setVerdict(e.target.value as 'satisfied'|'violated')}><option value="satisfied">Satisfied per the cited evidence</option><option value="violated">Violated per the cited evidence</option></select></label>
+  {doc.sources.length>0&&<fieldset className="metric-sources"><legend>Cited sources</legend>{doc.sources.map(s=><label key={s.id} className="check"><input type="checkbox" aria-label={`Cite source ${s.title} for ${label}`} checked={sourceIds.includes(s.id)} onChange={e=>setSources(toggle(sourceIds,s.id,e.target.checked))}/>{s.title}</label>)}</fieldset>}
+  {doc.blocks.length>0&&<fieldset className="metric-sources"><legend>Cited evidence blocks</legend>{doc.blocks.map(b=>{const synthetic=b.provenance==='synthetic';return <label key={b.id} className="check"><input type="checkbox" aria-label={`Cite block ${b.title} for ${label}`} disabled={synthetic} checked={blockIds.includes(b.id)} onChange={e=>setBlocks(toggle(blockIds,b.id,e.target.checked))}/>{b.title}{synthetic&&<span className="muted"> · synthetic, cannot establish compatibility</span>}</label>;})}</fieldset>}
+  <label>Recorded by<input aria-label={`Recorder of ${label}`} value={who} maxLength={160} onChange={e=>setWho(e.target.value)}/></label>
+  <label>Recorded on<input aria-label={`Record date of ${label}`} value={date} maxLength={40} onChange={e=>setDate(e.target.value)}/></label>
+  <Button size="small" type="button" disabled={!requirementId} onClick={()=>run(()=>recordCompatibility(doc,choice.id,optionId,{requirementId,verdict,sourceIds,blockIds,recordedBy:who,recordedAt:date},requirements))}>Record evidence</Button>
+  <p className="micro">Cite a project source or a non-synthetic evidence block; a matching name, provider or catalogue family is not evidence. Recording keeps your name and the date, and a reviewed decision then needs review again.</p>
  </div>;
 }

@@ -16,13 +16,21 @@ export const SUBSTITUTION_LABELS:Record<SubstitutionVerdict,string>={
 export const NOT_PROOF='A matching name, provider or catalogue family is not proof that one can replace the other.';
 export type SubstitutionCandidate={label:string;provider?:string;family?:string;choiceId?:string;optionId?:string};
 /** Supplied compatibility evidence for one requirement. Only citations that resolve in this document count. */
-export type CompatibilityEvidence={requirementId:string;verdict:'satisfied'|'violated';sourceIds?:string[];blockIds?:string[]};
-export type Requirement={id:string;kind:'role'|'connection'|'assumption';text:string;state:'UNKNOWN'|'satisfied'|'violated';citations:string[]};
-export type SubstitutionResult={verdict:SubstitutionVerdict;label:string;current:{nodeId:string;label:string|null};candidate:SubstitutionCandidate;requirements:Requirement[];reasons:string[];notProof:string[]};
+export type CompatibilityEvidence={requirementId:string;verdict:'satisfied'|'violated';sourceIds?:string[];blockIds?:string[];requirementText?:string;recordedBy?:string;recordedAt?:string};
+export type Requirement={id:string;kind:'role'|'connection'|'assumption';text:string;state:'UNKNOWN'|'satisfied'|'violated';citations:string[];recordedBy?:string;recordedAt?:string};
+/** Recorded or supplied evidence that was not counted, with the reason (removed or changed requirement, no usable citation). */
+export type IgnoredEvidence={requirementId:string;reason:string};
+export type SubstitutionResult={verdict:SubstitutionVerdict;label:string;current:{nodeId:string;label:string|null};candidate:SubstitutionCandidate;requirements:Requirement[];reasons:string[];notProof:string[];ignored:IgnoredEvidence[]};
+/** The requirements of a component that compatibility evidence can name, without any evidence applied. */
+export function substitutionRequirements(doc:Project,nodeId:string,choiceId?:string):Requirement[]{return substitutionCheck(doc,nodeId,{label:'',...(choiceId?{choiceId}:{})},[],{recorded:false}).requirements;}
 const words=(text:string)=>new Set(text.toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>=3));
-export function substitutionCheck(doc:Project,nodeId:string,candidate:SubstitutionCandidate,evidence:readonly CompatibilityEvidence[]=[]):SubstitutionResult{
+/**
+ * `evidence` is supplied for this check only. Unless `recorded` is false, the compatibility evidence recorded on the
+ * candidate option (`choiceId` + `optionId`, recorded in Edit mode by a named person) is read first.
+ */
+export function substitutionCheck(doc:Project,nodeId:string,candidate:SubstitutionCandidate,supplied:readonly CompatibilityEvidence[]=[],{recorded=true}:{recorded?:boolean}={}):SubstitutionResult{
  const node=doc.nodes.find(n=>n.id===nodeId);
- if(!node)return {verdict:'unavailable',label:SUBSTITUTION_LABELS.unavailable,current:{nodeId,label:null},candidate,requirements:[],reasons:[`Component ${nodeId} is not in this document.`],notProof:[NOT_PROOF]};
+ if(!node)return {verdict:'unavailable',label:SUBSTITUTION_LABELS.unavailable,current:{nodeId,label:null},candidate,requirements:[],reasons:[`Component ${nodeId} is not in this document.`],notProof:[NOT_PROOF],ignored:[]};
  const label=(id:string)=>doc.nodes.find(n=>n.id===id)?.label??id,inView=new Set(doc.views.flatMap(v=>v.edgeIds));
  const requirements:Requirement[]=[{id:`role:${node.id}`,kind:'role',text:`Plays the ${node.kind} role of “${node.label}”`,state:'UNKNOWN',citations:[]}];
  for(const e of doc.edges.filter(e=>inView.has(e.id)&&(e.source===node.id||e.target===node.id)).sort((a,b)=>a.id.localeCompare(b.id)))
@@ -31,12 +39,16 @@ export function substitutionCheck(doc:Project,nodeId:string,candidate:Substituti
    :{id:`out:${e.id}`,kind:'connection',text:`Provides the ${e.kind} output to “${label(e.target)}”${e.label?` (${e.label})`:''}`,state:'UNKNOWN',citations:[]});
  const choice=candidate.choiceId?node.choices?.find(c=>c.id===candidate.choiceId):undefined;
  choice?.assumptions.forEach((a,i)=>requirements.push({id:`assumption:${choice.id}:${i}`,kind:'assumption',text:`Keeps the assumption: ${a}`,state:'UNKNOWN',citations:[]}));
- const reasons:string[]=[],sources=new Set(doc.sources.map(s=>s.id)),blocks=new Map(doc.blocks.map(b=>[b.id,b]));
- for(const ev of evidence){const req=requirements.find(r=>r.id===ev.requirementId);if(!req){reasons.push(`Evidence for ${ev.requirementId} matches no requirement of this component and is ignored.`);continue;}
+ const reasons:string[]=[],ignored:IgnoredEvidence[]=[],sources=new Set(doc.sources.map(s=>s.id)),blocks=new Map(doc.blocks.map(b=>[b.id,b]));
+ const ignore=(requirementId:string,reason:string)=>{ignored.push({requirementId,reason});reasons.push(reason);};
+ const own=recorded&&choice&&candidate.optionId?choice.options.find(o=>o.id===candidate.optionId)?.compatibility??[]:[];
+ for(const ev of [...own,...supplied]){const req=requirements.find(r=>r.id===ev.requirementId);
+  if(!req){ignore(ev.requirementId,`Evidence for ${ev.requirementId} matches no requirement of this component and is ignored; it is never rebound to another requirement.`);continue;}
+  if(ev.requirementText!==undefined&&ev.requirementText!==req.text){ignore(req.id,`Evidence for ${req.id} was recorded for “${ev.requirementText}”, which now reads “${req.text}”: ignored, never rebound. Record it again if it still holds.`);continue;}
   const cited=[...(ev.sourceIds??[]).filter(id=>sources.has(id)),...(ev.blockIds??[]).filter(id=>{const b=blocks.get(id);return !!b&&b.provenance!=='synthetic';})];
   if((ev.blockIds??[]).some(id=>blocks.get(id)?.provenance==='synthetic'))reasons.push(`A synthetic evidence block cannot establish ${req.id}; it illustrates, it does not measure.`);
-  if(!cited.length){reasons.push(`Evidence for ${req.id} cites no project source or non-synthetic evidence block, so it stays UNKNOWN.`);continue;}
-  if(req.state!=='violated'){req.state=ev.verdict;req.citations=[...new Set([...req.citations,...cited])];}
+  if(!cited.length){ignore(req.id,`Evidence for ${req.id} cites no project source or non-synthetic evidence block, so it stays UNKNOWN.`);continue;}
+  if(req.state!=='violated'){req.state=ev.verdict;req.citations=[...new Set([...req.citations,...cited])];if(ev.recordedBy){req.recordedBy=ev.recordedBy;if(ev.recordedAt)req.recordedAt=ev.recordedAt;}}
  }
  const violated=requirements.filter(r=>r.state==='violated'),unknown=requirements.filter(r=>r.state==='UNKNOWN');
  const verdict:SubstitutionVerdict=violated.length?'not-substitutable':unknown.length?'UNKNOWN':'compatible-per-cited-evidence';
@@ -45,5 +57,5 @@ export function substitutionCheck(doc:Project,nodeId:string,candidate:Substituti
  if(shared.length)notProof.push(`“${candidate.label}” shares the words ${shared.join(', ')} with “${node.label}”: not evidence.`);
  if(candidate.provider&&candidate.provider.trim().toLowerCase()===node.provider.trim().toLowerCase())notProof.push(`Same provider (${node.provider}): not evidence.`);
  if(candidate.family)notProof.push(`Same catalogue family (${candidate.family}): not evidence.`);
- return {verdict,label:SUBSTITUTION_LABELS[verdict],current:{nodeId:node.id,label:node.label},candidate,requirements,reasons,notProof};
+ return {verdict,label:SUBSTITUTION_LABELS[verdict],current:{nodeId:node.id,label:node.label},candidate,requirements,reasons,notProof,ignored};
 }

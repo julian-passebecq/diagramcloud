@@ -45,7 +45,7 @@ test('comparison: a comparable baseline and current draw both values and a deriv
   assert.deepEqual(attr(svg,'data-dd-difference'),['-40','3']);assert.deepEqual(attr(svg,'data-dd-relative'),[String(-40/420),'unavailable']);
   assert.match(t,/−40 ms/);assert.match(t,/−9\.5% of baseline/);assert.match(t,/relative change unavailable: baseline is zero/);assert.match(t,/A zero baseline has no relative change/);
   assert.match(t,/A difference is not proof of causation/);assert.match(t,/No money, time saving or performance is inferred/);assert.match(t,/SOURCE-DERIVED READINGS/);assert.match(t,/Sources: APM export/);
-  assert.match(t,/measured inputs · windows of 7 days/);assert.doesNotMatch(t,/sav(ed|ing)s? of|\$|€|faster/i);
+  assert.match(t,/measured difference · windows of 7 days/);assert.doesNotMatch(t,/sav(ed|ing)s? of|\$|€|faster/i);
   assert.deepEqual(defects(svg,`comparison ${theme}`).failures,[]);}
  const est=designSvg(project([{measures:[m('baseline',420,{basis:'estimate'}),m('current',380)]}]),'root',{type:'comparison',now:NOW});assert.deepEqual(attr(est,'data-dd-basis'),['estimate-based']);
 });

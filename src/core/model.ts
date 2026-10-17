@@ -31,6 +31,8 @@ export const measureSchema=z.object({metric:short,value:z.number().finite().min(
  * supplied or declared as an estimate. `nodeIds` names the components it concerns. Not a run and not observed timing.
  */
 export const SCHEDULE_BASES=['supplied','estimate'] as const;
+/** The time basis of a schedule: date-only, UTC, a fixed offset or an IANA time zone name. */
+export const SCHEDULE_TIMEZONE=/^(?:date-only|UTC|[+-]\d{2}:\d{2}|[A-Za-z]+(?:\/[A-Za-z0-9_+-]+)+)$/;
 export const scheduleItemSchema=z.object({id,label:short,nodeIds:refs,start:dateOrInstant,end:dateOrInstant.optional(),duration:z.string().regex(DURATION,'Use an ISO 8601 duration such as P5D, P2W or PT6H').optional(),basis:z.enum(SCHEDULE_BASES),note:z.string().max(500).optional()}).strict();
 export const blockSchema = z.discriminatedUnion('type',[
  z.object({...baseBlock,type:z.literal('text'),text}).strict(),
@@ -38,7 +40,7 @@ export const blockSchema = z.discriminatedUnion('type',[
  z.object({...baseBlock,type:z.literal('table'),columns:z.array(short).min(1).max(20),rows:z.array(z.array(z.union([z.string().max(2000),z.number().finite(),z.boolean(),z.null()])).max(20)).max(500)}).strict(),
  z.object({...baseBlock,type:z.literal('image'),assetId:id,caption:text.default('')}).strict(),
  z.object({...baseBlock,type:z.literal('metrics'),items:z.array(z.object({label:short,value:z.string().max(80),note:z.string().max(500).default(''),measure:measureSchema.optional()}).strict()).max(12)}).strict(),
- z.object({...baseBlock,type:z.literal('schedule'),timezone:z.string().regex(/^(?:date-only|UTC|[+-]\d{2}:\d{2}|[A-Za-z]+(?:\/[A-Za-z0-9_+-]+)+)$/,'Use date-only, UTC, an offset such as +02:00 or a time zone name such as Europe/Paris'),items:z.array(scheduleItemSchema).min(1).max(100)}).strict()
+ z.object({...baseBlock,type:z.literal('schedule'),timezone:z.string().regex(SCHEDULE_TIMEZONE,'Use date-only, UTC, an offset such as +02:00 or a time zone name such as Europe/Paris'),items:z.array(scheduleItemSchema).min(1).max(100)}).strict()
 ]);
 /**
  * Where a component or connection comes from, when it matters (project atlas). `planned`: declared intent (a project
@@ -56,7 +58,16 @@ export const CHOICE_STATUSES=['candidate','accepted'] as const;
 export const CHOICE_ORIGINS=['author','ai','imported'] as const;
 const choiceLine=z.string().min(1).max(500),choiceLines=z.array(choiceLine).max(20).default([]);
 const fingerprint=z.string().regex(/^[0-9a-f]{16}$/,'A fingerprint is 16 hexadecimal characters');
-export const choiceOptionSchema=z.object({id,label:short,summary:z.string().max(1000).default('')}).strict();
+/**
+ * Compatibility evidence recorded by a named person for one requirement of the substitution check (`role:<node>`,
+ * `in:<edge>`, `out:<edge>` or `assumption:<choice>:<n>`). It counts only through citations that resolve to a project
+ * source or a non-synthetic evidence block; evidence for a requirement that no longer exists is shown ignored, never rebound.
+ */
+export const COMPATIBILITY_VERDICTS=['satisfied','violated'] as const;
+export const compatibilityEvidenceSchema=z.object({requirementId:z.string().min(1).max(200),
+ /** The requirement as worded when recorded; if it now reads otherwise (an assumption edited, a connection relabelled), the evidence is ignored. */
+ requirementText:z.string().min(1).max(1200).optional(),verdict:z.enum(COMPATIBILITY_VERDICTS),sourceIds:refs,blockIds:refs,recordedBy:z.string().trim().min(1,'Compatibility evidence records who recorded it').max(160),recordedAt:z.string().regex(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2}))?$/,'Use a date such as 2026-10-16 or an ISO 8601 timestamp with a time zone')}).strict();
+export const choiceOptionSchema=z.object({id,label:short,summary:z.string().max(1000).default(''),compatibility:z.array(compatibilityEvidenceSchema).max(50).optional()}).strict();
 export const choiceSchema=z.object({id,title:short,goal:z.string().min(1).max(1000),options:z.array(choiceOptionSchema).min(1).max(12),recommendedOptionId:id.optional(),chosenOptionId:id.optional(),reasons:choiceLines,tradeoffs:choiceLines,assumptions:choiceLines,revisitWhen:z.string().max(500).optional(),status:z.enum(CHOICE_STATUSES).default('candidate'),origin:z.enum(CHOICE_ORIGINS).default('author'),suggestedBy:z.string().min(1).max(160).optional(),decidedBy:z.string().min(1).max(160).optional(),decidedAt:z.string().regex(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2}))?$/,'Use a date such as 2026-10-16 or an ISO 8601 timestamp with a time zone').optional(),
  /** The project revision and the content fingerprint of the facts the decision was reviewed against; review-needed is derived from it, never stored. */
  reviewBasis:z.object({revision:z.number().int().nonnegative(),fingerprint}).strict().optional(),sourceIds:refs,visibility}).strict();
@@ -174,13 +185,14 @@ export type ProjectNode=z.infer<typeof nodeSchema>;
 export type ProjectEdge=z.infer<typeof edgeSchema>;
 export type ProjectView=z.infer<typeof viewSchema>;
 export type Choice=z.infer<typeof choiceSchema>;
+export type CompatibilityRecord=z.infer<typeof compatibilityEvidenceSchema>;
 export type EvidenceBlock=z.infer<typeof blockSchema>;
 export type Asset=z.infer<typeof assetSchema>;
 export type Observation=z.infer<typeof observationSchema>;
 
 /** Timing and measurement facts that the schema alone cannot check: real dates, ordered intervals, agreeing end and duration,
  * one time basis per schedule, no measured reading in a synthetic block. Refused visibly, never repaired. */
-function timingErrors(b:z.infer<typeof blockSchema>,nodes:Set<string>):string[]{
+export function timingErrors(b:z.infer<typeof blockSchema>,nodes:Set<string>):string[]{
  const errors:string[]=[];
  if(b.type==='schedule'){const dateOnly=b.timezone==='date-only',seen=new Set<string>();
   for(const i of b.items){const where=`${b.id}/${i.id}`;if(seen.has(i.id))errors.push(`${b.id}: duplicate schedule item ID ${i.id}`);seen.add(i.id);
@@ -237,6 +249,8 @@ export function validateDocument(input:unknown):Project {
   for(const ref of [c.recommendedOptionId,c.chosenOptionId])if(ref)check(ref,options,where);
   if(c.status==='candidate'&&c.chosenOptionId)errors.push(`${where}: a candidate has no chosen option; use recommendedOptionId, or accept it with chosenOptionId, decidedBy and decidedAt`);
   if(c.status==='accepted'&&!(c.chosenOptionId&&c.decidedBy&&c.decidedAt))errors.push(`${where}: an accepted decision records chosenOptionId, decidedBy and decidedAt`);
+  for(const o of c.options){const at=`${where}/${o.id}`,seen=new Set<string>();for(const e of o.compatibility??[]){if(seen.has(e.requirementId))errors.push(`${at}: two compatibility records for ${e.requirementId}; one option records one verdict per requirement`);seen.add(e.requirementId);
+   if(!e.sourceIds.length&&!e.blockIds.length)errors.push(`${at}: compatibility evidence for ${e.requirementId} cites at least one project source or evidence block; a name, provider or family is not evidence`);}}
   if(c.status==='accepted'&&sameAgent(c.decidedBy,c.suggestedBy))errors.push(`${where}: a recommendation cannot accept itself; decidedBy must be a person other than suggestedBy (an AI recommendation is not a decision)`);}
  // Concept mappings: an unknown or changed target is stale (derived), not invalid; establishing a mapping needs evidence and a human reviewer.
  ids(d.learningMappings??[],'concept mapping');const mappingPairs=new Set<string>();
