@@ -42,7 +42,7 @@ export function ComponentSummary({doc,node,onWorkspace}:{doc:Project;node:Projec
    {node.summary?<p>{node.summary}</p>:<p className="muted">No summary yet.</p>}
    {node.role&&<><h3>My contribution</h3><p className="prose">{node.role}</p></>}
    {edges.length>0&&<ul className="grammar-relations" aria-label="Relationships">{edges.map(e=><li key={e.id}>{e.source===node.id?<>→ {label(e.target)}</>:<>← {label(e.source)}</>}{e.label&&<span className="muted"> · {e.label}</span>}<span className="muted"> ({e.kind})</span></li>)}</ul>}
-   <ChoiceList choices={node.choices}/>
+   <ChoiceList choices={node.choices} doc={doc} owner={{kind:'node',id:node.id}}/>
   </Group>
   <Group title="Realization"><dl className="grammar-list">
    <Row k="Designed"><span title={STATUS_NOTE}>{node.status} <span className="muted">(illustrative design state)</span></span></Row>
@@ -89,7 +89,6 @@ export function Inspector(p:Props){
    <label>Summary<textarea name="summary" aria-label="Component summary" rows={3} maxLength={500} defaultValue={n.summary}/></label>
    <label>My contribution<textarea name="role" rows={3} maxLength={1000} defaultValue={n.role}/></label>
    <label>Child view<select name="child" defaultValue={n.childViewId??''}><option value="">No child view</option>{p.doc.views.map(v=><option key={v.id} value={v.id}>{v.title}</option>)}</select></label>
-   <ChoiceList choices={n.choices} edit/>
   </fieldset>
   <fieldset className="form-group"><legend>Realization</legend>
    <label>Design status (illustrative)<select name="status" defaultValue={n.status}>{['idle','running','complete','warning','failed'].map(k=><option key={k}>{k}</option>)}</select></label>
@@ -104,6 +103,7 @@ export function Inspector(p:Props){
   </fieldset>
   <Button appearance="primary" type="submit">Apply component</Button>
  </form>
+ <section className="form-group" aria-label="Choices and decisions"><h3>Choices and decisions</h3><ChoiceList choices={n.choices} edit doc={p.doc} owner={{kind:'node',id:n.id}} onCommit={next=>{const updated=next.nodes.find(x=>x.id===n.id);if(updated)p.onUpdate(updated);}} onError={p.onError}/></section>
  <div className="toolbar vertical-space"><Button onClick={p.onChild} disabled={!!n.childViewId}>+ Create subdiagram</Button><Button appearance="subtle" onClick={p.onDelete}>Delete component</Button></div><hr/>
  <h3>Add evidence</h3>
  <label className="property-form">Block type<select aria-label="Block type" value={type} onChange={e=>setType(e.target.value)}><option value="text">Explanation</option><option value="code">Code snippet</option><option value="table">Example table</option><option value="metrics">Metrics (KPI cards)</option><option value="transformation">Transformation explainer (input → logic → output)</option></select></label>

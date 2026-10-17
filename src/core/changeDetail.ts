@@ -1,4 +1,5 @@
 import type {Project} from './model';
+import {reviewBasisCautions} from './decisionReview';
 import type {ExperiencePack} from '../experience/model';
 
 /**
@@ -116,8 +117,12 @@ function choiceCautions(current:Project,incoming:Project,out:ChangeDetail){
  for(const [id,c] of all(incoming)){if(c.status!=='accepted')continue;const was=before.get(id);
   const who=`decidedBy ${c.decidedBy??'nobody'}${c.suggestedBy?`, suggestedBy ${c.suggestedBy}`:''}${c.origin!=='author'?`, origin ${c.origin}`:''}`;
   if(!was||was.status!=='accepted')out.cautions.push(`Choice “${c.title}” ${was?'changes to':'arrives'} accepted (${who}); an AI recommendation is not a decision. Accept it yourself in Edit mode.`);
-  else if(was.chosenOptionId!==c.chosenOptionId||was.decidedBy!==c.decidedBy)out.cautions.push(`Changes the accepted decision of choice “${c.title}” (${who}); an AI recommendation is not a decision.`);}
+  else if(DECISION_FIELDS.some(k=>JSON.stringify(was[k]??null)!==JSON.stringify(c[k]??null)))out.cautions.push(`Changes the accepted decision of choice “${c.title}” (${who}); an AI recommendation is not a decision.`);}
+ const after=all(incoming);for(const [id,was] of before)if(was.status==='accepted'&&!after.has(id))out.cautions.push(`Removes the accepted decision of choice “${was.title}” (decided by ${was.decidedBy} on ${was.decidedAt}).`);
+ out.cautions.push(...reviewBasisCautions(current,incoming));
 }
+/** The recorded content of an accepted decision; changing any of it is reported, never silent. */
+const DECISION_FIELDS=['chosenOptionId','decidedBy','decidedAt','goal','options','reasons','tradeoffs','assumptions','sourceIds'] as const;
 
 export function describeChanges(current:Project,incoming:Project):ChangeDetail{
  const out:ChangeDetail={changes:[],cautions:[]};

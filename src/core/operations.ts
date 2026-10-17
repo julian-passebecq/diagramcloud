@@ -1,6 +1,6 @@
 import {clone,validateDocument,viewSchema,type Project,type ProjectView} from './model';
 import {publicPack} from '../experience/model';
-import {publicLearningMappings} from './learningMapping';import {publicTours} from './tours';
+import {publicLearningMappings} from './learningMapping';import {publicTours} from './tours';import {publicChoiceReviews} from './decisionReview';
 export function positionFor(view:ProjectView,nodeId:string){const i=Math.max(0,view.nodeIds.indexOf(nodeId));return view.positions[nodeId]??{x:(i%3)*290,y:Math.floor(i/3)*170};}
 export function traceNodes(doc:Project,viewId:string,start:string,direction:'upstream'|'downstream'):Set<string>{const view=doc.views.find(v=>v.id===viewId),edges=doc.edges.filter(e=>view?.edgeIds.includes(e.id)),seen=new Set([start]),queue=[start];while(queue.length){const current=queue.shift();for(const e of edges){const next=direction==='downstream'?(e.source===current?e.target:null):(e.target===current?e.source:null);if(next&&!seen.has(next)){seen.add(next);queue.push(next);}}}return seen;}
 export function pathToView(doc:Project,target:string):string[]{function visit(viewId:string,path:string[]):string[]|null{if(viewId===target)return[...path,viewId];if(path.includes(viewId))return null;const v=doc.views.find(v=>v.id===viewId);for(const n of doc.nodes.filter(n=>v?.nodeIds.includes(n.id)))if(n.childViewId){const result=visit(n.childViewId,[...path,viewId]);if(result)return result;}return null;}return visit(doc.rootViewId,[])??[target];}
@@ -58,6 +58,8 @@ export function publicDocument(input:Project):Project{
  if(d.learningMappings){const kept=publicLearningMappings(input,d,{nodes:keptNodes,views:keptViews,sources,blocks});if(kept.length)d.learningMappings=kept;else delete d.learningMappings;}
  // Variants are candidates, never public facts. Tours: public ones only, a hidden subject or view omitted and said so.
  delete d.variants;if(d.tours){const kept=publicTours(input,d);if(kept.length)d.tours=kept;else delete d.tours;}
+ // Choice review bases: re-bound to the public facts only when current in authoring, otherwise dropped.
+ publicChoiceReviews(input,d);
  return validateDocument(d);
 }
 export type History={past:Project[];present:Project;future:Project[]};
