@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.27.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.27.1 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,6 +44,7 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
+| 1.27.1 | head of the `fix/1.27.1-tour-narration` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | R4 verifier corrections: a public tour stop whose subjects are all private is omitted with its narration, like a stop on a private view; the crosswalk test reads cited titles that contain quotes whole; Chromium only |
 | 1.27.0 | head of the `release/1.27.0-r4-remainder` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [R4 remainder notes](release-1.27/RELEASE_NOTES.md): CLI/MCP catalogue lookup, figure withholding, lesson depth and step playback, content guards, variants and tours; [R4 crosswalk](product/R4_CROSSWALK.md); Chromium only |
 | 1.26.1 | head of the `fix/r4-verifier-corrections` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | R4 verifier corrections: accepted-choice caution and no self-accepted recommendation (`suggestedBy`), mapping origin set by the calling path with normalized no-self-review, ticked citations for Mark reviewed, custom-catalogue return context, project-less catalogue entry (R4-AC-01 implemented); Chromium only |
 | 1.26.0 | head of the `release/1.26.0-r4` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [learning milestone notes](release-1.26/RELEASE_NOTES.md), [R4 crosswalk](product/R4_CROSSWALK.md); Chromium only |

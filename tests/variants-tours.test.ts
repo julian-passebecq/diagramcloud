@@ -7,6 +7,7 @@ import {addVariant,applyVariant,discardVariant,rebaseVariant,selectVariant,varia
 import {addTour,addTourStop,recordStop,tourStops} from '../src/core/tours';
 import {PATCH_FORMAT} from '../src/core/patch';
 import {samples} from '../src/data/samples';
+import {portfolioHtml} from '../src/export/html';
 
 /** R3-02 baseline-bound variants and R3-15 tours (inherited R3-AC-04..06 and R3-AC-33). */
 const shop=():Project=>validateDocument({schemaVersion:1,id:'shop',revision:3,title:'Shop',rootViewId:'overview',
@@ -103,18 +104,22 @@ test('tours: a stale or missing anchor fails visibly when played; reading a tour
 });
 
 test('tours: public copies keep safe identity and say what was omitted, without naming hidden subjects',()=>{
- const doc0=shop(),stops=[recordStop(doc0,'overview',[{kind:'node',id:'api'},{kind:'node',id:'vault'},{kind:'edge',id:'api-vault'}],'The API reads a key.'),recordStop(doc0,'ops',[{kind:'node',id:'ops-box'}],'The runner deploys nightly.'),recordStop(doc0,'overview',[{kind:'node',id:'db'}],'Orders land here.')];
- let doc=addTour(doc0,{id:'walk',title:'Order walkthrough',visibility:'public',stop:stops[0]});doc=addTourStop(addTourStop(doc,'walk',stops[1]),'walk',stops[2]);
+ const doc0=shop(),stops=[recordStop(doc0,'overview',[{kind:'node',id:'api'},{kind:'node',id:'vault'},{kind:'edge',id:'api-vault'}],'The API reads a key.'),recordStop(doc0,'ops',[{kind:'node',id:'ops-box'}],'The runner deploys nightly.'),recordStop(doc0,'overview',[{kind:'node',id:'db'}],'Orders land here.'),recordStop(doc0,'overview',[{kind:'node',id:'vault'}],'The vault holds the master key.')];
+ let doc=addTour(doc0,{id:'walk',title:'Order walkthrough',visibility:'public',stop:stops[0]});doc=addTourStop(addTourStop(addTourStop(doc,'walk',stops[1]),'walk',stops[2]),'walk',stops[3]);
  doc=addTour(doc,{id:'internal',title:'Internal runbook',stop:stops[2]});
  const pub=publicDocument(doc),text=JSON.stringify(pub.tours);
  assert.deepEqual(pub.tours!.map(t=>t.id),['walk'],'a private tour stays in the authoring document');
- const [a,b,c]=pub.tours![0].stops;
+ const [a,b,c,d]=pub.tours![0].stops;
  assert.deepEqual(a.subjects,[{kind:'node',id:'api'}]);assert.equal(a.omitted,'subjects');assert.equal(a.narration,'The API reads a key.');
  assert.deepEqual(b,{subjects:[],narration:'',omitted:'stop'},'a stop on a private view keeps no view, subject, fingerprint or narration');
  assert.equal(c.omitted,undefined);
- for(const hidden of ['vault','api-vault','ops-box','"viewId":"ops"','runner deploys','Internal runbook'])assert.ok(!text.includes(hidden),`${hidden} is not in the public tours`);
+ assert.deepEqual(d,{subjects:[],narration:'',omitted:'stop'},'a stop whose subjects are all private is omitted with its narration');
+ for(const hidden of ['vault','api-vault','ops-box','"viewId":"ops"','runner deploys','master key','Internal runbook'])assert.ok(!text.includes(hidden),`${hidden} is not in the public tours`);
+ const html=portfolioHtml(doc);
+ assert.ok(html.includes('Orders land here'),'the public tour reaches the HTML export');
+ for(const hidden of ['master key','runner deploys','Internal runbook'])assert.ok(!html.includes(hidden),`${hidden} is not in the public HTML export`);
  const read=tourStops(pub,pub.tours![0]);
- assert.deepEqual(read.map(s=>s.status),['current','omitted','current'],'a current stop reads current in the public copy');
+ assert.deepEqual(read.map(s=>s.status),['current','omitted','current','omitted'],'a current stop reads current in the public copy');
  assert.equal(read[0].note,'Some subjects of this stop are not public and are omitted from this copy.');assert.match(read[1].message,/not public and is omitted/);
  const stale=clone(doc);stale.nodes.find(n=>n.id==='db')!.label='Orders store';
  assert.equal(tourStops(publicDocument(validateDocument(stale)),publicDocument(validateDocument(stale)).tours![0])[2].status,'stale','a stale stop stays stale in the public copy');
