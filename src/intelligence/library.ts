@@ -44,7 +44,15 @@ export async function createPublication(input:Project,brief:{title:string;audien
 }
 export function collectionFacts(collection:ProjectCollection,projects:Project[]){
  const c=validateCollection(collection),byId=new Map(projects.map(p=>[p.id,validateDocument(p)]));
- return {collection:c,members:c.projectIds.map(id=>{const p=byId.get(id),active=p?.atlas?.snapshots.find(s=>s.id===p.atlas?.activeSnapshotId);return {id,state:p?'available' as const:'missing' as const,title:p?.title??id,documentRevision:p?.revision??null,sourceVector:active?.repositories.map(r=>({repositoryId:r.id,revision:r.revision??null}))??[]};}),revisionPolicy:'Each project and repository keeps its own revision; no collection SHA.'};
+ const members=c.projectIds.map(id=>{const p=byId.get(id),active=p?.atlas?.snapshots.find(s=>s.id===p.atlas?.activeSnapshotId);return {id,state:p?'available' as const:'missing' as const,title:p?.title??id,documentRevision:p?.revision??null,sourceVector:active?.repositories.map(r=>({repositoryId:r.id,revision:r.revision??null}))??[],repositories:active?.repositories.map(r=>({host:r.host,locator:r.locator}))??[]};});
+ return {collection:c,members:members.map(({repositories:_,...m})=>m),repositories:collectionRepositories(members),revisionPolicy:'Each project and repository keeps its own revision; no collection SHA.'};
+}
+/** Shared membership (V2 AC04): a repository is identified by host + locator, never by its title or per-project ID.
+ * Unique repositories and repository memberships (one per member project that lists it) are reported separately. */
+function collectionRepositories(members:{id:string;repositories:{host:string;locator:string}[]}[]){
+ const unique=new Map<string,{host:string;locator:string;projectIds:string[]}>();let memberships=0;
+ for(const m of members)for(const r of new Map(m.repositories.map(r=>[r.host+' '+r.locator.trim().replace(/\/+$/,'').replace(/\.git$/i,'').toLowerCase(),r]))){memberships++;const [key,repo]=r,row=unique.get(key)??{host:repo.host,locator:repo.locator,projectIds:[]};if(!row.projectIds.includes(m.id))row.projectIds.push(m.id);unique.set(key,row);}
+ return {unique:unique.size,memberships,shared:[...unique.values()].filter(r=>r.projectIds.length>1),identity:'host + locator' as const};
 }
 export function publicCollection(collection:ProjectCollection,projects:Project[]){
  const c=validateCollection(collection);if(c.visibility!=='public')throw new Error('Collection is private');
