@@ -7,16 +7,22 @@ import {resolve,join,relative,dirname,sep} from 'node:path';
 import {platform,arch} from 'node:os';
 import {bundleClients} from './lib/bundleClients';
 const git=(...args:string[])=>execFileSync('git',args,{encoding:'utf8'}).trim();
+// Git Bash puts its GNU tar first on PATH, which reads "D:\\..." as a remote host.
+// On Windows use the system bsdtar, and pass workspace-relative paths everywhere.
+const windowsTar=join(process.env.SystemRoot??'C:/Windows','System32','tar.exe');
+const tarBinary=platform()==='win32'&&existsSync(windowsTar)?windowsTar:'tar';
+const tar=(...tarArgs:string[])=>execFileSync(tarBinary,tarArgs,{cwd:root,stdio:['ignore','ignore','inherit']});
 const hash=(file:string)=>createHash('sha256').update(readFileSync(file)).digest('hex');
 const args=process.argv.slice(2),flag=(name:string)=>{const at=args.indexOf(name);return at>=0?args[at+1]:undefined;};
 const root=resolve('.'),sourceSha=git('rev-parse','HEAD'),version=(JSON.parse(readFileSync('package.json','utf8')) as {version:string}).version,out=resolve(flag('--out')||'.local/integration/DIAGRAM/'+sourceSha);
 if(!out.startsWith(root+sep)||out===root||existsSync(out))throw new Error('Choose a new package directory inside this workspace');
 if(git('status','--porcelain','--untracked-files=all').length)throw new Error('Commit the candidate before packaging');
 const evidencePath=flag('--evidence');if(!evidencePath||statSync(evidencePath).size>1024*1024)throw new Error('--evidence is required (1 MiB maximum)');
-const evidence=JSON.parse(readFileSync(evidencePath,'utf8')) as {sourceSha:string;ci:{sourceSha:string;url:string;conclusion:string};checks:{id:string;status:'PASS'|'FAIL'|'NOT_RUN';evidenceRefs:string[]}[]};
+const evidence=JSON.parse(readFileSync(evidencePath,'utf8')) as {sourceSha:string;ci:{sourceSha:string;url:string;conclusion:string};checks:{id:string;status:'PASS'|'FAIL'|'NOT_RUN';evidenceRefs:string[];inspectedBy?:string;method?:string}[]};
 if(evidence.sourceSha!==sourceSha||evidence.ci?.sourceSha!==sourceSha||evidence.ci.conclusion!=='success'||!/^https:\/\/github.com\/julian-passebecq\/diagramcloud\/actions\/runs\/\d+$/.test(evidence.ci.url))throw new Error('Successful exact-head CI and matching host evidence required');
 for(const required of ['typecheck','unit','build','browser','real-atlas-quality','pptx-zip','pptx-visual','bundled-cli'])if(!evidence.checks.some(c=>c.id===required&&c.status==='PASS'&&c.evidenceRefs.length))throw new Error('Missing qualification evidence: '+required);
 for(const c of evidence.checks)for(const ref of c.evidenceRefs)if(!/^https:/.test(ref)&&!existsSync(ref))throw new Error('Missing host evidence file');
+for(const c of evidence.checks)for(const field of ['inspectedBy','method'] as const)if(c[field]!==undefined&&(typeof c[field]!=='string'||!c[field].trim()||/[\r\n]/.test(c[field])||c[field].length>200))throw new Error('Check '+field+' must be one short line');
 if(!existsSync('dist/index.html'))throw new Error('Build the application first');
 mkdirSync(dirname(out),{recursive:true});mkdirSync(out);
 await bundleClients(join(out,'cli'));
@@ -25,12 +31,20 @@ const tracked=execFileSync('git',['ls-files','-z'],{encoding:'utf8'}).split('\0'
 if(tracked.some(p=>/^(?:\.git|\.local|node_modules|release|test-results)(?:\/|$)/.test(p)||/\.(?:woff2?|ttf|otf)$/i.test(p)||/[\r\n]/.test(p)||p.startsWith('-')))throw new Error('Unsafe source package membership');
 const generated=['public/diagramcloud.schema.json','public/diagramcloud.patch.schema.json','public/diagramcloud.project-brief.schema.json','public/examples','public/experience','public/galaxy','public/third-party-licenses.txt'].filter(existsSync);
 const manifest=join(out,'source-members.txt');writeFileSync(manifest,[...tracked,...generated,'dist'].join('\n')+'\n');
-execFileSync('tar',['-czf',join(out,'diagramcloud-source-and-build.tar.gz'),'-T',manifest],{cwd:root});
-execFileSync('tar',['-czf',join(out,'diagramcloud-web-build.tar.gz'),'-C','dist','.'],{cwd:root});
-execFileSync('tar',['-czf',join(out,'diagramcloud-cli.tar.gz'),'-C',out,'cli'],{cwd:root});
-execFileSync('tar',['-czf',join(out,'diagramcloud-synthetic-examples.tar.gz'),'examples/product-campaign','tests/fixtures/projects','tests/fixtures/deep'],{cwd:root});
+const local=(path:string)=>relative(root,path).split(sep).join('/');
+tar('-czf',local(join(out,'diagramcloud-source-and-build.tar.gz')),'-T',local(manifest));
+tar('-czf',local(join(out,'diagramcloud-web-build.tar.gz')),'-C','dist','.');
+tar('-czf',local(join(out,'diagramcloud-cli.tar.gz')),'-C',local(out),'cli');
+tar('-czf',local(join(out,'diagramcloud-synthetic-examples.tar.gz')),'examples/product-campaign','tests/fixtures/projects','tests/fixtures/deep');
 for(const name of ['outcome.json','RESUME.md'])copyFileSync(name,join(out,name));
-writeFileSync(join(out,'SHIP-REPORT.md'),readFileSync('SHIP-REPORT.md','utf8')+`\n## Exact packaged candidate\n\nSource: ${sourceSha}.\n\nCI: [exact-head run](${evidence.ci.url}), conclusion **${evidence.ci.conclusion}**, head ${evidence.ci.sourceSha}.\n\nHost: ${platform()} ${arch()}, Node ${process.version}. Checks: ${evidence.checks.map(c=>c.id+'='+c.status).join(', ')}. Detailed durations/counts, hashes and evidence references are in delivery-receipt.json. PowerPoint images were inspected by Codex; this is not human owner verification.\n`);
+/** Only what the evidence file records: an inspector and method per check, never a default claim. */
+function inspectionReport(checks:typeof evidence.checks){
+ const inspected=checks.filter(c=>c.inspectedBy);
+ const lines=inspected.map(c=>`- ${c.id} (${c.status}): inspected by ${c.inspectedBy}${c.method?' ('+c.method+')':''}; references: ${c.evidenceRefs.join(', ')||'none'}.`);
+ const silent=checks.filter(c=>!c.inspectedBy).map(c=>c.id);
+ return ['## Inspection recorded by this run','',...(lines.length?lines:['No check in the evidence file names an inspector.']),...(silent.length?['','No inspector is recorded for: '+silent.join(', ')+'. Their status comes from the evidence file and its references only.']:[]),'','Recorded inspection is not human owner verification unless the evidence says so.'].join('\n');
+}
+writeFileSync(join(out,'SHIP-REPORT.md'),readFileSync('SHIP-REPORT.md','utf8')+`\n## Exact packaged candidate\n\nSource: ${sourceSha}.\n\nCI: [exact-head run](${evidence.ci.url}), conclusion **${evidence.ci.conclusion}**, head ${evidence.ci.sourceSha}.\n\nHost: ${platform()} ${arch()}, Node ${process.version}. Checks: ${evidence.checks.map(c=>c.id+'='+c.status).join(', ')}. Detailed durations/counts, hashes and evidence references are in delivery-receipt.json.\n\n${inspectionReport(evidence.checks)}\n`);
 copyFileSync(evidencePath,join(out,'delivery-receipt.json'));writeFileSync(join(out,'SOURCE_COMMIT.txt'),sourceSha+'\n');
 writeFileSync(join(out,'PACKAGE-README.md'),`# DiagramCloud ${version}\n\nSource ${sourceSha}; exact-head CI ${evidence.ci.url}. Private package: no tag, public release or Marketplace publication.\n\nExtract the web archive and serve it on a local static HTTP host. Extract the CLI archive and use Node.js 22+: node cli/intelligence.mjs graph --input graph.json --out new-directory; node cli/intelligence-mcp.mjs selected-project.json for ten public MCP tools; optionally append --analysis explicitly-selected-analysis-bundle.json for bounded private author-context queries. Deep uses the bundled local grammar allowlist and recorded MIT licenses. Bundles need no installed npm packages. Source archive includes the lockfile for npm ci/check/test/build/browser qualification. Synthetic examples are labelled; no real Brain snapshot or private atlas is included. Do not use READY as permission to merge, deploy, execute analyzed code or review observations.\n`);
 const kinds:Record<string,'source'|'web-build'|'node-package'|'fixture'|'report'>={'diagramcloud-source-and-build.tar.gz':'source','diagramcloud-web-build.tar.gz':'web-build','diagramcloud-cli.tar.gz':'node-package','diagramcloud-synthetic-examples.tar.gz':'fixture','outcome.json':'report','SHIP-REPORT.md':'report','RESUME.md':'report','delivery-receipt.json':'report','SOURCE_COMMIT.txt':'report','PACKAGE-README.md':'report'};

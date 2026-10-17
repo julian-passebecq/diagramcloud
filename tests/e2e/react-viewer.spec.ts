@@ -6,10 +6,11 @@ import {join,resolve} from 'node:path';
 import {createReturnGuard,type ReturnGuard} from '../../src/react/hostSession';
 import {openMessage,handleReturn,handleSelectionRequest,webviewHtml} from '../../hosts/vscode/src/hostCore';
 import {completionRequestSchema} from '../../src/intelligence/completionKit';
+import {reactViewerUrl,edgeLabelUrl} from '../../scripts/lib/e2ePorts';
 
 // Explicit separate test-only built consumer. Root must start the approved ignored
 // fixture harness; the Studio production server does not gain a fixture route.
-const url=process.env.DIAGRAMCLOUD_VIEWER_FIXTURE_URL??'http://127.0.0.1:4174/tests/fixtures/react-viewer/consumer.html';
+const url=process.env.DIAGRAMCLOUD_VIEWER_FIXTURE_URL??reactViewerUrl;
 const viewer=(page:Page,name:string)=>page.getByRole('region',{name:'Viewer '+name,exact:true});
 async function context(owner:Locator){const details=owner.locator(':scope > details');if(!await details.evaluate(el=>(el as HTMLDetailsElement).open))await details.locator(':scope > summary').click();return details;}
 async function callbacks(page:Page):Promise<unknown[]>{return JSON.parse(await page.getByLabel('Permitted host callback log',{exact:true}).innerText());}
@@ -69,7 +70,7 @@ test('native 2D fallback and explicit read-only requests remain keyboard-usable 
 const watchLabels=(scope:Locator)=>scope.evaluate(root=>{const w=window as unknown as {labelDetached:string[];labelObserver?:MutationObserver};w.labelObserver?.disconnect();w.labelDetached=[];w.labelObserver=new MutationObserver(records=>{for(const record of records)for(const node of record.removedNodes)if(node instanceof Element)for(const label of [node,...node.querySelectorAll('*')])if(label.matches('button.edge-label'))w.labelDetached.push(label.getAttribute('data-edge-id')??'');});w.labelObserver.observe(root,{subtree:true,childList:true});});
 const detachedLabels=(page:Page)=>page.evaluate(()=>(window as unknown as {labelDetached:string[]}).labelDetached);
 // A separate INTERNAL Canvas QA bundle; never independent SDK consumer compilation proof.
-const internalLabelUrl=process.env.DIAGRAMCLOUD_LABEL_FIXTURE_URL??'http://127.0.0.1:4175/tests/fixtures/edge-label/consumer.html';
+const internalLabelUrl=process.env.DIAGRAMCLOUD_LABEL_FIXTURE_URL??edgeLabelUrl;
 test('internal Canvas label pointer and native keys deliver exactly once and do not submit the host form',async({page},info)=>{
  await page.goto(internalLabelUrl);const canvas=page.getByRole('region',{name:'Internal non-strict Canvas',exact:true}),view=canvas.getByTestId('view-root'),zero=canvas.getByRole('button',{name:'Select connection edge-00: Synthetic parallel label',exact:true}),one=canvas.getByRole('button',{name:'Select connection edge-01: Synthetic parallel label',exact:true});await expect(view.locator('.canvas-frame')).toHaveAttribute('data-label-placement','settled');
  await page.getByRole('button',{name:'Submit internal label form',exact:true}).click();await expect(page.getByLabel('Internal label form submits',{exact:true})).toHaveText('1');await page.getByRole('button',{name:'Reset internal counters',exact:true}).click();await expect(page.getByLabel('Internal label form submits',{exact:true})).toHaveText('0');
@@ -84,7 +85,7 @@ test('strict labels keep the original span path and host-controlled callbacks in
  await page.goto(internalLabelUrl);const a=page.getByRole('region',{name:'Internal strict A',exact:true}),b=page.getByRole('region',{name:'Internal strict B',exact:true});
  for(const viewer of [a,b]){await expect(viewer.locator('.edge-label.placed:not(.hidden-label)')).toHaveCount(2);await expect(viewer.locator('button.edge-label')).toHaveCount(0);expect(await viewer.locator('.edge-label').evaluateAll(elements=>elements.every(element=>element.tagName==='SPAN'&&element.getAttribute('title')==='Synthetic parallel label'&&element.getAttribute('data-full')==='Synthetic parallel label'))).toBe(true);await expect(viewer.getByRole('button',{name:'Edit view details',exact:true})).toHaveCount(0);}
  await context(a);await context(b);await a.getByRole('button',{name:'Select connection edge-00',exact:true}).click();await expect(page.getByLabel('Internal strict deliveries',{exact:true})).toHaveText(JSON.stringify([{projectId:'synthetic-label-qa',baseRevision:0,viewId:'root',edgeId:'edge-00'}]));await expect(page.getByLabel('Internal strict controlled selection',{exact:true})).toContainText('"nodeId":"left"');await expect(a.locator('.edge-selected')).toHaveCount(0);await expect(b.locator('.edge-selected')).toHaveCount(0);await expect(b.getByRole('button',{name:'Select connection edge-00',exact:true})).toBeDisabled();await expect(page.getByLabel('Internal canonical document unchanged',{exact:true})).toHaveText('true');
- // Existing independent consumer tests above remain byte-exact and use their separate4174 build.
+ // Existing independent consumer tests above remain byte-exact and use their separate react-viewer fixture build.
 });
 
 test('host session grants only explicit implemented capabilities and refuses stale, replayed, foreign and disposed returns, live and by file',async({page},info)=>{
