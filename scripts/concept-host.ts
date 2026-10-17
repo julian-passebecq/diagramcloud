@@ -1,7 +1,7 @@
 /** Isolated loopback host for an explicitly selected owner viewer. No arbitrary file route or runtime. */
 import {createServer,type RequestListener} from 'node:http';
 import {createHash} from 'node:crypto';
-import {openSync,readFileSync,fstatSync,closeSync} from 'node:fs';
+import {openSync,readFileSync,fstatSync,closeSync,watchFile,unwatchFile} from 'node:fs';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {parseDocument,MAX_DOCUMENT_BYTES,type Project} from '../src/core/model';
@@ -12,7 +12,14 @@ const VIEWER_MAX_BYTES=8*1024*1024,PACKET_MAX_BYTES=32*1024*1024;
 function selectedBytes(path:string,max:number):Buffer{
  const fd=openSync(resolve(path),'r');try{const stat=fstatSync(fd);if(!stat.isFile()||stat.size>max)throw new Error('Selected file exceeds its bounded profile.');const bytes=readFileSync(fd);if(bytes.length>max)throw new Error('Selected file exceeds its bounded profile.');return bytes;}finally{closeSync(fd);}
 }
-export type LocalConceptHost={url:string;origin:string;viewerOrigin:string;packet:ConceptPreview;close():Promise<void>};
+/**
+ * `packet` is the last packet prepared successfully. `regenerate` rebuilds it from a newly selected document (and
+ * optional sidecar); while the last regeneration failed (`failure` is set), `/` and `/packet.json` answer 503 with a
+ * generic error and never serve the previous packet. A later successful regeneration serves again.
+ */
+export type LocalConceptHost={url:string;origin:string;viewerOrigin:string;readonly packet:ConceptPreview;readonly failure:string|undefined;
+ regenerate(next:{document:Project;packet?:unknown}):Promise<{ok:true;packet:ConceptPreview}|{ok:false;reason:string}>;close():Promise<void>};
+export const REGENERATION_FAILED='Preview packet regeneration failed. The previous packet is no longer served; fix the selected document or packet and regenerate.';
 export async function startConceptHost(options:{document:Project;viewId:string;audience:'public'|'author';viewerHtml:Buffer|string;viewerSha256:string;packet?:unknown;port?:number;diagramcloudOrigin?:string}):Promise<LocalConceptHost>{
  const bytes=Buffer.isBuffer(options.viewerHtml)?Buffer.from(options.viewerHtml):Buffer.from(options.viewerHtml,'utf8');
  if(bytes.length>VIEWER_MAX_BYTES||!/^[a-f0-9]{64}$/.test(options.viewerSha256)||createHash('sha256').update(bytes).digest('hex')!==options.viewerSha256)throw new Error('Selected viewer hash does not match.');
@@ -20,9 +27,12 @@ export async function startConceptHost(options:{document:Project;viewId:string;a
  // Keep the owner's existing hashed executable. An additional response CSP denies every external request.
  const hashes=[...viewer.matchAll(/script-src 'sha256-([A-Za-z0-9+/]{43}=)'/g)].map(m=>m[1]);
  if(hashes.length!==1)throw new Error('Selected viewer must declare one owner script hash.');
- const packet=await prepareConceptHostPacket(options.document,options.viewId,options.audience,options.packet);
+ let packet=await prepareConceptHostPacket(options.document,options.viewId,options.audience,options.packet),failure:string|undefined;
  const port=options.port??0;if(!Number.isInteger(port)||port<0||port>65535)throw new Error('Invalid local port.');
  let origin='',viewerOrigin='',hostHtml='',hostCsp='',viewerCsp='';
+ const failedPage=`<!doctype html><html lang="en"><meta charset="utf-8"><title>DiagramCloud local concept preview</title><h1>Local concept preview unavailable</h1><p role="alert">${REGENERATION_FAILED}</p></html>`;
+ const servePage=(next:ConceptPreview)=>{const page=conceptHostPage(next,viewerOrigin,options.diagramcloudOrigin);hostHtml=page.html;
+  hostCsp=`default-src 'none'; script-src 'sha256-${createHash('sha256').update(page.script).digest('base64')}'; style-src 'unsafe-inline'; frame-src ${viewerOrigin}; connect-src 'none'; img-src 'none'; font-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`;};
  const handler:RequestListener=(req,res)=>{
   const hostname=req.headers.host;
   const common={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Permissions-Policy':'camera=(), microphone=(), geolocation=(), usb=(), serial=()'};
@@ -35,6 +45,8 @@ export async function startConceptHost(options:{document:Project;viewId:string;a
    if(url.pathname==='/viewer.html'&&!url.search)return respond(200,bytes,{'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':viewerCsp});
    return respond(404,'Not found');
   }
+  if(failure&&url.pathname==='/')return respond(503,failedPage,{'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'"});
+  if(failure&&url.pathname==='/packet.json'&&!url.search)return respond(503,JSON.stringify({error:REGENERATION_FAILED}),{'Content-Type':'application/json; charset=utf-8','Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'"});
   if(url.pathname==='/')return respond(200,hostHtml,{'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':hostCsp});
   if(url.pathname==='/packet.json'&&!url.search)return respond(200,JSON.stringify(packet),{'Content-Type':'application/json; charset=utf-8','Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'"});
   return respond(404,'Not found');
@@ -48,18 +60,24 @@ export async function startConceptHost(options:{document:Project;viewId:string;a
   await listen(ipv4,port,'127.0.0.1');
   const address=ipv4.address();if(!address||typeof address==='string')throw new Error('Local host did not bind.');
   origin='http://localhost:'+address.port;viewerOrigin='http://127.0.0.1:'+address.port;
-  const page=conceptHostPage(packet,viewerOrigin,options.diagramcloudOrigin);hostHtml=page.html;
-  hostCsp=`default-src 'none'; script-src 'sha256-${createHash('sha256').update(page.script).digest('base64')}'; style-src 'unsafe-inline'; frame-src ${viewerOrigin}; connect-src 'none'; img-src 'none'; font-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`;
+  servePage(packet);
   viewerCsp=`default-src 'none'; script-src 'sha256-${hashes[0]}'; style-src 'unsafe-inline'; img-src data: blob:; font-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors ${origin}`;
   // localhost can resolve to ::1 first. Both sockets use the same port/handler, and neither binds all interfaces.
   // Require the pair: silently advertising localhost with only IPv4 can hang browsers before an HTTP response.
   try{await listen(ipv6,address.port,'::1');}catch{throw new Error('Both IPv4 (127.0.0.1) and IPv6 (::1) loopback must be available on the selected port. No host was left running.');}
  }catch(error){await close();throw error;}
  // allow-scripts + allow-same-origin is restricted to this separate 127.0.0.1 origin; it cannot read the localhost host.
- return {url:origin+'/',origin,viewerOrigin,packet,close};
+ // The failure flag is raised before preparing, so a request racing a regeneration never sees the previous packet.
+ const regenerate:LocalConceptHost['regenerate']=async next=>{
+  failure=REGENERATION_FAILED;
+  try{const fresh=await prepareConceptHostPacket(next.document,options.viewId,options.audience,next.packet);servePage(fresh);packet=fresh;failure=undefined;return {ok:true,packet:fresh};}
+  catch{return {ok:false,reason:REGENERATION_FAILED};}
+ };
+ return {url:origin+'/',origin,viewerOrigin,get packet(){return packet;},get failure(){return failure;},regenerate,close};
 }
 const usage='Usage: npm run concept:host -- <document.json> --view <id> --audience <public|author> --viewer <local-owner.html> --viewer-sha256 <sha256> [--packet <preview.packet.json>] [--port <0..65535>] [--diagramcloud-origin <explicit-http-origin>]';
-export async function runConceptHost(args:string[]):Promise<LocalConceptHost>{
+/** `watch`: when the selected document file changes, re-read it (and the packet) and regenerate; a failed read or regeneration serves the error. */
+export async function runConceptHost(args:string[],options:{watch?:boolean;intervalMs?:number}={}):Promise<LocalConceptHost>{
  const [input,...rest]=args;if(!input||input.startsWith('--')||rest.length%2)throw new Error(usage);
  const values=new Map<string,string>();for(let i=0;i<rest.length;i+=2){const key=rest[i],value=rest[i+1];if(!['--view','--audience','--viewer','--viewer-sha256','--packet','--port','--diagramcloud-origin'].includes(key)||values.has(key)||!value||value.startsWith('--'))throw new Error(usage);values.set(key,value);}
  const viewId=values.get('--view'),audience=values.get('--audience'),viewer=values.get('--viewer'),viewerSha256=values.get('--viewer-sha256');
@@ -67,8 +85,20 @@ export async function runConceptHost(args:string[]):Promise<LocalConceptHost>{
  if(values.has('--port')&&!/^\d{1,5}$/.test(values.get('--port')!))throw new Error('Invalid local port.');
  const document=parseDocument(selectedBytes(input,MAX_DOCUMENT_BYTES).toString('utf8'));
  const packet=values.has('--packet')?JSON.parse(selectedBytes(values.get('--packet')!,PACKET_MAX_BYTES).toString('utf8')):undefined;
- return startConceptHost({document,viewId,audience,viewerHtml:selectedBytes(viewer,VIEWER_MAX_BYTES),viewerSha256,packet,port:values.has('--port')?Number(values.get('--port')):0,diagramcloudOrigin:values.get('--diagramcloud-origin')});
+ const host=await startConceptHost({document,viewId,audience,viewerHtml:selectedBytes(viewer,VIEWER_MAX_BYTES),viewerSha256,packet,port:values.has('--port')?Number(values.get('--port')):0,diagramcloudOrigin:values.get('--diagramcloud-origin')});
+ if(!options.watch)return host;
+ let queue=Promise.resolve();
+ const reload=()=>{queue=queue.then(async()=>{
+  let document:Project|undefined,selected:unknown;
+  try{document=parseDocument(selectedBytes(input,MAX_DOCUMENT_BYTES).toString('utf8'));selected=values.has('--packet')?JSON.parse(selectedBytes(values.get('--packet')!,PACKET_MAX_BYTES).toString('utf8')):undefined;}catch{document=undefined;}
+  const result=await host.regenerate({document:document as Project,packet:selected});
+  process.stderr.write(result.ok?`Regenerated preview packet for revision ${result.packet.baseRevision}.\n`:`${result.reason}\n`);
+ });};
+ const path=resolve(input);
+ watchFile(path,{interval:options.intervalMs??1000},(now,before)=>{if(now.mtimeMs!==before.mtimeMs||now.size!==before.size)reload();});
+ return {url:host.url,origin:host.origin,viewerOrigin:host.viewerOrigin,get packet(){return host.packet;},get failure(){return host.failure;},regenerate:host.regenerate,
+  close:async()=>{unwatchFile(path);await queue;await host.close();}};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
- runConceptHost(process.argv.slice(2)).then(host=>{process.stdout.write(`Local concept host: ${host.url}\nViewer origin: ${host.viewerOrigin}\nAudience: ${host.packet.audience}; viewer selection return unsupported. Press Ctrl+C to close.\n`);for(const signal of ['SIGINT','SIGTERM'] as const)process.once(signal,()=>{void host.close();});}).catch(()=>{process.stderr.write('Concept host failed. Check the explicit view/audience, authorized document, packet and selected owner viewer hash. Both IPv4 and IPv6 loopback must be available on the selected port.\n');process.exitCode=1;});
+ runConceptHost(process.argv.slice(2),{watch:true}).then(host=>{process.stdout.write(`Local concept host: ${host.url}\nViewer origin: ${host.viewerOrigin}\nAudience: ${host.packet.audience}; viewer selection return unsupported. Saving the document regenerates the packet; a failed regeneration serves an error. Press Ctrl+C to close.\n`);for(const signal of ['SIGINT','SIGTERM'] as const)process.once(signal,()=>{void host.close();});}).catch(()=>{process.stderr.write('Concept host failed. Check the explicit view/audience, authorized document, packet and selected owner viewer hash. Both IPv4 and IPv6 loopback must be available on the selected port.\n');process.exitCode=1;});
 }
