@@ -26,5 +26,6 @@ viewer: proposals go through the DiagramCloud Studio import review or the CLI, a
 ## Status
 
 Built from source with `npx tsx scripts/package-vsix.ts` (the package records its source commit). This source package
-is checked by unit tests (manifest, contents, policy, no network, no fonts). Installation in VS Code or Cursor has not
-been qualified; see `docs/contracts/react-viewer.md` for the remaining installed-host journey.
+is checked by unit tests (manifest, contents, policy, no network, no fonts). Installation and the session journey in an
+installed VS Code are proven locally by `npm run test:host:vscode` (isolated profile, see `docs/contracts/react-viewer.md`). Cursor
+has not been qualified.

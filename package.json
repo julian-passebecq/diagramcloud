@@ -21,7 +21,8 @@
     "package:candidate": "tsx scripts/package-campaign.ts",
     "package:vsix": "tsx scripts/package-vsix.ts",
     "concept:preview": "tsx scripts/concept-preview.ts",
-    "concept:host": "tsx scripts/concept-host.ts"
+    "concept:host": "tsx scripts/concept-host.ts",
+    "test:host:vscode": "tsx --test tests/host/vscode-host.test.ts"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.60.0",
@@ -42,6 +43,7 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.7.0",
+    "@vscode/test-electron": "3.1.0",
     "ajv": "^8.20.0",
     "esbuild": "0.28.2",
     "tsx": "^4.19.3",
