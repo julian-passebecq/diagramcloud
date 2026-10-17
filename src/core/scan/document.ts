@@ -16,7 +16,7 @@ import type {Confidence,Evidence,ScanItem,ScanLink,ScanModel} from './scanner';
 export const SCAN_LIMITS={nodes:480,edges:1400,views:78,componentViews:20,fileViews:30,filesPerView:40,perView:120};
 const SUFFIX:Record<Confidence,string>={confirmed:'',inferred:' (inferred)',possible:' (possible)'};
 /** Which perspective each generated view belongs to. */
-export const scanPerspective=(viewId:string):Perspective=>viewId.startsWith('components-')||viewId.startsWith('files-')?'code':viewId==='data-lineage'?'data':viewId.startsWith('infrastructure-')?'cloud':viewId==='delivery'?'cicd':'system';
+export const scanPerspective=(viewId:string):Perspective=>viewId.startsWith('components-')||viewId.startsWith('files-')?'code':viewId==='data-lineage'?'data':viewId.startsWith('infrastructure-')?'cloud':viewId==='delivery'?'cicd':viewId==='declared-rules'?'agents':'system';
 const clip=(s:string,n:number)=>s.length>n?`${s.slice(0,n-1)}…`:s;
 
 /** `limits` lowers the budget when several repositories share one document (project atlas). */
@@ -98,6 +98,17 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
   views.push({id:vid,title:`${p==='Generic'?'Terraform modules':`${p} infrastructure`}`,description:'Terraform resources and modules, linked where one references another.',keys:list.map(r=>r.key),links:model.links.filter(l=>l.layer==='resource'&&list.some(r=>r.key===l.from))});
  }
 
+ // Agents perspective: instruction files as declared rules (never enforcement, observation or permission).
+ // One group card in the system context opens the view, so the public copy keeps it reachable by drilldown.
+ const ruleItems=byLayer('rule'),ruleLinks=model.links.filter(l=>l.layer==='rule'),rulesKey='group:declared-rules';
+ if(ruleItems.length){
+  model.items.set(rulesKey,{key:rulesKey,label:'Declared rules',kind:'control',provider:'Generic',layer:'group',summary:`${ruleItems.length} instruction file(s) for AI agents and contributors. Declared rule; enforcement and effect UNKNOWN.`,confidence:'confirmed',evidence:[]});
+  for(const r of ruleItems.slice(0,40))for(const e of r.evidence.slice(0,1))recordEvidence(rulesKey,e,`${r.label}: ${e.finding}`);
+  componentViews.set(rulesKey,'declared-rules');
+  views.push({id:'declared-rules',title:'Declared rules',description:`Instruction files (AGENTS.md, CLAUDE.md, .cursorrules, Copilot instructions) found in ${model.name}. Each is a declared rule for AI agents and contributors: enforcement and effect are UNKNOWN. Reading a rule is not an observation that it is followed and grants no permission.`,
+   keys:[...ruleItems.slice(0,L.perView).map(r=>r.key),...new Set(ruleLinks.map(l=>l.to))],links:ruleLinks});
+ }
+
  // ---- System context (macro) ----
  const system=model.items.get('system')!;
  const ci=byLayer('ci'),deploy=items.filter(i=>i.key.startsWith('deploy:'));
@@ -105,9 +116,10 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
  const lift=new Map<string,{confidence:Confidence;count:number}>();
  for(const l of containerLinks)if(contextExternals.includes(l.to)){const v=lift.get(l.to);lift.set(l.to,{confidence:v?(RANKED.indexOf(l.confidence)<RANKED.indexOf(v.confidence)?l.confidence:v.confidence):l.confidence,count:(v?.count??0)+l.count});}
  views.unshift({id:'overview',title:'System context',description:`${model.name} as one system, the external systems its code and configuration use, how it is built and deployed, and its infrastructure as code. Open the system to see its containers.`,
-  keys:['system',...contextExternals,...ci.map(c=>c.key),...deploy.map(d=>d.key),...groupKeys],
+  keys:['system',...contextExternals,...ci.map(c=>c.key),...deploy.map(d=>d.key),...groupKeys,...(ruleItems.length?[rulesKey]:[])],
   links:[...[...lift].map(([to,v])=>({from:'system',to,label:'uses',confidence:v.confidence,kind:'batch' as const,count:1})),...ci.map(c=>({from:c.key,to:'system',label:'builds and tests',confidence:'confirmed' as Confidence,kind:'control' as const,count:1})),
-   ...model.links.filter(l=>l.layer==='ci'),...groupKeys.map(g=>({from:g,to:'system',label:'hosts',confidence:'inferred' as Confidence,kind:'dependency' as const,count:1}))]});
+   ...model.links.filter(l=>l.layer==='ci'),...groupKeys.map(g=>({from:g,to:'system',label:'hosts',confidence:'inferred' as Confidence,kind:'dependency' as const,count:1})),
+   ...(ruleItems.length?[{from:rulesKey,to:'system',label:'declares rules for (enforcement unknown)',confidence:'confirmed' as Confidence,kind:'control' as const,count:1}]:[])]});
 
  // CI/CD perspective: the same system card, with how it is built and where it is deployed (only when CI was found).
  if(ci.length)views.push({id:'delivery',title:'CI/CD',description:`How ${model.name} is built, tested and deployed, from its CI workflow files. Targets are what the workflow declares, not observed deployments.`,
@@ -115,7 +127,11 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
 
  // ---- Materialize views (root first so drilldown cards exist before their children are referenced) ----
  const childOf=(key:string)=>key==='system'?'containers':key===ci[0]?.key?'delivery':key===dataKey?'data-lineage':componentViews.get(key);
- for(const v of views.slice(0,L.views)){
+ // Over the node budget, coarse levels are materialized first so the files level never starves the components
+ // level; within the budget the order (and so every generated ID) is unchanged.
+ const planned=views.slice(0,L.views),overBudget=new Set(planned.flatMap(v=>v.keys)).size>L.nodes;
+ const order=overBudget?[...planned].sort((a,b)=>Number(a.id.startsWith('files-'))-Number(b.id.startsWith('files-'))):planned;
+ for(const v of order){
   const members:string[]=[];
   for(const key of v.keys){const it=model.items.get(key);if(!it)continue;const child=childOf(key);const id=addNode(it,child&&views.some(x=>x.id===child)?child:undefined);if(id&&!members.includes(id))members.push(id);}
   const edgeIds=v.links.map(l=>addEdge(v.id,l.from,l.to,l.label,l.confidence,l.kind,l.count)).filter((x):x is string=>!!x).filter(id=>{const e=doc.edges.find(e=>e.id===id)!;return members.includes(e.source)&&members.includes(e.target);});
@@ -123,7 +139,10 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
   const pos=layeredPositions({title:v.title,nodes:members.map(id=>({key:id,label:id})),edges:edgeIds.map(id=>{const e=doc.edges.find(e=>e.id===id)!;return {source:e.source,target:e.target};}),groups:[],direction:v.direction??'LR'});
   doc.views.push({id:v.id,title:clip(v.title,160),description:clip(v.description,2000),nodeIds:members,edgeIds,positions:Object.fromEntries([...pos].map(([k,p])=>[keyOf.get(k)!,p])),visibility:'public'});
  }
- doc.views=doc.views.filter((v,i)=>i>0||v.nodeIds.length);
+ if(overBudget){const rank=new Map(planned.map((v,i)=>[v.id,i]));doc.views=[doc.views[0],...doc.views.slice(1).sort((a,b)=>(rank.get(a.id)??0)-(rank.get(b.id)??0))];}
+ // A files view left empty by the budget is dropped (its module card keeps no drilldown) and reported below.
+ const emptyFileViews=doc.views.filter(v=>v.id.startsWith('files-')&&!v.nodeIds.length).length;
+ doc.views=doc.views.filter((v,i)=>i>0||v.nodeIds.length).filter(v=>!(v.id.startsWith('files-')&&!v.nodeIds.length));
  doc.views[0]=doc.views.find(v=>v.id==='overview'&&v.nodeIds.length)??doc.views[0];
  doc.views=doc.views.filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i);
  // Drop edges no view shows (their ends were capped out).
@@ -151,13 +170,15 @@ export function documentFromScan(model:ScanModel,options:{now?:Date;fileName?:st
  const document=validateDocument(doc);
  const counts=(layer:ScanItem['layer'])=>items.filter(i=>i.layer===layer).length;
  const conf=(c:Confidence)=>model.links.filter(l=>l.confidence===c).length;
- const kept=[`${document.nodes.length} components and ${document.edges.length} connections in ${document.views.length} views (system context → containers → components → files${counts('table')?', data lineage':''}${counts('resource')?', infrastructure':''}).`,
+ const kept=[`${document.nodes.length} components and ${document.edges.length} connections in ${document.views.length} views (system context → containers → components → files${counts('table')?', data lineage':''}${counts('resource')?', infrastructure':''}${counts('rule')?', declared rules':''}).`,
   `Found: ${[...model.detectors].map(([k,n])=>`${n} ${k}`).join(', ')||'nothing recognisable'}.`,
   `Connections: ${conf('confirmed')} confirmed, ${conf('inferred')} inferred, ${conf('possible')} possible. Each component lists its evidence (file, line, finding).`,
   ...(model.commit?[`Scanned at ${model.branch?`${model.branch} @ `:''}${model.commit.slice(0,12)}. Scanning again later gives the same IDs, so the review shows what changed.`]:[])];
  const lost=[...[...model.skipped].map(([k,n])=>`${n} ${k}.`),'Calls, runtime traffic, cloud resources not declared in this repository and code in other languages are not detected.'];
+ if(emptyFileViews)lost.push(`${emptyFileViews} files view(s) not created: the component budget of ${L.nodes} was reached first.`);
+ if(views.length>L.views)lost.push(`${views.length-L.views} view(s) beyond the budget of ${L.views} not created.`);
  if(items.length>document.nodes.length)lost.push(`${items.length-document.nodes.length} detected item(s) not shown (limits or not connected to a shown view).`);
  return {document,report:{format:'repository',fileName:options.fileName??model.name,pages:document.views.length,nodes:document.nodes.length,edges:document.edges.length,groups:counts('container'),kept,lost}};
 }
 const RANKED:Confidence[]=['confirmed','inferred','possible'];
-const LAYER_TAG:Record<ScanItem['layer'],string>={system:'System',external:'External system',container:'Container',component:'Component',file:'File',table:'Data',resource:'Infrastructure',ci:'CI/CD',group:'Group'};
+const LAYER_TAG:Record<ScanItem['layer'],string>={system:'System',external:'External system',container:'Container',component:'Component',file:'File',table:'Data',resource:'Infrastructure',ci:'CI/CD',rule:'Declared rule',group:'Group'};

@@ -8,6 +8,8 @@
 - [Diagram Design skill](skills/diagramcloud-design/SKILL.md): step-by-step skill for graphing a codebase and drawing it.
 - [Proposal validator](src/core/proposal.ts): the one check behind the JSON / AI dialog, `npm run intelligence -- validate-proposal` and the MCP `diagramcloud_validate_proposal`; same payload, same reasons (wrong project or revision, replay, no self-review, no provider launch).
 - [Schema compatibility](src/core/moduleCompat.ts) and [image identity](src/core/assetIdentity.ts): unknown top-level modules are dropped only after the author confirms them, an unknown schemaVersion is refused, image digests are local SHA-256 of the stored bytes (never a Drive checksum), and an exact duplicate image is reused or kept as a recorded distinct copy, never merged.
+- [Scanner](src/core/scan/scanner.ts): instruction files (AGENTS.md, CLAUDE.md, .cursorrules, Copilot instructions) become "Declared rules" controls whose enforcement and effect are UNKNOWN, never observations or permissions; scans are bounded, cancelable with an AbortSignal and name every omission.
+- [Readiness](src/intelligence/readiness.ts): "complete for the selected purpose" means `completeForPurpose` finds no `missing-required` gap for that purpose; never a completeness score.
 - [Contributor rules and current limits](AGENTS.md)
 
 ## Reference

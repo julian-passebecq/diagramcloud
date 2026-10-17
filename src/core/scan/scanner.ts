@@ -20,9 +20,9 @@ import {dbtArtifactModelPaths} from './dbt';
 export type ScanFile={path:string;text:string};
 export type Confidence='confirmed'|'inferred'|'possible';
 export type Evidence=({kind?:'source';file:string;line:number}|{kind:'selection-metadata';path:string})&{finding:string;confidence:Confidence};
-export type ScanLayer='system'|'external'|'container'|'component'|'file'|'table'|'resource'|'ci'|'group';
+export type ScanLayer='system'|'external'|'container'|'component'|'file'|'table'|'resource'|'ci'|'rule'|'group';
 export type ScanItem={key:string;label:string;kind:ProjectNode['kind'];provider:string;layer:ScanLayer;parent?:string;summary:string;confidence:Confidence;evidence:Evidence[];tech?:TechKey;files?:number};
-export type ScanLink={from:string;to:string;label:string;kind:ProjectEdge['kind'];confidence:Confidence;evidence:Evidence[];layer:'container'|'component'|'file'|'data'|'resource'|'ci';count:number};
+export type ScanLink={from:string;to:string;label:string;kind:ProjectEdge['kind'];confidence:Confidence;evidence:Evidence[];layer:'container'|'component'|'file'|'data'|'resource'|'ci'|'rule';count:number};
 export type ScanModel={name:string;branch?:string;commit?:string;items:Map<string,ScanItem>;links:ScanLink[];detectors:Map<string,number>;skipped:Map<string,number>;boundaries?:GitBoundary[];partition?:{authored:number;generated:number;vendor:number;boundary:number;unsupported:number}};
 
 const RANK:Record<Confidence,number>={confirmed:3,inferred:2,possible:1};
@@ -43,6 +43,12 @@ export const IGNORED_DIR=/(^|\/)(node_modules|\.git|dist|build|out|coverage|vend
 export const SECRET_FILE=/(^|\/)(\.env(\.(?!example$|sample$|template$|dist$)[^/]*)?|\.npmrc|\.pypirc|id_[a-z0-9]+|[^/]*\.(pem|key|p12|pfx|jks|keystore|tfstate|tfstate\.backup|tfvars)|[^/]*(secret|credential)s?[^/]*\.(json|ya?ml|txt))$/i;
 const SOURCE=/\.(ts|tsx|js|jsx|mjs|cjs|py|cs)$/;
 const GIT_FILES=/^\.git\/(HEAD|packed-refs|refs\/heads\/.+)$/;
+/** Instruction files written for AI agents and contributors. Read as declared rules only: enforcement and effect stay UNKNOWN. */
+export const INSTRUCTION_FILE=/(^|\/)(AGENTS\.md|CLAUDE\.md|\.cursorrules)$|^\.github\/copilot-instructions\.md$/i;
+/** Thrown when a caller's AbortSignal cancels a scan; no partial model is returned. */
+/** YAML documents, refusing a file the parser reports errors for (it is counted as unparsed, never half-read). */
+const yamlDocuments=(text:string)=>{const docs=parseAllDocuments(text);if(docs.some(d=>d.errors.length))throw new Error('YAML parse error');return docs;};
+export const checkAbort=(signal?:AbortSignal)=>{if(signal?.aborted)throw new DOMException('Scan cancelled','AbortError');};
 /** Whether a repository-relative path is worth reading (used by the browser folder picker and the CLI walker). */
 /** Sub-folders that carry their own `.git` (a nested clone, submodule or git worktree): another repository, never part of this one. */
 export function nestedRepositoryPrefixes(paths:string[]):string[]{
@@ -55,17 +61,21 @@ export function wantedFile(path:string):boolean{
  if(GIT_FILES.test(path))return true;
  if(((IGNORED_DIR.test(path)||GENERATED_PATH.test(path))&&!/(^|\/)target\/manifest\.json$/i.test(path))||SECRET_FILE.test(path))return false;
  const name=baseOf(path).toLowerCase();
+ if(INSTRUCTION_FILE.test(path))return true;
  return name==='.gitmodules'||name==='package.json'||/^requirements[\w.-]*\.txt$/.test(name)||name==='pyproject.toml'||name==='go.mod'||/^dockerfile/.test(name)||/\.dockerfile$/.test(name)
   ||/\.(ya?ml)$/.test(name)||/\.tf$/.test(name)||name==='schema.prisma'||/\.sql$/.test(name)
   ||/\.(pbir|pbip|tmdl|bicep|csproj|sln|slnx)$/.test(name)||name==='manifest.json'||name==='definition.pbism'||name==='asyncapi.json'||name==='openapi.json'||name==='swagger.json'||name==='.platform'||name==='databricks.json'||/\.job\.json$/.test(name)||/^(?:azuredeploy|main|template|deploymenttemplate|function|host|containerapp)\.json$/.test(name)||name==='kustomization'||/^\.env\.(example|sample|template|dist)$/.test(name)||SOURCE.test(name);
 }
 export const MAX_FILE_BYTES=512*1024,MAX_FILES=6000;
 
-export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPaths?:string[];boundaryMarkers?:ScanFile[];preferDbtManifest?:boolean}={}):ScanModel{
+export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPaths?:string[];boundaryMarkers?:ScanFile[];preferDbtManifest?:boolean;signal?:AbortSignal}={}):ScanModel{
+ checkAbort(options.signal);
  const files=new Map<string,string>(),skipped=new Map<string,number>(),detectors=new Map<string,number>();
  const skip=(why:string)=>skipped.set(why,(skipped.get(why)??0)+1),seen=(what:string,n=1)=>detectors.set(what,(detectors.get(what)??0)+n);
  const boundaries=gitBoundaries(options.boundaryPaths??input.map(f=>f.path),input.find(f=>f.path==='.gitmodules'),options.boundaryMarkers??input.filter(f=>/\/\.git$/.test(f.path))),partition={authored:0,generated:0,vendor:0,boundary:0,unsupported:0};
+ let admitted=0;
  for(const f of input){
+  if((++admitted&255)===0)checkAbort(options.signal);
   const raw=f.path.replace(/\\/g,'/');if(!raw||raw.length>512||/^(?:\/|[a-z]:)/i.test(raw)||/[\u0000-\u001f]/.test(raw)||raw.split('/').some(s=>!s||s==='.'||s==='..')){skip('unsafe source paths refused');continue;}
   const path=normalize(f.path.replace(/\\/g,'/'));
   if(boundaries.some(b=>path===b.path||path.startsWith(b.path+'/'))){partition.boundary++;skip('nested repository boundary entries excluded (metadata only)');continue;}
@@ -149,9 +159,10 @@ export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPa
  }
 
  // ---- docker-compose ----
+ checkAbort(options.signal);
  const services=new Map<string,string>();
  for(const [path,text] of files)if(/(^|\/)(docker-)?compose[\w.-]*\.ya?ml$/i.test(path)){
-  let doc:Record<string,unknown>|undefined;try{doc=parseAllDocuments(text)[0]?.toJSON() as Record<string,unknown>;}catch{skip('YAML file(s) that could not be parsed');continue;}
+  let doc:Record<string,unknown>|undefined;try{doc=yamlDocuments(text)[0]?.toJSON() as Record<string,unknown>;}catch{skip('YAML file(s) that could not be parsed');continue;}
   const svc=doc?.services as Record<string,Record<string,unknown>>|undefined;if(!svc||typeof svc!=='object')continue;seen('docker-compose file');
   for(const [sname,s] of Object.entries(svc)){
    if(!s||typeof s!=='object')continue;
@@ -177,10 +188,11 @@ export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPa
  }
 
  // ---- Kubernetes manifests ----
+ checkAbort(options.signal);
  const workloads=new Map<string,{key:string;labels:Record<string,string>}>(),k8sServices=new Map<string,string>(),ingresses:[string,number,string,string][]=[];
  const pendingK8sEnv:[string,string,string,number,string][]=[],pendingServices:[string,Record<string,string>,string,number][]=[];
  for(const [path,text] of files)if(/\.ya?ml$/i.test(path)&&/^\s*apiVersion:/m.test(text)&&/^\s*kind:/m.test(text)){
-  let docs:Record<string,unknown>[];try{docs=parseAllDocuments(text).map(d=>d.toJSON() as Record<string,unknown>).filter(Boolean);}catch{skip('YAML file(s) that could not be parsed');continue;}
+  let docs:Record<string,unknown>[];try{docs=yamlDocuments(text).map(d=>d.toJSON() as Record<string,unknown>).filter(Boolean);}catch{skip('YAML file(s) that could not be parsed');continue;}
   for(const doc of docs){
    const kind=String(doc.kind??''),meta=(doc.metadata??{}) as {name?:string},spec=(doc.spec??{}) as Record<string,unknown>,nm=meta.name??'';if(!nm)continue;
    const at=lineOf(text,new RegExp(`name:\\s*["']?${nm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}["']?\\s*$`,'m'));
@@ -206,6 +218,7 @@ export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPa
  for(const [from,value,path,line,envName] of pendingK8sEnv)for(const [svcName,to] of k8sServices)if(to!==from&&new RegExp(`(^|[/@])${svcName}(\\.|:|/|$)`).test(value))link(from,to,'connects to','container',ev(path,line,`env ${envName} names service “${svcName}”`,'inferred'),'query');
 
  // ---- Terraform ----
+ checkAbort(options.signal);
  const resources=new Map<string,{key:string;body:string;path:string;line:number}>();
  for(const [path,text] of files)if(/\.tf$/.test(path)){
   const re=/^\s*(resource|module)\s+"([^"]+)"(?:\s+"([^"]+)")?\s*\{/gm;let m:RegExpExecArray|null;
@@ -224,6 +237,7 @@ export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPa
  }
 
  // ---- GitHub Actions ----
+ checkAbort(options.signal);
  const ciKey='ci:github-actions';
  for(const [path,text] of files)if(/^\.github\/workflows\/[^/]+\.ya?ml$/.test(path)){
   seen('GitHub Actions workflow');
@@ -240,7 +254,27 @@ export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPa
   });
  }
 
+ // ---- Instruction files (AGENTS.md, CLAUDE.md, .cursorrules, Copilot instructions): declared rules, never enforcement ----
+ // A rule file states what agents and contributors are asked to do. It is not an observation that the rule is followed,
+ // not a permission, and not a measured effect: every card says enforcement and effect are UNKNOWN.
+ checkAbort(options.signal);
+ for(const [path,text] of [...files].filter(([p])=>INSTRUCTION_FILE.test(p)).sort(([a],[b])=>a.localeCompare(b,'en'))){
+  seen('agent instruction file');
+  const lines=text.split('\n'),plain=/\.cursorrules$/i.test(path);let sections=0,rules=0;const found:Evidence[]=[];
+  let fence=false;
+  lines.forEach((l,i)=>{const t=l.trim();if(t.startsWith('```')){fence=!fence;return;}if(fence||!t||/^(<!--|-->)/.test(t))return;
+   const heading=!plain&&/^#{1,6}\s+\S/.test(t),rule=plain?!t.startsWith('#'):/^(?:[-*+]|\d+[.)])\s+\S/.test(t)||/\b(?:must|never|always|do not|don't|should)\b/i.test(t);
+   if(heading){sections++;if(found.length<12)found.push(ev(path,i+1,`declared rule section “${t.replace(/^#+\s*/,'').slice(0,80)}”; enforcement and effect UNKNOWN`,'confirmed'));}
+   else if(rule){rules++;if(found.length<12)found.push(ev(path,i+1,'declared rule line; enforcement and effect UNKNOWN','confirmed'));}});
+  const key=`rule:${path}`,owner=dirOf(path)&&!/^\.github$/i.test(dirOf(path))?ownerOf(path):undefined;
+  item(key,{label:path.length>120?`…${path.slice(-119)}`:path,kind:'control',provider:'Generic',layer:'rule',
+   summary:`Declared rule; enforcement and effect UNKNOWN. ${rules} rule line(s) in ${sections} section(s) written for AI agents and contributors. Reading a rule file is not an observation that it is followed, and grants no permission.`,confidence:'confirmed'},
+   ev(path,1,'instruction file declares rules for AI agents and contributors; enforcement and effect UNKNOWN','confirmed'));
+  for(const e of found)items.get(key)!.evidence.push(e);
+  link(key,owner!==undefined&&owner!==''?containerKey(owner):systemKey,'declares rules for (enforcement unknown)','rule',ev(path,1,`${baseOf(path)} declares rules`,'confirmed'),'control');
+ }
  // ---- Example env files: key names only ----
+ checkAbort(options.signal);
  const ENV_TECH:[RegExp,TechKey][]=[[/^(DATABASE_URL|POSTGRES|PG(HOST|USER|DATABASE)|DB_HOST)/,'postgresql'],[/^MYSQL/,'mysql'],[/^MONGO/,'mongodb'],[/^REDIS/,'redis'],[/^STRIPE/,'stripe'],[/^OPENAI/,'openai'],[/^ANTHROPIC/,'anthropic'],[/^SENTRY/,'sentry'],[/^KAFKA/,'kafka'],[/^(AZURE_STORAGE|AZURITE)/,'azureblob'],[/^(S3_|AWS_S3)/,'s3'],[/^SENDGRID/,'sendgrid'],[/^TWILIO/,'twilio'],[/^AUTH0/,'auth0'],[/^(RABBIT|AMQP)/,'rabbitmq']];
  for(const [path,text] of files)if(/(^|\/)\.env\.(example|sample|template|dist)$/.test(path)){
   seen('example env file');const owner=ownerOf(path);const from=owner!==undefined?containerKey(owner):systemKey;
@@ -252,6 +286,7 @@ export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPa
  }
 
  // ---- Data: SQL, dbt and Prisma ----
+ checkAbort(options.signal);
  const tableKey=(n:string)=>`t:${n.replace(/["`[\]]/g,'').toLowerCase()}`;
  const table=(n:string,file:string,line:number,what:string,confidence:Confidence='confirmed',kind:ProjectNode['kind']='table')=>{const clean=n.replace(/["`[\]]/g,'');return item(tableKey(clean),{label:clean,kind,provider:'Generic',layer:'table',summary:what,confidence},ev(file,line,what,confidence)).key;};
  const IDENT=String.raw`((?:["\`\[]?[A-Za-z_][\w$]*["\`\]]?\.){0,2}["\`\[]?[A-Za-z_][\w$]*["\`\]]?)`;
@@ -294,6 +329,7 @@ export function scanRepository(input:ScanFile[],options:{name?:string;boundaryPa
  }
 
  // ---- Imports: components inside each code container ----
+ checkAbort(options.signal);
  const sources=[...files.keys()].filter(p=>SOURCE.test(p)&&!/(^|\/)(tests?|__tests__|e2e|spec|fixtures|mocks?)\//i.test(p)&&!/\.(test|spec|d)\.[a-z]+$/.test(p));
  const byContainer=new Map<string,string[]>();
  for(const p of sources){const d=ownerOf(p);if(d===undefined)continue;(byContainer.get(d)??byContainer.set(d,[]).get(d)!).push(p);}
