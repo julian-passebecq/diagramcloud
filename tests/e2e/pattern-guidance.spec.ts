@@ -1,6 +1,7 @@
 import {readFileSync} from 'node:fs';
 import {test,expect,type Locator,type Page} from '@playwright/test';
 import {documentSchema,validateDocument,type Project} from '../../src/core/model';
+import {reviewChoice} from '../../src/core/decisionReview';
 
 // This synthetic fixture supplies authored design/evidence only. No observations,
 // review decisions, actual execution or real client assertions are manufactured.
@@ -291,4 +292,54 @@ test('pattern inputs reset with permitted public modes, revision replacement and
  // Apply an ordinary reviewed same-ID document at its current revision; canonical Apply owns the revision increment.
  const revised=JSON.parse(before) as Project;revised.nodes.find(node=>node.id==='input-c')!.tags=[];revised.nodes.find(node=>node.id==='input-c')!.label='Synthetic replacement without tag';panel=await importWitnessInput(page,validateDocument(revised));before=await authoringText(page);expect(JSON.parse(before).revision).toBe(revised.revision+1);await expect(panel.locator('details[open] > summary').filter({hasText:'Inputs behind this suggestion'})).toHaveCount(0);row=await modularInputRow(panel);inputs=await disclosure(row,'Inputs behind this suggestion');await expect(inputs).toContainText('Existing result: not-established');await expect(inputs).toContainText('dotnet: not supplied');await expect(inputs).not.toContainText(privateMarker);await expect(inputs.getByRole('status',{name:'component input counts',exact:true})).toHaveText('Showing 1–2 of 2 · displayed 2 · omitted from this page 0.');expect(await authoringText(page)).toBe(before);
  panel=await importWitnessInput(page,witnessFixture('synthetic-pattern-input-replacement',false));before=await authoringText(page);await expect(panel.locator('details[open] > summary').filter({hasText:'Inputs behind this suggestion'})).toHaveCount(0);row=await modularInputRow(panel);inputs=await disclosure(row,'Inputs behind this suggestion');await expect(inputs).toContainText('Unrelated tag-only component C');await expect(inputs).not.toContainText(privateMarker);await expect(inputs).toContainText('Existing result: candidate');expect(await authoringText(page)).toBe(before);
+});
+
+test('choices show assumptions, alternatives with an UNKNOWN substitution check and a derived review state; review and acceptance are explicit Edit actions',async({page},info)=>{
+ // Synthetic candidate written by an AI, reviewed once, then its cited source moved: review is needed, and that is derived, not stored.
+ const base=fixture('synthetic-decision-review');
+ base.nodes.find(n=>n.id==='raw')!.choices=[{id:'input-format',title:'Input format',goal:'Keep the declared input readable by refinement',options:[{id:'delta',label:'Delta table',summary:''},{id:'csv',label:'CSV drop',summary:''}],recommendedOptionId:'delta',
+  reasons:['Schema travels with the data'],tradeoffs:['Needs a table reader'],assumptions:['Synthetic volume stays small'],status:'candidate',origin:'ai',suggestedBy:'claude',sourceIds:['instance-source'],visibility:'public'}];
+ const reviewed=reviewChoice(validateDocument(base),'input-format',{reviewedBy:'Fixture author'});
+ reviewed.sources.find(s=>s.id==='instance-source')!.location='Authored browser fixture; moved after the review';
+ const input=validateDocument(reviewed);
+ await page.goto('/');
+ await page.getByRole('button',{name:'JSON / AI',exact:true}).click();
+ await page.getByLabel('Project JSON',{exact:true}).fill(JSON.stringify(input));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();
+ await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
+ await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();
+ await page.getByRole('tab',{name:'Edit',exact:true}).click();
+ const open=async()=>{await page.getByTestId('view-root').getByRole('button',{name:'Explore Declared input',exact:true}).click();await page.getByRole('button',{name:'Inspector',exact:true}).click();return page.getByRole('region',{name:'Choice Input format',exact:true});};
+ let card=await open();
+ const state=()=>card.getByRole('status',{name:'Review state of Input format',exact:true});
+ await expect(state()).toContainText('Review needed · supporting facts changed');await expect(state()).toContainText('Nothing is re-bound automatically');
+ await expect(card).toContainText('Synthetic volume stays small');await expect(card).toContainText('Schema travels with the data');await expect(card).toContainText('Candidate · not an accepted decision');
+ const alternatives=card.getByRole('region',{name:'Alternatives to Delta table',exact:true});
+ await expect(alternatives).toContainText('“CSV drop” instead of “Delta table”');await expect(alternatives).toContainText('UNKNOWN · compatibility not established');
+ const check=await disclosure(alternatives,'Substitution check');
+ await expect(check).toContainText('Provides the batch output to “Refinement stage”');await expect(check).toContainText('Keeps the assumption: Synthetic volume stays small');await expect(check).toContainText('is not proof');
+ // The recommender cannot review itself; nothing changes.
+ const reviewer=card.getByLabel('Reviewer of Input format',{exact:true});
+ await reviewer.fill('claude');await card.getByRole('button',{name:'Mark reviewed against current facts',exact:true}).click();
+ await expect(page.getByText(/cannot review itself/).first()).toBeVisible();await expect(state()).toContainText('Review needed');
+ await reviewer.fill('Julian');await card.getByRole('button',{name:'Mark reviewed against current facts',exact:true}).click();
+ await expect(state()).toContainText('Reviewed against the current facts');
+ await card.getByLabel('Option to accept for Input format',{exact:true}).selectOption('delta');
+ await card.getByLabel('Decision date for Input format',{exact:true}).fill('2026-10-17');
+ await card.getByRole('button',{name:'Accept as my decision',exact:true}).click();
+ await expect(card).toContainText('Accepted decision');await expect(card).toContainText('decided by Julian on 2026-10-17');
+ await expect(card.getByRole('button',{name:'Accept as my decision',exact:true})).toHaveCount(0);
+ await card.screenshot({path:info.outputPath('decision-review-accepted.png')});
+ const saved=JSON.parse(await authoringText(page)) as Project,choice=saved.nodes.find(n=>n.id==='raw')!.choices![0];
+ expect([choice.status,choice.chosenOptionId,choice.decidedBy,choice.suggestedBy]).toEqual(['accepted','delta','Julian','claude']);
+ expect(choice.reviewBasis!.fingerprint).toMatch(/^[0-9a-f]{16}$/);expect(JSON.stringify(saved)).not.toContain('review-needed');
+ // One Undo restores the candidate, still reviewed.
+ await page.getByRole('button',{name:'Undo',exact:true}).click();
+ await expect(card).toContainText('Candidate · not an accepted decision');await expect(state()).toContainText('Reviewed against the current facts');
+ // Public mode: the rationale and the current review stay readable; no review or accept action exists.
+ await page.getByRole('tab',{name:'Portfolio',exact:true}).click();card=await open();
+ await expect(state()).toContainText('Reviewed against the current facts');
+ await expect(card).toContainText('UNKNOWN · compatibility not established');
+ await expect(page.getByRole('button',{name:'Mark reviewed against current facts',exact:true})).toHaveCount(0);await expect(page.getByRole('button',{name:'Accept as my decision',exact:true})).toHaveCount(0);
+ await expect(page.locator('body')).not.toContainText(privateMarker);
 });
