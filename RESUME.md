@@ -1,3 +1,20 @@
+# Now / Next (2026-10-17, 1.28.0)
+
+**Now.** 1.28.0 integrates the DiagramCloud standalone V2 mission ([mission](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/missions/2026-10-17-diagramcloud-standalone-v2.md)). The packages are P1 evidence figures (#79), P2 saved contexts (#78), P3 visual variants (#77), P4 React host session and VSIX source package (#80), P6 decision review (#82), P5 tour Resume (#83), and P7 proposal parity with offline journeys (from #81, folded into the integration PR). The changes are in [release notes](docs/release-1.28/RELEASE_NOTES.md), the [R4 crosswalk](docs/product/R4_CROSSWALK.md) and AGENTS.md "Current limits (1.28.0)". The integration PR records the exact head, the CI run and the local candidate package with its hashes, under `.local/integration/DIAGRAM/1.28.0-<sha>/`.
+
+**Next.** These are still open:
+- An installed VS Code/Cursor run of the VSIX.
+- Form editors for schedules and measures.
+- An environment selection, so saved contexts can carry one.
+- Compatibility evidence for the substitution check.
+- Tour controls checked at 390x844 and with reduced motion.
+- An env-selectable Playwright port above 20000. 4173-4175 are pinned, so parallel lanes collide.
+- R4-W7 adapters.
+
+V2 is not complete: all eight workstreams stay partial.
+
+# History
+
 # Remaining product and qualification boundaries
 
 State on 2026-10-14: DiagramCloud 1.25.0 is merged (PR #59, f230ae0f234092ddeaaf6b5925f56568d425bf83), kept on Vercel Production with the owner's agreement, and its package is published privately in juliandatapass-group/galaxy-release-vault as generic package diagramcloud/1.25.0-f230ae0 (authenticated re-download matched all sha256, anonymous access refused; receipt in `outcome.json` release.packageReceipt). The import-review-edit-save-reopen-export journey also passed on the production site. No tag, public release or Marketplace entry exists. Open: owner review (`ownerVerified` stays false until Julian reviews). PR #57 is merged and #58 was closed after integration; read `outcome.json`, `SHIP-REPORT.md`, `docs/product/CAMPAIGN_CLIENT.md` and the sole `docs/ROADMAP.md` before new work. The final exact-SHA immutable receipt determines which qualification actually ran.

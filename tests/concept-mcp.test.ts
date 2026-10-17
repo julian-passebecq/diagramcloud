@@ -13,7 +13,7 @@ test('public context renderer returns owner-valid concept and redacted typed map
  assert.equal(out.report.audience,'public');assert.ok(checkConceptSpec(out.spec).ok);assert.doesNotMatch(JSON.stringify(out),/PRIVATE_MCP/);assert.equal(out.report.nodes.length,1);
  assert.throws(()=>renderPublicArtifact(fixture(),{kind:'concept',viewId:'root',audience:'author'}));
 });
-test('MCP advertises source version and concept within the nine public tools',t=>{
+test('MCP advertises source version and concept within the ten public tools',t=>{
  const root=mkdtempSync(join(tmpdir(),'dc-concept-mcp-'));t.after(()=>rmSync(root,{recursive:true,force:true}));const input=join(root,'project.json');writeFileSync(input,JSON.stringify(fixture()));
  const messages=[{jsonrpc:'2.0',id:1,method:'initialize'},{jsonrpc:'2.0',method:'notifications/initialized'},{jsonrpc:'2.0',id:2,method:'tools/list'},...['public','author'].map((audience,i)=>({jsonrpc:'2.0',id:i+3,method:'tools/call',params:{name:'diagramcloud_render',arguments:{kind:'concept',viewId:'root',...(audience==='author'?{audience}:{})}}}))];
  const processResult=spawnSync(process.execPath,['--import','tsx','scripts/intelligence-mcp.ts',input],{input:messages.map(m=>JSON.stringify(m)).join('\n')+'\n',encoding:'utf8',timeout:30000});
