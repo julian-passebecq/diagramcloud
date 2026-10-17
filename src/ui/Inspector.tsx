@@ -119,6 +119,7 @@ export function Inspector(p:Props){
  {attached.map((b,i)=><details key={`${b.id}-${p.doc.revision}`} className="block-editor"><summary>{b.title}{b.transform&&<span className="muted"> · {TRANSFORM_LABEL[b.transform]}</span>}</summary>
   {b.type==='metrics'?<MetricsEditor block={b} sources={p.doc.sources} newId={()=>b.id} submitLabel="Apply metrics" onSubmit={u=>p.onBlock(u,b.id)} onError={p.onError}/>
   :b.type==='table'?<TableEditor block={b} sources={p.doc.sources} newId={()=>b.id} submitLabel="Apply table" onSubmit={u=>p.onBlock(u,b.id)} onError={p.onError}/>
+  :b.type==='schedule'?<p className="micro">Schedule items (dates, durations, estimates) are edited as JSON below.</p>
   :<ContentEditor block={b} sources={p.doc.sources} submitLabel="Apply block" onSubmit={u=>p.onBlock(u,b.id)} onError={p.onError}/>}
   <details className="json-fallback"><summary>Edit as JSON</summary>{blockJson(b)}</details>
   <div className="toolbar"><Button size="small" appearance="subtle" aria-label={`Move ${b.title} up`} disabled={i===0} onClick={()=>move(i,-1)}>↑</Button><Button size="small" appearance="subtle" aria-label={`Move ${b.title} down`} disabled={i===attached.length-1} onClick={()=>move(i,1)}>↓</Button><Button size="small" onClick={()=>p.onDetach(b.id)}>Detach</Button></div>

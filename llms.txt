@@ -4,7 +4,7 @@
 
 ## For agents
 
-- [AI guide](docs/AI_GUIDE.md): commands, the formats an agent writes (project manifest, design brief, patch), choosing a figure, worked flows, and what never to do.
+- [AI guide](docs/AI_GUIDE.md): commands, the formats an agent writes (project manifest, design brief, patch), choosing a figure (including the evidence the Sankey, Gantt and baseline/current comparison need), worked flows, and what never to do.
 - [Diagram Design skill](skills/diagramcloud-design/SKILL.md): step-by-step skill for graphing a codebase and drawing it.
 - [Contributor rules and current limits](AGENTS.md)
 

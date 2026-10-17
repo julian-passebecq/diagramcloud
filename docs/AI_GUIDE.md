@@ -6,7 +6,7 @@ This page is for an AI agent (Claude Code, Codex, any LLM with a shell) that has
 
 - **A document model, not a drawing.** A project is one JSON document (`diagramcloud.json`, schema version 1). It has components (`nodes`), connections (`edges`), views that each show a subset with positions, evidence blocks, sources, a guided story and optional observations. `src/core/model.ts` is the contract and `validateDocument` is the gate: JSON Schema alone (`public/diagramcloud.schema.json`, written by `npm run generate`) is not enough.
 - **Facts come from repositories, not from memory.** A deterministic scanner reads a folder (no code run, no network, no secret files) and produces components and links, each with file:line evidence and a confidence. An atlas joins several repositories, each at **its own Git revision**: there is never one project revision.
-- **Drawing is a separate layer.** Diagram Design mode renders any public view as one of 21 figure types. You choose the figure through a *design brief*; you never change facts to make a picture look better.
+- **Drawing is a separate layer.** Diagram Design mode renders any public view as one of 23 figure types. You choose the figure through a *design brief*; you never change facts to make a picture look better.
 - **Public vs private is enforced.** Public exports go through `publicDocument`, which drops private components, connections, evidence and repositories. Authoring JSON is the explicit full private backup. Mark something `"visibility": "private"` instead of leaving it out.
 
 ## 2. Three meanings you must keep apart
@@ -134,6 +134,12 @@ A document may carry `variants` (optional; `src/core/model.ts`, logic in `src/co
 
 A document may carry `tours` (optional; `src/core/tours.ts`, **Tours** tab in `src/ui/Tours.tsx`). A tour has a stable `id`, `title`, `visibility`, the `sourceRevision` it was recorded at and `stops`; each stop stores its selected `viewId`, the stable IDs of its `subjects` (`node` or `edge`), a content `fingerprint` taken when recorded, and `narration`. A tour is a presented sequence, not timing and not a run. Anchors are not repaired: playing derives each stop as current, stale (content changed since recording), missing (view or subject gone) or omitted, and a stale or missing anchor fails visibly. Public export keeps public tours only; a subject that is not public is dropped and the stop is marked `omitted: "subjects"`, a stop on a non-public view becomes `omitted: "stop"` with no view, subjects or narration, and neither names nor counts what was hidden. Narration of a public tour is published as written.
 
+**Evidence for the measured figures.** Sankey, Gantt and Comparison draw only supplied evidence; otherwise they are withheld and name what is missing, with the same words in Studio, SVG, the figure book, the manual and the deck.
+
+- A connection `quantity` may add `measurementId` (the identity of one supplied measurement), `scope` and `window` (`{"from": "2026-09-01", "to": "2026-09-07"}`). The Sankey draws one unit, scope and window; others are listed, never summed. Two connections with equal labels or endpoints stay two flows; one `measurementId` on two connections of one scope is reported as ambiguous and never counted twice. Zero stays zero.
+- A schedule block is an evidence block `{"type": "schedule", "timezone": "date-only", "items": [{"id": "build", "label": "Build", "nodeIds": ["etl"], "start": "2026-10-01", "end": "2026-10-05", "basis": "supplied"}]}`. `timezone` is `date-only` (calendar days; an end date is the last day) or a zone such as `UTC` or `Europe/Paris` (then `start`/`end` are timestamps with an offset). Give `end` or an ISO 8601 `duration` (`P5D`, `PT6H`); both must agree. `basis` is `supplied` or `estimate`, and estimates stay drawn as estimates. An end before its start, an unknown component, a date mixed with a timestamp or one item ID with two intervals is refused visibly. Schedule items are dated evidence, not runs or observations.
+- A metrics item may add `measure`: `{"metric": "p95 latency", "value": 420, "unit": "ms", "scope": "checkout API", "window": {"from": "2026-09-01", "to": "2026-09-07"}, "basis": "measured", "role": "baseline"}`. `basis` is `measured`, `estimate` or `derived`; a synthetic block never carries `measured`. The comparison needs one `baseline` and one `current` reading of the same metric, unit and scope over windows of the same length; a zero baseline has no percentage. The difference is derived arithmetic, not a cause, and no money or time saving is inferred.
+
 ## 5. Choosing a figure
 
 Run `npm run design -- doc.json --out figures/` and read `figures/suggestions.json` (`diagramcloud.design-suggestions/1`): for each public view, the five best figure types with the fact behind each ("a numeric table on Input rows", "6 child views below this one"). Then choose by the question the figure must answer:
@@ -155,6 +161,8 @@ Run `npm run design -- doc.json --out figures/` and read `figures/suggestions.js
 | Which parts are in which designed state? | `status` | designed statuses |
 | Where does this come from and go? | `lineage` | a flow 3+ steps deep |
 | How much moves along each connection? | `sankey` | `quantity` on connections |
+| When does each dated item start and end? | `gantt` | a schedule evidence block on a component: items with supplied dates or declared estimates (story order is never timing) |
+| Did a metric change between a baseline and now? | `comparison` | metrics items with a measure: one baseline and one current reading of the same metric, unit, scope and window length |
 | How do supplied signed increments accumulate in table order? | `waterfall` | One public numeric table column, at most eight readable rows with omissions reported; running sums are derived, never observed or causal totals |
 | Which repositories moved? | `atlas` | an atlas document |
 

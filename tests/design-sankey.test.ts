@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {sankeySvg,sankeyUnit} from '../src/export/design/sankey';
-import {DESIGN_THEMES,type Project} from '../src/core/model';
+import {DESIGN_THEMES,validateDocument,type Project} from '../src/core/model';
+import {defects} from './helpers/designGeometry';
+import {semanticVisualQuality} from '../src/intelligence/visualQuality';
 import {contosoForecasting} from '../src/data/contosoForecasting';
 import {viewSpec} from '../src/core/viewspec';
 import {parseXml,walk,find} from '../src/core/interchange/xml';
@@ -71,4 +73,36 @@ test('sankey: no quantities is an empty state that says how to add one',()=>{
  const svg=sankeySvg(contosoForecasting(),'overview',{now:NOW});
  assert.equal(bands(svg).length,0);assert.equal(attr(svg,'data-dd-empty').length,1);
  assert.ok(texts(svg).includes('no connection quantities'));assert.match(texts(svg),/"quantity" field/);
+});
+
+/** Two parallel connections with equal labels and endpoints, plus a third flow; quantities as given. */
+function parallel(q:Record<string,Record<string,unknown>>):Project{
+ return validateDocument({schemaVersion:1,id:'parallel-flows',title:'Parallel flows',rootViewId:'root',nodes:[{id:'a',label:'Orders',kind:'source'},{id:'b',label:'Lake',kind:'storage'},{id:'c',label:'Report',kind:'report'}],
+  edges:[{id:'e1',source:'a',target:'b',label:'rows'},{id:'e2',source:'a',target:'b',label:'rows'},{id:'e3',source:'b',target:'c',label:'rows'}].map(e=>q[e.id]?{...e,quantity:{unit:'rows/day',provenance:'author',...q[e.id]}}:e),
+  views:[{id:'root',title:'Flows',nodeIds:['a','b','c'],edgeIds:['e1','e2','e3'],positions:{a:{x:0,y:0},b:{x:300,y:0},c:{x:600,y:0}}}]});
+}
+const total=(svg:string,id:string)=>Number(els(svg).find(e=>e.attrs['data-dd-node']===id)!.attrs['data-dd-total']);
+
+test('sankey identity: parallel flows with equal labels and endpoints both count; zero stays zero',()=>{
+ const svg=sankeySvg(parallel({e1:{value:100},e2:{value:100},e3:{value:0}}),'root',{now:NOW});
+ assert.deepEqual(bands(svg).map(b=>b.attrs['data-dd-edge']),['e1','e2','e3']);assert.equal(total(svg,'a'),200,'never deduplicated by label or endpoints');
+ assert.equal(bands(svg).find(b=>b.attrs['data-dd-edge']==='e3')!.attrs['data-dd-value'],'0');assert.deepEqual(defects(svg,'parallel').failures,[]);
+ const distinct=sankeySvg(parallel({e1:{value:100,measurementId:'m-1'},e2:{value:100,measurementId:'m-2'},e3:{value:200}}),'root',{now:NOW});assert.equal(total(distinct,'a'),200);
+});
+
+test('sankey identity: one measurement ID on two connections of one scope is ambiguous, reported and never counted twice',()=>{
+ const d=parallel({e1:{value:100,measurementId:'m-1'},e2:{value:100,measurementId:'m-1'},e3:{value:200}}),svg=sankeySvg(d,'root',{now:NOW});
+ assert.deepEqual(bands(svg).map(b=>b.attrs['data-dd-edge']),['e3']);assert.match(texts(svg),/Measurement m-1 appears on 2 connections of this scope \(Orders → Lake; Orders → Lake\): ambiguous, not drawn and never counted twice/);
+ assert.equal(semanticVisualQuality(d,'root','sankey').checks.find(c=>c.id==='sankey-source-quantities')!.state,'passed','the quality check expects the same bands');
+ const only=sankeySvg(parallel({e1:{value:100,measurementId:'m-1'},e2:{value:100,measurementId:'m-1'}}),'root',{now:NOW});
+ assert.equal(bands(only).length,0);assert.match(texts(only),/measurement m-1 is on 2 connections of one scope \(ambiguous, never counted twice\)/);
+ const scoped=sankeySvg(parallel({e1:{value:100,measurementId:'m-1',scope:'EU'},e2:{value:100,measurementId:'m-1',scope:'US'},e3:{value:200,scope:'EU'}}),'root',{now:NOW});
+ assert.deepEqual(bands(scoped).map(b=>b.attrs['data-dd-edge']).sort(),['e1','e3'],'the same ID in another scope is another population, listed not summed');
+ assert.match(texts(scoped),/in rows\/day \(EU\)/);assert.match(texts(scoped),/1 connection\(s\) in other units, scopes or windows, not drawn and never summed: Orders → Lake 100 rows\/day \(US\)/);
+});
+
+test('sankey identity: different windows are not aggregated, and a quantity window is validated',()=>{
+ const svg=sankeySvg(parallel({e1:{value:100,window:{from:'2026-09-01',to:'2026-09-30'}},e2:{value:50,window:{from:'2026-10-01',to:'2026-10-31'}},e3:{value:80,window:{from:'2026-09-01',to:'2026-09-30'}}}),'root',{now:NOW});
+ assert.deepEqual(bands(svg).map(b=>b.attrs['data-dd-edge']).sort(),['e1','e3']);assert.match(texts(svg),/2026-09-01 → 2026-09-30/);assert.equal(total(svg,'a'),100);
+ assert.throws(()=>parallel({e1:{value:1,window:{from:'2026-09-30',to:'2026-09-01'}}}),/e1: quantity window ends/);
 });

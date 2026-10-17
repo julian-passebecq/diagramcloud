@@ -9,10 +9,11 @@ import {rasterDimensions} from './rasterDimensions';
 import {assetFidelity} from './assetFidelity';
 import type {IconEntry} from '../core/icons';
 import {TRANSFORM_LABEL} from '../core/transform';
+import {measureText,scheduleItemText} from '../core/schedule';
 import {CLAIM_LABEL,REALIZATION_EXPORT_NOTE,day,observationLine,presentedObservations,stateFacetLine} from '../core/realization';
 /** Largest scale (inches per layout pixel): small views are not blown up past a readable size. */
 const MAX_SCALE=.0165;
-function textOf(b:EvidenceBlock):string{return b.type==='text'?b.text:b.type==='code'?b.code:b.type==='metrics'?b.items.map(i=>`${i.label}: ${i.value}\n${i.note}`).join('\n\n'):'';}
+function textOf(b:EvidenceBlock):string{return b.type==='text'?b.text:b.type==='code'?b.code:b.type==='metrics'?b.items.map(i=>`${i.label}: ${i.value}\n${i.note}${i.measure?`\n${measureText(i.measure)}`:''}`).join('\n\n'):b.type==='schedule'?`${b.items.map(scheduleItemText).join('\n')}\nDated evidence (${b.timezone}), not a run or observed timing.`:'';}
 
 type Pptx=InstanceType<typeof import('pptxgenjs').default>;
 /** `screens` maps an experience workspace id to its first slide in the same deck; boxes linked to one get a SCREEN link. */

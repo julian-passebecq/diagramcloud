@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {packSchema,validatePack} from '../experience/model';
 import {isOpenUri,secretFindings} from './secrets';
+import {DATE_ONLY,DATE_OR_INSTANT,DURATION,intervalOf,isError,windowOf} from './schedule';
 export const MAX_DOCUMENT_BYTES = 12 * 1024 * 1024;
 const id = z.string().regex(/^[a-z][a-z0-9_.-]{0,79}$/, 'Use a stable lowercase ID');
 const text = z.string().max(50000), short = z.string().min(1).max(160);
@@ -14,12 +15,30 @@ export const PROVENANCES=['source-derived','synthetic','reference','author'] as 
 const baseBlock = {id,title:short,visibility,sourceIds:refs,provenance:z.enum(PROVENANCES).default('author'),
  /** Optional step when the block is part of an explained transformation (input → logic → output); display only. */
  transform:z.enum(['input','logic','output','mapping','rules']).optional()};
+const dateOrInstant=z.string().regex(DATE_OR_INSTANT,'Use a date such as 2026-10-16 or an ISO 8601 timestamp with an offset');
+/** A measurement window: two dates (inclusive days) or two timestamps with an offset. */
+export const windowSchema=z.object({from:dateOrInstant,to:dateOrInstant}).strict();
+/**
+ * Optional quantitative reading on a metrics item, for the baseline/current comparison figure. `measured` was supplied as
+ * a measurement, `estimate` is declared as an estimate, `derived` is arithmetic over other supplied values. A synthetic
+ * block never carries a measured reading. Comparable only with the same metric, unit, scope and window length.
+ */
+export const MEASURE_BASES=['measured','estimate','derived'] as const;
+export const MEASURE_ROLES=['baseline','current'] as const;
+export const measureSchema=z.object({metric:short,value:z.number().finite().min(-1e15).max(1e15),unit:z.string().min(1).max(24),scope:short,window:windowSchema,basis:z.enum(MEASURE_BASES),role:z.enum(MEASURE_ROLES)}).strict();
+/**
+ * One dated item of a schedule evidence block (Gantt figure): a start and an end or an ISO 8601 duration, either
+ * supplied or declared as an estimate. `nodeIds` names the components it concerns. Not a run and not observed timing.
+ */
+export const SCHEDULE_BASES=['supplied','estimate'] as const;
+export const scheduleItemSchema=z.object({id,label:short,nodeIds:refs,start:dateOrInstant,end:dateOrInstant.optional(),duration:z.string().regex(DURATION,'Use an ISO 8601 duration such as P5D, P2W or PT6H').optional(),basis:z.enum(SCHEDULE_BASES),note:z.string().max(500).optional()}).strict();
 export const blockSchema = z.discriminatedUnion('type',[
  z.object({...baseBlock,type:z.literal('text'),text}).strict(),
  z.object({...baseBlock,type:z.literal('code'),language:z.enum(['sql','python','dax','json','text']).default('text'),code:text}).strict(),
  z.object({...baseBlock,type:z.literal('table'),columns:z.array(short).min(1).max(20),rows:z.array(z.array(z.union([z.string().max(2000),z.number().finite(),z.boolean(),z.null()])).max(20)).max(500)}).strict(),
  z.object({...baseBlock,type:z.literal('image'),assetId:id,caption:text.default('')}).strict(),
- z.object({...baseBlock,type:z.literal('metrics'),items:z.array(z.object({label:short,value:z.string().max(80),note:z.string().max(500).default('')}).strict()).max(12)}).strict()
+ z.object({...baseBlock,type:z.literal('metrics'),items:z.array(z.object({label:short,value:z.string().max(80),note:z.string().max(500).default(''),measure:measureSchema.optional()}).strict()).max(12)}).strict(),
+ z.object({...baseBlock,type:z.literal('schedule'),timezone:z.string().regex(/^(?:date-only|UTC|[+-]\d{2}:\d{2}|[A-Za-z]+(?:\/[A-Za-z0-9_+-]+)+)$/,'Use date-only, UTC, an offset such as +02:00 or a time zone name such as Europe/Paris'),items:z.array(scheduleItemSchema).min(1).max(100)}).strict()
 ]);
 /**
  * Where a component or connection comes from, when it matters (project atlas). `planned`: declared intent (a project
@@ -36,8 +55,11 @@ export type Perspective=typeof PERSPECTIVES[number];
 export const CHOICE_STATUSES=['candidate','accepted'] as const;
 export const CHOICE_ORIGINS=['author','ai','imported'] as const;
 const choiceLine=z.string().min(1).max(500),choiceLines=z.array(choiceLine).max(20).default([]);
+const fingerprint=z.string().regex(/^[0-9a-f]{16}$/,'A fingerprint is 16 hexadecimal characters');
 export const choiceOptionSchema=z.object({id,label:short,summary:z.string().max(1000).default('')}).strict();
-export const choiceSchema=z.object({id,title:short,goal:z.string().min(1).max(1000),options:z.array(choiceOptionSchema).min(1).max(12),recommendedOptionId:id.optional(),chosenOptionId:id.optional(),reasons:choiceLines,tradeoffs:choiceLines,assumptions:choiceLines,revisitWhen:z.string().max(500).optional(),status:z.enum(CHOICE_STATUSES).default('candidate'),origin:z.enum(CHOICE_ORIGINS).default('author'),suggestedBy:z.string().min(1).max(160).optional(),decidedBy:z.string().min(1).max(160).optional(),decidedAt:z.string().regex(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2}))?$/,'Use a date such as 2026-10-16 or an ISO 8601 timestamp with a time zone').optional(),sourceIds:refs,visibility}).strict();
+export const choiceSchema=z.object({id,title:short,goal:z.string().min(1).max(1000),options:z.array(choiceOptionSchema).min(1).max(12),recommendedOptionId:id.optional(),chosenOptionId:id.optional(),reasons:choiceLines,tradeoffs:choiceLines,assumptions:choiceLines,revisitWhen:z.string().max(500).optional(),status:z.enum(CHOICE_STATUSES).default('candidate'),origin:z.enum(CHOICE_ORIGINS).default('author'),suggestedBy:z.string().min(1).max(160).optional(),decidedBy:z.string().min(1).max(160).optional(),decidedAt:z.string().regex(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2}))?$/,'Use a date such as 2026-10-16 or an ISO 8601 timestamp with a time zone').optional(),
+ /** The project revision and the content fingerprint of the facts the decision was reviewed against; review-needed is derived from it, never stored. */
+ reviewBasis:z.object({revision:z.number().int().nonnegative(),fingerprint}).strict().optional(),sourceIds:refs,visibility}).strict();
 const choices=z.array(choiceSchema).max(20).optional();
 /** Words of a person or agent name, ignoring case, accents, spacing and punctuation. */
 export const agentWords=(name:string|undefined)=>(name??'').normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
@@ -48,11 +70,13 @@ export function sameAgent(a:string|undefined,b:string|undefined):boolean{
  const [few,many]=x.length<=y.length?[x,y]:[y,x];return few.every(w=>many.includes(w));
 }
 export const nodeSchema=z.object({id,label:short,kind:z.enum(['source','process','storage','model','report','app','control','physics','function','table']).default('process'),provider:z.string().max(80).default('Generic'),icon:z.string().max(80).default('generic'),customIconAssetId:id.optional(),summary:z.string().max(500).default(''),role:z.string().max(1000).default(''),status:z.enum(['idle','running','complete','warning','failed']).default('idle'),childViewId:id.optional(),experienceWorkspaceId:id.optional(),blockIds:refs,sourceIds:refs,tags:z.array(z.string().max(80)).max(20).default([]),basis,choices,visibility}).strict();
-/** An optional amount carried by a connection (rows/day, GB, events/s…), with its provenance; drawn by the Sankey figure. Never inferred by an importer. */
-export const quantitySchema=z.object({value:z.number().finite().min(0).max(1e15),unit:z.string().min(1).max(24),provenance:z.enum(PROVENANCES),note:z.string().max(200).optional()}).strict();
+/** An optional amount carried by a connection (rows/day, GB, events/s…), with its provenance; drawn by the Sankey figure. Never inferred by an importer.
+ * `measurementId` is the identity of the supplied measurement: one measurement on two connections of one scope is ambiguous and
+ * never counted twice. `scope` and `window` say what population and period it covers; only comparable ones are aggregated. */
+export const quantitySchema=z.object({value:z.number().finite().min(0).max(1e15),unit:z.string().min(1).max(24),provenance:z.enum(PROVENANCES),note:z.string().max(200).optional(),measurementId:id.optional(),scope:short.optional(),window:windowSchema.optional()}).strict();
 export const edgeSchema=z.object({id,source:id,target:id,label:z.string().max(160).default(''),kind:z.enum(['batch','stream','query','control','dependency']).default('batch'),speed:z.enum(['slow','medium','fast']).default('medium'),basis,quantity:quantitySchema.optional(),visibility}).strict();
 /** Diagram Design render hints (visual grammar adapted from diagram-design, MIT): which figure type, which 1-2 focal components, which theme. Presentation only: never facts. */
-export const DESIGN_TYPES=['auto','architecture','layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line','context','status','lineage','radial','atlas','sankey','waterfall'] as const;
+export const DESIGN_TYPES=['auto','architecture','layers','exploded','tree','swimlane','sequence','timeline','chart','deployment','matrix','treemap','hub','heatmap','line','context','status','lineage','radial','atlas','sankey','waterfall','gantt','comparison'] as const;
 export type DesignType=typeof DESIGN_TYPES[number];
 export const DESIGN_THEMES=['light','dark','editorial'] as const;
 export type DesignTheme=typeof DESIGN_THEMES[number];
@@ -99,7 +123,6 @@ const variantPath=z.string().max(512).regex(/^\/(?:(?:nodes|edges)\/(?:-|@[a-z][
 export const variantOperationSchema=z.discriminatedUnion('op',[
  z.object({op:z.literal('add'),path:variantPath,value:z.unknown()}).strict(),z.object({op:z.literal('remove'),path:variantPath}).strict(),
  z.object({op:z.literal('replace'),path:variantPath,value:z.unknown()}).strict(),z.object({op:z.literal('test'),path:variantPath,value:z.unknown()}).strict()]);
-const fingerprint=z.string().regex(/^[0-9a-f]{16}$/,'A fingerprint is 16 hexadecimal characters');
 export const variantSchema=z.object({id,title:short,summary:z.string().max(1000).default(''),viewId:id,base:z.object({revision:z.number().int().nonnegative(),fingerprint}).strict(),
  operations:z.array(variantOperationSchema).min(1).max(200),origin:z.enum(CHOICE_ORIGINS).default('author'),suggestedBy:z.string().min(1).max(160).optional()}).strict();
 export type Variant=z.infer<typeof variantSchema>;
@@ -109,7 +132,7 @@ export type Variant=z.infer<typeof variantSchema>;
  * revision it was authored at. Anchors are not checked here: a missing or changed anchor is derived on reading and fails
  * visibly when played. In public output a hidden subject or view is omitted and the stop says so (`omitted`).
  */
-export const tourStopSchema=z.object({viewId:id.optional(),subjects:z.array(z.object({kind:z.enum(['node','edge']),id}).strict()).max(20).default([]),fingerprint:fingerprint.optional(),narration:z.string().max(2000).default(''),omitted:z.enum(['subjects','stop']).optional()}).strict();
+export const tourStopSchema=z.object({id:id.optional(),viewId:id.optional(),subjects:z.array(z.object({kind:z.enum(['node','edge']),id}).strict()).max(20).default([]),fingerprint:fingerprint.optional(),narration:z.string().max(2000).default(''),omitted:z.enum(['subjects','stop']).optional()}).strict();
 export const tourSchema=z.object({id,title:short,sourceRevision:z.number().int().nonnegative(),stops:z.array(tourStopSchema).min(1).max(50),visibility}).strict();
 export type Tour=z.infer<typeof tourSchema>;
 export type TourStop=z.infer<typeof tourStopSchema>;
@@ -155,6 +178,21 @@ export type EvidenceBlock=z.infer<typeof blockSchema>;
 export type Asset=z.infer<typeof assetSchema>;
 export type Observation=z.infer<typeof observationSchema>;
 
+/** Timing and measurement facts that the schema alone cannot check: real dates, ordered intervals, agreeing end and duration,
+ * one time basis per schedule, no measured reading in a synthetic block. Refused visibly, never repaired. */
+function timingErrors(b:z.infer<typeof blockSchema>,nodes:Set<string>):string[]{
+ const errors:string[]=[];
+ if(b.type==='schedule'){const dateOnly=b.timezone==='date-only',seen=new Set<string>();
+  for(const i of b.items){const where=`${b.id}/${i.id}`;if(seen.has(i.id))errors.push(`${b.id}: duplicate schedule item ID ${i.id}`);seen.add(i.id);
+   i.nodeIds.forEach(r=>{if(!nodes.has(r))errors.push(`${where}: unknown reference ${r}`);});
+   if(dateOnly!==DATE_ONLY.test(i.start)||(i.end!==undefined&&dateOnly!==DATE_ONLY.test(i.end)))errors.push(`${where}: this schedule is ${dateOnly?'date-only: use calendar dates such as 2026-10-16':`timed (${b.timezone}): use timestamps with an offset such as 2026-10-16T09:00:00Z`}; one schedule uses one time basis`);
+   else{const x=intervalOf(i,dateOnly);if(isError(x))errors.push(`${where}: ${x.error}`);}}}
+ if(b.type==='metrics'){const keys=new Set<string>();
+  for(const i of b.items){if(!i.measure)continue;const m=i.measure,where=`${b.id}/${i.label}`,w=windowOf(m.window);if(isError(w))errors.push(`${where}: ${w.error}`);
+   if(b.provenance==='synthetic'&&m.basis==='measured')errors.push(`${where}: a synthetic block cannot carry a measured value; use basis estimate or derived`);
+   const key=m.metric+'\0'+m.scope+'\0'+m.role;if(keys.has(key))errors.push(`${b.id}: two ${m.role} readings of ${m.metric} for ${m.scope}; one block gives one`);keys.add(key);}}
+ return errors;
+}
 /** Every import and edit crosses the same structural and relational boundary. */
 export function validateDocument(input:unknown):Project {
  const d=documentSchema.parse(input), errors:string[]=[];
@@ -166,8 +204,8 @@ export function validateDocument(input:unknown):Project {
  check(d.rootViewId,views,'rootViewId');
  if(d.views.find(v=>v.id===d.rootViewId)?.visibility==='private')errors.push('Root view must be public');
  for(const n of d.nodes){if(n.customIconAssetId){check(n.customIconAssetId,assets,n.id);const asset=d.assets.find(a=>a.id===n.customIconAssetId);if(asset&&!asset.rights.trim())errors.push(n.id+': custom icon requires recorded rights');}n.blockIds.forEach(r=>check(r,blocks,n.id));n.sourceIds.forEach(r=>check(r,sources,n.id));if(n.childViewId)check(n.childViewId,views,n.id);}
- for(const e of d.edges){check(e.source,nodes,e.id);check(e.target,nodes,e.id);}
- for(const b of d.blocks){b.sourceIds.forEach(r=>check(r,sources,b.id));if(b.type==='image')check(b.assetId,assets,b.id);if(b.type==='table'&&b.rows.some(r=>r.length!==b.columns.length))errors.push(`${b.id}: each row must match the column count`);}
+ for(const e of d.edges){check(e.source,nodes,e.id);check(e.target,nodes,e.id);if(e.quantity?.window){const w=windowOf(e.quantity.window);if(isError(w))errors.push(`${e.id}: quantity ${w.error}`);}}
+ for(const b of d.blocks){b.sourceIds.forEach(r=>check(r,sources,b.id));for(const e of timingErrors(b,nodes))errors.push(e);if(b.type==='image')check(b.assetId,assets,b.id);if(b.type==='table'&&b.rows.some(r=>r.length!==b.columns.length))errors.push(`${b.id}: each row must match the column count`);}
  for(const v of d.views){v.nodeIds.forEach(r=>check(r,nodes,v.id));v.edgeIds.forEach(r=>check(r,edges,v.id));if(new Set(v.nodeIds).size!==v.nodeIds.length||new Set(v.edgeIds).size!==v.edgeIds.length)errors.push(`${v.id}: duplicate view membership`);for(const key of Object.keys(v.positions))if(!v.nodeIds.includes(key))errors.push(`${v.id}: position for non-member ${key}`);for(const f of v.design?.focal??[])if(!v.nodeIds.includes(f))errors.push(`${v.id}: focal component ${f} is not in this view`);for(const e of d.edges.filter(e=>v.edgeIds.includes(e.id)))if(!v.nodeIds.includes(e.source)||!v.nodeIds.includes(e.target))errors.push(`${v.id}: edge ${e.id} has an endpoint outside this view`);}
  // External observations: no credentials or .env text, no synthetic backing, no self-promotion to shareable.
  d.observations.forEach((o,i)=>{check(o.nodeId,nodes,o.id);o.blockIds.forEach(r=>check(r,blocks,o.id));
@@ -220,9 +258,10 @@ export function validateDocument(input:unknown):Project {
  // Tours: anchors are derived on reading (a stale or missing one fails visibly when played); only the stop shape is checked here.
  ids(d.tours??[],'tour');
  for(const t of d.tours??[])t.stops.forEach((s,n)=>{const where=`${t.id} stop ${n+1}`;
-  if(s.omitted==='stop'){if(s.viewId||s.subjects.length||s.narration||s.fingerprint)errors.push(`${where}: an omitted stop keeps no view, subjects, fingerprint or narration`);}
+  if(s.omitted==='stop'){if(s.id||s.viewId||s.subjects.length||s.narration||s.fingerprint)errors.push(`${where}: an omitted stop keeps no view, subjects, fingerprint, narration or ID`);}
   else if(!s.viewId||!s.fingerprint)errors.push(`${where}: a stop records its selected view and a content fingerprint`);
   if(new Set(s.subjects.map(x=>x.kind+'\0'+x.id)).size!==s.subjects.length)errors.push(`${where}: duplicate subject`);});
+ for(const t of d.tours??[]){const stopIds=t.stops.flatMap(s=>s.id?[s.id]:[]);if(new Set(stopIds).size!==stopIds.length)errors.push(`${t.id}: duplicate stop ID; a stop ID is unique within its tour`);}
  // Data-flow cycles are legal. Recursive view expansion is not.
  const done=new Set<string>(),visiting=new Set<string>();
  function visit(viewId:string){if(visiting.has(viewId)){errors.push(`Recursive drilldown cycle at ${viewId}`);return;}if(done.has(viewId))return;visiting.add(viewId);const v=d.views.find(v=>v.id===viewId);for(const n of d.nodes.filter(n=>v?.nodeIds.includes(n.id)))if(n.childViewId)visit(n.childViewId);visiting.delete(viewId);done.add(viewId);}

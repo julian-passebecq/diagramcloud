@@ -6,9 +6,8 @@ import {flowRanks} from './flow';
 import {f,footerLine,header,legendStrip,lines,markers,monoWidth,MONO,sansLines,svgDocument,txt,type LegendItem} from './kit';
 import {xml} from '../diagram';
 import {figureAvailability,withheldSvg} from './availability';
+import {sankeyBands} from './measures';
 
-type Quantity=NonNullable<SpecEdge['quantity']>;
-type Band=SpecEdge&{quantity:Quantity};
 const M=48,BAR=12,GAP=30,PLOT=320,MIN_NODE=4,LAST_W=150;
 const PROVENANCE:Record<EvidenceBlock['provenance'],{tag:string;note:string}>={
  synthetic:{tag:'SYNTHETIC QUANTITIES',note:'Illustrative amounts made up for teaching or design. Not measured or verified.'},
@@ -19,8 +18,7 @@ const fmt=(v:number)=>Math.abs(v)>=1e9?`${+(v/1e9).toFixed(1)}G`:Math.abs(v)>=1e
 const clipSans=(s:string,w:number,size:number)=>{const l=sansLines(s,w,size,1)[0]??'';return l.length<s.replace(/\s+/g,' ').trim().length?`${l.replace(/.$/,'')}…`:l;};
 /** The figure's one unit: the most common among the view's quantities (ties: first in connection order). Different units are never summed. */
 export function sankeyUnit(edges:SpecEdge[]):string|undefined{
- const count=new Map<string,number>();for(const e of edges)if(e.quantity)count.set(e.quantity.unit,(count.get(e.quantity.unit)??0)+1);
- return [...count].sort((a,b)=>b[1]-a[1])[0]?.[0];
+ return sankeyBands({nodes:[...new Set(edges.flatMap(e=>[e.from,e.to]))].map(id=>({id})),edges}).unit;
 }
 
 /**
@@ -32,17 +30,15 @@ export function sankeyUnit(edges:SpecEdge[]):string|undefined{
  * fallback relationship diagram, rather than inventing amounts.
  */
 export function sankeySvg(input:Project,viewId:string,options:DesignOptions={}):string{
- const c=designContext(input,viewId,'sankey',options),{spec,t}=c,unit=sankeyUnit(spec.edges);
- const byId=new Map(spec.nodes.map(n=>[n.id,n]));
- const bands=spec.edges.filter((e):e is Band=>!!e.quantity&&e.quantity.unit===unit&&e.from!==e.to&&byId.has(e.from)&&byId.has(e.to));
- const otherUnit=spec.edges.filter(e=>e.quantity&&e.quantity.unit!==unit),selfLoops=spec.edges.filter(e=>e.quantity&&e.quantity.unit===unit&&e.from===e.to),unquantified=spec.edges.filter(e=>!e.quantity);
- if(!bands.length){const a=figureAvailability(c,'sankey');return withheldSvg(c,a.available?{...a,available:false,missing:[{input:'Connection quantities with units',reason:`No connection between two different components states a quantity in ${unit}; ${selfLoops.length} from a component to itself.`,needs:'A quantity with a unit and provenance on a connection between two components.'}]}:a,{label:'Sankey'});}
+ const c=designContext(input,viewId,'sankey',options),{spec,t}=c,a=figureAvailability(c,'sankey');
+ if(!a.available)return withheldSvg(c,a,{label:'Sankey'});
+ const byId=new Map(spec.nodes.map(n=>[n.id,n])),{bands,unit:u,scope,window,otherGroup,selfLoops,unquantified,ambiguous}=sankeyBands(spec),unit=u!,within=[scope,window].filter(Boolean).join(', ');
  const provs=[...new Set(bands.map(b=>b.quantity.provenance))].sort(),mixed=provs.length>1;
  // Columns from the reading order, compacted so empty ranks leave no gap.
  const ranks=flowRanks(spec.nodes,spec.edges),members=spec.nodes.filter(n=>bands.some(b=>b.from===n.id||b.to===n.id));
  const used=[...new Set(members.map(n=>ranks.get(n.id)??0))].sort((a,b)=>a-b),col=new Map(members.map(n=>[n.id,used.indexOf(ranks.get(n.id)??0)])),cols=used.length;
  const colW=Math.max(150,Math.min(220,Math.floor(960/Math.max(1,cols-1)))),contentW=Math.max(720,(cols-1)*colW+BAR+8+LAST_W);
- const hdr=header(eyebrowOf(c,'Sankey'),spec.title,`How much moves along each connection of ${spec.title}, in ${unit}.`,M,M,contentW,t,c.editorial);
+ const hdr=header(eyebrowOf(c,'Sankey'),spec.title,`How much moves along each connection of ${spec.title}, in ${unit}${within?` (${within})`:''}.`,M,M,contentW,t,c.editorial);
  const out:string[]=[];let bottom=M+hdr.height+24;
  {
   const top=M+hdr.height+28,p=mixed?{tag:'MIXED PROVENANCE',note:`${bands.filter(b=>b.quantity.provenance==='synthetic').length} of ${bands.length} band(s) synthetic (dashed outline): illustrative, not measured. Others: ${provs.filter(x=>x!=='synthetic').join(', ')}.`}:PROVENANCE[provs[0] as EvidenceBlock['provenance']];
@@ -78,7 +74,8 @@ export function sankeySvg(input:Project,viewId:string,options:DesignOptions={}):
   bottom=py+plotH+26;
   const notes=[
    'Band thickness is proportional to the stated value. Columns follow the reading order from connections, not timing.',
-   ...(otherUnit.length?[`${otherUnit.length} connection(s) in other units, not drawn and never summed: ${otherUnit.slice(0,4).map(e=>`${byId.get(e.from)?.label??e.from} → ${byId.get(e.to)?.label??e.to} ${fmt(e.quantity!.value)} ${e.quantity!.unit}`).join('; ')}${otherUnit.length>4?'; …':''}.`]:[]),
+   ...(otherGroup.length?[`${otherGroup.length} connection(s) in other units${otherGroup.some(e=>e.quantity.unit===unit)?', scopes or windows':''}, not drawn and never summed: ${otherGroup.slice(0,4).map(e=>`${byId.get(e.from)?.label??e.from} → ${byId.get(e.to)?.label??e.to} ${fmt(e.quantity.value)} ${e.quantity.unit}${e.quantity.unit===unit&&e.quantity.scope?` (${e.quantity.scope})`:''}`).join('; ')}${otherGroup.length>4?'; …':''}.`]:[]),
+   ...ambiguous.map(x=>`Measurement ${x.measurementId} appears on ${x.edges.length} connections of this scope (${x.edges.map(e=>`${byId.get(e.from)?.label??e.from} → ${byId.get(e.to)?.label??e.to}`).join('; ')}): ambiguous, not drawn and never counted twice.`),
    ...(selfLoops.length?[`${selfLoops.length} connection(s) from a component to itself, not drawn.`]:[]),
    ...(unquantified.length?[`${unquantified.length} connection(s) without a quantity, not drawn.`]:[])];
   for(const note of notes){const ls=sansLines(note,contentW,10,2);out.push(`<g data-dd-note="">${lines(ls,M,bottom+12,14,{size:10,fill:t.muted,italic:true})}</g>`);bottom+=ls.length*14+4;}
