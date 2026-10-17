@@ -1,7 +1,7 @@
-import React,{useCallback,useMemo,useState} from 'react';
+import React,{useCallback,useMemo,useRef,useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {ReactFlow,ReactFlowProvider,MarkerType,applyNodeChanges,type NodeChange,type Node} from '@xyflow/react';
-import {DiagramCloudViewer,type ViewerSelection,type ViewerSelectionIntent,type ViewerSourceIntent} from '../../../src/react';
+import {DiagramCloudViewer,createReturnGuard,parseReturnFile,negotiateCapabilities,HOST_SESSION_FORMAT,RETURN_REFUSAL_TEXT,type ViewerSelection,type ViewerSelectionIntent,type ViewerSourceIntent,type HostReturnIntent,type ReturnGuard} from '../../../src/react';
 import {documentSchema,validateDocument,type Project} from '../../../src/core/model';
 
 // Synthetic only: no observations/review decisions, client identifiers or tokens.
@@ -15,6 +15,26 @@ function fixture(id:string,prefix:string):Project{return validateDocument(docume
  {id:'outside',title:'UNGRANTED_VIEW_TITLE',nodeIds:['outside-node','a','b'],edgeIds:['ungranted-edge']},{id:'home',title:'UNGRANTED_HOME_TITLE',nodeIds:['root-entry','outside-entry']},{id:'hidden',title:'UNGRANTED_HIDDEN_CHILD',nodeIds:['outside-node']}],
  sources:[{id:'selected-source',title:prefix+' selected synthetic citation',location:'Synthetic selected locator',url:'https://example.invalid/synthetic-selected'},{id:'private-source',title:'PRIVATE_SOURCE_SENTINEL',location:'PRIVATE_SOURCE_LOCATOR',visibility:'private'},{id:'outside-source',title:'UNGRANTED_SOURCE_SENTINEL'}],
  blocks:[{id:'note',title:'Synthetic selected explanation',type:'text',text:prefix+' illustrative context, not execution.',sourceIds:['selected-source'],provenance:'synthetic'},{id:'analysis-context-0',title:'PRIVATE_RECEIPT_SENTINEL',type:'code',language:'json',code:'PRIVATE_RECEIPT_BYTES',visibility:'private'}]}));}
+/** Third viewer with an explicit host session: negotiated grants, guarded returns, file fallback, dispose/reopen. */
+function SessionHost(){
+ const [doc,setDoc]=useState(()=>fixture('synthetic-viewer-c','C')),[grants,setGrants]=useState<string[]>([]),[generation,setGeneration]=useState(1),[open,setOpen]=useState(true);
+ const [selected,setSelected]=useState<ViewerSelection>({projectId:'synthetic-viewer-c',baseRevision:7,viewId:'root',nodeId:'a'}),[log,setLog]=useState<unknown[]>([]),[file,setFile]=useState('');
+ const sessionId=`fixture-session-${generation}`,offer=useMemo(()=>({format:HOST_SESSION_FORMAT,sessionId,audience:'public',grants}),[sessionId,grants]);
+ const guard=useRef<ReturnGuard|null>(null),last=useRef<HostReturnIntent|null>(null);
+ // One guard per session; it follows grant and revision changes and is disposed with the session.
+ if(!guard.current||guard.current.binding.sessionId!==sessionId){guard.current?.dispose();const n=negotiateCapabilities(offer);guard.current=createReturnGuard({sessionId,projectId:doc.id,baseRevision:doc.revision,audience:'public',granted:n.state==='ready'?n.granted:[]});}
+ const receive=useCallback((input:unknown,via:string)=>{const verdict=guard.current!.accept(input);if(verdict.ok){last.current=verdict.intent;const i=verdict.intent;if(i.kind==='selection'||i.kind==='navigate')setSelected({projectId:i.projectId,baseRevision:i.baseRevision,viewId:i.viewId,...(i.nodeId?{nodeId:i.nodeId}:{}),...(i.edgeId?{edgeId:i.edgeId}:{})});
+  setLog(old=>[...old,{via,ok:true,kind:i.kind,session:i.sessionId,revision:i.baseRevision,viewId:i.viewId,nodeId:i.nodeId,payload:i.payload===undefined?undefined:i.kind==='render'?i.payload.slice(0,4):(JSON.parse(i.payload) as {format?:string}).format}]);}
+  else setLog(old=>[...old,{via,ok:false,reason:verdict.reason,text:RETURN_REFUSAL_TEXT[verdict.reason]}]);},[]);
+ const regrant=(next:string[])=>{setGrants(next);const n=negotiateCapabilities({...offer,grants:next});guard.current!.rebind({projectId:doc.id,baseRevision:doc.revision,audience:'public',granted:n.state==='ready'?n.granted:[]});};
+ return <section aria-label="Session host"><nav aria-label="Session host controls"><button type="button" onClick={()=>regrant(grants.length?[]:['query','render','apply','publish'])}>{grants.length?'Withdraw C grants':'Grant C query, render, apply and publish'}</button>
+  <button type="button" onClick={()=>{const next={...doc,revision:doc.revision+1};setDoc(next);setSelected(old=>({...old,baseRevision:next.revision}));guard.current!.rebind({...guard.current!.binding,baseRevision:next.revision});}}>Advance C revision</button>
+  <button type="button" disabled={!open} onClick={()=>{guard.current!.dispose();setOpen(false);}}>Dispose C session</button><button type="button" disabled={open} onClick={()=>{setGeneration(old=>old+1);setOpen(true);}}>Reopen C session</button>
+  <button type="button" onClick={()=>receive(last.current,'replay')}>Replay last C return</button></nav>
+  {open&&<DiagramCloudViewer key={sessionId} label="Viewer C" apiVersion={1} document={doc} allowedViewIds={['root','child']} selection={selected} onSelectionChange={setSelected} session={offer} onReturn={intent=>receive(intent,'live')}/>}
+  <label>C return file<textarea aria-label="C return file" value={file} onChange={event=>setFile(event.target.value)}/></label><button type="button" onClick={()=>receive(parseReturnFile(file),'file')}>Load C return file</button>
+  <output aria-label="C session">{open?sessionId:'closed'}</output><pre aria-label="C host return log">{JSON.stringify(log)}</pre></section>;
+}
 function Host(){
  const [a,setA]=useState(()=>fixture('synthetic-viewer-a','A')),[b]=useState(()=>fixture('synthetic-viewer-b','B'));
  const [selectedA,setSelectedA]=useState<ViewerSelection>({projectId:a.id,baseRevision:7,viewId:'root',nodeId:'a'}),[selectedB,setSelectedB]=useState<ViewerSelection>({projectId:b.id,baseRevision:7,viewId:'root',nodeId:'a'});
@@ -31,6 +51,6 @@ function Host(){
  return <><nav aria-label="Synthetic host controls"><button onClick={()=>setAccept(old=>!old)}>{accept?'Reject selection intents':'Accept selection intents'}</button><button onClick={()=>setCapabilities(old=>!old)}>{capabilities?'Withdraw callbacks':'Restore callbacks'}</button><button onClick={()=>{setNarrow(true);setSelectedA({projectId:a.id,baseRevision:a.revision,viewId:'root',nodeId:'a'});}}>Narrow A scope</button><button onClick={()=>setA(old=>structuredClone(old))}>Replace A with same revision clone</button><button onClick={()=>{setA(old=>({...old,revision:old.revision+1}));setSelectedA(old=>({...old,baseRevision:old.baseRevision+1}));}}>Advance A revision</button><button onClick={()=>setMounted(old=>!old)}>{mounted?'Unmount A':'Mount A'}</button><button onClick={()=>setKey(old=>old+1)}>Remount A</button><button onClick={()=>setSelectedA(old=>({...old,viewId:'outside'}))}>Invalid A selection</button></nav>
  <div className="fixture-host-flow" aria-label="Actual host React Flow"><ReactFlow id="host-canvas" nodes={hostNodes} edges={hostEdges} onNodesChange={(changes:NodeChange[])=>setHostNodes(old=>applyNodeChanges(changes,old))} fitView nodesDraggable={false}/></div>
  <form aria-label="Actual host form" onSubmit={event=>{event.preventDefault();setFormSubmits(old=>old+1);}}><div className="fixture-viewers">{mounted&&<DiagramCloudViewer key={key} label="Viewer A" apiVersion={1} document={a} allowedViewIds={scopesA} selection={selectedA} onSelectionChange={capabilities?selectA:undefined} onNavigateView={capabilities?navigateA:undefined} onOpenSource={capabilities?sourceA:undefined}/>}<DiagramCloudViewer label="Viewer B" apiVersion={1} document={b} allowedViewIds={scopeB} selection={selectedB} onSelectionChange={selectB}/></div><button type="submit">Submit host form</button><button type="button" onClick={()=>setFormSubmits(0)}>Reset host form count</button></form><output aria-label="Host form submissions">{formSubmits}</output>
- <output aria-label="A controlled selection">{JSON.stringify(selectedA)}</output><output aria-label="B controlled selection">{JSON.stringify(selectedB)}</output><output aria-label="Host canonical documents unchanged">{String(JSON.stringify({a,b})===before)}</output><pre aria-label="Permitted host callback log">{JSON.stringify(logs)}</pre></>;
+ <output aria-label="A controlled selection">{JSON.stringify(selectedA)}</output><output aria-label="B controlled selection">{JSON.stringify(selectedB)}</output><output aria-label="Host canonical documents unchanged">{String(JSON.stringify({a,b})===before)}</output><pre aria-label="Permitted host callback log">{JSON.stringify(logs)}</pre><SessionHost/></>;
 }
 createRoot(document.getElementById('consumer-root')!).render(<ReactFlowProvider><Host/></ReactFlowProvider>);

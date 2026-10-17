@@ -4,6 +4,7 @@ import {clone,validateDocument,type Choice,type Project} from '../src/core/model
 import {commitHistory,publicDocument,undo,type History} from '../src/core/operations';
 import {describeChanges} from '../src/core/changeDetail';
 import {applyDraft,checkDraft,createLatestValidator,draftText,DRAFT_NO_COMPONENT,type DraftBase} from '../src/core/jsonDraft';
+import {acceptChoice} from '../src/core/decisionReview';
 import {contosoForecasting} from '../src/data/contosoForecasting';
 
 const choice=(over:Partial<Choice>={}):Choice=>({id:'store-choice',title:'Where forecasts are stored',goal:'Keep forecasts queryable by the planner',
@@ -59,6 +60,21 @@ test('choices: a recommendation never accepts itself, and an incoming accepted c
  assert.deepEqual(describeChanges(decided,decided).cautions,[],'an unchanged accepted decision is not cautioned');
  assert.ok(describeChanges(decided,withChoices([choice({...accepted,origin:'author',chosenOptionId:'warehouse',decidedBy:'Julian'})])).cautions.some(c=>c.startsWith('Changes the accepted decision of choice')));
  assert.ok(!describeChanges(withChoices([]),before).cautions.some(c=>c.includes('accepted')),'a candidate is not a decision and needs no caution');
+});
+
+test('choices: an imported accepted decision is never rewritten silently (date, sources, content or removal)',()=>{
+ const decided=withChoices([choice({status:'accepted',origin:'imported',chosenOptionId:'warehouse',decidedBy:'Architecture board',decidedAt:'2026-03-02',sourceIds:['src-store']})]);
+ const rewrite=(f:(c:Choice)=>void)=>{const d=clone(decided),c=d.nodes.find(n=>n.id==='planner')!.choices![0];f(c);return validateDocument(d);};
+ const rewrites:[string,Project][]=[['date',rewrite(c=>{c.decidedAt='2026-10-17';})],['sources',rewrite(c=>{c.sourceIds=[];})],['assumptions',rewrite(c=>{c.assumptions=['Rewritten after the fact'];})],['goal',rewrite(c=>{c.goal='A different goal';})]];
+ for(const [what,next] of rewrites){
+  assert.ok(describeChanges(decided,next).cautions.some(c=>c.startsWith('Changes the accepted decision of choice “Where forecasts are stored”')),`import review reports a rewritten ${what}`);
+  const scope={kind:'node' as const,id:'planner'},check=checkDraft({projectId:decided.id,revision:decided.revision,scope},decided,JSON.stringify(next.nodes.find(n=>n.id==='planner')));
+  assert.ok(check.ok&&check.decisions.includes('store-choice'),`the JSON drawer reports a rewritten ${what} before Apply`);
+ }
+ const removed=withChoices([]);
+ assert.ok(describeChanges(decided,removed).cautions.some(c=>c==='Removes the accepted decision of choice “Where forecasts are stored” (decided by Architecture board on 2026-03-02).'));
+ assert.throws(()=>acceptChoice(decided,'store-choice','lakehouse',{decidedBy:'Julian',decidedAt:'2026-10-17'}),/not rewritten silently/,'the Edit-mode accept action refuses to overwrite it');
+ assert.equal(decided.nodes.find(n=>n.id==='planner')!.choices![0].decidedBy,'Architecture board','nothing was mutated');
 });
 
 test('draft: invalid JSON or an invalid document is a result, and the applied project is never mutated',()=>{

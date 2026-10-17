@@ -1,6 +1,6 @@
 import {clone,validateDocument,viewSchema,type Project,type ProjectView} from './model';
 import {publicPack} from '../experience/model';
-import {publicLearningMappings} from './learningMapping';import {publicTours} from './tours';
+import {publicLearningMappings} from './learningMapping';import {publicTours} from './tours';import {publicChoiceReviews} from './decisionReview';
 export function positionFor(view:ProjectView,nodeId:string){const i=Math.max(0,view.nodeIds.indexOf(nodeId));return view.positions[nodeId]??{x:(i%3)*290,y:Math.floor(i/3)*170};}
 export function traceNodes(doc:Project,viewId:string,start:string,direction:'upstream'|'downstream'):Set<string>{const view=doc.views.find(v=>v.id===viewId),edges=doc.edges.filter(e=>view?.edgeIds.includes(e.id)),seen=new Set([start]),queue=[start];while(queue.length){const current=queue.shift();for(const e of edges){const next=direction==='downstream'?(e.source===current?e.target:null):(e.target===current?e.source:null);if(next&&!seen.has(next)){seen.add(next);queue.push(next);}}}return seen;}
 export function pathToView(doc:Project,target:string):string[]{function visit(viewId:string,path:string[]):string[]|null{if(viewId===target)return[...path,viewId];if(path.includes(viewId))return null;const v=doc.views.find(v=>v.id===viewId);for(const n of doc.nodes.filter(n=>v?.nodeIds.includes(n.id)))if(n.childViewId){const result=visit(n.childViewId,[...path,viewId]);if(result)return result;}return null;}return visit(doc.rootViewId,[])??[target];}
@@ -23,6 +23,8 @@ export function publicDocument(input:Project):Project{
  walk(d.rootViewId);d.nodes=d.nodes.filter(n=>keptNodes.has(n.id));for(const n of d.nodes)if(n.childViewId&&!keptViews.has(n.childViewId))delete n.childViewId;
  d.views=d.views.filter(v=>keptViews.has(v.id));const membership=new Set(d.views.flatMap(v=>v.edgeIds));d.edges=d.edges.filter(e=>e.visibility==='public'&&keptNodes.has(e.source)&&keptNodes.has(e.target)&&membership.has(e.id));const edges=new Set(d.edges.map(e=>e.id));
  for(const v of d.views){v.nodeIds=v.nodeIds.filter(id=>keptNodes.has(id));v.edgeIds=v.edgeIds.filter(id=>edges.has(id));v.positions=Object.fromEntries(Object.entries(v.positions).filter(([id])=>v.nodeIds.includes(id)));if(v.design)v.design={...v.design,focal:v.design.focal.filter(id=>v.nodeIds.includes(id))};}
+ // A schedule item names only kept components; one about private components only is dropped, and an emptied schedule stays private.
+ for(const b of d.blocks)if(b.type==='schedule'){b.items=b.items.filter(i=>!i.nodeIds.length||i.nodeIds.some(id=>keptNodes.has(id))).map(i=>({...i,nodeIds:i.nodeIds.filter(id=>keptNodes.has(id))}));if(!b.items.length)b.visibility='private';}
  const blockRefs=new Set(d.nodes.flatMap(n=>n.blockIds)),publicAssets=new Set(d.assets.filter(a=>a.visibility==='public').map(a=>a.id));d.blocks=d.blocks.filter(b=>b.visibility==='public'&&blockRefs.has(b.id)&&(b.type!=='image'||publicAssets.has(b.assetId)));
  const blocks=new Set(d.blocks.map(b=>b.id));d.nodes.forEach(n=>n.blockIds=n.blockIds.filter(id=>blocks.has(id)));for(const n of d.nodes)if(n.customIconAssetId&&!publicAssets.has(n.customIconAssetId))delete n.customIconAssetId;const assetRefs=new Set([...d.blocks.flatMap(b=>b.type==='image'?[b.assetId]:[]),...d.nodes.flatMap(n=>n.customIconAssetId?[n.customIconAssetId]:[])]);d.assets=d.assets.filter(a=>assetRefs.has(a.id));d.assets.forEach(asset=>{delete asset.remote;});
  // Prune delivery closure before collecting sources: a dropped private declaration
@@ -56,6 +58,8 @@ export function publicDocument(input:Project):Project{
  if(d.learningMappings){const kept=publicLearningMappings(input,d,{nodes:keptNodes,views:keptViews,sources,blocks});if(kept.length)d.learningMappings=kept;else delete d.learningMappings;}
  // Variants are candidates, never public facts. Tours: public ones only, a hidden subject or view omitted and said so.
  delete d.variants;if(d.tours){const kept=publicTours(input,d);if(kept.length)d.tours=kept;else delete d.tours;}
+ // Choice review bases: re-bound to the public facts only when current in authoring, otherwise dropped.
+ publicChoiceReviews(input,d);
  return validateDocument(d);
 }
 export type History={past:Project[];present:Project;future:Project[]};

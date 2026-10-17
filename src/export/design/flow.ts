@@ -90,6 +90,6 @@ export function timelineSvg(input:Project,viewId:string,options:DesignOptions={}
  const bottom=axisY+88+(hidden>0?16:0)+sched.height;
  const legend=legendStrip([{kind:'box',treatment:'focal',label:'Step on this view'},{kind:'box',treatment:'backend',label:'Step'}],M,bottom+24,contentW,t);
  let y=bottom+24+legend.height+12;const cards=c.editorial?summaryCards(c,M,y+8,contentW):undefined;if(cards)y+=cards.height+24;
- return svgDocument({slug:c.slug,width:contentW+2*M,height:y+12+M-12,title:`${doc.title} · story timeline`,desc:`Story timeline of ${steps.length} public step(s) in presentation order, not timing${hidden>0?`; ${hidden} on private views not drawn`:''}. Scheduled timeline (Gantt) withheld: no dates, durations or labelled estimates.`,
+ return svgDocument({slug:c.slug,width:contentW+2*M,height:y+12+M-12,title:`${doc.title} · story timeline`,desc:`Story timeline of ${steps.length} public step(s) in presentation order, not timing${hidden>0?`; ${hidden} on private views not drawn`:''}. Scheduled timeline (Gantt) ${a.schedule.state==='supplied'?'available as its own figure, from supplied dates':'withheld: no dates, durations or labelled estimates'}.`,
   t,theme:c.theme,type:'timeline',viewId:spec.viewId,defs:markers(c.slug,t),body:hdr.svg+out.join('')+legend.svg+(cards?.svg??'')+footerLine(footerParts(c),M,y+12,contentW,t)});
 }

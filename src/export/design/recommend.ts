@@ -5,7 +5,8 @@ import {waterfallTable} from './waterfall';
 import {flowRanks} from './flow';
 import {layersOf} from './layers';
 import {contextRoles} from './systemContext';
-import {FALLBACK_FIGURE,figureAvailability} from './availability';
+import {FALLBACK_FIGURE,figureAvailability,type MeasuredFigure} from './availability';
+import {comparisonOf,scheduleOf} from './measures';
 
 export type FigureType=Exclude<DesignType,'auto'>;
 export type FigureRecommendation={type:FigureType;score:number;reason:string;available:boolean};
@@ -37,7 +38,8 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
  const repos=doc.atlas?.snapshots.find(x=>x.id===doc.atlas!.activeSnapshotId)?.repositories.length??0;
  const layers=layersOf(spec.nodes).length,count=spec.nodes.length,empty=!count;
  const numeric=table?.series.length??0,rows=table?.block.rows.length??0,on=table?` on ${owner??'a component'}`:'',noTable='no numeric table evidence on this view';
- const waterfall=waterfallTable(c),withheld=`withheld, fallback: ${FALLBACK_FIGURE}`,measured=(k:'sankey'|'timeline'|'sequence')=>figureAvailability(c,k).available;
+ const waterfall=waterfallTable(c),withheld=`withheld, fallback: ${FALLBACK_FIGURE}`,measured=(k:MeasuredFigure)=>figureAvailability(c,k).available;
+ const sched=scheduleOf(c),scheduled=measured('gantt'),compared=comparisonOf(c),comparable=compared.rows.length;
  const r:Record<FigureType,[number,string]>={
   architecture:[empty?10:50,empty?'no public components in this view':`a sound default for ${n(count,'component')} and ${n(edges.length,'connection')}`],
   layers:layers>=3?[55,`${layers} layers of component kinds`]:[layers===2?30:12,layers===2?'only 2 layers of component kinds':'fewer than 2 layers of component kinds'],
@@ -46,7 +48,9 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
   treemap:children>=2?[Math.min(72,56+children*3),`${n(children,'child view')} below this one`]:children?[40,'only 1 child view below this one']:[8,'no drilldown from this view'],
   swimlane:count>=5&&depth>=3?[spec.groups.length>=2?72:62,`${n(count,'component')} on a flow ${depth} steps deep${spec.groups.length>=2?` across ${spec.groups.length} repositories`:''}`]:[count>=3&&depth>=2?30:12,count<5?`only ${n(count,'component')}, no clear flow`:`flow only ${depth} step(s) deep`],
   sequence:!measured('sequence')?[5,`no connection to order; ${withheld}`]:edges.length>=2&&edges.length<=18&&count<=10?[48,`${n(edges.length,'connection')} between ${n(count,'component')} (order from connections, not timing)`]:[edges.length>18||count>10?20:8,edges.length>18||count>10?'too many connections or components for a sequence':'fewer than 2 connections'],
-  timeline:steps.length?[here?62:50,`${n(steps.length,'public story step')}${here?`, ${here} on this view`:''} in presentation order; a scheduled timeline (Gantt) is withheld: no dates, durations or labelled estimates`]:[5,`no public story steps; ${withheld}`],
+  timeline:steps.length?[here?62:50,`${n(steps.length,'public story step')}${here?`, ${here} on this view`:''} in presentation order; ${scheduled?'the scheduled timeline is the Gantt figure, from supplied dates':'a scheduled timeline (Gantt) is withheld: no dates, durations or labelled estimates'}`]:[5,`no public story steps; ${withheld}`],
+  gantt:scheduled?[80,`${n(sched.rows.length,'schedule item')} with dates${sched.estimates?`, ${sched.estimates} declared as estimates`:''}`]:[3,`${sched.conflicts.length?'conflicting schedule items':'no schedule items with dates'} on this view; ${withheld}`],
+  comparison:comparable?[82,`${n(comparable,'metric')} with a comparable baseline and current reading; the difference is derived, not a cause`]:[3,`${compared.readings?'no comparable baseline and current reading':'no baseline and current measures'} on this view; ${withheld}`],
   chart:table?[90,`a numeric table${on}`]:[3,noTable],
   waterfall:waterfall?[waterfall.incrementLabel?84:26,waterfall.incrementLabel?`supplied signed increments in ${waterfall.block.columns[waterfall.column]}; sums are derived in table order, not observed or causal totals`:`numeric evidence can be interpreted as increments by a reviewed choice; the source does not explicitly label deltas`]:[3,noTable],
   line:table?[rows>=3?82:68,`a numeric table${on} with ${n(rows,'row')}`]:[3,noTable],
@@ -60,7 +64,7 @@ export function recommendFigures(input:Project,viewId:string):FigureRecommendati
   sankey:perUnit>=2?[86,`${n(perUnit,'connection')} with quantities in ${unit}${synth?' (synthetic)':''}`]:perUnit?[30,'only 1 connection with a quantity']:[3,`no connection quantities on this view; ${withheld}`],
   atlas:repos>=2?(spec.viewId===doc.rootViewId?[76,`${n(repos,'repository')} at their own revisions in the atlas snapshot`]:[30,`an atlas of ${n(repos,'repository')}; its revisions read best from the root view`]):repos?[24,'an atlas with only 1 repository']:[4,'not an atlas document (npm run atlas)'],
   lineage:count>=5&&depth>=3?[66,`${n(count,'component')} on a flow ${depth} steps deep`]:[count>=3&&depth>=2?28:10,count<5?`only ${n(count,'component')}, no clear flow`:`flow only ${depth} step(s) deep`]};
- const available:Record<FigureType,boolean>={...Object.fromEntries(FIGURES.map(x=>[x,true])) as Record<FigureType,boolean>,sankey:measured('sankey'),timeline:measured('timeline'),sequence:measured('sequence'),chart:!!table,line:!!table,heatmap:!!table,waterfall:!!waterfall,atlas:repos>0};
+ const available:Record<FigureType,boolean>={...Object.fromEntries(FIGURES.map(x=>[x,true])) as Record<FigureType,boolean>,sankey:measured('sankey'),timeline:measured('timeline'),sequence:measured('sequence'),gantt:scheduled,comparison:comparable>0,chart:!!table,line:!!table,heatmap:!!table,waterfall:!!waterfall,atlas:repos>0};
  return FIGURES.map((type,i)=>({type,score:available[type]?r[type][0]:Math.min(5,r[type][0]),reason:r[type][1],available:available[type],i})).sort((a,b)=>+b.available-+a.available||b.score-a.score||a.i-b.i).map(({type,score,reason,available})=>({type,score,reason,available}));
 }
 export const recommendedType=(input:Project,viewId:string):FigureType=>recommendFigures(input,viewId)[0].type;
