@@ -13,7 +13,7 @@ import {learningCatalogue} from './catalogue';
 export const JOURNEY_TAG='Adoption journey';
 /** Every self-description citation: a real file of this repository, the line, and a token that must stay on that line (tests/adoption-journeys.test.ts). */
 export const SELF_CITATIONS=[
- {id:'src-model-validate',title:'validateDocument',path:'src/core/model.ts',line:209,token:'export function validateDocument'},
+ {id:'src-model-validate',title:'validateDocument',path:'src/core/model.ts',line:214,token:'export function validateDocument'},
  {id:'src-json-draft',title:'JSON drawer applyDraft',path:'src/core/jsonDraft.ts',line:70,token:'export function applyDraft'},
  {id:'src-brief-compile',title:'ProjectBrief compiler',path:'src/intelligence/brief.ts',line:77,token:'export function compileProjectBrief'},
  {id:'src-patch-guard',title:'JSON Patch revision guard',path:'src/core/patch.ts',line:113,token:'Stale patch'},

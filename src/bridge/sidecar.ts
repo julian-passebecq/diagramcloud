@@ -16,11 +16,25 @@ export type SidecarFile={getFile():Promise<{size:number;text():Promise<string>}>
 export type SidecarFolder={name:string;requestPermission?(descriptor:{mode:'readwrite'}):Promise<PermissionState>;getDirectoryHandle(name:string,options?:{create?:boolean}):Promise<SidecarFolder>;getFileHandle(name:string,options?:{create?:boolean}):Promise<SidecarFile>};
 
 /** baseHash is the SHA-256 of the file as last read or written; null means it did not exist yet. */
-export type SidecarLink={folder:SidecarFolder;projectId:string;baseRevision:number|null;baseHash:string|null};
+/** landed: set by the save that found a previously uncertain write on disk (that attempt is now the base). */
+export type SidecarLink={folder:SidecarFolder;projectId:string;baseRevision:number|null;baseHash:string|null;landed?:SidecarAttempt};
 export type SidecarRead={status:'missing'}|{status:'found';text:string;hash:string;bytes:number};
 export type ManifestIdentity={id:string;title:string};
 
 export class SidecarConflictError extends Error{constructor(message:string){super(message);this.name='SidecarConflictError';}}
+/** What DiagramCloud tried to write when the outcome is unknown: the identity the next save looks for on disk. */
+export type SidecarAttempt={projectId:string;revision:number;hash:string;bytes:number;baseHash:string|null;at:string};
+/** The write started (createWritable succeeded) but did not confirm: the file may hold the attempt, the old text or neither. */
+export class SidecarUncertainWriteError extends Error{constructor(message:string,readonly attempt:SidecarAttempt){super(message);this.name='SidecarUncertainWriteError';}}
+
+/**
+ * In-memory receipts of uncertain writes, one per picked folder handle. Never persisted: a reload forgets them, and
+ * the hash check against the last read still refuses a blind overwrite. The next save re-reads the file first.
+ */
+const receipts=new WeakMap<SidecarFolder,SidecarAttempt>();
+export const sidecarReceipt=(folder:SidecarFolder):SidecarAttempt|undefined=>receipts.get(folder);
+const shortHash=(hash:string)=>hash.slice(0,12);
+export const describeAttempt=(a:SidecarAttempt)=>`revision ${a.revision} (sha256 ${shortHash(a.hash)}…, ${a.bytes} bytes)`;
 
 export async function contentHash(text:string):Promise<string>{const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');}
 const notFound=(error:unknown)=>error instanceof Error&&(error.name==='NotFoundError'||error.name==='TypeMismatchError');
@@ -35,6 +49,8 @@ async function sidecarHandle(folder:SidecarFolder,create:boolean):Promise<Sideca
 
 /** Reads raw text only. Callers must still parseDocument + preview before anything reaches the open project. */
 export async function readSidecar(folder:SidecarFolder):Promise<SidecarRead>{
+ // Re-reading the file for review is how the author resolves an uncertain save: the receipt has done its job.
+ receipts.delete(folder);
  const handle=await sidecarHandle(folder,false);if(!handle)return{status:'missing'};
  const text=await (await handle.getFile()).text();if(!text.trim())return{status:'missing'};
  return{status:'found',text,hash:await contentHash(text),bytes:new TextEncoder().encode(text).byteLength};
@@ -50,15 +66,30 @@ export async function readManifestIdentity(folder:SidecarFolder):Promise<Manifes
  }catch{return null;}
 }
 
-/** Write the open project back, refusing if the file changed since it was read (DataPass plan applied, Git pull, other editor). */
+/**
+ * Write the open project back, refusing if the file changed since it was read (DataPass plan applied, Git pull, other editor).
+ * After an uncertain write the file is re-read first: if it holds exactly the attempted bytes, that attempt landed and
+ * becomes the base; anything else is a conflict naming the attempt. A failed write is never retried blindly.
+ */
 export async function writeSidecar(link:SidecarLink,project:Project):Promise<SidecarLink>{
  if(project.id!==link.projectId)throw new Error(`The open project (${project.id}) is not the one linked to ${link.folder.name}/${SIDECAR_PATH} (${link.projectId}).`);
  if(link.folder.requestPermission&&await link.folder.requestPermission({mode:'readwrite'})!=='granted')throw new Error(`Write access to ${link.folder.name} was not granted. Nothing was written.`);
  const text=serializeSidecar(project),handle=(await sidecarHandle(link.folder,true))!;
- const onDisk=await (await handle.getFile()).text(),diskHash=onDisk.trim()?await contentHash(onDisk):null;
- if(diskHash!==link.baseHash)throw new SidecarConflictError(`${link.folder.name}/${SIDECAR_PATH} changed after DiagramCloud last read it. Nothing was written. Download a backup, then reopen the repository file to review the newer version.`);
- const writable=await handle.createWritable();await writable.write(text);await writable.close();
- return{...link,baseRevision:project.revision,baseHash:await contentHash(text)};
+ const onDisk=await (await handle.getFile()).text(),diskHash=onDisk.trim()?await contentHash(onDisk):null,where=`${link.folder.name}/${SIDECAR_PATH}`;
+ const receipt=receipts.get(link.folder);let base=link.baseHash,landed:SidecarAttempt|undefined;
+ if(receipt){
+  if(diskHash!==receipt.hash)throw new SidecarConflictError(`The last save of ${where} did not confirm: ${describeAttempt(receipt)} may not have been written, and the file now holds different content. Nothing was written. Download a backup, then reopen the repository file to review what is on disk.`);
+  receipts.delete(link.folder);landed=receipt;base=receipt.hash;
+  if(receipt.revision===project.revision&&receipt.projectId===project.id&&receipt.hash===await contentHash(text))return{folder:link.folder,projectId:link.projectId,baseRevision:project.revision,baseHash:receipt.hash,landed};
+ }
+ if(diskHash!==base)throw new SidecarConflictError(`${link.folder.name}/${SIDECAR_PATH} changed after DiagramCloud last read it. Nothing was written. Download a backup, then reopen the repository file to review the newer version.`);
+ const writable=await handle.createWritable(),hash=await contentHash(text);
+ try{await writable.write(text);await writable.close();}
+ catch(error){
+  const attempt:SidecarAttempt={projectId:project.id,revision:project.revision,hash,bytes:new TextEncoder().encode(text).byteLength,baseHash:base,at:new Date().toISOString()};receipts.set(link.folder,attempt);
+  throw new SidecarUncertainWriteError(`Outcome unknown, not saved: writing ${describeAttempt(attempt)} to ${where} did not confirm (${error instanceof Error?error.message:String(error)}). The next save re-reads the file first and never retries blindly.`,attempt);
+ }
+ return{folder:link.folder,projectId:link.projectId,baseRevision:project.revision,baseHash:hash,...(landed?{landed}:{})};
 }
 
 /** Review notes shown before a sidecar is written into a Git repository. */

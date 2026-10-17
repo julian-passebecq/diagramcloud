@@ -7,6 +7,7 @@
 - [AI guide](docs/AI_GUIDE.md): commands, the formats an agent writes (project manifest, design brief, patch), choosing a figure (including the evidence the Sankey, Gantt and baseline/current comparison need, and the Edit-mode forms that author them), recorded compatibility evidence for a choice, worked flows, and what never to do.
 - [Diagram Design skill](skills/diagramcloud-design/SKILL.md): step-by-step skill for graphing a codebase and drawing it.
 - [Proposal validator](src/core/proposal.ts): the one check behind the JSON / AI dialog, `npm run intelligence -- validate-proposal` and the MCP `diagramcloud_validate_proposal`; same payload, same reasons (wrong project or revision, replay, no self-review, no provider launch).
+- [Schema compatibility](src/core/moduleCompat.ts) and [image identity](src/core/assetIdentity.ts): unknown top-level modules are dropped only after the author confirms them, an unknown schemaVersion is refused, image digests are local SHA-256 of the stored bytes (never a Drive checksum), and an exact duplicate image is reused or kept as a recorded distinct copy, never merged.
 - [Contributor rules and current limits](AGENTS.md)
 
 ## Reference
