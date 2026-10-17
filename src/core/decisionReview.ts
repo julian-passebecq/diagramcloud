@@ -1,4 +1,4 @@
-import {clone,sameAgent,validateDocument,type Choice,type Project} from './model';
+import {clone,sameAgent,validateDocument,type Choice,type CompatibilityRecord,type Project} from './model';
 import {canonical,fnv64,targetFingerprint} from './learningMapping';
 /**
  * Evidence-aware decisions. A choice may record `reviewBasis` (the document revision and a content fingerprint of the facts
@@ -27,7 +27,9 @@ export function findChoice(doc:Project,choiceId:string):{owner:ChoiceOwner;choic
 export function choiceFingerprint(doc:Project,owner:ChoiceOwner,choice:Choice):string|undefined{
  const ownerPrint=targetFingerprint(doc,owner);if(!ownerPrint)return undefined;
  const sources=[...choice.sourceIds].sort().map(id=>{const s=doc.sources.find(s=>s.id===id);return s?{id,title:s.title,location:s.location,url:s.url??null}:{id,missing:true};});
- const decision={goal:choice.goal,options:choice.options.map(o=>({id:o.id,label:o.label,summary:o.summary})),reasons:choice.reasons,tradeoffs:choice.tradeoffs,assumptions:choice.assumptions,
+ // Recorded compatibility evidence is part of what the decision rests on; an option without any keeps its earlier print.
+ const cite=(e:CompatibilityRecord)=>({...e,sourceIds:[...e.sourceIds].sort().map(id=>doc.sources.some(s=>s.id===id)?id:`${id}!missing`),blockIds:[...e.blockIds].sort().map(id=>{const b=doc.blocks.find(b=>b.id===id);return b?`${id}:${b.provenance}`:`${id}!missing`;})});
+ const decision={goal:choice.goal,options:choice.options.map(o=>({id:o.id,label:o.label,summary:o.summary,...(o.compatibility?.length?{compatibility:o.compatibility.map(cite)}:{})})),reasons:choice.reasons,tradeoffs:choice.tradeoffs,assumptions:choice.assumptions,
   chosenOptionId:choice.chosenOptionId??null,recommendedOptionId:choice.recommendedOptionId??null,revisitWhen:choice.revisitWhen??null};
  return fnv64(canonical({owner:{kind:owner.kind,id:owner.id,fingerprint:ownerPrint},choiceId:choice.id,sources,decision}));
 }
@@ -69,6 +71,35 @@ export function acceptChoice(input:Project,choiceId:string,optionId:string,{deci
  if(!choice.options.some(o=>o.id===optionId))throw new Error(`Unknown option ${optionId} in choice ${choiceId}`);
  Object.assign(choice,{status:'accepted',chosenOptionId:optionId,decidedBy:who,decidedAt});
  choice.reviewBasis={revision:d.revision,fingerprint:choiceFingerprint(d,owner,choice)!};
+ return validateDocument(d);
+}
+export type CompatibilityInput={requirementId:string;verdict:CompatibilityRecord['verdict'];sourceIds:string[];blockIds:string[];recordedBy:string;recordedAt:string};
+/**
+ * Explicit Edit-mode record of compatibility evidence for one option of a component's choice and one current requirement
+ * of its substitution check. It cites at least one project source or non-synthetic evidence block (a synthetic block, a
+ * name, a provider or a family never establishes compatibility), names who recorded it, and replaces an earlier record
+ * for the same requirement. The review basis is left as it is, so a reviewed decision becomes review-needed.
+ * `requirements` are the component's current requirements (substitutionRequirements); the record keeps the wording.
+ */
+export function recordCompatibility(input:Project,choiceId:string,optionId:string,e:CompatibilityInput,requirements:readonly {id:string;text:string}[]):Project{
+ const who=person(e.recordedBy,'Compatibility evidence'),d=clone(input),found=findChoice(d,choiceId);if(!found)throw new Error(`Unknown choice ${choiceId}`);
+ const {owner,choice}=found;if(owner.kind!=='node')throw new Error(`Choice “${choice.title}” belongs to a view; compatibility is recorded for a component’s choice`);
+ const option=choice.options.find(o=>o.id===optionId);if(!option)throw new Error(`Unknown option ${optionId} in choice ${choiceId}`);
+ if(choice.origin!=='author'&&sameAgent(who,choice.suggestedBy))throw new Error(`A recommendation cannot record evidence for itself; a person other than ${choice.suggestedBy} records it in Edit mode`);
+ const text=requirements.find(r=>r.id===e.requirementId)?.text;if(!text)throw new Error(`${e.requirementId} is not a current requirement of this component; evidence is never recorded for, or rebound to, another one`);
+ const sourceIds=[...new Set(e.sourceIds)],blockIds=[...new Set(e.blockIds)];
+ for(const id of sourceIds)if(!d.sources.some(s=>s.id===id))throw new Error(`Unknown source ${id}`);
+ for(const id of blockIds){const b=d.blocks.find(b=>b.id===id);if(!b)throw new Error(`Unknown evidence block ${id}`);if(b.provenance==='synthetic')throw new Error(`Synthetic block “${b.title}” cannot establish compatibility; it illustrates, it does not measure`);}
+ if(!sourceIds.length&&!blockIds.length)throw new Error('Cite at least one project source or non-synthetic evidence block; a matching name, provider or family is not evidence');
+ const record:CompatibilityRecord={requirementId:e.requirementId,requirementText:text,verdict:e.verdict,sourceIds,blockIds,recordedBy:who,recordedAt:e.recordedAt.trim()};
+ option.compatibility=[...(option.compatibility??[]).filter(x=>x.requirementId!==e.requirementId),record];
+ return validateDocument(d);
+}
+/** Explicit Edit-mode removal of one recorded compatibility entry, by exact requirement ID (a removed requirement included). */
+export function removeCompatibility(input:Project,choiceId:string,optionId:string,requirementId:string):Project{
+ const d=clone(input),option=findChoice(d,choiceId)?.choice.options.find(o=>o.id===optionId);if(!option)throw new Error(`Unknown option ${optionId} in choice ${choiceId}`);
+ const kept=(option.compatibility??[]).filter(x=>x.requirementId!==requirementId);if(kept.length===(option.compatibility??[]).length)throw new Error(`No compatibility evidence for ${requirementId}`);
+ if(kept.length)option.compatibility=kept;else delete option.compatibility;
  return validateDocument(d);
 }
 /**

@@ -21,7 +21,8 @@ export const relativeText=(r:ComparisonRow)=>r.relative===undefined?'relative ch
 /**
  * Baseline and current comparison: for each metric of the public view's evidence with exactly one baseline and one
  * current reading of the same unit and scope over windows of the same length, the two supplied values side by side and
- * their difference, labelled derived arithmetic, with its basis (measured inputs, estimate-based or from derived inputs).
+ * their difference, labelled derived arithmetic, with its basis; it reads "measured difference" only when both readings are
+ * measured in non-synthetic blocks that cite a source, else "not a measured saving" with the reason (measuredDifference).
  * A zero baseline has no relative change. Metrics that cannot be compared are listed with the reason; when none can,
  * the figure is withheld (availability.ts). A difference is not a cause, and no money, time saving or performance is
  * inferred from the diagram.
@@ -39,7 +40,7 @@ export function comparisonSvg(input:Project,viewId:string,options:DesignOptions=
  const rowsTop=headY+10;
  shown.forEach((r,i)=>{const y=rowsTop+i*ROW,b=r.baseline,k2=r.current,bars=b.value>=0&&k2.value>=0,scale=Math.max(Math.abs(b.value),Math.abs(k2.value)),bw=(v:number)=>bars&&scale>0?Math.max(1,v/scale*(PLOT_W-TEXT_W-8)):0;
   if(i%2===1)out.push(`<rect x="${M}" y="${f(y)}" width="${W}" height="${ROW}" fill="${t.paper2}" fill-opacity="0.5"/>`);
-  out.push(`<g data-dd-comparison="${xml(r.metric)}" data-dd-scope="${xml(r.scope)}" data-dd-unit="${xml(r.unit)}" data-dd-baseline="${b.value}" data-dd-current="${k2.value}" data-dd-difference="${r.difference}"${r.relative===undefined?' data-dd-relative="unavailable"':` data-dd-relative="${r.relative}"`} data-dd-basis="${xml(r.basis)}">`,
+  out.push(`<g data-dd-comparison="${xml(r.metric)}" data-dd-scope="${xml(r.scope)}" data-dd-unit="${xml(r.unit)}" data-dd-baseline="${b.value}" data-dd-current="${k2.value}" data-dd-difference="${r.difference}"${r.relative===undefined?' data-dd-relative="unavailable"':` data-dd-relative="${r.relative}"`} data-dd-basis="${xml(r.basis)}" data-dd-measured="${r.measured}">`,
    txt(clipSans(r.metric,LABEL_W-16,11,true),M+4,y+16,{size:11,fill:t.ink,weight:600}),
    txt(clipMono(r.scope,LABEL_W-16,8),M+4,y+30,{size:8,fill:t.muted,font:MONO}),
    txt(clipMono(`${b.from}→${b.to} vs ${k2.from}→${k2.to}`,LABEL_W-16,8),M+4,y+43,{size:8,fill:t.soft,font:MONO}));
@@ -48,12 +49,13 @@ export function comparisonSvg(input:Project,viewId:string,options:DesignOptions=
     txt(clipMono(`${label} ${num(reading.value)} ${reading.unit} · ${reading.basis}${syn?' · synthetic':''}`,PLOT_W-w-6,8),px+w+6,y+dy+11,{size:8,fill:t.ink,font:MONO}));}
   out.push(txt(clipMono(`${signed(r.difference)} ${r.unit}`,rw,11),rx,y+18,{size:11,fill:t.ink,font:MONO,weight:600}),
    txt(clipMono(relativeText(r),rw,8),rx,y+32,{size:8,fill:r.relative===undefined?t.accent:t.muted,font:MONO}),
-   txt(clipMono(`${r.basis} · windows of ${r.windowLength}`,rw,8),rx,y+45,{size:8,fill:t.soft,font:MONO}),'</g>');});
+   txt(clipMono(`${r.measured?'measured difference':'not a measured saving'} · windows of ${r.windowLength}`,rw,8),rx,y+45,{size:8,fill:t.soft,font:MONO}),'</g>');});
  let bottom=rowsTop+shown.length*ROW+8;
  const notes=[
   'Difference = current − baseline: derived arithmetic over the supplied readings, in one unit and scope over windows of the same length. A difference is not proof of causation.',
   'No money, time saving or performance is inferred from the diagram, its shape or its node count. Estimates and synthetic readings are dashed.',
   ...(shown.some(r=>r.relative===undefined)?['A zero baseline has no relative change: no percentage is shown for it.']:[]),
+  ...shown.flatMap(r=>r.measured?[]:[`Not a measured saving · ${r.metric} (${r.scope}): ${r.notMeasured}. A measured difference needs two measured readings from non-synthetic blocks that cite a source.`]),
   ...k.unavailable.map(u=>`Not compared · ${u.metric}: ${u.reason}.`),
   ...(omitted?[`${omitted} further comparable metric(s) not drawn (${MAX_ROWS}-row readability limit).`]:[])];
  for(const note of notes){const ls=sansLines(note,W,10,3);out.push(`<g data-dd-note="">${lines(ls,M,bottom+12,14,{size:10,fill:t.muted,italic:true})}</g>`);bottom+=ls.length*14+4;}
