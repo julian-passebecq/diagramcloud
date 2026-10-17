@@ -74,4 +74,16 @@ export function rebaseVariant(doc:Project,id:string):Project{
  try{candidateOf(doc,v);}catch(e){throw new Error(`Cannot rebase: the operations no longer apply (${errorMessage(e)}). Discard the variant or write a new one.`);}
  return validateDocument({...doc,variants:doc.variants!.map(x=>x.id===id?{...x,base:{revision:doc.revision,fingerprint}}:x)});
 }
+/**
+ * Replace a current variant's operations (a visual edit of the variant), as one ordinary revision. Refused on a stale or
+ * broken variant, and when the new operations do not apply; the baseline is re-recorded on the current content.
+ */
+export function reviseVariant(doc:Project,id:string,operations:unknown):Project{
+ const state=variantState(doc,id);
+ if(state.status!=='current')throw new Error(`Cannot revise: ${state.message}`);
+ const parsed=variantSchema.parse({...state.variant,operations}),ops=parsed.operations as Operation[],fingerprint=variantFingerprint(doc,parsed.viewId,ops)!;
+ const next=validateDocument({...doc,variants:doc.variants!.map(x=>x.id===id?{...parsed,base:{revision:doc.revision,fingerprint}}:x)});
+ try{candidateOf(next,variantState(next,id).variant);}catch(e){throw new Error(`The revised variant does not apply to the current baseline: ${errorMessage(e)}`);}
+ return next;
+}
 export function discardVariant(doc:Project,id:string):Project{find(doc,id);return validateDocument(without(doc,id));}
