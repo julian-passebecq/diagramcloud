@@ -1,4 +1,5 @@
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
+import './tours.css';
 import {Button} from '@fluentui/react-components';
 import {errorMessage,type Project} from '../core/model';
 import {addTour,addTourStop,moveTourStop,recordStop,removeTour,removeTourStop,tourStops,updateTourStop,TOUR_LABEL,type TourSubject} from '../core/tours';
@@ -24,6 +25,11 @@ export function ToursPanel({doc,edit,viewId,selectedNodeId,selectedEdgeId,live,o
  const tours=doc.tours??[];
  const [title,setTitle]=useState(''),[narration,setNarration]=useState(''),[visibility,setVisibility]=useState<'public'|'private'>('public'),[notice,setNotice]=useState<{kind:'ok'|'refused';text:string}|null>(null);
  const [ownChoice,setOwnChoice]=useState<Extract<TourResumeResolution,{state:'choose'}>|null>(null),[draft,setDraft]=useState<{key:string;text:string}|null>(null),[resumeVersion,setResumeVersion]=useState(0);
+ // Keyboard focus: a control that disappears or becomes unavailable hands focus to the next sensible place.
+ const root=useRef<HTMLElement>(null),focusNext=useRef<string|null>(null),focusTo=(selector:string)=>{focusNext.current=selector;};
+ // Opened by the host with a tour already playing (a restored saved context): pick up focus the host's control lost.
+ useEffect(()=>{if(document.activeElement===document.body||document.activeElement===null)root.current?.querySelector<HTMLElement>('[data-focus="resume-choice"] button,[data-focus="tour-player"]')?.focus();},[]);// eslint-disable-line react-hooks/exhaustive-deps
+ useEffect(()=>{const sel=focusNext.current;if(!sel)return;focusNext.current=null;for(const one of sel.split('||')){const el=root.current?.querySelector<HTMLElement>(one);if(el){el.focus();break;}}});
  const choice=pending??ownChoice,clearChoice=()=>{setOwnChoice(null);onPending?.(null);};
  const tour=play?tours.find(t=>t.id===play.tourId):undefined,stops=useMemo(()=>tour?tourStops(doc,tour):[],[doc,tour]),index=play&&tour?play.index:-1,stop=index>=0?stops[index]:undefined;
  const resume=useMemo(()=>readTourResume(storage(),doc.id,audience,host),[doc.id,audience,host,resumeVersion]);
@@ -34,33 +40,33 @@ export function ToursPanel({doc,edit,viewId,selectedNodeId,selectedEdgeId,live,o
  const commit=(f:(d:Project)=>Project,ok:string)=>{setNotice(null);try{if(!onCommit(f(live()))){setNotice({kind:'refused',text:'Refused: the project did not accept this revision.'});return false;}setNotice({kind:'ok',text:ok});return true;}catch(e){setNotice({kind:'refused',text:errorMessage(e)});return false;}};
  const subjects=():TourSubject[]=>selectedNodeId?[{kind:'node',id:selectedNodeId}]:selectedEdgeId?[{kind:'edge',id:selectedEdgeId}]:[];
  const resumeTour=(tourId:string)=>{const p=resume.positions[tourId];if(!p)return;setNotice(null);const out=resolveTourResume(doc,{tourId,stopRef:p.stopRef,index:p.index});
-  if(out.state==='resumed'){clearChoice();go(tourId,out.index);setNotice({kind:'ok',text:out.message});}else if(out.state==='choose')setOwnChoice(out);else setNotice({kind:'refused',text:out.message});};
+  if(out.state==='resumed'){clearChoice();go(tourId,out.index);setNotice({kind:'ok',text:out.message});}else if(out.state==='choose'){setOwnChoice(out);focusTo('[data-focus="resume-choice"] button');}else setNotice({kind:'refused',text:out.message});};
  const recorded=tour&&index>=0?tour.stops[index]:undefined,draftKey=play?`${play.tourId}\0${index}\0${recorded?.id??''}\0${recorded?.narration??''}`:'',draftText=draft?.key===draftKey?draft.text:null;
  const selectionText=selectedNodeId?<>, subject component {selectedNodeId}</>:selectedEdgeId?<>, subject connection {selectedEdgeId}</>:', no subject selected';
- return <section className="inspector tours-panel" aria-label="Tours">
-  <div className="eyebrow">TOURS</div><h2>Guided tours</h2>
+ return <section ref={root} className="inspector tours-panel" aria-label="Tours">
+  <div className="eyebrow">TOURS</div><h2 tabIndex={-1} data-focus="tours-heading">Guided tours</h2>
   <p className="micro">{TOUR_LABEL}. Each stop keeps its view, the stable IDs of its subjects and the content they had when recorded; a changed or missing anchor is shown as such, never repaired silently.</p>
   {tours.length===0?<p className="muted">No tour{edit?' yet':' in this copy'}.</p>:<ul className="variant-list">{tours.map(t=>{const p=resume.positions[t.id];return <li key={t.id}>
-   <Button size="small" appearance={play?.tourId===t.id?'primary':'secondary'} aria-pressed={play?.tourId===t.id} onClick={()=>{setNotice(null);clearChoice();go(t.id,0);}}>{`Play ${t.title}`}</Button>
-   {p&&<> <Button size="small" onClick={()=>resumeTour(t.id)}>{`Resume ${t.title}`}</Button></>}<br/>
+   <Button size="small" data-tour-play={t.id} appearance={play?.tourId===t.id?'primary':'secondary'} aria-pressed={play?.tourId===t.id} onClick={()=>{setNotice(null);clearChoice();go(t.id,0);}}>{`Play ${t.title}`}</Button>
+   {p&&<> <Button size="small" data-tour-resume={t.id} onClick={()=>resumeTour(t.id)}>{`Resume ${t.title}`}</Button></>}<br/>
    <span className="micro">{t.stops.length} stop{t.stops.length===1?'':'s'} · recorded at revision {t.sourceRevision}{edit&&` · ${t.visibility}`}{p&&` · last seen at stop ${p.index+1} in this browser`}</span></li>;})}</ul>}
   {resume.status==='corrupt'&&<p className="revision-warning" role="alert">Saved tour positions in this browser cannot be read. They were left untouched. <Button size="small" onClick={()=>{clearTourResume(storage(),doc.id,audience,host);setResumeVersion(v=>v+1);}}>Clear tour positions</Button></p>}
   {resume.status==='unavailable'&&tours.length>0&&<p className="micro">Browser storage is unavailable here: tours play, but the last position is not kept.</p>}
-  {choice&&<section className="note-card" aria-label="Resume choice" role="group">
+  {choice&&<section className="note-card" aria-label="Resume choice" role="group" data-focus="resume-choice">
    <p className="revision-warning" role="alert" data-testid="tour-resume-choice">{choice.message}</p>
-   <div className="toolbar">{choice.candidates.map(at=><Button key={at} size="small" appearance="primary" onClick={()=>{clearChoice();go(choice.tourId,at);}}>{`Continue at stop ${at+1}`}</Button>)}
-    <Button size="small" onClick={()=>{clearChoice();go(choice.tourId,0);}}>Start from stop 1</Button>
-    <Button size="small" appearance="subtle" onClick={clearChoice}>Stay here</Button></div>
+   <div className="toolbar">{choice.candidates.map(at=><Button key={at} size="small" appearance="primary" onClick={()=>{clearChoice();go(choice.tourId,at);focusTo('[data-focus="tour-player"]');}}>{`Continue at stop ${at+1}`}</Button>)}
+    <Button size="small" onClick={()=>{clearChoice();go(choice.tourId,0);focusTo('[data-focus="tour-player"]');}}>Start from stop 1</Button>
+    <Button size="small" appearance="subtle" onClick={()=>{const id=choice.tourId;clearChoice();focusTo(`[data-tour-resume="${CSS.escape(id)}"]`);}}>Stay here</Button></div>
   </section>}
   {tour&&stop&&<section className="note-card" aria-label="Tour player">
    <p className="eyebrow">{TOUR_LABEL.toUpperCase()}</p>
-   <h3>{tour.title} · stop {index+1} of {stops.length}</h3>
+   <h3 tabIndex={-1} data-focus="tour-player">{tour.title} · stop {index+1} of {stops.length}</h3>
    {stop.status!=='current'&&<p className="revision-warning" role="alert" data-testid="tour-anchor">{stop.message}</p>}
    {stop.note&&<p className="micro" data-testid="tour-omission">{stop.note}</p>}
    {stop.status!=='omitted'&&stop.status!=='missing'&&stop.narration&&<p data-testid="tour-narration">{stop.narration}</p>}
    {stop.status==='current'||stop.status==='stale'?<p className="micro">View {stop.viewId}{stop.subjects.length>0&&<> · {stop.subjects.map(subjectText).join(', ')}</>}</p>:null}
-   <div className="toolbar"><Button size="small" disabled={index<=0} onClick={()=>go(tour.id,index-1)}>Previous stop</Button><Button size="small" disabled={index>=stops.length-1} onClick={()=>go(tour.id,index+1)}>Next stop</Button><Button size="small" onClick={()=>{setDraft(null);onPlay(null);}}>Stop tour</Button>
-    {edit&&<Button size="small" onClick={()=>{if(commit(d=>removeTour(d,tour.id),`Removed tour ${tour.title}. One Undo restores it.`))onPlay(null);}}>Remove tour</Button>}</div>
+   <div className="toolbar"><Button size="small" disabledFocusable={index<=0} onClick={()=>go(tour.id,index-1)}>Previous stop</Button><Button size="small" disabledFocusable={index>=stops.length-1} onClick={()=>go(tour.id,index+1)}>Next stop</Button><Button size="small" onClick={()=>{const id=tour.id;setDraft(null);onPlay(null);focusTo(`[data-tour-resume="${CSS.escape(id)}"]||[data-tour-play="${CSS.escape(id)}"]`);}}>Stop tour</Button>
+    {edit&&<Button size="small" onClick={()=>{if(commit(d=>removeTour(d,tour.id),`Removed tour ${tour.title}. One Undo restores it.`)){onPlay(null);focusTo('[data-focus="tours-heading"]');}}}>Remove tour</Button>}</div>
    {edit&&recorded&&!recorded.omitted&&<form className="property-form" aria-label="Edit this stop" onSubmit={e=>e.preventDefault()}>
     <h3>Edit this stop</h3>
     {draftText===null?<Button size="small" onClick={()=>setDraft({key:draftKey,text:recorded.narration})}>Edit narration</Button>:<>
@@ -69,9 +75,9 @@ export function ToursPanel({doc,edit,viewId,selectedNodeId,selectedEdgeId,live,o
       <Button size="small" onClick={()=>setDraft(null)}>Cancel</Button></div></>}
     <p className="micro">Re-record from view {viewId}{selectionText}.</p>
     <div className="toolbar"><Button size="small" onClick={()=>commit(d=>updateTourStop(d,tour.id,index,recorded,{rerecord:{viewId,subjects:subjects()}}),`Re-recorded stop ${index+1} on the current content. One Undo restores it.`)}>Re-record stop</Button>
-     <Button size="small" disabled={index<=0} onClick={()=>{if(commit(d=>moveTourStop(d,tour.id,index,recorded,-1),`Moved the stop to position ${index}. One Undo restores the order.`))onPlay({tourId:tour.id,index:index-1});}}>Move earlier</Button>
-     <Button size="small" disabled={index>=stops.length-1} onClick={()=>{if(commit(d=>moveTourStop(d,tour.id,index,recorded,1),`Moved the stop to position ${index+2}. One Undo restores the order.`))onPlay({tourId:tour.id,index:index+1});}}>Move later</Button>
-     <Button size="small" disabled={stops.length<=1} onClick={()=>{if(commit(d=>removeTourStop(d,tour.id,index,recorded),`Removed stop ${index+1}. One Undo restores it.`))onPlay({tourId:tour.id,index:Math.max(0,Math.min(index,stops.length-2))});}}>Remove stop</Button></div>
+     <Button size="small" disabledFocusable={index<=0} onClick={()=>{if(commit(d=>moveTourStop(d,tour.id,index,recorded,-1),`Moved the stop to position ${index}. One Undo restores the order.`))onPlay({tourId:tour.id,index:index-1});}}>Move earlier</Button>
+     <Button size="small" disabledFocusable={index>=stops.length-1} onClick={()=>{if(commit(d=>moveTourStop(d,tour.id,index,recorded,1),`Moved the stop to position ${index+2}. One Undo restores the order.`))onPlay({tourId:tour.id,index:index+1});}}>Move later</Button>
+     <Button size="small" disabledFocusable={stops.length<=1} onClick={()=>{if(commit(d=>removeTourStop(d,tour.id,index,recorded),`Removed stop ${index+1}. One Undo restores it.`))onPlay({tourId:tour.id,index:Math.max(0,Math.min(index,stops.length-2))});}}>Remove stop</Button></div>
    </form>}
   </section>}
   {notice&&<p className={notice.kind==='ok'?'micro':'validation-error'} role={notice.kind==='ok'?'status':'alert'} data-testid="tour-notice">{notice.text}</p>}
@@ -83,7 +89,7 @@ export function ToursPanel({doc,edit,viewId,selectedNodeId,selectedEdgeId,live,o
    <label>New tour title<input value={title} onChange={e=>setTitle(e.target.value)} maxLength={160}/></label>
    <label>Visibility<select value={visibility} onChange={e=>setVisibility(e.target.value as 'public'|'private')}><option value="public">Public (hidden subjects are omitted in public copies)</option><option value="private">Private</option></select></label>
    <Button disabled={!title.trim()} onClick={()=>{try{const d=live(),base='tour-'+(slug(title)||'untitled');let id=base;for(let n=2;(d.tours??[]).some(t=>t.id===id);n++)id=`${base}-${n}`;const stop=recordStop(d,viewId,subjects(),narration);
-    if(commit(x=>addTour(x,{id,title:title.trim(),visibility,stop}),`Recorded tour ${title.trim()} at revision ${d.revision}.`)){setTitle('');setNarration('');onPlay({tourId:id,index:0});}}catch(e){setNotice({kind:'refused',text:errorMessage(e)});}}}>New tour from this stop</Button>
+    if(commit(x=>addTour(x,{id,title:title.trim(),visibility,stop}),`Recorded tour ${title.trim()} at revision ${d.revision}.`)){setTitle('');setNarration('');onPlay({tourId:id,index:0});focusTo('[data-focus="tour-player"]');}}catch(e){setNotice({kind:'refused',text:errorMessage(e)});}}}>New tour from this stop</Button>
   </form>}
  </section>;
 }
