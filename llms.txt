@@ -6,6 +6,7 @@
 
 - [AI guide](docs/AI_GUIDE.md): commands, the formats an agent writes (project manifest, design brief, patch), choosing a figure, worked flows, and what never to do.
 - [Diagram Design skill](skills/diagramcloud-design/SKILL.md): step-by-step skill for graphing a codebase and drawing it.
+- [Proposal validator](src/core/proposal.ts): the one check behind the JSON / AI dialog, `npm run intelligence -- validate-proposal` and the MCP `diagramcloud_validate_proposal`; same payload, same reasons (wrong project or revision, replay, no self-review, no provider launch).
 - [Contributor rules and current limits](AGENTS.md)
 
 ## Reference
