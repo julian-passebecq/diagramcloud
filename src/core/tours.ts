@@ -57,7 +57,8 @@ export function tourStops(doc:Project,tour:Tour):StopState[]{
 /**
  * Public projection, called by publicDocument once the public closure is known. Only public tours. A stop whose view is
  * not public, or whose subjects are all not public, becomes an omitted stop with no view, subjects or narration; a subject that is not public is dropped and the
- * stop says some subjects are omitted, without naming or counting them. A stop current in authoring carries the
+ * stop says some subjects are omitted, without naming or counting them. Its narration is omitted too, because
+ * free text cannot be separated safely into public and private parts. A stop current in authoring carries the
  * fingerprint of its public content; a stale one keeps its recorded fingerprint, so it reads stale in the copy too.
  */
 export function publicTours(input:Project,pub:Project):Tour[]{
@@ -68,6 +69,6 @@ export function publicTours(input:Project,pub:Project):Tour[]{
   // Every subject private: the narration is about hidden content, so the stop is omitted like one on a private view.
   if(!kept.length&&s.subjects.length)return {subjects:[],narration:'',omitted:'stop'};
   const current=stopFingerprint(input,s.viewId,s.subjects)===s.fingerprint;
-  return {viewId:s.viewId,subjects:kept,fingerprint:current?stopFingerprint(pub,s.viewId,kept)!:s.fingerprint,narration:s.narration,...(lost?{omitted:'subjects' as const}:{})};
+  return {viewId:s.viewId,subjects:kept,fingerprint:current?stopFingerprint(pub,s.viewId,kept)!:s.fingerprint,narration:lost?'':s.narration,...(lost?{omitted:'subjects' as const}:{})};
  })}));
 }

@@ -110,7 +110,7 @@ test('tours: public copies keep safe identity and say what was omitted, without 
  const pub=publicDocument(doc),text=JSON.stringify(pub.tours);
  assert.deepEqual(pub.tours!.map(t=>t.id),['walk'],'a private tour stays in the authoring document');
  const [a,b,c,d]=pub.tours![0].stops;
- assert.deepEqual(a.subjects,[{kind:'node',id:'api'}]);assert.equal(a.omitted,'subjects');assert.equal(a.narration,'The API reads a key.');
+ assert.deepEqual(a.subjects,[{kind:'node',id:'api'}]);assert.equal(a.omitted,'subjects');assert.equal(a.narration,'','mixed-subject narration is not independently public');
  assert.deepEqual(b,{subjects:[],narration:'',omitted:'stop'},'a stop on a private view keeps no view, subject, fingerprint or narration');
  assert.equal(c.omitted,undefined);
  assert.deepEqual(d,{subjects:[],narration:'',omitted:'stop'},'a stop whose subjects are all private is omitted with its narration');
