@@ -1,0 +1,32 @@
+{
+  "name": "diagramcloud-viewer",
+  "displayName": "DiagramCloud Viewer",
+  "description": "Read-only public viewer for DiagramCloud documents, with explicit host capabilities and guarded selection return.",
+  "version": "0.1.0",
+  "publisher": "diagramcloud-local",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "private": true,
+  "type": "module",
+  "engines": {"vscode": "^1.90.0"},
+  "categories": ["Visualization"],
+  "main": "./dist/extension.cjs",
+  "activationEvents": [],
+  "capabilities": {"untrustedWorkspaces": {"supported": true}, "virtualWorkspaces": false},
+  "contributes": {
+    "commands": [
+      {"command": "diagramcloud.viewer.open", "title": "Open in DiagramCloud viewer", "category": "DiagramCloud"},
+      {"command": "diagramcloud.viewer.loadReturnFile", "title": "Load viewer return file", "category": "DiagramCloud"}
+    ],
+    "configuration": {
+      "title": "DiagramCloud viewer",
+      "properties": {
+        "diagramcloud.viewer.grants": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["query", "render", "propose", "validate", "apply", "publish"]},
+          "default": [],
+          "markdownDescription": "Capabilities granted to the viewer. Empty means read-only selection and context return. This viewer implements `query` and `render`; `propose`, `validate`, `apply` and `publish` are always refused by the read-only viewer."
+        }
+      }
+    }
+  }
+}
