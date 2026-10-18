@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {blueprintSvg,editorialSvg} from '../src/export/styled';
 import {svgDiagram} from '../src/export/diagram';
-import {viewSpec} from '../src/core/viewspec';
+import {viewSpec,PUBLIC_OMISSION_NOTICE} from '../src/core/viewspec';
 import {samples} from '../src/data/samples';
 import {parseManifest,documentFromAtlas} from '../src/core/atlas';
 import {scanRepository} from '../src/core/scan';
@@ -46,6 +46,6 @@ test('styled SVG: offline, no script, escaped text, public content only, determi
   assert.deepEqual([...svg.matchAll(/https?:\/\/[^"']+/g)].map(m=>m[0]),['http://www.w3.org/2000/svg']);
   assert.doesNotThrow(()=>parseXml(svg));
  }
- assert.match(blueprintSvg(tricky,s.rootViewId,NOW),/1 private or unreachable component\(s\) removed/);
+ assert.ok(blueprintSvg(tricky,s.rootViewId,NOW).includes(PUBLIC_OMISSION_NOTICE));
  assert.equal(blueprintSvg(s,s.rootViewId,NOW),blueprintSvg(s,s.rootViewId,NOW));
 });

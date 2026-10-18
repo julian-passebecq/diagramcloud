@@ -38,6 +38,9 @@ export function repositoryOf(doc:Project,id:string){
  return snap?.repositories.find(r=>id.startsWith(`${r.id}.`)||r.nodeId===id);
 }
 
+/** The one, uncounted notice a public copy gives when private or unreachable content of a view is not shown. */
+export const PUBLIC_OMISSION_NOTICE='Some private or unreachable content is not shown.';
+
 export function viewSpec(input:Project,viewId:string,options:{audience?:'public'|'author';now?:Date}={}):ViewSpec{
  const audience=options.audience??'public',doc=audience==='public'?publicDocument(input):input;
  const view=doc.views.find(v=>v.id===viewId);
@@ -54,8 +57,8 @@ export function viewSpec(input:Project,viewId:string,options:{audience?:'public'
  const specEdges:SpecEdge[]=edges.map(e=>{const c=edgeConfidence(e.label);return {id:e.id,from:e.source,to:e.target,label:e.label,kind:e.kind,basis:e.basis??'unspecified',...(c?{confidence:c}:{}),...(e.quantity?{quantity:{...e.quantity}}:{})};});
  const groups=[...new Set(specNodes.map(n=>n.group).filter((g):g is string=>!!g))].map(g=>({id:g,title:repositoryOf(doc,`${g}.x`)?.title??g,members:specNodes.filter(n=>n.group===g).map(n=>n.id)}));
  const omissions:string[]=[];
- if(audience==='public'){const full=input.views.find(v=>v.id===viewId);if(full){const hidden=full.nodeIds.length-view.nodeIds.length,hiddenEdges=full.edgeIds.length-view.edgeIds.length;
-  if(hidden>0)omissions.push(`${hidden} private or unreachable component(s) removed.`);if(hiddenEdges>0)omissions.push(`${hiddenEdges} private connection(s) removed.`);}}
+ // A public copy says that something is not shown, never what or how much (AC25): one sentence for cards and connections.
+ if(audience==='public'){const full=input.views.find(v=>v.id===viewId);if(full&&(full.nodeIds.length>view.nodeIds.length||full.edgeIds.length>view.edgeIds.length))omissions.push(PUBLIC_OMISSION_NOTICE);}
  if(specNodes.some(n=>n.basis==='unknown'))omissions.push('Some components are declared but nothing was read for them (basis unknown).');
  const scopedStates=doc.observations.filter(o=>ids.has(o.nodeId)&&o.stateFacet).length;
  if(scopedStates)omissions.push(`${scopedStates} scoped state-facet claim(s) retained in Project observation history; not represented as general component realization in this view.`);

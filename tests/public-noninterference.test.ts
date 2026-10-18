@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {samples} from '../src/data/samples';
 import {validateDocument,type Project} from '../src/core/model';
 import {publicDocument} from '../src/core/operations';
+import {PUBLIC_OMISSION_NOTICE} from '../src/core/viewspec';
 import {layeredLayout} from '../src/core/layout';
 import {targetFingerprint} from '../src/core/learningMapping';
 import {buildScene,sceneRoutes,routeIsOrthogonal} from '../src/export/scene';
@@ -76,11 +77,11 @@ const drawn=(svg:string)=>[...svg.matchAll(/<(?:g|path|line|polyline|rect)[^>]*
 const NOW=new Date('2026-10-17T00:00:00.000Z');
 const views=(p:Project)=>p.views.map(v=>v.id);
 /**
- * The one deliberate difference: a public figure states how many components and connections of its view were removed
- * (viewSpec omissions, asserted by viewspec, manual and styled tests). Only those sentences (and a footer that carries them, cut with an ellipsis) are removed here;
+ * The one deliberate difference: a public figure says, uncounted, that some content of its view is not shown
+ * (viewSpec omissions; how much never moves, see public-omission-counts.test.ts). Only that sentence (and a footer that carries it, cut with an ellipsis) is removed here;
  * every other byte must match.
  */
-const disclosed=(text:string)=>text.replace(/( · public content only)[^<]*/g,'$1').replace(/ ?\d+ private or unreachable (?:component|view)\(s\) removed\./g,'').replace(/ ?\d+ private connection\(s\) removed\./g,'');
+const disclosed=(text:string)=>text.replace(/( · public content only)[^<]*/g,'$1').split(' '+PUBLIC_OMISSION_NOTICE).join('').split(PUBLIC_OMISSION_NOTICE).join('');
 
 test('public noninterference: hidden cards, links, blocks, assets and steps leave the public projection identical',()=>{
  for(const {p,h} of pairs){

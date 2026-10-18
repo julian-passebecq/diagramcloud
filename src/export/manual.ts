@@ -3,7 +3,7 @@ import {svgDiagram} from './diagram';
 import {styledSvg} from './styled';
 import type {Project,EvidenceBlock} from '../core/model';
 import {publicDocument} from '../core/operations';
-import {viewSpec,PERSPECTIVE_LABEL,type ViewSpec} from '../core/viewspec';
+import {viewSpec,PERSPECTIVE_LABEL,PUBLIC_OMISSION_NOTICE,type ViewSpec} from '../core/viewspec';
 import {xml} from './diagram';
 import {orderedViews} from './drawio';
 import {editorialSvg} from './styled';
@@ -86,7 +86,8 @@ export function technicalManualHtml(input:Project,options:{now?:Date;viewIds?:st
  const usedSources=new Set([...specs.flatMap(spec=>spec.nodes.flatMap(n=>n.sourceRefs)),...blocks.flatMap(b=>b.sourceIds)]),selectedSources=options.viewIds?d.sources.filter(s=>usedSources.has(s.id)):d.sources;
  const omitted=[...new Set(specs.flatMap(s=>s.omissions))];
  if(options.viewIds&&allViews.length>views.length)omitted.push(`${allViews.length-views.length} public view(s) omitted by the selected publication brief.`);
- const fullViews=input.views.length-d.views.length;if(fullViews>0)omitted.unshift(`${fullViews} private or unreachable view(s) removed.`);
+ // Views that are not public are said to be missing, never counted (AC25); the views' own notices use the same sentence.
+ if(input.views.length>d.views.length&&!omitted.includes(PUBLIC_OMISSION_NOTICE))omitted.unshift(PUBLIC_OMISSION_NOTICE);
  const bases=[...new Map(specs.flatMap(s=>s.nodes).map(n=>[n.id,n])).values()].reduce<Record<string,number>>((a,n)=>{a[n.basis??'unspecified']=(a[n.basis??'unspecified']??0)+1;return a;},{});
  const generated=now.toISOString().replace('T',' ').slice(0,16)+' UTC';
  const cover=`<header class="cover">

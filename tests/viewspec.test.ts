@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {viewSpec,perspectivesFor,pathTo} from '../src/core/viewspec';
+import {viewSpec,perspectivesFor,pathTo,PUBLIC_OMISSION_NOTICE} from '../src/core/viewspec';
 import {parseManifest,documentFromAtlas} from '../src/core/atlas';
 import {scanRepository,scanToDocument} from '../src/core/scan';
 import {samples} from '../src/data/samples';
@@ -51,7 +51,7 @@ test('view spec: public audience removes private content and says so; unknown or
  const s=samples.find(x=>x.nodes.some(n=>n.childViewId))!;
  const priv:Project={...s,nodes:[...s.nodes,{...s.nodes[0],id:'secret-node',label:'SECRET-XYZ',visibility:'private',childViewId:undefined}],views:s.views.map(v=>v.id===s.rootViewId?{...v,nodeIds:[...v.nodeIds,'secret-node']}:v)};
  const spec=viewSpec(priv,s.rootViewId,{now:NOW});
- assert.ok(!JSON.stringify(spec).includes('SECRET-XYZ'));assert.match(spec.omissions.join(' '),/1 private or unreachable component/);
+ assert.ok(!JSON.stringify(spec).includes('SECRET-XYZ'));assert.deepEqual(spec.omissions.filter(o=>o===PUBLIC_OMISSION_NOTICE),[PUBLIC_OMISSION_NOTICE]);assert.doesNotMatch(spec.omissions.join(' '),/\d+ private/);
  assert.ok(JSON.stringify(viewSpec(priv,s.rootViewId,{audience:'author',now:NOW})).includes('SECRET-XYZ'));
  assert.throws(()=>viewSpec(priv,'nope'),/Unknown view/);
  // Views without an explicit perspective count as System; samples keep working.
