@@ -1,0 +1,442 @@
+{
+ "id": "synthetic-rag-capabilities",
+ "title": "Synthetic example: document question-answering service",
+ "summary": "SYNTHETIC teaching example. A generic retrieval-augmented question-answering service with an agentic planner, described as capabilities. It is invented: no repository, deployment, model choice or measurement exists. Product choices, versions, runtime and verification stay UNKNOWN.",
+ "visibility": "public",
+ "capturedAt": "2026-10-19T00:00:00Z",
+ "sourceCut": [
+  {
+   "repository": "diagramcloud examples/v3-capabilities/synthetic-rag (synthetic specification)",
+   "revision": "synthetic specification, no product revision"
+  }
+ ],
+ "sources": [
+  {
+   "id": "spec-label",
+   "title": "Synthetic label",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:3",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-purpose",
+   "title": "Purpose",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:8",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-mix",
+   "title": "Traditional and agentic mix",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:9",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-ingest",
+   "title": "Ingestion job",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:13",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-embed",
+   "title": "Embedding step",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:14",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-index",
+   "title": "Vector index",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:15",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-retrieve",
+   "title": "Retrieval API",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:16",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-planner",
+   "title": "Agent planner",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:17",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-answer",
+   "title": "Answer generator",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:18",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-eval",
+   "title": "Evaluation harness",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:19",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-http",
+   "title": "HTTP interface",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:23",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-cli-ingest",
+   "title": "ingest command",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:24",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-cli-eval",
+   "title": "evaluate command",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:25",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-origin-rag",
+   "title": "Origin: retrieval-augmented generation",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:29",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-origin-agent",
+   "title": "Origin: tool-calling agent loop",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:30",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-lim-select",
+   "title": "Limit: nothing selected",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:34",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-lim-numbers",
+   "title": "Limit: no figures",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:35",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-lim-loop",
+   "title": "Limit: planner loop rule",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:36",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-lim-truth",
+   "title": "Limit: citations are not truth",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:37",
+   "visibility": "public"
+  }
+ ],
+ "technologies": [
+  {
+   "id": "llm",
+   "title": "Language model (not chosen)",
+   "kind": "model",
+   "version": null,
+   "explanation": "Synthetic placeholder. No model or provider is selected; identity, licence and cost are UNKNOWN.",
+   "sourceIds": [
+    "spec-answer",
+    "spec-lim-select"
+   ],
+   "visibility": "public"
+  },
+  {
+   "id": "embedder",
+   "title": "Embedding model (not chosen)",
+   "kind": "model",
+   "version": null,
+   "explanation": "Synthetic placeholder. No embedding model is selected.",
+   "sourceIds": [
+    "spec-embed",
+    "spec-lim-select"
+   ],
+   "visibility": "public"
+  },
+  {
+   "id": "vector-index",
+   "title": "Vector index (not chosen)",
+   "kind": "datastore",
+   "version": null,
+   "explanation": "Synthetic placeholder. No vector index product is selected.",
+   "sourceIds": [
+    "spec-index",
+    "spec-lim-select"
+   ],
+   "visibility": "public"
+  }
+ ],
+ "capabilities": [
+  {
+   "id": "ingest",
+   "title": "Ingest and index documents",
+   "goal": "Split documents into passages, embed them and store them for retrieval (traditional batch pipeline).",
+   "surfaces": [
+    "Command line (ingest)"
+   ],
+   "version": "Synthetic design 0",
+   "environment": "Not chosen (UNKNOWN)",
+   "basis": "planned",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-ingest",
+    "spec-embed",
+    "spec-index"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "Run the ingest command for a folder; it runs the ingestion job once.",
+     "sourceIds": [
+      "spec-cli-ingest"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    },
+    {
+     "kind": "implementation",
+     "text": "Ingestion job, then embedding step, then vector index.",
+     "sourceIds": [
+      "spec-ingest",
+      "spec-embed",
+      "spec-index"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "No embedding model or index product is chosen.",
+     "sourceIds": [
+      "spec-lim-select"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "lifecycle",
+     "value": "Designed only (synthetic)",
+     "scope": "synthetic example; no implementation exists",
+     "sourceIds": [
+      "spec-label"
+     ]
+    }
+   ],
+   "uses": [
+    {
+     "technologyId": "embedder",
+     "relation": "embeds passages",
+     "basis": "planned",
+     "sourceIds": [
+      "spec-embed"
+     ]
+    },
+    {
+     "technologyId": "vector-index",
+     "relation": "stores passages",
+     "basis": "planned",
+     "sourceIds": [
+      "spec-index"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ask",
+   "title": "Answer a question with citations",
+   "goal": "Return an answer and the passage identifiers it used.",
+   "surfaces": [
+    "HTTP API"
+   ],
+   "version": "Synthetic design 0",
+   "environment": "Not chosen (UNKNOWN)",
+   "basis": "planned",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-purpose",
+    "spec-retrieve",
+    "spec-answer"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "POST /ask with a question; the response holds the answer and cited passage identifiers.",
+     "sourceIds": [
+      "spec-http"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    },
+    {
+     "kind": "implementation",
+     "text": "Retrieval API returns top passages; the answer generator writes an answer that must cite them.",
+     "sourceIds": [
+      "spec-retrieve",
+      "spec-answer"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    },
+    {
+     "kind": "origins",
+     "text": "Follows the common retrieval-augmented generation pattern.",
+     "sourceIds": [
+      "spec-origin-rag"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "Answers may be wrong even with citations. No latency, cost or accuracy figure exists.",
+     "sourceIds": [
+      "spec-lim-truth",
+      "spec-lim-numbers"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "lifecycle",
+     "value": "Designed only (synthetic)",
+     "scope": "synthetic example; no implementation exists",
+     "sourceIds": [
+      "spec-label"
+     ]
+    }
+   ],
+   "uses": [
+    {
+     "technologyId": "llm",
+     "relation": "writes the answer",
+     "basis": "planned",
+     "sourceIds": [
+      "spec-answer"
+     ]
+    },
+    {
+     "technologyId": "vector-index",
+     "relation": "retrieves passages",
+     "basis": "planned",
+     "sourceIds": [
+      "spec-retrieve"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "plan",
+   "title": "Plan tool calls (agentic step)",
+   "goal": "Decide whether to answer from passages or call a tool first.",
+   "surfaces": [
+    "HTTP API"
+   ],
+   "version": "Synthetic design 0",
+   "environment": "Not chosen (UNKNOWN)",
+   "basis": "planned",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-planner",
+    "spec-mix"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "Runs inside /ask; it may search again or call a calculator before answering.",
+     "sourceIds": [
+      "spec-planner"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    },
+    {
+     "kind": "origins",
+     "text": "Follows the common tool-calling agent loop: plan, call a tool, observe the output, answer.",
+     "sourceIds": [
+      "spec-origin-agent"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "At most three tool calls per question is a design rule, not a measured behaviour.",
+     "sourceIds": [
+      "spec-lim-loop"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "lifecycle",
+     "value": "Designed only (synthetic)",
+     "scope": "synthetic example; no implementation exists",
+     "sourceIds": [
+      "spec-label"
+     ]
+    }
+   ],
+   "uses": [
+    {
+     "technologyId": "llm",
+     "relation": "plans tool calls",
+     "basis": "planned",
+     "sourceIds": [
+      "spec-planner"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "evaluate",
+   "title": "Evaluate answers against a question set",
+   "goal": "Replay a fixed question set and compare cited passages with expected passages.",
+   "surfaces": [
+    "Command line (evaluate)"
+   ],
+   "version": "Synthetic design 0",
+   "environment": "Not chosen (UNKNOWN)",
+   "basis": "planned",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-eval"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "Run the evaluate command with a question set file.",
+     "sourceIds": [
+      "spec-cli-eval"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    },
+    {
+     "kind": "assurance",
+     "text": "Checks cited passages only; it does not establish that an answer is true.",
+     "sourceIds": [
+      "spec-eval",
+      "spec-lim-truth"
+     ],
+     "basis": "planned",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "lifecycle",
+     "value": "Designed only (synthetic)",
+     "scope": "synthetic example; no implementation exists",
+     "sourceIds": [
+      "spec-label"
+     ]
+    }
+   ],
+   "uses": []
+  }
+ ]
+}
