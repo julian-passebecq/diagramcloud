@@ -309,7 +309,9 @@ A perspective is a property of a view (`view.perspective`, default System), not 
 
 ## 1.9 additions: MosaicStudio adapter
 
-`conceptSpec(doc, viewId)` maps the public ViewSpec to MosaicStudio's concept spec. Layers come from what a component does (storage and tables, processing, control, apps and reports, sources and people), bottom to top with heights 0, 1, 2…; domains are repository groups or the view, and a cell above three components spills into a continuation domain. Kinds come from the provider first (SQLite → sql-db, DuckLake → lakehouse, dbt → pipeline, React → web-app…), then from the DiagramCloud kind; `lake` is never emitted because the contract allows one, on the bottom layer, which is the Studio author's call. Basis planned becomes status planned. Provenance is `documented` only when every component cites a source URL or an evidence block. Parallel connections merge into one flow, as the contract requires. Positions, navigation, story and evidence content stay in DiagramCloud, and the loss report says so.
+`conceptSpec(doc, viewId)` maps the public ViewSpec to MosaicStudio's concept spec. Layers come from what a component does (storage and tables, processing, control, apps and reports, sources and people), bottom to top with heights 0, 1, 2…; domains are repository groups or the view, and a cell above three components spills into a continuation domain. Kinds come from the provider first (SQLite → sql-db, DuckLake → lakehouse, dbt → pipeline, React → web-app…), then from the DiagramCloud kind; `lake` is never emitted because the contract allows one, on the bottom layer, which is the Studio author's call. Basis planned becomes status planned. Provenance is `documented` when every component carries source metadata or an evidence reference; that is not execution verification. Compatible parallel connections merge into one flow; incompatible relations are explicitly omitted. Confidence stays in labels/evidence or component descriptions, and dependency uses a labelled control style. Positions, navigation, story and evidence content stay in DiagramCloud, and the loss report says so.
+
+The selected-file `concept:preview` CLI adds a derived host sidecar and typed source mappings without changing the Project or owner schema. Public projection remains separate from the explicitly selected private author helper. Pick resolution is candidate host logic, not a wired Mosaic/T3 integration; see [the contract and limits](contracts/concept-preview.md).
 
 ## 1.10 additions: Technical Manual
 
@@ -366,3 +368,20 @@ The canvas sets `nodeOrigin={[0,0]}`, so scene coordinates equal React Flow coor
 ## 1.23 additions: label placement, crossing guard
 
 Canvas label candidates walk every route segment and its two sides in a fixed order and reject any spot that meets a card or another label (`src/ui/labelPlace.ts`); `layeredLayout` keeps the ordering with the fewest `layoutCrossings` among sweeps, neighbour swaps, one-column shifts and an authored-order seed.
+
+
+## Full-product continuation (unmerged candidate)
+
+The shell still orchestrates one canonical Project. `src/app/useProjectWorkspace.ts` owns loading, quarantined rows, guarded history, latest-save queue and unsaved-work handling; `useNavigationHistory.ts` owns navigation independently from author undo history; `ReviewShell.tsx` renders import review; `exports.ts` dispatches existing public exports. Delivery and Atlas metadata participate in whole-document change previews, including metadata-only patches.
+
+Selected-source workers (`analysisWorker.ts`, `workerClient.ts`, `deepWorker.ts`) never own authoring truth. Generation and revision guards refuse stale results, progress is bounded, cancellation terminates work and source budgets are reported. A validated `AnalysisProfile` and rebuildable larger `AnalysisBundle` retain source digests/revisions/line pointers separately from Project. Deep syntax uses pinned local WASM grammars; no source is executed. Explicit domain/native adapters append private reviewed candidate facts, not observations. Selection metadata has its own evidence discriminant, without a fabricated file:line.
+
+`graphProjection.ts` filters/collapses explicit imported graph memberships without editing the Project. Original IDs and endpoint maps survive the transient representative projection. `navigation.ts` keeps declared logical hierarchy distinct from bounded physical child views and source-qualified mappings. Recipe availability is a validated data/config registry and never creates missing facts.
+
+Optional `delivery` and `customIconAssetId` are additive canonical fields. Public delivery closure strips inaccessible nodes/environments/artifacts/releases/configuration/source refs, private nested bindings and private-known atlas repository references. Observations still enter only reviewed patches and remain private/unreviewed/nonshareable until a human decides in Edit. Source/build/artifact/release/instance identities are independent. Evolution retains bounded immutable source-qualified author snapshots in private evidence; presentation and migration plans never establish deployment.
+
+`library.ts` uses separate bounded IndexedDB collections/publications. Collection revisions are atomically checked; immutable publication records use add-only writes, validate public document identity/digest/vector and freeze existing public view/story selection with a presentation-only brief. Independent projects never share an invented SHA. Manual specs originate from full input before public redaction; selected detail/profile/paper settings change rendering only.
+
+`visualQuality.ts` compares actual public render alternatives with transparent geometry/semantic metrics. The production geometry port is the original unchanged checker, re-exported for tests. Verification specs are NOT_RUN; exact-revision owner receipts and permission/time-scoped cockpit statements stage observation patches. Operational links and IAM concepts remain source pointers/unknown health, without a runner, collector or security certification.
+
+For runnable interfaces and numeric budgets see `docs/product/CAMPAIGN_CLIENT.md`; qualification source identities and residual work are in the existing campaign report and sole roadmap.

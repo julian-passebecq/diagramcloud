@@ -4,11 +4,20 @@ import {quantitySchema,type ProjectEdge,type ProjectNode} from '../model';
 
 /** DiagramCloud's own draw.io export carries its component type, provider and ID so a round trip keeps them. */
 const NODE_KINDS:readonly string[]=['source','process','storage','model','report','app','control','physics','function','table'] satisfies ProjectNode['kind'][];
+type ParsedQuantity={state:'absent'|'invalid'}|{state:'valid';quantity:NonNullable<ProjectEdge['quantity']>};
 /** A connection quantity only from DiagramCloud's own style keys (written by our draw.io export); never inferred from a label. */
-function quantityOf(style:string):ProjectEdge['quantity']{
+function quantityOf(style:string):ParsedQuantity{
  const key=(k:string)=>style.match(new RegExp(`(?:^|;)${k}=([^;]*)`))?.[1],dec=(v?:string)=>{try{return v===undefined?undefined:decodeURIComponent(v);}catch{return undefined;}};
- const v=key('dcQuantity');if(v===undefined)return undefined;const note=dec(key('dcQuantityNote'));
- const q=quantitySchema.safeParse({value:Number(v),unit:dec(key('dcUnit')),provenance:key('dcProvenance'),...(note!==undefined?{note}:{})});return q.success?q.data:undefined;
+ const v=key('dcQuantity');if(v===undefined)return {state:'absent'};
+ const unit=dec(key('dcUnit')),rawNote=key('dcQuantityNote'),note=dec(rawNote);
+ // Number('') and Number(whitespace) are zero; neither declares a supplied zero.
+ // Reject blank units at this import boundary, preserving valid source vocabulary verbatim.
+ if(!v.trim()||!unit?.trim()||rawNote!==undefined&&note===undefined)return {state:'invalid'};
+ const value=Number(v);
+ // A nonzero decimal mantissa can underflow to 0 (or -0); it is not a supplied zero.
+ // Ignore exponent digits so genuine zero such as 0e-9999 remains valid.
+ if(value===0&&/[1-9]/.test(v.trim().split(/[eE]/)[0]))return {state:'invalid'};
+ const q=quantitySchema.safeParse({value,unit,provenance:key('dcProvenance'),...(note!==undefined?{note}:{})});return q.success?{state:'valid',quantity:q.data}:{state:'invalid'};
 }
 const EDGE_KINDS:readonly string[]=['batch','stream','query','control','dependency'] satisfies ProjectEdge['kind'][];
 
@@ -120,7 +129,9 @@ function pageGraph(title:string,cells:Cell[],lost:Map<string,number>):GraphPage{
   const label=[plainLabel(c.value),...(children.get(c.id)??[]).filter(k=>k.vertex).map(k=>plainLabel(k.value))].filter(Boolean).join(' · ');
   if(c.points)count('connector waypoint set(s) replaced by DiagramCloud routing');
   if(/startArrow=(?!none)[a-z]/i.test(c.style)&&/endArrow=(?!none)[a-z]/i.test(c.style)||/endArrow=none/.test(c.style)&&!/startArrow=(?!none)[a-z]/i.test(c.style))count('two-way or undirected connector(s) imported as one direction');
-  edges.push({source:s&&nodeIds.has(s)?s:'',target:t&&nodeIds.has(t)?t:'',label,kind:EDGE_KINDS.includes(c.style.match(/(?:^|;)dcKind=([a-z]+)/)?.[1]??'')?c.style.match(/(?:^|;)dcKind=([a-z]+)/)![1] as ProjectEdge['kind']:/dashed=1/.test(c.style)?'dependency':'batch',...(quantityOf(c.style)?{quantity:quantityOf(c.style)}:{})});
+  const quantity=quantityOf(c.style);
+  if(quantity.state==='invalid')count('invalid connection quantity declaration(s) omitted');
+  edges.push({source:s&&nodeIds.has(s)?s:'',target:t&&nodeIds.has(t)?t:'',label,kind:EDGE_KINDS.includes(c.style.match(/(?:^|;)dcKind=([a-z]+)/)?.[1]??'')?c.style.match(/(?:^|;)dcKind=([a-z]+)/)![1] as ProjectEdge['kind']:/dashed=1/.test(c.style)?'dependency':'batch',...(quantity.state==='valid'?{quantity:quantity.quantity}:{})});
  }
  // Small unlabelled dots that connectors meet at are junctions: replace each by direct connections through it.
  const junctions=new Set(nodes.filter(n=>n.label==='Untitled'&&(n.w??0)<=24&&(n.h??0)<=24).map(n=>n.key));

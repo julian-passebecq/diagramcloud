@@ -2,7 +2,8 @@ import {documentSchema,validateDocument,type EvidenceBlock,type Project,type Pro
 import {layeredPositions,type ImportResult} from '../interchange/graph';
 import {documentFromScan,SCAN_LIMITS} from '../scan/document';
 import type {ScanModel} from '../scan/scanner';
-import {REPO_ID,type ManifestRepository,type ProjectManifest} from './manifest';
+import {REPO_ID,GALAXY_IMPORT_PROVENANCE_PREFIX,GALAXY_IMPORT_PROVENANCE_BLOCK,prepareGalaxyImportProvenance,type ManifestRepository,type ProjectManifest} from './manifest';
+import {extendWithDomainFacts,type DomainResult} from '../../intelligence/domainAdapters';
 
 /**
  * Project atlas composition: one project made of N repositories. The root view shows the repositories and the
@@ -40,12 +41,18 @@ function factsBlock(r:{id:string;title:string;purpose?:string;capabilities:strin
 }
 
 /** Insert one repository's scan, prefixed, as the drilldown of its card. Returns report lines. */
-function embedScan(doc:Project,repo:string,model:ScanModel,limits:ReturnType<typeof scanBudget>,now:Date):{lost:string[];views:number}{
- const {document:scan,report}=documentFromScan(model,{now,fileName:repo,limits});
+function embedScan(doc:Project,repo:string,model:ScanModel,limits:ReturnType<typeof scanBudget>,now:Date,domain?:DomainResult):{lost:string[];views:number}{
+ const reserve=domain?Math.min(domain.facts.length+domain.capabilities.length,Math.floor(limits.nodes/2)):0;
+ const viewReserve=domain?Math.min(domain.capabilities.length,Math.max(0,limits.views-3)):0;
+ const {document:baseScan,report}=documentFromScan(model,{now,fileName:repo,limits:{...limits,nodes:limits.nodes-reserve,views:limits.views-viewReserve,componentViews:Math.max(1,limits.componentViews-viewReserve)}});
+ const sourceBudget=Math.max(1,Math.floor(190/Math.max(1,Math.ceil(1200/limits.edges))));
+ const scan=domain?extendWithDomainFacts(baseScan,domain,{nodes:limits.nodes,edges:limits.edges,views:limits.views,sources:sourceBudget,sourceRevision:model.commit}):baseScan;
+ if(domain){report.lost.push(...domain.diagnostics.map(d=>'Specialist: '+d));const materialized=scan.nodes.filter(n=>n.id.startsWith('domain-')&&!n.id.startsWith('domain-nav-')).length;if(materialized<domain.facts.length)report.lost.push((domain.facts.length-materialized)+' specialist declarations omitted by per-repository budget; absence is not removal.');}
  const p=(id:string)=>prefixed(repo,id);
- for(const n of scan.nodes)doc.nodes.push({...n,id:p(n.id),childViewId:n.childViewId?p(n.childViewId):undefined,blockIds:n.blockIds.map(p)});
+ for(const n of scan.nodes)doc.nodes.push({...n,id:p(n.id),childViewId:n.childViewId?p(n.childViewId):undefined,blockIds:n.blockIds.map(p),sourceIds:n.sourceIds.map(p)});
  for(const e of scan.edges)doc.edges.push({...e,id:p(e.id),source:p(e.source),target:p(e.target)});
- for(const b of scan.blocks)doc.blocks.push({...b,id:p(b.id)});
+ for(const b of scan.blocks)doc.blocks.push({...b,id:p(b.id),sourceIds:b.sourceIds.map(p)});
+ for(const source of scan.sources)doc.sources.push({...source,id:p(source.id)});
  for(const v of scan.views)doc.views.push({...v,id:p(v.id),title:clip(`${model.name} · ${v.title}`,160),nodeIds:v.nodeIds.map(p),edgeIds:v.edgeIds.map(p),positions:Object.fromEntries(Object.entries(v.positions).map(([k,v])=>[p(k),v]))});
  for(const n of doc.nodes)if(n.childViewId===undefined)delete n.childViewId;
  const card=doc.nodes.find(n=>n.id===repoNodeId(repo));if(card)card.childViewId=p(scan.rootViewId);
@@ -59,7 +66,7 @@ export function appendSnapshot(doc:Project,repositories:SnapshotRepository[],now
  doc.atlas={snapshots:[...history,snap],activeSnapshotId:snap.id};
 }
 
-export type AtlasScan={model?:ScanModel;error?:string;missing?:boolean};
+export type AtlasScan={model?:ScanModel;domain?:DomainResult;error?:string;missing?:boolean};
 
 /** Manifest + the scans that were possible → a validated atlas project and an import report. */
 export function documentFromAtlas(manifest:ProjectManifest,scans:Record<string,AtlasScan>={},options:{now?:Date;previous?:Project;fileName?:string}={}):ImportResult{
@@ -83,7 +90,7 @@ export function documentFromAtlas(manifest:ProjectManifest,scans:Record<string,A
  manifest.relationships.forEach((l,i)=>doc.edges.push({id:`rel-${i+1}`,source:repoNodeId(l.from),target:repoNodeId(l.to),label:l.label,kind:l.kind,speed:'medium',basis:l.basis,visibility:'public'}));
  const root=doc.views[0];root.nodeIds=doc.nodes.map(n=>n.id);root.edgeIds=doc.edges.map(e=>e.id);
  root.positions=Object.fromEntries(layeredPositions({title:root.title,nodes:root.nodeIds.map(key=>({key,label:key})),edges:doc.edges.map(e=>({source:e.source,target:e.target})),groups:[],direction:'LR'}));
- for(const id of scannedIds){const out=embedScan(doc,id,scans[id].model!,budget,now);lost.push(...out.lost);}
+ for(const id of scannedIds){const out=embedScan(doc,id,scans[id].model!,budget,now,scans[id].domain);lost.push(...out.lost);}
  appendSnapshot(doc,repositories,now,options.previous?.atlas);
  doc.story=[{title:manifest.project.title,viewId:ATLAS_ROOT,narration:`${repos.length} repositories, ${scannedIds.length} scanned. Each card lists its host, locator and revision; open a scanned repository to follow it down to files.`,highlightEdgeIds:[]}];
  const document=validateDocument(doc);
@@ -96,15 +103,15 @@ export function documentFromAtlas(manifest:ProjectManifest,scans:Record<string,A
 export const activeSnapshot=(doc:Project)=>{const a=doc.atlas;if(!a)throw new Error('This project is not a project atlas.');return a.snapshots.find(s=>s.id===a.activeSnapshotId)!;};
 
 /** Replace one repository's scan (all IDs under its prefix) and record a new snapshot; other repositories are untouched. */
-export function rescanRepository(input:Project,repo:string,model:ScanModel,now=new Date()):ImportResult{
+export function rescanRepository(input:Project,repo:string,model:ScanModel,now=new Date(),domain?:DomainResult):ImportResult{
  const doc=structuredClone(input),snap=activeSnapshot(doc),entry=snap.repositories.find(r=>r.id===repo);
  if(!entry)throw new Error(`Repository ${repo} is not part of this atlas. Add it first.`);
  const removedViews=new Set(doc.views.filter(v=>ownedBy(repo,v.id)).map(v=>v.id));
- doc.nodes=doc.nodes.filter(n=>!ownedBy(repo,n.id));doc.edges=doc.edges.filter(e=>!ownedBy(repo,e.id));doc.blocks=doc.blocks.filter(b=>!ownedBy(repo,b.id));doc.views=doc.views.filter(v=>!removedViews.has(v.id));
+ doc.nodes=doc.nodes.filter(n=>!ownedBy(repo,n.id));doc.edges=doc.edges.filter(e=>!ownedBy(repo,e.id));doc.blocks=doc.blocks.filter(b=>!ownedBy(repo,b.id));doc.sources=doc.sources.filter(s=>!ownedBy(repo,s.id));doc.views=doc.views.filter(v=>!removedViews.has(v.id));
  doc.story=doc.story.filter(s=>!removedViews.has(s.viewId));
  const card=doc.nodes.find(n=>n.id===repoNodeId(repo));if(card)delete card.childViewId;
  const scanned=snap.repositories.filter(r=>r.scanStatus==='scanned'||r.id===repo).length;
- const out=embedScan(doc,repo,model,scanBudget(scanned,snap.repositories.length),now);
+ const out=embedScan(doc,repo,model,scanBudget(scanned,snap.repositories.length),now,domain);
  const updated:SnapshotRepository={...entry,scanStatus:'scanned',scannedAt:now.toISOString(),authority:model.commit?'git':entry.authority};delete updated.note;
  if(model.commit)updated.revision=model.commit;if(model.branch)updated.ref=model.branch.slice(0,200);
  if(card){card.basis='static-source';card.tags=[STATUS_LABEL.scanned,...card.tags.slice(1)];}
@@ -129,4 +136,25 @@ export function addRepository(input:Project,repo:{id:string;title:string;host:Sn
  const xs=Object.values(root.positions);root.nodeIds.push(repoNodeId(repo.id));root.positions[repoNodeId(repo.id)]={x:xs.length?Math.max(...xs.map(p=>p.x))+300:0,y:xs.length?Math.min(...xs.map(p=>p.y)):0};
  appendSnapshot(doc,[...snap.repositories,s],now,doc.atlas);
  return validateDocument(doc);
+}
+
+export const GALAXY_PROVENANCE_CAPTURED='Private Galaxy import provenance captured. No namespace binding or ID reuse.';
+export const GALAXY_PROVENANCE_UNAVAILABLE='Galaxy provenance capture unavailable. The normal import is unchanged; no IDs were reused.';
+/** Attach only to a newly composed candidate. No prior receipt reader, namespace inference or identity reassignment. */
+export async function attachGalaxyImportProvenance(input:Project,raw:string,options:{now?:Date}={}):Promise<{document:Project;captured:boolean;message:string}>{
+ const unavailable=()=>({document:input,captured:false,message:GALAXY_PROVENANCE_UNAVAILABLE});
+ try{
+  const snapshot=input.atlas?.snapshots.find(s=>s.id===input.atlas!.activeSnapshotId);
+  if(!snapshot||input.blocks.some(b=>b.id.startsWith(GALAXY_IMPORT_PROVENANCE_PREFIX)))return unavailable();
+  const prepared=await prepareGalaxyImportProvenance(raw,input.id,snapshot.id,options.now);
+  if(!prepared||input.id!==`atlas-${prepared.manifest.project.id}`||snapshot.repositories.length!==prepared.receipt.mappings.length)return unavailable();
+  for(const row of prepared.receipt.mappings){
+   const repository=snapshot.repositories.find(r=>r.id===row.repositoryId),declared=prepared.manifest.repositories.find(r=>r.id===row.repositoryId);
+   if(!repository||!declared||repository.nodeId!==row.nodeId||repository.locator!==declared.locator||repository.host!==declared.host||!input.nodes.some(n=>n.id===row.nodeId))return unavailable();
+  }
+  const doc=structuredClone(input),code=JSON.stringify(prepared.receipt);
+  doc.blocks.push({id:GALAXY_IMPORT_PROVENANCE_BLOCK,title:'Private Galaxy import provenance',type:'code',language:'json',code,visibility:'private',sourceIds:[],provenance:'source-derived'});
+  for(const row of prepared.receipt.mappings)doc.nodes.find(n=>n.id===row.nodeId)!.blockIds.push(GALAXY_IMPORT_PROVENANCE_BLOCK);
+  return {document:validateDocument(doc),captured:true,message:GALAXY_PROVENANCE_CAPTURED};
+ }catch{return unavailable();}
 }

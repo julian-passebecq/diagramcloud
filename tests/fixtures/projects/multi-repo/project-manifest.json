@@ -1,0 +1,24 @@
+{
+  "format": "diagramcloud.project-manifest",
+  "version": 1,
+  "project": {
+    "id": "synthetic-multi",
+    "title": "Synthetic multi repository"
+  },
+  "repositories": [
+    {
+      "id": "producer",
+      "title": "Producer",
+      "host": "local",
+      "locator": "explicit-producer",
+      "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "id": "consumer",
+      "title": "Consumer",
+      "host": "local",
+      "locator": "explicit-consumer",
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+import {useMemo,useState} from 'react';
+import {selectGraphNodes,type GraphSnapshot} from '../intelligence/graphSnapshot';
+/** No persistent alternate graph: browse the selected file before choosing a
+ * bounded Project projection. No source paths are opened or downloaded. */
+export function LargeGraphPreview({snapshot,onSelect}:{snapshot:GraphSnapshot;onSelect:(input:GraphSnapshot)=>void}){
+ const [search,setSearch]=useState(''),[org,setOrg]=useState(''),[kind,setKind]=useState(''),[page,setPage]=useState(0),[chosen,setChosen]=useState<Set<string>>(new Set()),[error,setError]=useState('');
+ const rows=useMemo(()=>snapshot.nodes.filter(n=>(!org||n.organization_id===org)&&(!kind||n.kind===kind)&&(!search||(n.label+' '+n.id).toLowerCase().includes(search.toLowerCase()))),[snapshot,org,kind,search]);
+ const preview=()=>{try{onSelect(selectGraphNodes(snapshot,[...chosen]));}catch(e){setError(e instanceof Error?e.message:String(e));}};
+ return <section aria-label="Large snapshot table"><h3>Selected-file table</h3><p>This file has {snapshot.nodes.length} imported components. Browse offline and choose at most 450 for a partial Project; no import has been applied.</p>
+  <div className="pi-controls"><label>Table search<input aria-label="Large graph search" value={search} onChange={e=>{setSearch(e.target.value);setPage(0);}}/></label><label>Organization<select aria-label="Large graph organization" value={org} onChange={e=>{setOrg(e.target.value);setPage(0);}}><option value="">All imported organizations</option>{[...new Set(snapshot.nodes.map(n=>n.organization_id))].map(x=><option key={x}>{x}</option>)}</select></label><label>Kind<select aria-label="Large graph kind" value={kind} onChange={e=>{setKind(e.target.value);setPage(0);}}><option value="">All kinds</option>{[...new Set(snapshot.nodes.map(n=>n.kind))].map(x=><option key={x}>{x}</option>)}</select></label></div>
+  <p>{rows.length} matching components · {chosen.size} selected</p><button disabled={rows.length>450||!rows.length} onClick={()=>setChosen(new Set(rows.map(n=>n.id)))}>Select matching components</button><button onClick={()=>setChosen(new Set())}>Clear selection</button>
+  <div className="graph-table-scroll"><table><caption>Private selected-file facts</caption><thead><tr><th>Select</th><th>Label</th><th>Kind</th><th>Declared state</th></tr></thead><tbody>{rows.slice(page*50,(page+1)*50).map(n=><tr key={n.id}><td><input type="checkbox" aria-label={'Select '+n.label} checked={chosen.has(n.id)} disabled={chosen.size>=450&&!chosen.has(n.id)} onChange={()=>setChosen(old=>{const next=new Set(old);if(next.has(n.id))next.delete(n.id);else next.add(n.id);return next;})}/></td><td>{n.label}</td><td>{n.kind}</td><td>{n.state??'UNKNOWN'}</td></tr>)}</tbody></table></div>
+  <div className="pi-controls"><button disabled={!page} onClick={()=>setPage(p=>p-1)}>Previous table page</button><span>Page {page+1}</span><button disabled={(page+1)*50>=rows.length} onClick={()=>setPage(p=>p+1)}>Next table page</button><button disabled={!chosen.size} onClick={preview}>Preview selected components</button></div>{error&&<p role="alert">{error}</p>}
+ </section>;
+}

@@ -1,5 +1,7 @@
 import type {DocumentInput, DocumentMap, DocumentDiagnostic, DocumentLink} from './types';
 import {secretInText} from '../core/secrets';
+import {mapStructuredDocuments,wantedStructuredDocument} from './structuredDocuments';
+import {actionForGapCause,gapAdvice} from './gapDetails';
 
 /** Application boundary for already-authorized inventory text. Filtering remains
  * mandatory even when metadata was accepted; document instructions stay inert. */
@@ -16,7 +18,7 @@ export function wantedDocument(path: string): boolean {
   if (p.split('/').some(s => !s || s === '.' || s === '..')) return false;
   if (/(^|\/)(\.git|node_modules|vendor|dist|build|out|target|coverage|\.venv|venv|\.cache|\.worktrees|\.claude|\.terraform|test-results|playwright-report)(\/|$)/i.test(p)) return false;
   if (/(^|\/)[^/]*(secret|credential|private[-_]?key)[^/]*\.(md|csv)$/i.test(p)) return false;
-  return /\.(md|csv)$/i.test(p);
+  return /\.(md|csv)$/i.test(p)||wantedStructuredDocument(p);
 }
 
 type Row = {cells: string[]; startLine: number; endLine: number};
@@ -79,7 +81,14 @@ export function mapDocuments(input: readonly DocumentInput[], isSafeText: (text:
   const pending: {path: string; line: number; ids: string[]}[] = [];
   const sourceRecords = new Map<string, {path: string; line: number}[]>();
   const addLink = (link: DocumentLink) => {if (links.length < DOCUMENT_LIMITS.links) links.push(link); else {omitted.links++; diagnostic({path: link.fromPath, line: link.fromLine, code: 'limited', message: 'Link budget reached.'});}};
+  const structured=mapStructuredDocuments([...files].filter(([path])=>wantedStructuredDocument(path)).map(([path,text])=>({path,text})),isSafeText,[...files.keys()]);
+  documents.push(...structured.documents);structured.links.forEach(addLink);structured.diagnostics.forEach(diagnostic);
+  omitted.documents+=structured.omitted.documents;omitted.links+=structured.omitted.links;omitted.diagnostics+=structured.omitted.diagnostics;
+  const structuredPaths=new Set(structured.documents.map(d=>d.path));
+  // A malformed selected structured file cannot resolve a Markdown provenance link.
+  for(const path of files.keys())if(wantedStructuredDocument(path)&&!structuredPaths.has(path))files.delete(path);
   for (const [path, text] of files) {
+    if(wantedStructuredDocument(path))continue;
     const entry: DocumentMap['documents'][number] = {path, kind: /\.md$/i.test(path) ? 'markdown' : 'csv', headings: [], records: []};
     documents.push(entry);
     if (entry.kind === 'markdown') {
@@ -97,8 +106,8 @@ export function mapDocuments(input: readonly DocumentInput[], isSafeText: (text:
           const toPath = targetPath(path, target);
           if (toPath && files.has(toPath)) {
             addLink({fromPath: path, fromLine: index + 1, toPath, kind: 'document-link'});
-            if (target.includes('#')) diagnostic({path, line: index + 1, code: 'unsupported', message: 'File resolved; heading-fragment resolution is not implemented.'});
-          } else diagnostic({path, line: index + 1, code: 'unresolved', message: 'Relative link has no authorized target in the selected document set.'});
+            if (target.includes('#')) diagnostic({path, line: index + 1, code: 'unsupported', message: 'File resolved; heading-fragment resolution is not implemented.',...gapAdvice('unsupported-analyzer')});
+          } else diagnostic({path, line: index + 1, code: 'unresolved', message: 'Relative link has no authorized target in the selected document set.',...(toPath&&wantedDocument(toPath)?{action:actionForGapCause('missing-source')}:{})});
         }
       });
     } else {
@@ -131,13 +140,13 @@ export function mapDocuments(input: readonly DocumentInput[], isSafeText: (text:
   for (const row of pending) for (const id of new Set(row.ids)) {
     const matches = sourceRecords.get(id) || [];
     if (matches.length === 1) addLink({fromPath: row.path, fromLine: row.line, toPath: matches[0].path, toLine: matches[0].line, kind: 'source-record'});
-    else diagnostic({path: row.path, line: row.line, code: matches.length ? 'ambiguous' : 'unresolved', message: matches.length ? 'Source ID has multiple records; no relationship created.' : 'Source ID has no authorized source record.'});
+    else diagnostic({path: row.path, line: row.line, code: matches.length ? 'ambiguous' : 'unresolved', message: matches.length ? 'Source ID has multiple records; no relationship created.' : 'Source ID has no authorized source record.',action:actionForGapCause(matches.length?'conflicting-evidence':'missing-source')});
   }
   const unique = new Map(links.map(link => [JSON.stringify(link), link]));
   return {format: 'diagramcloud.document-map', version: 1, documents, links: [...unique.values()], diagnostics, omitted,
-    limitations: ['Only selected Markdown/CSV documents are mapped; source files are not fetched.',
+    limitations: ['Only selected Markdown/CSV/JSON/YAML documents are mapped; source files are not fetched.',
       'Markdown support is limited to ATX headings and inline relative file links outside fenced code; fragments/images/reference links are not resolved.',
       'CSV source_ids uses semicolons and resolves only unique id rows in selected sources.csv files. This is a provenance link, not data lineage.',
       'Filename current/history, prose, dates and status text do not prove implementation or supersession.',
-      'The map is private authoring context until separately projected and reviewed for publication.']};
+      'The map is private authoring context until separately projected and reviewed for publication.',...structured.limitations]};
 }

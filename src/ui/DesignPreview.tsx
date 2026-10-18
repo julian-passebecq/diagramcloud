@@ -7,6 +7,7 @@ import {viewSpec} from '../core/viewspec';
 import {DESIGN_THEME_LABEL,DESIGN_TYPE_LABEL,designSvg,resolveDesignType} from '../export/design';
 import {download,pngFromSvg} from '../export/browser';
 import {recommendFigures} from '../export/design/recommend';
+import {assetFidelity} from '../export/assetFidelity';
 
 /**
  * Diagram Design mode: the current public view drawn by a Diagram Design renderer. The figure is shown as an image
@@ -36,6 +37,7 @@ export function DesignPreview({project,viewId,appTheme,edit,busy,onOpen,onSaveHi
    <label className="trace-label">Theme <select aria-label="Figure theme" value={theme} onChange={e=>setTheme(e.target.value as DesignTheme)}>{DESIGN_THEMES.map(k=><option key={k} value={k}>{DESIGN_THEME_LABEL[k]}</option>)}</select></label>
    <Button size="small" onClick={()=>download(shown,`${delta?`${project.id}.${shownId}.delta`:name}.svg`,'image/svg+xml')}>Download SVG</Button>
    <Button size="small" onClick={()=>void pngFromSvg(shown).then(png=>download(png,`${delta?`${project.id}.${shownId}.delta`:name}.png`))}>PNG</Button>
+   <Button size="small" onClick={()=>download(JSON.stringify(assetFidelity(project,shownId,'design'),null,2),`${name}.asset-fidelity.json`,'application/json')}>Artwork fidelity (JSON)</Button>
    {earlier?<Button size="small" onClick={()=>{setEarlier(null);setCompareError('');}}>Close comparison</Button>:<label className="file-button" title="Another diagramcloud.json or authoring export of this project: the figure becomes Before · Changes · After for this view (the lower revision is Before), compared by stable ID. Nothing is imported.">Compare with another version…<input type="file" accept=".json,application/json" aria-label="Compare with another version" onChange={e=>{const f=e.target.files?.[0];if(f)void readEarlier(f);e.target.value='';}}/></label>}
    {edit&&<Button size="small" disabled={busy||project.views.find(v=>v.id===shownId)?.design?.type===type&&project.views.find(v=>v.id===shownId)?.design?.theme===theme} title="Store this figure type and theme on the view, so exports and other people get the same figure." onClick={()=>onSaveHint(shownId,type,theme)}>Use for this view</Button>}
    {edit&&<label className={`file-button${busy?' disabled':''}`} title="A diagramcloud.design-brief JSON (for example written by an AI agent): figure type, focal components, theme and caption per view. Reviewed before it applies.">Read design brief…<input type="file" accept=".json,application/json" aria-label="Read design brief" disabled={busy} onChange={e=>{const f=e.target.files?.[0];if(f)onBrief(f);e.target.value='';}}/></label>}
@@ -46,5 +48,6 @@ export function DesignPreview({project,viewId,appTheme,edit,busy,onOpen,onSaveHi
   {url&&<img className="design-figure" src={url} alt={delta?`${view.title}: architecture delta between two versions`:`${view.title}: ${DESIGN_TYPE_LABEL[resolved]} figure`} data-design-type={delta?'delta':resolved} data-theme={theme}/>}
   {children.length>0&&resolved!=='tree'&&<p className="design-open">Open a level: {children.map(ch=><button key={ch.viewId} type="button" className="link-button" onClick={()=>onOpen(ch.viewId)}>{ch.title}</button>)}</p>}
   <p className="micro">Public content only, drawn from the same model as the canvas: static, offline, accessible SVG. Visual grammar adapted from diagram-design (MIT).</p>
+  {safe.nodes.some(n=>view.nodeIds.includes(n.id)&&n.customIconAssetId)&&<p className="micro">This figure profile uses semantic labels and types. Project custom artwork is omitted here; Classic SVG, interactive HTML and editable PowerPoint contain the public project asset. The artwork fidelity ledger reports each choice.</p>}
  </section>;
 }

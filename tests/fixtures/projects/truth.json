@@ -1,0 +1,119 @@
+{
+  "format": "diagramcloud.synthetic-truth/1",
+  "version": 1,
+  "provenance": "synthetic",
+  "cases": [
+    {
+      "id": "tiny",
+      "root": "tiny",
+      "minimumOutputs": [
+        "overview",
+        "structure",
+        "relations",
+        "evidence-gaps"
+      ],
+      "forbiddenClaims": [
+        "observed-runtime",
+        "verified-runtime",
+        "inferred-repository-membership"
+      ]
+    },
+    {
+      "id": "docs",
+      "root": "docs",
+      "minimumOutputs": [
+        "overview",
+        "structure",
+        "relations",
+        "evidence-gaps"
+      ],
+      "forbiddenClaims": [
+        "observed-runtime",
+        "verified-runtime",
+        "inferred-repository-membership"
+      ],
+      "documentLinks": [
+        {
+          "fromPath": "README.md",
+          "fromLine": 2,
+          "toPath": "docs/decision.md"
+        }
+      ]
+    },
+    {
+      "id": "ambiguous",
+      "root": "ambiguous",
+      "minimumOutputs": [
+        "overview",
+        "structure",
+        "relations",
+        "evidence-gaps"
+      ],
+      "forbiddenClaims": [
+        "observed-runtime",
+        "verified-runtime",
+        "inferred-repository-membership"
+      ],
+      "forbiddenRelations": [
+        "medallion-runtime-lineage"
+      ]
+    },
+    {
+      "id": "secrets",
+      "root": "secrets",
+      "minimumOutputs": [
+        "overview",
+        "structure",
+        "relations",
+        "evidence-gaps"
+      ],
+      "forbiddenClaims": [
+        "observed-runtime",
+        "verified-runtime",
+        "inferred-repository-membership"
+      ],
+      "metadataExcluded": [
+        ".env",
+        "credentials/private.pem"
+      ],
+      "contentExcluded": [
+        "private-export.md"
+      ]
+    },
+    {
+      "id": "conflicts",
+      "root": "conflicts",
+      "minimumOutputs": [
+        "overview",
+        "structure",
+        "relations",
+        "evidence-gaps"
+      ],
+      "forbiddenClaims": [
+        "observed-runtime",
+        "verified-runtime",
+        "inferred-repository-membership"
+      ],
+      "minimumDiagnostics": 1
+    },
+    {
+      "id": "multi-repo",
+      "root": "multi-repo",
+      "minimumOutputs": [
+        "overview",
+        "structure",
+        "relations",
+        "evidence-gaps"
+      ],
+      "forbiddenClaims": [
+        "observed-runtime",
+        "verified-runtime",
+        "inferred-repository-membership"
+      ],
+      "explicitRepositoryIds": [
+        "producer",
+        "consumer"
+      ]
+    }
+  ]
+}

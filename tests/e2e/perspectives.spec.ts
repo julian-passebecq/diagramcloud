@@ -24,6 +24,12 @@ test('perspectives: switch a component from System to CI/CD with its parents kep
  await expect(page.getByTestId('view-containers')).toBeVisible();await expect(page.getByTestId('view-delivery')).toHaveCount(0);
  await page.getByRole('button',{name:'Forward',exact:true}).click();
  await expect(page.getByTestId('view-delivery')).toBeVisible();
+ // Returning from a visible output sheet restores that sheet as well as the diagram target.
+ await page.getByRole('button',{name:'Relationships',exact:true}).click();await expect(page.getByRole('region',{name:'Relationships output',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Back',exact:true}).click();await expect(page.getByTestId('view-delivery')).toBeVisible();await expect(page.getByRole('region',{name:'Relationships output',exact:true})).toHaveCount(0);
+ await page.getByRole('button',{name:'Forward',exact:true}).click();await expect(page.getByRole('region',{name:'Relationships output',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Back',exact:true}).click();await expect(page.getByTestId('view-delivery')).toBeVisible();
+
  // Provenance filter: everything here is read from source, so "Planned" dims every card.
  await page.getByLabel('Basis filter').selectOption('planned');
  await expect(page.getByTestId('view-overview').locator('.component-node.dimmed').first()).toBeVisible();

@@ -39,6 +39,10 @@ export function fieldChanges(a:Rec,b:Rec):FieldChange[]{
  const out:FieldChange[]=[];
  for(const k of [...new Set([...Object.keys(a),...Object.keys(b)])]){
   const x=a[k],y=b[k];if(k==='id'||same(x,y))continue;
+  if(k==='stateFacet'){
+   const state=(v:unknown)=>v&&typeof v==='object'?['facet','value','scope'].map(key=>`${key}: ${String((v as Rec)[key]??'—')}`).join(' · '):'—';
+   out.push({field:k,before:state(x),after:state(y)});continue;
+  }
   if(k==='data'&&typeof x==='string'&&typeof y==='string'){out.push({field:k,before:'previous image',after:'replaced image'});continue;}
   if(isStrings(x)&&isStrings(y)){const add=y.filter(v=>!x.includes(v)),rem=x.filter(v=>!y.includes(v));
    out.push(add.length||rem.length?{field:k,before:rem.length?`− ${clip(rem.join(', '))}`:'',after:add.length?`+ ${clip(add.join(', '))}`:''}:{field:k,before:'',after:'reordered'});continue;}
@@ -54,7 +58,7 @@ export function fieldChanges(a:Rec,b:Rec):FieldChange[]{
 
 /** Everything a reviewer needs to judge an incoming observation: who says it, when, at which revision, and the caveat. */
 const OBSERVATION_FIELDS=['nodeId','claim','sourceApp','authority','observedAt','sourceRevision','link','caveat','visibility','reviewedAt'];
-function observationFields(x:Rec):FieldChange[]{return OBSERVATION_FIELDS.filter(k=>x[k]!==undefined&&x[k]!=='').map(k=>({field:k,before:'',after:typeof x[k]==='string'?clip(x[k] as string,200):show(x[k])}));}
+function observationFields(x:Rec):FieldChange[]{return [...OBSERVATION_FIELDS.filter(k=>x[k]!==undefined&&x[k]!=='').map(k=>({field:k,before:'',after:typeof x[k]==='string'?clip(x[k] as string,200):show(x[k])})),...fieldChanges({},x.stateFacet?{stateFacet:x.stateFacet}:{})];}
 
 function byId(current:Rec[],incoming:Rec[]){
  const before=new Map(current.map(i=>[String(i.id),i])),after=new Map(incoming.map(i=>[String(i.id),i]));

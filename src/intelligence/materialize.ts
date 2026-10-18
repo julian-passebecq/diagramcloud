@@ -1,6 +1,7 @@
 import {validateDocument,type Project} from '../core/model';
 import type {AcquisitionAnalysis} from './acquisition';
 import {z} from 'zod';
+import {gapActionSchema,gapCauseSchema} from './gapDetails';
 
 const PREFIX='analysis-context-';
 /** Private derived context uses existing evidence persistence, never a new graph/model. */
@@ -50,17 +51,24 @@ export function attachAcquisitionContext(project:Project,analysis:AcquisitionAna
   chunks.forEach((code,index)=>{const id=`${prefix}${index}`;doc.blocks.push({id,title:`Private source analysis ${index+1}/${chunks.length}`,type:'code',language:'json',code,visibility:'private',sourceIds:[],provenance:'source-derived'});root.blockIds.push(id);});
   return validateDocument(doc);
 }
-/** Restores analysis after existing Project save/reload. Never use for public projection. */
-export function readAcquisitionAnalysis(project:Project,repositoryId?:string):AcquisitionAnalysis|undefined{
+/** Internal read outcome only, never a stored receipt, producer cause or permission. */
+export type AcquisitionContextRead={state:'absent'}|{state:'unreadable'}|{state:'available';analysis:AcquisitionAnalysis};
+/** Inspect the existing private scope using exactly the legacy reader rules. */
+export function inspectAcquisitionAnalysis(project:Project,repositoryId?:string):AcquisitionContextRead{
   const prefix=repositoryId?`analysis-repo-${repositoryId}-context-`:PREFIX;
   const blocks=project.blocks.filter(b=>b.id.startsWith(prefix)&&b.visibility==='private').sort((a,b)=>Number(a.id.slice(prefix.length))-Number(b.id.slice(prefix.length)));
-  if(!blocks.length||blocks.length>42)return undefined;
-  try{const serialized=blocks.map(b=>b.type==='code'?b.code:'').join('');if(serialized.length>2000000)return undefined;const parsed=analysisSchema.safeParse(JSON.parse(serialized));return parsed.success?parsed.data:undefined;}catch{return undefined;}
+  if(!blocks.length)return {state:'absent'};
+  if(blocks.length>42)return {state:'unreadable'};
+  try{const serialized=blocks.map(b=>b.type==='code'?b.code:'').join('');if(serialized.length>2000000)return {state:'unreadable'};const parsed=analysisSchema.safeParse(JSON.parse(serialized));return parsed.success?{state:'available',analysis:parsed.data}:{state:'unreadable'};}catch{return {state:'unreadable'};}
+}
+/** Legacy reader stays compatible. Never use either private reader for public projection. */
+export function readAcquisitionAnalysis(project:Project,repositoryId?:string):AcquisitionAnalysis|undefined{
+  const read=inspectAcquisitionAnalysis(project,repositoryId);return read.state==='available'?read.analysis:undefined;
 }
 const count=z.number().int().nonnegative(),path=z.string().max(512).refine(value=>!value.startsWith('/')&&!/^[a-z]:/i.test(value)&&!/[\u0000-\u001f]/.test(value)&&!value.split('/').some(part=>!part||part==='.'||part==='..'));
 const analysisSchema=z.object({
-  inventory:z.object({entries:z.array(z.object({path,bytes:count,state:z.enum(['scanned','document','unsupported','ignored','limited','unsafe'])})).max(2000),selectedFiles:count,readFiles:count,readBytes:count,omittedEntries:count,unsupported:count,ignored:count,limited:count}),
+  inventory:z.object({entries:z.array(z.object({path,bytes:count,state:z.enum(['scanned','document','unsupported','ignored','limited','unsafe','failed'])})).max(2000),selectedFiles:count,readFiles:count,readBytes:count,omittedEntries:count,unsupported:count,ignored:count,limited:count}),
   sourceIdentity:z.object({selectedRoot:z.string().max(120),sourceRevision:z.string().regex(/^[a-f0-9]{40,64}$/).nullable(),contentDigest:z.string().regex(/^sha256:[a-f0-9]{64}$/),scopeComplete:z.boolean(),observedAt:z.string().datetime(),dirtyState:z.literal('unknown'),profile:z.enum(['quick','standard']),analyzerVersion:z.literal('diagramcloud-acquisition/1')}),
   technologies:z.array(z.string().max(160)).max(200),
-  documentMap:z.object({format:z.literal('diagramcloud.document-map'),version:z.literal(1),documents:z.array(z.object({path,kind:z.enum(['markdown','csv']),headings:z.array(z.object({title:z.string().max(200),line:count,level:count})).max(500),records:z.array(z.object({id:z.string().max(200),startLine:count,endLine:count})).max(2000)})).max(200),links:z.array(z.object({fromPath:path,fromLine:count,toPath:path,toLine:count.optional(),kind:z.enum(['document-link','source-record'])})).max(4000),diagnostics:z.array(z.object({path:z.string().max(512),line:count.optional(),code:z.enum(['unresolved','ambiguous','unsupported','limited','unsafe','invalid']),message:z.string().max(2000)})).max(1000),omitted:z.object({documents:count,links:count,diagnostics:count}),limitations:z.array(z.string().max(2000)).max(20)}),
+  documentMap:z.object({format:z.literal('diagramcloud.document-map'),version:z.literal(1),documents:z.array(z.object({path,kind:z.enum(['markdown','csv','json','yaml']),headings:z.array(z.object({title:z.string().max(200),line:count,level:count})).max(500),records:z.array(z.object({id:z.string().max(200),startLine:count,endLine:count})).max(2000)})).max(200),links:z.array(z.object({fromPath:path,fromLine:count,toPath:path,toLine:count.optional(),kind:z.enum(['document-link','source-record','structured-reference'])})).max(4000),diagnostics:z.array(z.object({path:z.string().max(512),line:count.optional(),code:z.enum(['unresolved','ambiguous','unsupported','limited','unsafe','invalid']),message:z.string().max(2000),cause:gapCauseSchema.optional(),action:gapActionSchema.optional()})).max(1000),omitted:z.object({documents:count,links:count,diagnostics:count}),limitations:z.array(z.string().max(2000)).max(20)}),
 });

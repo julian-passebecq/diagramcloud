@@ -1,0 +1,19 @@
+import type {StudioLayout} from '../core/studioLayout';
+import {STUDIO_LAYOUT_BOUNDS,type fitStudioLayout} from '../core/studioLayout';
+export function StudioLayoutControls({layout,fit,detailsOpen,onChange,onOpenDetails,onReset,onSave,onLoad,persistenceNotice}:{layout:StudioLayout;fit:ReturnType<typeof fitStudioLayout>;detailsOpen:boolean;onChange:(changes:Partial<StudioLayout>)=>void;onOpenDetails:()=>void;onReset:()=>void;onSave:()=>void;onLoad:()=>void;persistenceNotice?:string}){
+ const requestedSidebar=layout.sidebarWidth??fit.sidebar,requestedDetails=layout.detailsWidth??fit.details;
+ const sidebarValue=fit.desktop?`${requestedSidebar}px requested; ${fit.sidebar}px effective`:`${requestedSidebar}px requested for desktop; compact panel uses full width`;
+ const detailsValue=fit.desktop?`${requestedDetails}px requested; ${fit.details}px effective when open`:`${requestedDetails}px requested for desktop; compact panel uses full width`;
+ return <section className="studio-layout-controls" aria-label="Workspace layout"><div className="toolbar">
+  <button type="button" aria-controls="studio-sidebar-panel" aria-expanded={!layout.sidebarCollapsed} onClick={()=>onChange({sidebarCollapsed:!layout.sidebarCollapsed})}>{layout.sidebarCollapsed?'Show sidebar':'Hide sidebar'}</button>
+  <button type="button" aria-controls={detailsOpen?'studio-details-panel':undefined} aria-expanded={detailsOpen&&!layout.detailsCollapsed} onClick={()=>{if(detailsOpen)onChange({detailsCollapsed:!layout.detailsCollapsed});else{onChange({detailsCollapsed:false});onOpenDetails();}}}>{!detailsOpen?'Open details':layout.detailsCollapsed?'Show details':'Hide details'}</button>
+  <button type="button" onClick={onReset}>Reset workspace layout</button>
+ </div><p>Reset also replaces saved placement and widths when present. Collapse, selection and pinned context stay temporary; closing details still ends its pinned context.</p>
+ {persistenceNotice&&<p role="status" aria-label="Panel preference status">{persistenceNotice}</p>}
+ <details><summary>Panel placement and widths</summary><p>Changes apply for this session until you save placement and widths for this project in this browser. Saved choices load on reopen; collapsed panels and context are never restored. Explicit saves replace the saved preference; other tabs do not rearrange automatically.</p>
+ <div className="toolbar"><button type="button" onClick={onSave}>Save placement and widths</button><button type="button" onClick={onLoad}>Load saved placement and widths</button></div>
+ <fieldset disabled={!fit.desktop}><legend>Wide layout</legend><label>Sidebar side<select aria-label="Sidebar side" value={layout.sidebarSide} onChange={event=>onChange({sidebarSide:event.target.value as StudioLayout['sidebarSide']})}><option value="left">Left</option><option value="right">Right</option></select></label>
+ <label>Sidebar width<input aria-label="Sidebar width" aria-valuetext={sidebarValue} type="range" min={STUDIO_LAYOUT_BOUNDS.sidebar.min} max={STUDIO_LAYOUT_BOUNDS.sidebar.max} step={10} value={requestedSidebar} onChange={event=>onChange({sidebarWidth:Number(event.target.value)})}/><output>{fit.desktop?`${fit.sidebar}px effective`:`${requestedSidebar}px requested for desktop`}</output></label>
+ <label>Details width<input aria-label="Details width" aria-valuetext={detailsValue} type="range" min={STUDIO_LAYOUT_BOUNDS.details.min} max={STUDIO_LAYOUT_BOUNDS.details.max} step={10} value={requestedDetails} onChange={event=>onChange({detailsWidth:Number(event.target.value)})}/><output>{fit.desktop?`${fit.details}px effective when open`:`${requestedDetails}px requested for desktop`}</output></label></fieldset>
+ {!fit.desktop&&<p>Compact panels stack at full width. Desktop placement and widths resume when space allows.</p>}</details></section>;
+}
