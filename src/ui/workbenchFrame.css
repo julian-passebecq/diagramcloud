@@ -41,3 +41,21 @@
 .workbench-frame[data-compact=true] .wb-status{grid-row:3}
 .workbench-frame[data-compact=true] .wb-layout-fields{position:fixed;top:150px;right:12px}
 @media(prefers-reduced-motion:reduce){.workbench-frame{scroll-behavior:auto}}
+
+/* App integration (V3 workspace): the host's existing explorer, view and context components inside the frame. */
+.v3-workspace{min-width:0;display:flex;flex-direction:column;gap:8px;padding:8px 0 0}
+.v3-frame-box{height:calc(100dvh - 16px);min-height:560px;min-width:0}
+.v3-workspace .workbench-frame{border-top:1px solid var(--border,#bec5cf)}
+.v3-workspace .main-workspace{padding:0;min-width:0}
+.v3-workspace .side-tabs{flex-wrap:wrap;padding:0 0 10px}
+.v3-workspace .wb-explorer .side-scroll{padding:10px 0;overflow:visible}
+.v3-workspace .v3-capability{display:inline-block;margin-top:8px;max-width:100%;white-space:normal}
+.v3-workspace .project-context{position:static;max-height:none;border:0;padding:0}
+.v3-notice{margin:0 12px;padding:10px 12px;border:1px solid var(--border,#bec5cf);border-left:4px solid var(--blue,#2c62c5);border-radius:8px;background:var(--panel,#fff);min-width:0;overflow-wrap:anywhere}
+.v3-notice p{margin:4px 0 8px;font-size:13px}
+.v3-notice ul,.v3-route ol,.v3-route ul{margin:0 0 8px;padding-left:18px}
+.v3-notice button,.v3-route button{font:inherit;min-height:34px;max-width:100%;white-space:normal;text-align:left;overflow-wrap:anywhere;border:1px solid var(--border,#bec5cf);border-radius:6px;background:var(--soft,#f4f6f9);color:inherit;padding:5px 9px;margin:2px 0;cursor:pointer}
+.v3-route button[aria-current],.v3-route button[aria-pressed=true]{border-color:var(--blue,#2c62c5);font-weight:600}
+.v3-notice .toolbar{display:flex;flex-wrap:wrap;gap:6px}
+.v3-dock-controls .wb-layout-fields{inset-inline-end:auto;inset-inline-start:0}
+.workbench-frame[data-compact=true] .v3-dock-controls .wb-layout-fields{left:12px;right:auto}
