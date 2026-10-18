@@ -164,6 +164,19 @@ test('audience change and source replacement never show private data in any work
  expect(errors).toEqual([]);
 });
 
+test('a capability brief from the explorer enters the ordinary import review and is not applied by itself',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/?workspace=v3');await importFixture(page,fixture('synthetic-v3-capability'));const before=await current(page);
+ await explorer(page).getByLabel('Load capability brief',{exact:true}).setInputFiles('tests/fixtures/v3-capabilities/synthetic-rag.guide.json');
+ const review=page.getByRole('dialog',{name:'JSON / AI workspace'});await expect(review).toBeVisible();
+ await expect(review.getByText(/^Valid: /)).toBeVisible();await expect(review.getByText('A new local project will be added.',{exact:true})).toBeVisible();
+ await review.getByRole('button',{name:'Close dialog',exact:true}).click();
+ expect(await current(page),'reading a brief changes nothing until the author applies it').toEqual(before);
+ // Public audiences have no brief loader.
+ await page.getByRole('tab',{name:'Portfolio',exact:true}).click();await expect(explorer(page).getByLabel('Load capability brief',{exact:true})).toHaveCount(0);
+ expect(errors).toEqual([]);
+});
+
 test.describe('390 x 844',()=>{
  test.use({reducedMotion:'reduce'});
  test('one pane at a time, no horizontal scroll, every pane reached by keyboard and focus never on the body',async({page})=>{
