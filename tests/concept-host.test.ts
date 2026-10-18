@@ -8,7 +8,7 @@ import {request,createServer,type Server} from 'node:http';
 import {documentSchema,validateDocument,type Project} from '../src/core/model';
 import {prepareConceptPreview,resolveConceptPick,resolveUniqueConceptPick} from '../src/interop/conceptPreview';
 import {conceptHostOrigin,conceptHostPage,prepareConceptHostPacket} from '../src/interop/conceptHost';
-import {runConceptHost,startConceptHost,REGENERATION_FAILED} from '../scripts/concept-host';
+import {runConceptHost,startConceptHost,REGENERATION_FAILED,type WatchedConceptHost} from '../scripts/concept-host';
 const now=new Date('2026-10-14T12:00:00.000Z');
 const viewer=`<!doctype html><meta http-equiv="Content-Security-Policy" content="script-src 'sha256-${createHash('sha256').update('void 0').digest('base64')}'"><script>void 0</script>`;
 const viewerSha256=createHash('sha256').update(viewer).digest('hex');
@@ -146,17 +146,28 @@ test('preview origin cannot reach host routes or a shell; no response carries en
  }finally{delete process.env.DIAGRAMCLOUD_HOST_TEST_SECRET;await host.close();}
 });
 test('watched CLI host regenerates when the selected document is saved and serves the error after a failed save',async()=>{
- const dir=mkdtempSync(join(tmpdir(),'diagramcloud-host-watch-'));let host:Awaited<ReturnType<typeof runConceptHost>>|undefined;
- const until=async(check:()=>Promise<boolean>)=>{for(let i=0;i<100;i++){if(await check())return;await new Promise(r=>setTimeout(r,50));}assert.fail('host did not regenerate in time');};
+ const dir=mkdtempSync(join(tmpdir(),'diagramcloud-host-watch-'));let host:WatchedConceptHost|undefined;
+ // Subscribe before checking, so a regeneration that lands between the check and the wait is never missed. A save can
+ // be seen half-written (one extra regeneration), hence a few rounds rather than exactly one.
+ const until=async(check:()=>Promise<boolean>)=>{for(let i=0;i<10;i++){const next=host!.nextRegeneration();if(await check())return;await next;}assert.fail('host did not reach the expected state');};
  try{
   const doc=join(dir,'doc.json'),owner=join(dir,'owner.html'),first=project();writeFileSync(doc,JSON.stringify(first));writeFileSync(owner,viewer);
   host=await runConceptHost([doc,'--view','root','--audience','public','--viewer',owner,'--viewer-sha256',viewerSha256],{watch:true,intervalMs:50});
   const served=async()=>(await get(host!.origin+'/packet.json'));
-  // watchFile takes its first reading asynchronously: let it settle so the first save is not missed.
-  await new Promise(r=>setTimeout(r,300));
+  await host.ready;
   writeFileSync(doc,'{"not":"a document"}');await until(async()=>(await served()).status===503);assert.equal(host.failure,REGENERATION_FAILED);
   const next=structuredClone(first);next.revision=first.revision+3;writeFileSync(doc,JSON.stringify(next));
   await until(async()=>{const r=await served();return r.status===200&&JSON.parse(r.body).baseRevision===first.revision+3;});assert.equal(host.failure,undefined);
   writeFileSync(doc,JSON.stringify(hiddenView(next)));await until(async()=>(await served()).status===503);
+ }finally{await host?.close();rmSync(dir,{recursive:true,force:true});}
+});
+test('watched CLI host regenerates a save made right after start, before its first poll',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'diagramcloud-host-watch-early-'));let host:WatchedConceptHost|undefined;
+ try{
+  const doc=join(dir,'doc.json'),owner=join(dir,'owner.html'),first=project();writeFileSync(doc,JSON.stringify(first));writeFileSync(owner,viewer);
+  host=await runConceptHost([doc,'--view','root','--audience','public','--viewer',owner,'--viewer-sha256',viewerSha256],{watch:true,intervalMs:50});
+  const next=structuredClone(first);next.revision=first.revision+100;/* a longer file: a save in the same clock tick still changes the size */const regenerated=host.nextRegeneration();writeFileSync(doc,JSON.stringify(next));
+  let result=await regenerated;for(let i=0;i<10&&!(result.ok&&result.packet.baseRevision===first.revision+100);i++)result=await host.nextRegeneration();
+  assert.ok(result.ok);assert.equal(host.packet.baseRevision,first.revision+100);assert.equal(host.failure,undefined);
  }finally{await host?.close();rmSync(dir,{recursive:true,force:true});}
 });
