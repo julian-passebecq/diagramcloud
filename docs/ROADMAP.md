@@ -4,6 +4,20 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 
 The selected r3/r4 V2 scope is the complete standalone architectural Studio: general core, Studio UX, Galaxy/external projects, IT catalogue, source analyses/bridges, visualizations, integrations and publication. The [eight-workstream status and original acceptance crosswalk](product/V2_WORKSTREAM_STATUS.md) is a navigation/status view of those contracts, not a replacement roadmap or permission grant. Mosaic/T3 remains one integration; its owner-side limits do not block independent authorized DiagramCloud work. All unfinished criteria remain open.
 
+## V3 workspace (in progress, 2026-10-18)
+
+V3 is adopted into this roadmap, not tracked in a parallel backlog. The adoption report, patch hashes, block filesets and acceptance UX26-UX30 are in [V3_WORKSPACE](product/V3_WORKSPACE.md); the mission rows UX01-UX25 are in the [V3 handoff entrypoint](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/workstreams/diagramcloud-v3-handoff-20261018/START.md).
+
+- **W0 adopt** (foundation PR): four source patches (frame and view routes, perspectives and history lane, capability briefs and usage arithmetic, PM task import) and this report. A-C compile and pass their unit tests but are not yet mounted in the App.
+- **W1 workspace and context navigation** (after W0): mount WorkbenchFrame, PerspectiveBar and `resolveViewRoute` in `src/App.tsx` on the real components.
+- **W2 capability and project examples** (after W0): cited DiagramCloud-self and one non-Galaxy project; unknown stays unknown.
+- **W3 linked comparison** (after W1): exact IDs or explicit correspondence, absent counterparts visible.
+- **W4 interruptible presentation** (after W1): pause, inspect, return and explicit resume.
+- **W5 PM plan consumption** (after W0): the `datapass.owner-tasks/1` reader is reachable from the import dialog, private and read-only, with a browser journey; no write-back, no launch.
+- **W6 integrate, qualify and deliver** (after W2-W5): version, release notes, AGENTS.md limits and the private candidate.
+
+Estimates in the handoff are uncalibrated allowances; calendar completion is unknown.
+
 ## Current state (2026-10-18): 1.29.1 V2 standalone continuation
 
 - **1.29.1** ([notes](release-1.29/RELEASE_NOTES-1.29.1.md)): public figures never count private items, they print one generic notice (#100, AC25 implemented); the watched concept host takes its change baseline synchronously (#99).

@@ -1,6 +1,12 @@
-# Now / Next (2026-10-18, 1.29.1)
+# Now / Next (2026-10-18, V3 integration in progress on 1.29.1)
 
-**Now.** 1.29.1 ([notes](docs/release-1.29/RELEASE_NOTES-1.29.1.md)) is a patch on 1.29.0: public figures never count private items and print one generic notice, "Some private or unreachable content is not shown." (#100, AC25 now implemented in the [R4 crosswalk](docs/product/R4_CROSSWALK.md)), and the watched concept host records its change baseline synchronously so a save right after start is regenerated (#99). AGENTS.md "Current limits (1.29.1)" has the details. The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.29.1-<sha>/`.
+**Now.** V3 integration is in progress. W0 (adopt) lands the four handoff patches and the adoption report [V3_WORKSPACE](docs/product/V3_WORKSPACE.md): view routes and workbench layout presets, reading perspectives and a history lane over supplied records, capability briefs and usage arithmetic, and the private read-only PM task import (`datapass.owner-tasks/1`) reachable from the import dialog with a browser journey. The workbench, perspective, history, capability and usage modules are not yet mounted in the App. One Claude lead coordinates a workflow; W2 runs as a native subagent lane; no external Codex writer.
+
+**Next.** W1 (mount the workbench and route resolution in `src/App.tsx`), W2 (cited capability examples) and W5 follow-ups in parallel after W0; then W3 and W4 after W1; W6 integrates, versions and qualifies. Filesets and acceptance UX26-UX30 are in V3_WORKSPACE.
+
+## Previous: 1.29.1
+
+1.29.1 ([notes](docs/release-1.29/RELEASE_NOTES-1.29.1.md)) is a patch on 1.29.0: public figures never count private items and print one generic notice, "Some private or unreachable content is not shown." (#100, AC25 now implemented in the [R4 crosswalk](docs/product/R4_CROSSWALK.md)), and the watched concept host records its change baseline synchronously so a save right after start is regenerated (#99). AGENTS.md "Current limits (1.29.1)" has the details. The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.29.1-<sha>/`.
 
 **Next.** These are still open:
 - Owner decisions: AC02 profile levels (L1 vs rich pack), AC09 run/attempt model, AC11 Brain format.

@@ -67,3 +67,55 @@ export function hierarchyRail(doc:Project,path:string[],activeView:string,select
  if(selected&&view?.nodeIds.includes(selected)){const child=childLinks(doc,activeView).find(l=>l.nodeId===selected)?.viewId;if(child&&!prefix.includes(child))out.down={path:[...prefix,child],view:child,selected:null};}
  return out;
 }
+
+export const VIEW_ROUTE_UNAVAILABLE='This navigation target is unavailable in the current permitted context.';
+export type ViewRouteResolution=
+ | {state:'resolved';path:string[];basis:'explicit'|'retained'|'unique'}
+ | {state:'choose';paths:ParentPath[];truncated:boolean}
+ | {state:'unavailable';message:typeof VIEW_ROUTE_UNAVAILABLE};
+
+/**
+ * Resolve a view jump without replacing the reader's chosen parent with the first root path.
+ * Inputs are stable pointers into the CURRENT validated, already-permitted Project. An explicit
+ * path must still be valid; a revoked current path is not silently replaced. With no current path,
+ * multiple memberships require a choice. Call again with the chosen explicitPath before applying.
+ * Results are detached navigation values, not authorization, document edits or a durable route.
+ */
+export function resolveViewRoute(doc:Project,target:string,currentPath:readonly string[]=[],explicitPath?:readonly string[]):ViewRouteResolution{
+ const unavailable=():ViewRouteResolution=>({state:'unavailable',message:VIEW_ROUTE_UNAVAILABLE});
+ if(!doc.views.some(v=>v.id===target))return unavailable();
+ if(explicitPath!==undefined){
+  if(!Array.isArray(explicitPath)||explicitPath[explicitPath.length-1]!==target||!isPermittedPath(doc,[...explicitPath]))return unavailable();
+  return {state:'resolved',path:[...explicitPath],basis:'explicit'};
+ }
+ if(!Array.isArray(currentPath)||(currentPath.length>0&&!isPermittedPath(doc,[...currentPath])))return unavailable();
+ const current=currentPath.length?[...currentPath]:[doc.rootViewId];
+ const existing=current.indexOf(target);
+ if(existing>=0)return {state:'resolved',path:current.slice(0,existing+1),basis:'retained'};
+
+ // Index once and deduplicate equivalent child memberships before walking paths. A shared DAG
+ // can have exponentially many paths; disconnected branches must not be exhaustively traversed.
+ const children=new Map<string,{nodeId:string;viewId:string}[]>();
+ for(const view of doc.views){const seen=new Set<string>();children.set(view.id,childLinks(doc,view.id).filter(link=>!seen.has(link.viewId)&&!!seen.add(link.viewId)));}
+ for(let depth=current.length-1;depth>=0;depth--){
+  const prefix=current.slice(0,depth+1),blocked=new Set(prefix.slice(0,-1)),start=prefix[prefix.length-1];
+  const reverse=new Map<string,string[]>();
+  for(const [from,links] of children)if(!blocked.has(from))for(const link of links)if(!blocked.has(link.viewId)){
+   const parents=reverse.get(link.viewId)??[];parents.push(from);reverse.set(link.viewId,parents);
+  }
+  const canReach=new Set<string>([target]),pending=[target];
+  for(let i=0;i<pending.length;i++)for(const parent of reverse.get(pending[i])??[])if(!canReach.has(parent)){canReach.add(parent);pending.push(parent);}
+  if(!canReach.has(start))continue;
+  const paths:ParentPath[]=[],prefixVia=prefix.slice(0,-1).map((view,i)=>children.get(view)!.find(link=>link.viewId===prefix[i+1])!.nodeId);
+  let truncated=false;
+  const visit=(view:string,path:string[],via:string[])=>{
+   if(truncated)return;
+   if(view===target){if(paths.length===MAX_PARENT_PATHS){truncated=true;return;}paths.push({viewIds:[...path],via:[...via]});return;}
+   for(const link of children.get(view)??[])if(canReach.has(link.viewId)&&!blocked.has(link.viewId)&&!path.includes(link.viewId))visit(link.viewId,[...path,link.viewId],[...via,link.nodeId]);
+  };
+  visit(start,prefix,prefixVia);
+  if(paths.length===1&&!truncated)return {state:'resolved',path:paths[0].viewIds,basis:depth>0?'retained':'unique'};
+  if(paths.length>1||truncated)return {state:'choose',paths,truncated};
+ }
+ return unavailable();
+}
