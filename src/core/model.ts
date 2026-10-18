@@ -146,9 +146,9 @@ export type Variant=z.infer<typeof variantSchema>;
  * Tour: a presented sequence of stops, never timing and never a run. Each stop stores its selected view, the stable IDs
  * of its subjects, a content fingerprint of them taken when recorded, and narration; the tour records the project
  * revision it was authored at. Anchors are not checked here: a missing or changed anchor is derived on reading and fails
- * visibly when played. In public output a hidden subject or view is omitted and the stop says so (`omitted`).
+ * visibly when played. In public output a hidden subject or view is omitted and the stop says so (`omitted`). `referencedFingerprint` covers the content the subjects reference (core/tours.ts); a stop without it (recorded before it existed) reads "not covered".
  */
-export const tourStopSchema=z.object({id:id.optional(),viewId:id.optional(),subjects:z.array(z.object({kind:z.enum(['node','edge']),id}).strict()).max(20).default([]),fingerprint:fingerprint.optional(),narration:z.string().max(2000).default(''),omitted:z.enum(['subjects','stop']).optional()}).strict();
+export const tourStopSchema=z.object({id:id.optional(),viewId:id.optional(),subjects:z.array(z.object({kind:z.enum(['node','edge']),id}).strict()).max(20).default([]),fingerprint:fingerprint.optional(),referencedFingerprint:fingerprint.optional(),narration:z.string().max(2000).default(''),omitted:z.enum(['subjects','stop']).optional()}).strict();
 export const tourSchema=z.object({id,title:short,sourceRevision:z.number().int().nonnegative(),stops:z.array(tourStopSchema).min(1).max(50),visibility}).strict();
 export type Tour=z.infer<typeof tourSchema>;
 export type TourStop=z.infer<typeof tourStopSchema>;
@@ -278,7 +278,7 @@ export function validateDocument(input:unknown):Project {
  // Tours: anchors are derived on reading (a stale or missing one fails visibly when played); only the stop shape is checked here.
  ids(d.tours??[],'tour');
  for(const t of d.tours??[])t.stops.forEach((s,n)=>{const where=`${t.id} stop ${n+1}`;
-  if(s.omitted==='stop'){if(s.id||s.viewId||s.subjects.length||s.narration||s.fingerprint)errors.push(`${where}: an omitted stop keeps no view, subjects, fingerprint, narration or ID`);}
+  if(s.omitted==='stop'){if(s.id||s.viewId||s.subjects.length||s.narration||s.fingerprint||s.referencedFingerprint)errors.push(`${where}: an omitted stop keeps no view, subjects, fingerprint, narration or ID`);}
   else if(!s.viewId||!s.fingerprint)errors.push(`${where}: a stop records its selected view and a content fingerprint`);
   if(new Set(s.subjects.map(x=>x.kind+'\0'+x.id)).size!==s.subjects.length)errors.push(`${where}: duplicate subject`);});
  for(const t of d.tours??[]){const stopIds=t.stops.flatMap(s=>s.id?[s.id]:[]);if(new Set(stopIds).size!==stopIds.length)errors.push(`${t.id}: duplicate stop ID; a stop ID is unique within its tour`);}
