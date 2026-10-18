@@ -83,7 +83,7 @@ DiagramCloud_V2_Code_r4_2026-10-14.zip
                      └─ features.csv / ux.csv / SPEC.md / CONTRACTS.md
 ```
 
-The selected local original is `C:\Users\julia\Downloads\DiagramCloud_V2_Code_r4_2026-10-14.zip`; its existing extracted r4 root is `C:\Users\julia\AppData\Local\Temp\diagramcloud-handoff-0526e95370ae451bbe4277bcf1ba25dc\DiagramCloud_V2_Code_r4_2026-10-14`. Nested parent entries were read directly, without extracting or copying their contents into this repository. The ignored `.local/overnight/acceptance/` copies and index are navigation aids; appended overnight dispositions do not supersede original acceptance.
+The selected original is the owner's local archive `DiagramCloud_V2_Code_r4_2026-10-14.zip` and its extracted r4 root (local paths are not recorded here). Nested parent entries were read directly, without extracting or copying their contents into this repository. The ignored `.local/overnight/acceptance/` copies and index are navigation aids; appended overnight dispositions do not supersede original acceptance.
 
 Preflight for this continuation found branch `codex/concept-preview-r4`, HEAD `091947452683102849eb225d67ef870fc6e2f1d0`, with the preserved dirty working tree. Existing 1.25 source `f0a3c40680dd4d75da0f1a2ef2662892a4055d68` was reconciled locally with r4 and the overnight delta. Fileset ownership separates this status document, the coordinating product writer and other assigned work; no reset, new competing checkout, commit, push or other-product write is part of this document.
 
