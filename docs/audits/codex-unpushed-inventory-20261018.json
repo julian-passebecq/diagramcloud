@@ -1,0 +1,2697 @@
+{
+  "date": "2026-10-18",
+  "scope": "codex/concept-preview-r4 worktree, plus this chat HEAD; other product worktrees not audited",
+  "snapshot": "c4c97f008d0821c4f2bdad1fdc66e57e9da4e45b",
+  "mainCompared": "39c081692735305b814f6cb2d1df0b934dab972c",
+  "comparison": "Git blob identities after Git path filters; ignores CRLF-only working-copy differences",
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "worktreeStatus": " M",
+      "gitBlob": "4014006b59dd5a67ff920755ff22850c0c1777ea",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "README.md",
+      "worktreeStatus": " M",
+      "gitBlob": "6e3e803322ee6c30fb0b396a024f53f7682a338f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "worktreeStatus": " M",
+      "gitBlob": "64c638be4a19f709a44a5f80e45333afe3b44540",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/AI_GUIDE.md",
+      "worktreeStatus": " M",
+      "gitBlob": "ed64709b9958af4e5968a5062c112da5bc1e6540",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "worktreeStatus": " M",
+      "gitBlob": "fc45a67a0b699b82d9cdee6c41f5b17a292e385b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "worktreeStatus": " M",
+      "gitBlob": "1dc91eb17a1a51b3c3447116c6e4fe322e5e83e2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "docs/product/NIGHT4_CROSSWALK.md",
+      "worktreeStatus": " M",
+      "gitBlob": "4f36f9a41e07281e6264316be31ca63a9f605e7f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/product/README.md",
+      "worktreeStatus": " M",
+      "gitBlob": "26c491a12a34595561dd2be1f79b8471f134a20d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "package-lock.json",
+      "worktreeStatus": " M",
+      "gitBlob": "18a3f0b62fe8cdd1512160c0159fb52d26cd9e19",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "package.json",
+      "worktreeStatus": " M",
+      "gitBlob": "9277a5988c4c90366309e51d3ac806b8560245a2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "playwright.config.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "c89854320554fceaff36b3ee9e56652104f91b57",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "scripts/atlas.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "e22aac83d0ff30f18431bb83ad27df4efef7334f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "scripts/design.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "40912925ba4f4843c92976cef4592c95bb66e514",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "scripts/generate.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "ac973082401194000b0f3fa14298d06626828edd",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "scripts/intelligence.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "724bbe4a4dc0141dcb3961c90bc6c935d6aaec76",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "scripts/lib/readRepo.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "73d31b5ce478486f3c56144392951a053faf609f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/App.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "3ade2daaca3d3502f8518a31a283c663fd8efb3a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/core/atlas/compose.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "ff3bf54594b4e823260a44f0c59c13b81ad647f7",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/atlas/manifest.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "c590583f350d0faefad140e0245a9dc62b7d50e8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/changeDetail.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "6c5d4f49f9d2f4e7a3da7375ac1632ad4bf669c5",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/core/changePreview.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "149551bc4d936fe099bac55d5b4a5e7b40661452",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/core/galaxy.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "ac4906f990bfb5a03ebf0b84fcf63d9d0b3907e8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/icons.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "3581d1803c143a967291a6d570580fdfb3353559",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/interchange/drawio.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "a39b7076558530b3d7fa5f7e111ada90e5f8b412",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/links.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "ec86210f51d167e0b73877be6eb2e073ec38808a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/model.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "86035ab4cd2f59516c0ee558f7d4d5bad1deff93",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/core/operations.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "e3fc7b5d98b018e8c0b02f3517dee3a19427ba5e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/core/realization.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "f1cc9e49d45b220d743fc00e4b3da0f2db7f4d8e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/scan/document.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "7278548cb3092024c7babddc9ec4679e34520042",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/core/scan/scanner.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "152b119efd8c2a1adb088ac22ced1c023c36350b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/core/viewspec.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "e08ff6bc581c50510dc97e3c840d5946c8db0c65",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/data/samples.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "82fd8ce9918265f648058458ab284096318cd88d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/export/concept.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "92c4dcf7594ea059fa995ec38c1005541ef22e67",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/design/deployment.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "a4eef4aeee4948ea8db9d230f952db72aa51bfcc",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/design/index.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "267afca9ffc684d147ede7afa17a09e0fefe73b7",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/export/design/lineage.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "2ba6c7929e9048fd7b4ff80c1049b5607814420a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/design/recommend.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "aecdc64d2276856b5398770263dfba50b37ace94",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/export/diagram.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "460a8bc6cb72e661477418d761482497213879d3",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/export/html.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "58b9ff3a7d18b91d5cf1fc1bfc1e5915efb96cfe",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/export/iconData.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "cb88dd65eec0204e2eb1d497d734e1a9dc33e56f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/manual.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "8933b782e700dd0c6cadb44fbc66da23260b0b2a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/export/portfolioIndex.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "542f626ed2da47492b322b2b6ffaf04565f72c1c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/pptx.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "19c7d20fcd51ed9e17e3a85efd0276486ec0a32a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/export/scene.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "ccd11a1bb624a4b58af59c58c3a40efdf32bc4e6",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/acquisition.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "2d7d4bb8de6a8863fc1e30253ba5a143cc7ca2ba",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/assets.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "1c13919a94189d53f75234ae4424f82bf3ad858f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/brief.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "b3c900ccd9d806c9626dcb8a7d819c103a9dea79",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/documents.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "a962f8de23b132c9ca1559c42ff5c7c3412bc900",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/domainAdapters.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "e6ae95cca6250f9bb61631d9728f2921e7500fbb",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/graphSnapshot.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "1ad2d9d8f7f245f899b4fd32b49ae2f607efa1e1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/materialize.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "af2b6615b92d449509de78163e61ed5663facca1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/readiness.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "ef1a20f58b0be89d720a88dd48f9d85dd0b8327e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/intelligence/refresh.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "f028cc51fdbede1deae3490234a0d76089b8ed94",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/types.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "8c7c283f024f9ad303bb9d412b3097dc4fbd5c75",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/main.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "5479f45e064274ea56840feea66bb4190662a501",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/styles.css",
+      "worktreeStatus": " M",
+      "gitBlob": "658eef3232122c93123d4685bd6543ba554c6006",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/AnalysisOutputs.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "d334e65c61d4cbaac7f1a25e0ec27b2b1d15b928",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/Canvas.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "0ce8c3d2689599130c1737e5e805d55cf7e7ea76",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/DesignPreview.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "6a5d5eddeb191c58ce0b039b3836e576362914bd",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/Gallery.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "781ca31d6d0c4074cccb719862b78cf9194b0d0b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/Inspector.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "7a417ad9121f94619ba9def0085ddcb602a0da24",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/Perspectives.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "3809b97e2ba8c25e47f808677648d24e4e24ac27",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/ProjectContext.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "23044a942adb04164b19cc354260d46e52e5116a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/ProjectNavigator.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "ae88a35b17a7d3005b99446af3a1194d9d3006fa",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/ProjectOverview.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "39b2712f6d8effdaa4680f7268cf24221d83786f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/ProjectStart.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "108f2ab8e8192770ba1ab3462ba2052476c8fc64",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/Realization.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "1db53c0fed001bbd9593510e70749639532e1bd1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/SceneEdge.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "5b6159048c2923ba1b40e75709716cc476dc8426",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/StoryComposer.tsx",
+      "worktreeStatus": " M",
+      "gitBlob": "0496e709da587e0699e4040c109d48436f4499eb",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/project-intelligence.css",
+      "worktreeStatus": " M",
+      "gitBlob": "e6ad6a324058f1f2f8d0a22d283b5854f7299425",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/atlas.test.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "e162e0104222eb8811794836ffcfec810ee7cf3c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/core.test.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "6e67646d2b7b2ba6d534a29567532502ce58ba48",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/manual.spec.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "85be1d48f4c0e95562fa3676ec666123c885b5a1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/e2e/perspectives.spec.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "69db247358802eace766be330f82d51247a73c18",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/routes.spec.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "43394875795644c400704ad7cf3434388c6ab226",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/storage.spec.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "bcba845ba03a255be1a8fa22638b045359949814",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/gallery.test.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "3ba76bda516c593a7087a7ef4e520db164bd6b8e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/helpers/designGeometry.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "85ad40678df0be7f4d60cf2c9c14685344855cd5",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/intelligence-brief.test.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "cc2fccb33ffaa7f6b79a760af3fd798df865c60f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/intelligence-refresh.test.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "dc9ff4cc915ea7c40f9fa01cedf84f62a0d7ed24",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/manual.test.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "009cf425474957c05f0cfa5d2dcd092c58fc716f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/quantity.test.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "ff4202aa4b33dacdb6f0ffae13926cb511c03720",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/scan.test.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "2d0179234cbb5cb17f9a527bcf98002cdedaaec2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/viewspec.test.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "cfa51aa59a2379301ff5002f86c3582980a98548",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "vite.config.ts",
+      "worktreeStatus": " M",
+      "gitBlob": "73a70457b8fc72ff7d9e69353c77b10a944da2aa",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "CLAUDE-HANDOFF-STATE.json",
+      "worktreeStatus": "??",
+      "gitBlob": "da89ecc2db0d5cb71d2b6bac6104f6f3dab9f6d9",
+      "matchesAuditSnapshot": false,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "CLAUDE-HANDOFF.md",
+      "worktreeStatus": "??",
+      "gitBlob": "3ae4ab78bfee86281a11eee0a053c099911d3516",
+      "matchesAuditSnapshot": false,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "OVERNIGHT-CHANGES.md",
+      "worktreeStatus": "??",
+      "gitBlob": "5b672420a949920d0d56ec2215430447ad19ce8c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "OVERNIGHT-OUTCOME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "fe494241a796aee5ca9cf91ea49d7186d1f8e8a3",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "OVERNIGHT-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "4f98db8d08e37f7f9be41e67b1cecb857130d2fa",
+      "matchesAuditSnapshot": false,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "e2001b1f832c0a8e48670a6997b4290d439cf186",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "SHIP-REPORT.md",
+      "worktreeStatus": "??",
+      "gitBlob": "6e53d6c248f8c5e49e6005695ffc4149d5f51894",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "V2-CATALOGUE-FAMILY-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "f1c68e78898cfabe861904b69815fee1dda1b2d1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CATALOGUE-FAMILY-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "ef13542745dd332a7f2650ea4e6cc67527eecc11",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CATALOGUE-FAMILY.md",
+      "worktreeStatus": "??",
+      "gitBlob": "71f64de43719ad2353dc69a8c5d8d625c773bf71",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CATALOGUE-QUANTITY-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "cbeaa033910c8fde1f9398bd6a06bf501b527cee",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CATALOGUE-QUANTITY-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "922f7cdac187eb170377879b65b051b852d4f408",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CATALOGUE-QUANTITY.md",
+      "worktreeStatus": "??",
+      "gitBlob": "524911a1250cbf426b2eea27bec57041507402a4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-COMPLETION-STUDIO-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "3a1d48dbd3d8459094c7ea54db29b558d51d96d0",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-COMPLETION-STUDIO-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "1ff13004f31b7ea746bcc1541f5bf9b03fcc8cca",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-COMPLETION-STUDIO.md",
+      "worktreeStatus": "??",
+      "gitBlob": "eae2bbe6a1c3e30a0d487a705d52f90cf13f55ad",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CONTINUATION-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "46e10e640856e36ae218e1404d8f609f2ab824ff",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CONTINUATION.md",
+      "worktreeStatus": "??",
+      "gitBlob": "59a0719ccb49f6c431e14058e32bee44d6a58ee4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CORE-SOURCES-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "eca8059d7d97ae08a361e46851cb5d64fd254983",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CORE-SOURCES-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "2e7c263cf9c17c625d6b51b0a1308f48e45800a3",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-CORE-SOURCES.md",
+      "worktreeStatus": "??",
+      "gitBlob": "c82ac597455c620fb0100367cc9bc2f956b18aa9",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-EXPLORE-CONNECTION-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "d5dc4d9a5744e6992b916f15ae473c8db7135685",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-EXPLORE-CONNECTION-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "ed5314e45fa11228118afd1f2655f826cdff5e68",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-EXPLORE-CONNECTION.md",
+      "worktreeStatus": "??",
+      "gitBlob": "bc8d552564455ed1b90153470e9c3cb94e436bcc",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-GENERAL-AUTHORING-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "f58f693c1068ffc85f31a5474e1562b4de390bf7",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-GENERAL-AUTHORING-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "897086861560e8f4fc17d2780efdae8407e791cd",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-GENERAL-AUTHORING.md",
+      "worktreeStatus": "??",
+      "gitBlob": "2ffcdc5ef2d83b54c7178eaa10b436d20b64f891",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-GENERAL-NEXT-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "4f6641f01242a4f1c77a0948e087b3e507411cde",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-GENERAL-NEXT-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "0de41d9b8fb924df8504c576a8ef85d7af0183bf",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-GENERAL-NEXT.md",
+      "worktreeStatus": "??",
+      "gitBlob": "de92c60ddac6924b41c834358de2c7f889498d04",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-GENERAL-PRODUCT-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "8a26d3fa929ea1bc1534759370be0092145de587",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-GENERAL-PRODUCT-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "95b8cfe823e8c84b68b420d44cbc29fc82a4b7c5",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-GENERAL-PRODUCT.md",
+      "worktreeStatus": "??",
+      "gitBlob": "8d44fee6ad9fd8e77cb29850f18aea08ba40ad3c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-LIBRARY-GRAPH-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "a2755df70589ee58fe4b20dc35f367afa749caf8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-LIBRARY-GRAPH-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "810f680dcbb08f5ad017beed3393f7db475deeb2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-LIBRARY-GRAPH.md",
+      "worktreeStatus": "??",
+      "gitBlob": "4fbb181bbaf8c0f2d5e0ee1c819ca0aa3e6d8dc0",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-MIGRATION-EDGE-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "18b4152f48866c602ffc88267cefa45d520a7343",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-MIGRATION-EDGE-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "c3fb217854c3138c0b5249ef1abbbfd0d5ce6586",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-MIGRATION-EDGE.md",
+      "worktreeStatus": "??",
+      "gitBlob": "9bdba12d95ad45f3fde4539ae495e547a6ca9ba6",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-PATTERN-GUIDANCE-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "ceb5538f0874360e722998bb5e4f4aa45b139ff1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-PATTERN-GUIDANCE-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "c4a34bfe1a6eb1574ec9b1021d6adae7a8b9ccca",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-PATTERN-GUIDANCE.md",
+      "worktreeStatus": "??",
+      "gitBlob": "d24c15b766e16c4faadf38be9bfcfa33da31992a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-PUBLICATION-DIAGNOSTICS-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "cc55691e80c4f78bffb0acbfac027f36b12cecce",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-PUBLICATION-DIAGNOSTICS-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "78846260c355ecef8d48e8f0cc38efd5fd2181fa",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-PUBLICATION-DIAGNOSTICS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "7fb5204601e84010be58c5cc357e25e0da76e5b0",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-REACT-VIEWER-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "07befa1a4b3c022bcd78a6e43bd2c40ffc86fe61",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-REACT-VIEWER-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "2e446f98146e3cc3ce757910999119752668db5c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-REACT-VIEWER.md",
+      "worktreeStatus": "??",
+      "gitBlob": "4c56054b16cb6b555ba1626d93b248f2ca50ae02",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "618a25a903e153841a3a72461623713c8d19200d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-STUDIO-IDENTITY-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "64362eaac77d5ea5f93b8d92124f1968ca756fbb",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-STUDIO-IDENTITY-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "21d8d142dd7fe977fead7a605245c38c0a413d5c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-STUDIO-IDENTITY.md",
+      "worktreeStatus": "??",
+      "gitBlob": "a9608216c076d8318af06f641dfa1ae5bc45c1e5",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-STUDIO-LAYOUT-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "bd60299507c1f23df7f7c13f7b6f802f8c8102f1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-STUDIO-LAYOUT-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "e198a3512bd4e8684b61bc8d79d8d223f67b896d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-STUDIO-LAYOUT.md",
+      "worktreeStatus": "??",
+      "gitBlob": "cb2e34da77f4a72b213234a5688d9aaec8cb1e3d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-STUDIO-MEMBERSHIP-RESUME.md",
+      "worktreeStatus": "??",
+      "gitBlob": "ac2d4ec8ecdcd4183e68df50323c1f900cf79233",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-STUDIO-MEMBERSHIP-TESTS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "e5c7c0acdf0f0e94f5038de8b8a356b0ffb93bd9",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "V2-STUDIO-MEMBERSHIP.md",
+      "worktreeStatus": "??",
+      "gitBlob": "880b6a706b8fa9d6833cb194a4779ce88b2f0000",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "absent"
+    },
+    {
+      "path": "docs/contracts/actionable-gaps.md",
+      "worktreeStatus": "??",
+      "gitBlob": "89e92efaa6916bd1d2e5bdae978917a2e7a2e34c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/completion-kit.md",
+      "worktreeStatus": "??",
+      "gitBlob": "76f6463d8cc6b7a22f85b9fd9a9e46e7c380d3ad",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/concept-preview.md",
+      "worktreeStatus": "??",
+      "gitBlob": "a642974d728d634e6c6fa046b8a59eee71b6356e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/context-pin.md",
+      "worktreeStatus": "??",
+      "gitBlob": "5a66231f22d5cf39398cf0a1f287e887afc21d03",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/export-recovery.md",
+      "worktreeStatus": "??",
+      "gitBlob": "3a697d124e795477e7298667461d4782f8b81405",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/galaxy-manifest-identity.md",
+      "worktreeStatus": "??",
+      "gitBlob": "af6018e66ed5b0c42615a50936798d86a1fa915e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/graph-assertion-inspection.md",
+      "worktreeStatus": "??",
+      "gitBlob": "495f016a9d940e631702e414a022660d84ee99d4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/mosaic-local-host.md",
+      "worktreeStatus": "??",
+      "gitBlob": "a9faefd185f0b8ee9a303c898aff35b21709b468",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/navigation-relations.md",
+      "worktreeStatus": "??",
+      "gitBlob": "6d5bcb20486d5a0ef1dc14fb1e8ef887e57d53f0",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/pattern-guidance.md",
+      "worktreeStatus": "??",
+      "gitBlob": "f2dc84e3b5554d34cba0b45e0574a0d1a2308c25",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "docs/contracts/project-brief-source-bindings.md",
+      "worktreeStatus": "??",
+      "gitBlob": "ec5d295079b7659989ea4e930bf24b9633ef7fee",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/quantity-import.md",
+      "worktreeStatus": "??",
+      "gitBlob": "8bdf2f90a2c860c2f9278fc55a7fa27ee854e010",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/react-viewer.md",
+      "worktreeStatus": "??",
+      "gitBlob": "c4c5f1e6e72d5e979271a56ea496f6f3d03e3099",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "docs/contracts/source-bridge-status.md",
+      "worktreeStatus": "??",
+      "gitBlob": "c2dd3754f58cca2293456308cbfcb78f440dedb1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/state-facets.md",
+      "worktreeStatus": "??",
+      "gitBlob": "8c5daa67da24a6b79c7cb7aa56b070c0d21ca2c2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/contracts/studio-layout.md",
+      "worktreeStatus": "??",
+      "gitBlob": "c9f37b63047b702aaa0a05418f303b03c8642988",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "docs/contracts/workflow-templates.md",
+      "worktreeStatus": "??",
+      "gitBlob": "d2179693ae9f26cf33e531e3e9d042011d2f9b1e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/examples/standalone-workflow.md",
+      "worktreeStatus": "??",
+      "gitBlob": "79d5f5c07b076dddb65a22c958921508132ba0c1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "docs/product/CAMPAIGN_CLIENT.md",
+      "worktreeStatus": "??",
+      "gitBlob": "6523baa82bae303746855768fae0ff1db42b8aa2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "docs/product/V2_WORKSTREAM_STATUS.md",
+      "worktreeStatus": "??",
+      "gitBlob": "be5f90c12711a188c7d68f697f4cf0e75c2c9575",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "docs/qualification/concept-preview-r4.md",
+      "worktreeStatus": "??",
+      "gitBlob": "5ba780eda857ad5c58eae3a2c6bc374ac6b9cb3f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/product-campaign/README.md",
+      "worktreeStatus": "??",
+      "gitBlob": "c50c1ae9b5bf5ae8eb8bfa6aacb4ade9a0a28794",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/product-campaign/delivery-brief.json",
+      "worktreeStatus": "??",
+      "gitBlob": "3d04a457513b983ad846b706b7eaa31a7289ad4d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/product-campaign/fixtures/declared-1.json",
+      "worktreeStatus": "??",
+      "gitBlob": "2b96bc4816ca68833fcda9ef69efccc3118df26c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/product-campaign/graph-1.json",
+      "worktreeStatus": "??",
+      "gitBlob": "c6629b48f358b570a98d2e52678e656a1d8b9afd",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/product-campaign/graph-2.json",
+      "worktreeStatus": "??",
+      "gitBlob": "15019714e5bfa69235eaa01f14d371c77025e948",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/product-campaign/native-artifacts.json",
+      "worktreeStatus": "??",
+      "gitBlob": "01eb547015f5cc0791db79e3d37345a04ff64ac2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/product-campaign/project-brief.json",
+      "worktreeStatus": "??",
+      "gitBlob": "490b609d6fd83a2308ded7e1ca41476c9b6f76b4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/product-campaign/truth.json",
+      "worktreeStatus": "??",
+      "gitBlob": "1bc777663687a51b578ef31fef348cc40ba2c58e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/project-intelligence/shared-repository-brief.json",
+      "worktreeStatus": "??",
+      "gitBlob": "3b3e99add9d51d69359e3b094635029108aff502",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/workflows/01-petit-client.project-brief.json",
+      "worktreeStatus": "??",
+      "gitBlob": "15a8fe897ce855f72a44d2745756aab0f372cf45",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "examples/workflows/01-petit-client.source.json",
+      "worktreeStatus": "??",
+      "gitBlob": "e4de30931a8fad653b726fe54da9ed0127e8bb6c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "outcome.json",
+      "worktreeStatus": "??",
+      "gitBlob": "be99023dc34070db970305c5f2ad1c190a98b663",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "scripts/build-edge-label-fixture.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ae34e80885966a5545fdea5fbe4e03ae546f03e7",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "scripts/build-react-viewer-fixture.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "d19d1298b2bbfe286b337aa0d505eada15cd62bf",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "scripts/concept-host.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "39b84d3f1de342c1161c7aa5d71d7aa71472311a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "scripts/concept-preview.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "301af6ffabf8d3065c64e3c5ecb3fdc1a96b012c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "scripts/intelligence-mcp.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "402399acb3e0509b51402a182f6ff501f37d8959",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "scripts/lib/bundleClients.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "638d80bd61a7474454f47d134a0e5ad59994d1aa",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "scripts/lib/deepRuntime.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "921e7983be77eff53e40c85bc97a72dc1e47c379",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "scripts/overnight-demo.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "f1ce3a54cfebf9386a68927963ed74fe8bdd52be",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "scripts/package-campaign.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "956acfcc6234b197890bf3e2c11b1e96702e8fce",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "scripts/qualify-clients.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a15f29403a0c8d49d534f639637df11c139cfe8a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "scripts/qualify-real.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "232a5e05da653b05a690d3846c58850f99b14a32",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/app/ReviewShell.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "9e653e4061c5dce253ff8ebe1ef86df21fdf347b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/app/exports.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "0ec0d2cc8cc1c62684b27c85492f20cf8ac5e9b5",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/app/useNavigationHistory.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "49ae4dc514ee3890c47288bbd98e0cd0acd62c1f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/app/useProjectWorkspace.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "aea84ecada0ceed6121c6f18fb3564f7017012c8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/core/contextPin.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "4a8273627f685d63b6b0572cd05a35afa5903300",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/iconGlyph.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "4326d6cc68f0ada238a367d1466b2426805deb5f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/presentationProfile.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "56ea454858bcf72f7a03aefe161657d7a19fa3ff",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/scan/dbt.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "6d2b3d437db1594ec50cd5fd7d26ed160b4d698b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/scan/inventory.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "5243c8014395480d30a10e40121b365d1063d2e7",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/core/studioLayout.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "8426a8aa6615e64e05e763cc0aa64f7672162b16",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/assetFidelity.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "81119f25bdb8b28b8eaacf6c13009951bc40de0a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/design/operations.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "b98e472131b8375356ec60ca94bd3f2e6b281bb4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/design/quality.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "26aa932046ef9fffbab9358e825ce5ede6281c7e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/design/waterfall.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "b13404113b461119856442bc103c21413bc3fe14",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/howItWorks.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "3a38c3d5467effbec3046bfb03894a906c854653",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/intelligenceReport.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "47200cc345a1d1eb5db33f1e1348135ca5e32ec0",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/publicationPages.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a33987dbf43bb3342a589bfdcbedb080c50a8f08",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/export/rasterDimensions.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "3a9484e896ff02371bd48ac01250e08b5a199b63",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/analysisContext.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "18ed9edc75d78a9a469880df71e44f3592efce87",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/analysisWorker.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "3d46611e4cb511d839dfcc7b306b41d2396e7bd0",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/browserDeepRuntime.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "d93999630830356cd78d7faafec786ef395370f9",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/completionKit.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "bfe58033f296d59ee38337f93605914cf6b3240f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/context.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "0951a2f1125a280bcde0af20ca3721f47bf59027",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/cookbook.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "dfef2e3d8ec7f42e32b97cf5a0d5b1532224ea8b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/intelligence/crossRepository.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "b6a03095feab6733c2f3512593b1e18cbaf92a9d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/deepAnalysis.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "7101d9c13e6ba3489ed209a9cbe0d3adda6fe8f5",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/deepClient.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "19b39f845f67631849d75fb50af4e22c67b2840a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/deepProposal.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "cbb048ea5243b4f245d4c624d0407ac0f8767b14",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/deepWorker.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "9d4ead34b453952b61f61f5bd7fd17489866ea9b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/delivery.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "3e8b07e3cb6c2b4e3533683342bb94ff9b736350",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/intelligence/documentBundle.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "caa6f194ece4eb54703c81bc67fd3937a1d978f9",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/entityProposal.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ae7938824edf868bdb959fdca57e7ec64e03f442",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/eventDeclarations.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ad5039e8b345217a663a449ea2b91e48ac16c670",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/evolution.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "4654103ddbdbe803fb96f70ef9e866d8e0d4859c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/gapDetails.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "6309f11f3d24de5d3280715d39bbcd38b32cabee",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/graphProjection.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "166e739f128a3bb0234aca8639ff0d43f7d68382",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/library.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "9da009628412e88549264ce7ea0cb7779477a55c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/intelligence/nativeAdapters.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a808bb36e1d20364ad1b04911ef5aa836d20a7b4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/navigation.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ae4cddab1703d296cf92430b278f23b19c10b1ec",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/profile.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "80ceaa671cec970fcf74cc200accc0a868335c23",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/publicationBrief.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "e85326c2091eccb98e9f15493d7691c667c7dc67",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/recipes.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "8ddea4fbe24d6f01ef20fbe511d881d39d7b90e4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/selectedFileRead.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "79640e9ec7abb5eb48ba9cf1bf693de98b64525e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/sourceBridgeStatus.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "6b85fb2d33931cac2688dd80fd8baad0450ac897",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/sourceBundle.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "f1386a3f6afdf4d8bc4837c1be1543dc35f2c201",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/sourceBundleClient.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "64d3516d1ebb2f9ef30fb28515c0f21b2a83174c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/sourceBundlePatch.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "9736c2b95ae8f4039bc8cdf7f5e1f2ef5806b81c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/sourceBundleWorker.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "9dccb2dfc1189984264a80222083e791639f442c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/sourceConflicts.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "6e643d02f2026d097b372181b44956c7d8a27538",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/structuredDocuments.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "4a244dbe7bd9aacf0f82549d92e87ee177b20c91",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/verification.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "9b870d8abf30d7f89447fcaa875c1637bb64956a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/visualQuality.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "90e61918257bd12a2974071c49c1b7dc917ee988",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/intelligence/workerClient.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "bc9b53d2fd490834bda68bee029013c7679005c0",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/intelligence/workflowTemplates.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "e2a119cc6e3222277ce129c527ec6e253c8b3ac8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/interop/conceptHost.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ba66b808542d75734c6b8383085f410271f7a99a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/interop/conceptPreview.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "928bf542f5f18aa682bf1ba8f5bd8d5f6d996c88",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/react/DiagramCloudViewer.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "fe28461b36d9364d6cadb31ee1abac85dd99f35c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/react/index.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "e37cdd8163694f590c07485a0e20d0d537703957",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/react/viewer.css",
+      "worktreeStatus": "??",
+      "gitBlob": "9c54529805b1c965dd6894a9adf14ed3cbb1b75d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/react/viewerBoundary.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ff61138ed77d51724335bf4cabe4e5abad80849d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/AnalysisProfilePanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "d205b89a592c6f1ff00a96e9848931daeb3d0f7d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/CompletionKitPanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "131ba2c470aa1877a1bc53d7a71093650d4a45f8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/CrossRepositoryPanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "c93c7f63bf12986ca8fbc9c1e80951a88d81b2b6",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/DeepAnalysisPanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "8c7e5cd4e62d63d2784def3f9f2024e07a990607",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/DeliveryPanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "0736009ed9b576285abdd3ea6c7f2267d339aa99",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/EvolutionPanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "e017943d8b7d6e45814bd98b592eaef29a5fc344",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/FigureQualityPanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "74d8266aa27a33c3df00ef2b5799312247ded5a5",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/GraphExplorer.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "aafe356e66564bf5936ca48dbb2748ffe30fed01",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/GraphFilters.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "406afb4d497d529828e5f4cba24201bf069af859",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/HowItWorksPanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "e6a229dd3fd8d1e0f89bb7f052047a202c340e3f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/IntelligenceInsights.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "2c830aa0f639d35b3f3a650004ab9aa0a8c80574",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/LargeGraphPreview.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "c128a37cbe3bf8d051cd09fcf7ae7e1899172767",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/LibraryPanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "e0a0acdf0a9181874b5c508e4936fa9e4566b397",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/MosaicPreview.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "8e7346664b7758fb40ed630aa20611f5bc01c0a6",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/PresentationProfile.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "844e364bc3f2ad7f86414dcb93d0f6b0395bb1e2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/RecipeWorkbench.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "a7cce2dd5c7ab6b00ab9a915d07e1d78482c7174",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "src/ui/SourceBridgeSummary.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "bf8962dc852097c2cef301f89fda3c1c7e3da3af",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/SourceBundlePanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "13924a0884b15eb876a46540bef1d0c105cb81bc",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/StateFacets.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "fbe73eea012115214cbfc11308d02d688eabafef",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/StudioLayoutControls.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "6dee0f02ee750eedd45c7d2a5114d3750be03e32",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/WorkVerificationPanel.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "7100fcb5de3ce6898f993c7f8d59baa94d0e3a1f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/mosaic-preview.css",
+      "worktreeStatus": "??",
+      "gitBlob": "2b58ab54843dd055fc0688672f03ca4f6089fa2f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/presentation-profile.css",
+      "worktreeStatus": "??",
+      "gitBlob": "9a4019290d9ba286ade78edea16d7a308b5538cf",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "src/ui/studio-layout.css",
+      "worktreeStatus": "??",
+      "gitBlob": "39f0f42f633bcd0af1db4f651cceee897a403ba1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/acquisition-failure.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "833ca7061350fa4a79a4aea8f6979c58bb4d6d4e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/actionable-gaps.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "77b550675ccc12fe0557b3e7b989c1eb10ea256d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/actionable-native-gaps.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "06dc717ca50ead77486e7ea2fe3ef19364f2388b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/actionable-reader-runtime.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "7a897629bd971fdd15534b5218dd281f47950171",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/business-publication.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "c66bb924ff23937a3d4baaa89895f59c60c147d1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/campaign-contract.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a36e2b0975d7b87db183b986d99e12e6d4d76602",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/campaign-examples.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "9722af6683d0f2c67d258246dc25b14bc97699bc",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/completion-kit.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "e2123625a57074160cde810036cca1197b7b2df8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/concept-host.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "3b0d733747140fd2997c80667f78321ab42516e7",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/concept-mcp.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "8271461a350601a77bb19dc4f626d2867c389c1c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/concept-preview-cli.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "e278b235cdbcb696236ffff73ab3a0e79a50490e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/concept-preview.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "c442c2e142b8bb0e8d18facd84aeee169c42132e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/context-pin.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ea5f8a2a79a6c345d1788e39e17b00b8c46d5d79",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/cross-repository.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "51b98c0f0965b4523381e0563c37ff0fcf0df679",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/custom-icons.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "902337f722e40326ee8839193fd7f4e6ceb4e892",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/dbt-artifact.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "d8d23220f9a353fb78c5d9340c9a665fbf18a1dd",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/deep-analysis.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "8d4822bf12d4baea8a84336c8bce1a235e7bd8c4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/deep-cache.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "7eb9b160f6961d4a7b2047cbacc0719c72def4cf",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/delivery-figures.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "37b10acd2d47aba338bdd242378fe2afa8543904",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/delivery-intelligence.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a4f31d0f29c6cf057daaa7b2c271fe69fdc5815b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/design-lineage-headings.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a6514e2a4cb25d682ef25afd71a5db96386bbedf",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/design-waterfall.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "bfff24efffed7dcd6c0d78d4d17f3140981403c6",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/actionable-gaps.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "339d38616ef546a7d0d41c98e077035f9cbddc74",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/business-publication-settings.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a1e4f90cddaae5187a553888a6bc8b94551aa1a3",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/completion-kit.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "c72ef7ccb609c88a898bc3ea129f94068b2e1bee",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/concept-host.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "e87fa7e28e52ef124d283189f9922e3ef0f84c4b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/concept-preview.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "250b7c3d87c7119dca1bbe1bf4fa2c352cf5dd5c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/configured-source-bundle.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "f9294e7f88bf04e1625d7f8db556cd6d523208f8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/context-pin.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "2bbf73f7e65fe50b07c6d19fd99c3833dcfc112c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/custom-icons.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "f6c653b1c63968df80efa2c9b3b62a1f2d84a29d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/deep-source.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "78f0d0b55d68ed48ec9426027f0139d34da44af8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/e2e/delivery-figures.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "741d0c299f02c548767e6d1d55ff43621db1b841",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/evolution-delivery.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "c6e4cefbc62514cf47eef23fae33a5fc30969e54",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/galaxy-identity.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "18b9dfdf23c79bfc51924fcba66d7ce617b32f9a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/graph-canvas-library.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "76da9351171691f3bbbed3b23f051e9cbed851b3",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/graph-client.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "da2ab9d7b448f86848b44042ebffd32ee5eef07f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/import-race.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "92cc9d111ee2f1702f22964cb8920fab969d7965",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/library-links-images.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "8ab7db9f8acfef62f850dc0ddcd839592168080f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/mosaic-workspace.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "3f9eeceba6420ee80486e48208a0bad87fbaafa5",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/e2e/navigation-context.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "fb18021bcd2b38aca5823aca8ece3157d44001b0",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/e2e/overnight-journey.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ab545dddef44549249237cce858ea78efd4f0d5b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/pattern-guidance.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "bf63633a46ee4b8998addd0030576037258c05dc",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/e2e/presentation-profile.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "06a7dd7c5d38aff0a8157fc57a25b67187f7d7b5",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/quantity-import.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "4bdbf0b6f6d5cfd894b9cf26522958b5cd87f5ea",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/react-viewer.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "1d0edf959ae11342fae3bf5067416a4dc616c25c",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/e2e/source-bridge-status.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "7fa7cc285a4f79987662864cd1b93d7a0bfbfdda",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/state-facets.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "8b0f634e651814fe7a4f52e49090933981a160a8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/studio-layout.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "d9b1ef7222e88ac816a0849dd74e63676d6a7eff",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/verification-recipes.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "f30d5680364f42441c634385f7ffaa1f806d24c4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/waterfall.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ce250eef5cfcf14adcbc7a3089966a54cebb8771",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/e2e/workflow-template.spec.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "541f29b088db338d17dc08196b1fe44da8fcd778",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/evolution-delivery-workbench.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ce682b7360cee0a3e1f1f6b07129453d28951b09",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/deep/synthetic-client/Api/Program.cs",
+      "worktreeStatus": "??",
+      "gitBlob": "7cf9c04033121d36d5b5ee5ac3be1e8dbe9c5a06",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/deep/synthetic-client/src/load.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a3ce557b07eac6c9ccf2b7f79f2357e6968434ec",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/deep/synthetic-client/src/main.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "6ff75a43af7627a49bc2705b59958e9a5577d01e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/edge-label/consumer.html",
+      "worktreeStatus": "??",
+      "gitBlob": "dd21f3677143d29531cefd7491d8904c56d6c586",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/edge-label/consumer.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "419e590f12066eec987f2938ce417e69bdbcc5ba",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/overnight-workflow/README.md",
+      "worktreeStatus": "??",
+      "gitBlob": "e7d4303fa0b75ec9a094e2771c8d7a64f9f7c0cc",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/overnight-workflow/docs/workflow.md",
+      "worktreeStatus": "??",
+      "gitBlob": "83a529643ae10feacb2c8820de8ea88274b4dd44",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/overnight-workflow/package.json",
+      "worktreeStatus": "??",
+      "gitBlob": "21c72122aae327c2829c7aeeaab3c9a1805a59d2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/overnight-workflow/sources.csv",
+      "worktreeStatus": "??",
+      "gitBlob": "75fd1ea2a5fe202dc6635f70f0b1c19106a883d1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/overnight-workflow/src/input/index.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "81457fc1b60c563acd55a93244735bfb762bf558",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/overnight-workflow/src/normalize/index.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "400001369f073058065a9a364dc7074932478dde",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/overnight-workflow/src/report/index.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ba52ff17cddad9ba8380a41e91a2a7a533597dff",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/ambiguous/README.md",
+      "worktreeStatus": "??",
+      "gitBlob": "a2f598f97cbe53ce3ece987389771cd7bd1e4a8b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/ambiguous/package.json",
+      "worktreeStatus": "??",
+      "gitBlob": "168ad844cca06051da311be83849e9089107730f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/conflicts/databricks.yml",
+      "worktreeStatus": "??",
+      "gitBlob": "9221d264cdfe1808a4caf264223b322290585736",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/docs/README.md",
+      "worktreeStatus": "??",
+      "gitBlob": "ce4693ac18624588e06af862e4774a6879aece99",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/docs/docs/decision.md",
+      "worktreeStatus": "??",
+      "gitBlob": "bffff14ab79bb9aed098ed91d17e290172cd81a6",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/multi-repo/consumer/package.json",
+      "worktreeStatus": "??",
+      "gitBlob": "ae103398eb2c552fb571c06c08b0401de5c85e5e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/multi-repo/producer/package.json",
+      "worktreeStatus": "??",
+      "gitBlob": "ae103398eb2c552fb571c06c08b0401de5c85e5e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/multi-repo/project-manifest.json",
+      "worktreeStatus": "??",
+      "gitBlob": "3a1cd5900f4b3a1d8effddc67386a181f1ff2209",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/secrets/README.md",
+      "worktreeStatus": "??",
+      "gitBlob": "cd699a26c62f093e6f65fc0a9182010ad0b12bc0",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/secrets/credentials/private.pem",
+      "worktreeStatus": "??",
+      "gitBlob": "fb9a7a0ecfff9cb87475b24d2b5214d3a9a2bb56",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/secrets/private-export.md",
+      "worktreeStatus": "??",
+      "gitBlob": "574a5625a94113ad51266040a7b5c34dd1d6aa92",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/tiny/package.json",
+      "worktreeStatus": "??",
+      "gitBlob": "44eaa4f8fa23fce24ca0267b6405187d734336bd",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/truth.json",
+      "worktreeStatus": "??",
+      "gitBlob": "5040acfdbd7d77d62dd4a69ad02878ceb155086b",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/projects/zoo/selectedSources.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "fc79de766f0db99525d640e3f6f34812c0ae8cf8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/react-viewer/consumer.html",
+      "worktreeStatus": "??",
+      "gitBlob": "602cabec7eee1c5d25f10ced12d47a5559182749",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/fixtures/react-viewer/consumer.tsx",
+      "worktreeStatus": "??",
+      "gitBlob": "16852a572f3538532b38682bc8983286ba6da915",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/git-history.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "4f9a8ef18db4784526dee20381f912b3168281e2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/graph-client.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "04f323fd25292dd7c34c4e3b0e6bafe35a939d6f",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/graph-projection.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "e2b0360f65b8479df4c75ddaa04602e543f0f08a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/helpers/customIcon.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "4e13f4f05b9ec75f9325cc51aab1d7fab02b61d7",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/helpers/delivery.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "54beb72f73fdc23d4dcae433f5f454e4ebfe4aeb",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/helpers/gitHistory.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "906ba5562d42a158ce906dbd7c832e7f57687c7e",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/helpers/manualImages.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "dff8cefa1de5090221719471f3f199a102fa9322",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/library-links-manual.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "b4ac7a5364dd2cf2dc495ef9f6fe321259bc1f6d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/library.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "e95970b7863db6fea3bc47c2623bb2fb44c0825a",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/mcp-client.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a8142cc80cdefa8edca5f4bec35616238f2e57e9",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/native-adapters.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "3d4f84a56af6b724d0658733569e7ea6b86c7435",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/navigation-intelligence.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "6ed0e6f7304f98a2d82886d16de2d772de74b0fc",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/pattern-guidance.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a2825010256e0e21c90b0d904bf17918dc361038",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/presentation-profile.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "bd4e32eb269547aaee59b67cc7eb93e69e5be680",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/publication-pages.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "78782bc38273eac45452ae0e9bec59985a1eb8d3",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "different"
+    },
+    {
+      "path": "tests/react-viewer.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "fcf6b905090d923ba8b61700fbc1e5c851547d10",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/recipe-assets.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "dfde1a1b8d763b2125410efd3f25c40338f7ba11",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/recipes-verification.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "e336e92de58fe99947805fab45decca658724305",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/scanner-import-kind.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "875da6cd5537e7a872983733eba9b441139797f1",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/selected-file-read.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "ecaeed67526207a6428112a2cca6aa805b32fa57",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/source-bridge-status.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "f55c52c71c41bf7c6c8047d6241eca7b202f2564",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/source-bundle.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "a29e5b1b297041e997b673860d80617744864fc4",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/source-conflicts.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "373268799466afde963bd826255cec1fb06a66c8",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/source-inventory.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "733f78a3ef4ab677368833a1b1b6cf4e43991a49",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/state-facet-consumers.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "75a6f2121e8a06635c1b64a79f516b8e666cac08",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/state-facets.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "f7d28b6399edaba6d32bdf8fa145ffaba532d379",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/structured-documents-integration.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "3f4e384e1632a5b5c97259f60da46e0655ca1ab2",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/structured-documents.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "f91ea8bfb2ff1eb3fd43331d6a6f13b3462371d9",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/studio-layout.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "c6cd78c8e237fe0904949a86c6eab3a6e826c2dd",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/synthetic-oracle.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "d82edd3bab47305117f4bce0e0e3085d39e80afb",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/visual-quality-intelligence.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "6e26bcc445779e86d9f77611cdfb541bd7285f26",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/workflow-templates.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "f7528c23c7c5f0853775019b75e70febd65bb537",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    },
+    {
+      "path": "tests/zoo-matrix.test.ts",
+      "worktreeStatus": "??",
+      "gitBlob": "10d6d738512d11be37e2902b71c98fbbe50a9c7d",
+      "matchesAuditSnapshot": true,
+      "mainComparison": "identical"
+    }
+  ]
+}
