@@ -38,8 +38,8 @@ All commands run from the repository root after `npm ci`. They read files and wr
 | Before / after a rescan | `npm run design -- new.json --delta old.json --out figures/` | Before · Changes · After per view, compared by stable ID |
 | Prepare a Mosaic concept preview | `npm run concept:preview -- doc.json --view root --audience public --out new-preview/` | concept JSON, typed source mapping, host sidecar and a local receipt; output must be a new directory under an existing parent |
 | Open a selected local owner viewer | `npm run concept:host -- doc.json --view root --audience public --viewer concept-viewer.html --viewer-sha256 <sha256>` | isolated loopback host; no renderer download, source collection or publication; optional matching `--packet` and explicit `--diagramcloud-origin` enable bounded mapping return |
-| Prepare an authored walkthrough | `npm run explain -- --project project.json --request walkthrough.json --out new-dir/` | `explanation.patch.json`, `explanation.preview.json` and `explanation-map.json` (not applied); see "Prepare an explanation walkthrough" below |
 | Check your edits | `npx tsc --noEmit`, `npm test`, `npm run build`, `npx playwright test` | the qualification a change needs before a PR |
+| Prepare an authored walkthrough | `npm run explain -- --project project.json --request walkthrough.json --out new-dir/` | `explanation.patch.json`, `explanation.preview.json` and `explanation-map.json` (not applied); see "Prepare an explanation walkthrough" below |
 
 The scanner also skips nested repositories and git worktrees (any sub-folder with its own `.git`, `.claude/worktrees`, `.worktrees`), `node_modules`, build output and secret files.
 

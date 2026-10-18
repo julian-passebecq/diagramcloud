@@ -6,11 +6,7 @@ import {noIcons,type IconData} from './iconData';
 import {CLAIM_LABEL,STATUS_NOTE} from '../core/realization';
 import {TRANSFORM_LABEL} from '../core/transform';
 const scriptJson=(value:unknown)=>JSON.stringify(value).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
-export type PortfolioHtmlOptions={focusStory?:boolean};
-/** Standalone, read-only public portfolio: no CDN, service, account or framework required.
- * focusStory opts into a focused current view, context breadcrumbs and explicit return to the
- * last explanation stop. It adds no playback timer, source refresh or application state.
- */
+/** Standalone, read-only public portfolio: no CDN, service, account or framework required (options: PortfolioHtmlOptions below). */
 export function portfolioHtml(input:Project,icons:IconData=noIcons,options:PortfolioHtmlOptions={}):string{
  // Every focus-only fragment is emitted only when focusStory is set: the default export stays byte-identical.
  const F=options.focusStory===true;
@@ -39,3 +35,8 @@ ${F?`function focusContext(id){const target=[...document.querySelectorAll('#cont
 document.getElementById('reset').onclick=()=>{path=[doc.rootViewId];selected=null;step=-1;render();};document.getElementById('previous').onclick=()=>go(step-1);document.getElementById('next').onclick=()=>go(step+1);document.getElementById('print').onclick=()=>window.print();${F?`document.getElementById('focus').onclick=()=>{focusCurrent=!focusCurrent;render();};document.getElementById('return-step').onclick=()=>{go(lastStep);focusContext(path[path.length-1]);};`:''}render();
 </script></body></html>`;
 }
+/** focusStory opts into a focused current view, context breadcrumbs and explicit return to the
+ * last explanation stop. It adds no playback timer, source refresh or application state; without it
+ * the export is byte-identical to the classic layout.
+ */
+export type PortfolioHtmlOptions={focusStory?:boolean};
