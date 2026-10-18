@@ -26,7 +26,7 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
  const stale:string[]=[];
  for(const [name,content] of Object.entries(expressivenessExampleFiles())){
   const file=path.join(EXAMPLES_DIR,name);
-  if(check){const current=await fs.readFile(file,'utf8').catch(()=>null);if(current!==content)stale.push(name);}
+  if(check){const current=await fs.readFile(file,'utf8').then(t=>t.replace(/\r\n/g,'\n'),()=>null);if(current!==content)stale.push(name);}
   else await fs.writeFile(file,content);
  }
  if(stale.length){console.error(`Stale examples: ${stale.join(', ')}. Run tsx scripts/generate-expressiveness-examples.ts.`);process.exitCode=1;}
