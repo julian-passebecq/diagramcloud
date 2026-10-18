@@ -1,6 +1,19 @@
-# Now / Next (2026-10-18, 1.29.0)
+# Now / Next (2026-10-18, 1.29.1)
 
-**Now.** 1.29.0 ([notes](docs/release-1.29/RELEASE_NOTES.md)) integrates eight V2 standalone packages: hierarchy rail and Choose parent with a real Tab walk at 390x844 (#89), schedule and measure forms with cited compatibility evidence (#90), host refusals that keep their input, Cursor proven locally and a Linux packaging dry run in CI (#91), one studio environment selection (#92), public noninterference and private-ID refusal (#93), uncertain writes, unknown-module imports and image digests (#94), instruction files as declared rules with bounded cancelable scans (#95), and artifact entry with declared-workflow playback (#96). Rows moved are in the [R4 crosswalk](docs/product/R4_CROSSWALK.md) and AGENTS.md "Current limits (1.29.0)". The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.29.0-<sha>/`.
+**Now.** 1.29.1 ([notes](docs/release-1.29/RELEASE_NOTES-1.29.1.md)) is a patch on 1.29.0: public figures never count private items and print one generic notice, "Some private or unreachable content is not shown." (#100, AC25 now implemented in the [R4 crosswalk](docs/product/R4_CROSSWALK.md)), and the watched concept host records its change baseline synchronously so a save right after start is regenerated (#99). AGENTS.md "Current limits (1.29.1)" has the details. The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.29.1-<sha>/`.
+
+**Next.** These are still open:
+- Owner decisions: AC02 profile levels (L1 vs rich pack), AC09 run/attempt model, AC11 Brain format.
+- Small UI follow-ups: a completeness badge in the readiness panel, an AbortSignal from the folder picker to the scanner, a host that calls `acceptPublicReturn`, navigator/search/story steps honouring a chosen parent.
+- Byte comparison of the binary PPTX exports for omission counts; completion-kit omission counts.
+- Host runs in CI, extension update, signing and Marketplace.
+- R4-W7 adapters (optional).
+
+V2 is not complete: all eight workstreams stay partial.
+
+## Previous: 1.29.0
+
+1.29.0 ([notes](docs/release-1.29/RELEASE_NOTES.md)) integrates eight V2 standalone packages: hierarchy rail and Choose parent with a real Tab walk at 390x844 (#89), schedule and measure forms with cited compatibility evidence (#90), host refusals that keep their input, Cursor proven locally and a Linux packaging dry run in CI (#91), one studio environment selection (#92), public noninterference and private-ID refusal (#93), uncertain writes, unknown-module imports and image digests (#94), instruction files as declared rules with bounded cancelable scans (#95), and artifact entry with declared-workflow playback (#96). Rows moved are in the [R4 crosswalk](docs/product/R4_CROSSWALK.md) and AGENTS.md "Current limits (1.29.0)". The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.29.0-<sha>/`.
 
 **Next.** These are still open:
 - Owner decisions: AC02 profile levels (L1 vs rich pack), AC09 run/attempt model, AC11 Brain format, and whether public figures may print omission counts (AC25 strict reading).
