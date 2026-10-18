@@ -1,0 +1,4691 @@
+{
+ "schemaVersion": 1,
+ "id": "diagramcloud-self-capabilities",
+ "revision": 0,
+ "title": "DiagramCloud capabilities (self-description)",
+ "summary": "What DiagramCloud does, how it is used (browser studio, CLI commands, stdio MCP tools, import and export formats), how it is built, where it comes from and where it stops. Every statement cites a file and line of the public repository at the recorded source cut. Static source only: nothing here was observed running, reviewed or certified; runtime and verification stay UNKNOWN unless a cited line says otherwise.",
+ "author": "",
+ "category": "Reference",
+ "tags": [
+  "Capability guide"
+ ],
+ "rootViewId": "guide-root",
+ "provenance": "Explicit source-bound authoring brief. No code, tool, scan or provider is executed. No observation or approval is created.",
+ "nodes": [
+  {
+   "id": "cap.document",
+   "label": "Author a project as one validated document",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Describe a project as components, connections, views and evidence in one JSON document that always passes the canonical validator.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.document",
+   "blockIds": [
+    "reuse.document.react",
+    "reuse.document.zod",
+    "reuse.document.indexeddb"
+   ],
+   "sourceIds": [
+    "readme-what",
+    "model-validate",
+    "readme-modes"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.document",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.document",
+    "states.document"
+   ],
+   "sourceIds": [
+    "model-validate",
+    "readme-node"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.document.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.document.use"
+   ],
+   "sourceIds": [
+    "readme-node",
+    "readme-modes"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.document.implementation",
+   "label": "How it is built",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.document.implementation"
+   ],
+   "sourceIds": [
+    "model-validate",
+    "model-provenances"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.document.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.document.limits"
+   ],
+   "sourceIds": [
+    "readme-not",
+    "readme-lim-runtime",
+    "readme-lim-browser"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.public-projection",
+   "label": "Share only the public projection",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Produce public outputs from which private components, connections, evidence and repositories are removed rather than hidden.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.public-projection",
+   "blockIds": [],
+   "sourceIds": [
+    "ops-public",
+    "readme-public"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.public-projection",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.public-projection",
+    "states.public-projection"
+   ],
+   "sourceIds": [
+    "ops-public"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.public-projection.implementation",
+   "label": "How it is built",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.public-projection.implementation"
+   ],
+   "sourceIds": [
+    "ops-public",
+    "readme-public"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.public-projection.assurance",
+   "label": "Checks and trust boundaries",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.public-projection.assurance"
+   ],
+   "sourceIds": [
+    "readme-secrets"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.observations",
+   "label": "Keep planned, read-from-source and observed apart",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Record external observations only through a reviewed patch, never by authoring them directly or marking them reviewed on the author's behalf.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.observations",
+   "blockIds": [],
+   "sourceIds": [
+    "real-patch",
+    "guide-observed"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.observations",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.observations",
+    "states.observations"
+   ],
+   "sourceIds": [
+    "real-patch"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.observations.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.observations.use"
+   ],
+   "sourceIds": [
+    "real-patch",
+    "guide-observed"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.observations.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.observations.limits"
+   ],
+   "sourceIds": [
+    "readme-lim-observe",
+    "guide-synthetic"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.scan",
+   "label": "Diagram a repository from its declarations",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Build a drilldown project (system, containers, components, files, data lineage, infrastructure) from a local folder, each finding backed by file:line evidence.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.scan",
+   "blockIds": [
+    "reuse.scan.treesitter"
+   ],
+   "sourceIds": [
+    "scan-cli",
+    "scan-fn",
+    "guide-cmd-scan"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.scan",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.scan",
+    "states.scan"
+   ],
+   "sourceIds": [
+    "scan-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.scan.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.scan.use"
+   ],
+   "sourceIds": [
+    "scan-cli",
+    "guide-cmd-scan"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.scan.implementation",
+   "label": "How it is built",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.scan.implementation"
+   ],
+   "sourceIds": [
+    "scan-fn",
+    "scan-cli"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.scan.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.scan.limits"
+   ],
+   "sourceIds": [
+    "readme-scan-limit",
+    "readme-lim-scan"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.atlas",
+   "label": "Join several repositories in one atlas",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Combine the repositories a manifest lists into one document where each repository keeps its own revision.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.atlas",
+   "blockIds": [],
+   "sourceIds": [
+    "atlas-cli",
+    "guide-cmd-atlas"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.atlas",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.atlas",
+    "states.atlas"
+   ],
+   "sourceIds": [
+    "atlas-cli"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.atlas.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.atlas.use"
+   ],
+   "sourceIds": [
+    "guide-cmd-atlas",
+    "atlas-cli"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.atlas.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.atlas.limits"
+   ],
+   "sourceIds": [
+    "atlas-cli"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.import",
+   "label": "Import draw.io, Mermaid and Visio diagrams",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Turn an existing diagram file into a new reviewed project with a report of what was kept and dropped.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.import",
+   "blockIds": [],
+   "sourceIds": [
+    "import-accept",
+    "import-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.import",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.import",
+    "states.import"
+   ],
+   "sourceIds": [
+    "import-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.import.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.import.use"
+   ],
+   "sourceIds": [
+    "import-accept",
+    "import-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.import.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.import.limits"
+   ],
+   "sourceIds": [
+    "readme-lim-import"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.exports",
+   "label": "Export public formats",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Hand the public projection to other tools and readers as HTML, SVG, Mermaid, draw.io, PowerPoint and a technical manual.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.exports",
+   "blockIds": [
+    "reuse.exports.pptxgenjs"
+   ],
+   "sourceIds": [
+    "export-html",
+    "export-svg",
+    "export-drawio",
+    "export-pptx",
+    "export-manual",
+    "export-mermaid"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.exports",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.exports",
+    "states.exports"
+   ],
+   "sourceIds": [
+    "export-html",
+    "export-svg",
+    "export-drawio",
+    "export-pptx",
+    "export-manual",
+    "export-mermaid"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.exports.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.exports.use"
+   ],
+   "sourceIds": [
+    "export-html",
+    "export-svg",
+    "export-mermaid",
+    "export-drawio",
+    "export-pptx",
+    "export-manual",
+    "readme-public"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.exports.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.exports.limits"
+   ],
+   "sourceIds": [
+    "readme-lim-pptx"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.design",
+   "label": "Draw publication figures",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Render each public view as a Diagram Design figure, with suggested figure types that each carry a reason.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.design",
+   "blockIds": [
+    "reuse.design.diagram-design"
+   ],
+   "sourceIds": [
+    "design-cli",
+    "design-recommend",
+    "guide-cmd-design"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.design",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.design",
+    "states.design"
+   ],
+   "sourceIds": [
+    "design-cli",
+    "design-recommend"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.design.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.design.use"
+   ],
+   "sourceIds": [
+    "guide-cmd-design",
+    "design-cli"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.design.implementation",
+   "label": "How it is built",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.design.implementation"
+   ],
+   "sourceIds": [
+    "design-recommend"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.design.origins",
+   "label": "Origins and reuse",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.design.origins"
+   ],
+   "sourceIds": [
+    "notices-design"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.cli",
+   "label": "Run the local intelligence CLI",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Read a validated project or compile a candidate locally and write results into a new directory.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.cli",
+   "blockIds": [],
+   "sourceIds": [
+    "cli-header",
+    "cli-modes"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.cli",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.cli",
+    "states.cli"
+   ],
+   "sourceIds": [
+    "cli-modes"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.cli.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.cli.use"
+   ],
+   "sourceIds": [
+    "cli-modes",
+    "cli-header"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.cli.assurance",
+   "label": "Checks and trust boundaries",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.cli.assurance"
+   ],
+   "sourceIds": [
+    "cli-header",
+    "cli-newdir"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.mcp",
+   "label": "Answer agents through a local stdio MCP",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Let an agent query and render the public projection of one selected document without mutating it.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.mcp",
+   "blockIds": [],
+   "sourceIds": [
+    "mcp-header",
+    "mcp-query"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.mcp",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.mcp",
+    "states.mcp"
+   ],
+   "sourceIds": [
+    "mcp-header"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.mcp.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.mcp.use"
+   ],
+   "sourceIds": [
+    "mcp-header",
+    "mcp-query",
+    "mcp-render",
+    "mcp-catalogue",
+    "mcp-validate"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.mcp.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.mcp.limits"
+   ],
+   "sourceIds": [
+    "mcp-header"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.proposals",
+   "label": "Validate change proposals without applying them",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Check a diagramcloud.patch proposal with one validator shared by the import dialog, the CLI and the MCP.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.proposals",
+   "blockIds": [],
+   "sourceIds": [
+    "proposal-validate"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.proposals",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.proposals",
+    "states.proposals"
+   ],
+   "sourceIds": [
+    "proposal-validate"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.proposals.implementation",
+   "label": "How it is built",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.proposals.implementation"
+   ],
+   "sourceIds": [
+    "proposal-validate",
+    "mcp-validate"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.proposals.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.proposals.limits"
+   ],
+   "sourceIds": [
+    "mcp-validate"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.viewer",
+   "label": "Embed a read-only React viewer",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Reuse the canvas as a public read-only viewer inside a host application.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.viewer",
+   "blockIds": [
+    "reuse.viewer.reactflow"
+   ],
+   "sourceIds": [
+    "react-entry",
+    "host-negotiate"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.viewer",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.viewer",
+    "states.viewer"
+   ],
+   "sourceIds": [
+    "react-entry"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.viewer.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.viewer.use"
+   ],
+   "sourceIds": [
+    "react-entry"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.viewer.assurance",
+   "label": "Checks and trust boundaries",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.viewer.assurance"
+   ],
+   "sourceIds": [
+    "host-negotiate"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.layout",
+   "label": "Lay out a view deterministically",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Place the components of a view in layered columns computed from its connections.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.layout",
+   "blockIds": [],
+   "sourceIds": [
+    "layout-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.layout",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.layout",
+    "states.layout"
+   ],
+   "sourceIds": [
+    "layout-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.layout.implementation",
+   "label": "How it is built",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.layout.implementation"
+   ],
+   "sourceIds": [
+    "layout-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.layout.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.layout.limits"
+   ],
+   "sourceIds": [
+    "readme-lim-layout"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.capability-guide",
+   "label": "Compile a capability guide",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Turn an explicit, cited capability brief into an ordinary project (the mechanism used for this very example).",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.capability-guide",
+   "blockIds": [],
+   "sourceIds": [
+    "capguide-doc",
+    "capguide-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.capability-guide",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.capability-guide",
+    "states.capability-guide"
+   ],
+   "sourceIds": [
+    "capguide-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.capability-guide.implementation",
+   "label": "How it is built",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.capability-guide.implementation"
+   ],
+   "sourceIds": [
+    "capguide-fn"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.capability-guide.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.capability-guide.limits"
+   ],
+   "sourceIds": [
+    "capguide-doc"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.qualification",
+   "label": "Check a change before it ships",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Run type checks, unit tests, the build and browser tests locally and in CI.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.qualification",
+   "blockIds": [],
+   "sourceIds": [
+    "guide-cmd-check",
+    "ci-workflow"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "status.qualification",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.qualification",
+    "states.qualification"
+   ],
+   "sourceIds": [
+    "ci-workflow"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.qualification.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.qualification.use"
+   ],
+   "sourceIds": [
+    "guide-cmd-check",
+    "ci-workflow"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "section.qualification.origins",
+   "label": "Origins and reuse",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "static-source; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.qualification.origins"
+   ],
+   "sourceIds": [
+    "license",
+    "notices-deps"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.react",
+   "label": "React and React DOM",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "UI library; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.react"
+   ],
+   "sourceIds": [
+    "readme-what",
+    "notices-deps"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.fluent",
+   "label": "Fluent UI React components",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "UI component library; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.fluent"
+   ],
+   "sourceIds": [
+    "readme-what",
+    "notices-deps"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.reactflow",
+   "label": "React Flow (@xyflow/react)",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "canvas library; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.reactflow"
+   ],
+   "sourceIds": [
+    "readme-what",
+    "notices-deps"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.zod",
+   "label": "Zod",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "validation library; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.zod"
+   ],
+   "sourceIds": [
+    "notices-deps",
+    "model-validate"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.pptxgenjs",
+   "label": "PptxGenJS",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "export library; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.pptxgenjs"
+   ],
+   "sourceIds": [
+    "notices-deps",
+    "export-pptx"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.treesitter",
+   "label": "web-tree-sitter",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "parser runtime; version 0.25.10. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.treesitter"
+   ],
+   "sourceIds": [
+    "notices-tree"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.indexeddb",
+   "label": "Browser IndexedDB",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "browser storage; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.indexeddb"
+   ],
+   "sourceIds": [
+    "readme-what",
+    "readme-storage"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.diagram-design",
+   "label": "diagram-design visual grammar",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "design reference; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.diagram-design"
+   ],
+   "sourceIds": [
+    "notices-design"
+   ],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "guide.capabilities",
+   "label": "Capabilities",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "What can this application do, and how is each capability used?",
+   "role": "",
+   "status": "idle",
+   "childViewId": "guide-list",
+   "blockIds": [
+    "guide-context"
+   ],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "guide.surfaces",
+   "label": "Interfaces",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "The same capabilities grouped by supplied entry surface, without duplicate identities.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "guide-surfaces",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "guide.implementation",
+   "label": "Implementation and reuse",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Explicit capability-to-technology associations. Not an automatically inferred dependency map.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "guide-implementation",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.7723fc58ac504bfb",
+   "label": "Browser studio",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.7723fc58ac504bfb",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.2036e7375306763f",
+   "label": "JSON file",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.2036e7375306763f",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.7e5a4c8649c9f960",
+   "label": "Exports",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.7e5a4c8649c9f960",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.12ece685d75d64bd",
+   "label": "JSON patch",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.12ece685d75d64bd",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.ba44e19aa603c29",
+   "label": "CLI",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.ba44e19aa603c29",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.1e8c4519b588d223",
+   "label": "MCP",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.1e8c4519b588d223",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.339407d2cc5e09fc",
+   "label": "React module",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.339407d2cc5e09fc",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.25de8e328c58d852",
+   "label": "TypeScript module",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.25de8e328c58d852",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.90f3707b5a6bfe1",
+   "label": "CI",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.90f3707b5a6bfe1",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  }
+ ],
+ "edges": [
+  {
+   "id": "uses.document.react",
+   "source": "cap.document",
+   "target": "tech.react",
+   "label": "renders the studio",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.document.zod",
+   "source": "cap.document",
+   "target": "tech.zod",
+   "label": "validates the document schema",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.document.indexeddb",
+   "source": "cap.document",
+   "target": "tech.indexeddb",
+   "label": "stores projects locally",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.scan.treesitter",
+   "source": "cap.scan",
+   "target": "tech.treesitter",
+   "label": "optional local syntax parsing",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.exports.pptxgenjs",
+   "source": "cap.exports",
+   "target": "tech.pptxgenjs",
+   "label": "writes the PowerPoint export",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.design.diagram-design",
+   "source": "cap.design",
+   "target": "tech.diagram-design",
+   "label": "adapts its visual grammar",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "static-source",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.viewer.reactflow",
+   "source": "cap.viewer",
+   "target": "tech.reactflow",
+   "label": "reuses the canvas",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "static-source",
+   "visibility": "public"
+  }
+ ],
+ "views": [
+  {
+   "id": "guide-root",
+   "title": "Capability guide",
+   "description": "",
+   "nodeIds": [
+    "guide.capabilities",
+    "guide.surfaces",
+    "guide.implementation"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "guide.capabilities": {
+     "x": 0,
+     "y": 0
+    },
+    "guide.surfaces": {
+     "x": 320,
+     "y": 0
+    },
+    "guide.implementation": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.document",
+   "title": "Author a project as one validated document",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.document",
+    "section.document.use",
+    "section.document.implementation",
+    "section.document.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.document": {
+     "x": 0,
+     "y": 0
+    },
+    "section.document.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.document.implementation": {
+     "x": 640,
+     "y": 0
+    },
+    "section.document.limits": {
+     "x": 0,
+     "y": 180
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.public-projection",
+   "title": "Share only the public projection",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.public-projection",
+    "section.public-projection.implementation",
+    "section.public-projection.assurance"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.public-projection": {
+     "x": 0,
+     "y": 0
+    },
+    "section.public-projection.implementation": {
+     "x": 320,
+     "y": 0
+    },
+    "section.public-projection.assurance": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.observations",
+   "title": "Keep planned, read-from-source and observed apart",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.observations",
+    "section.observations.use",
+    "section.observations.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.observations": {
+     "x": 0,
+     "y": 0
+    },
+    "section.observations.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.observations.limits": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.scan",
+   "title": "Diagram a repository from its declarations",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.scan",
+    "section.scan.use",
+    "section.scan.implementation",
+    "section.scan.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.scan": {
+     "x": 0,
+     "y": 0
+    },
+    "section.scan.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.scan.implementation": {
+     "x": 640,
+     "y": 0
+    },
+    "section.scan.limits": {
+     "x": 0,
+     "y": 180
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.atlas",
+   "title": "Join several repositories in one atlas",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.atlas",
+    "section.atlas.use",
+    "section.atlas.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.atlas": {
+     "x": 0,
+     "y": 0
+    },
+    "section.atlas.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.atlas.limits": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.import",
+   "title": "Import draw.io, Mermaid and Visio diagrams",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.import",
+    "section.import.use",
+    "section.import.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.import": {
+     "x": 0,
+     "y": 0
+    },
+    "section.import.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.import.limits": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.exports",
+   "title": "Export public formats",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.exports",
+    "section.exports.use",
+    "section.exports.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.exports": {
+     "x": 0,
+     "y": 0
+    },
+    "section.exports.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.exports.limits": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.design",
+   "title": "Draw publication figures",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.design",
+    "section.design.use",
+    "section.design.implementation",
+    "section.design.origins"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.design": {
+     "x": 0,
+     "y": 0
+    },
+    "section.design.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.design.implementation": {
+     "x": 640,
+     "y": 0
+    },
+    "section.design.origins": {
+     "x": 0,
+     "y": 180
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.cli",
+   "title": "Run the local intelligence CLI",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.cli",
+    "section.cli.use",
+    "section.cli.assurance"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.cli": {
+     "x": 0,
+     "y": 0
+    },
+    "section.cli.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.cli.assurance": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.mcp",
+   "title": "Answer agents through a local stdio MCP",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.mcp",
+    "section.mcp.use",
+    "section.mcp.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.mcp": {
+     "x": 0,
+     "y": 0
+    },
+    "section.mcp.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.mcp.limits": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.proposals",
+   "title": "Validate change proposals without applying them",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.proposals",
+    "section.proposals.implementation",
+    "section.proposals.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.proposals": {
+     "x": 0,
+     "y": 0
+    },
+    "section.proposals.implementation": {
+     "x": 320,
+     "y": 0
+    },
+    "section.proposals.limits": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.viewer",
+   "title": "Embed a read-only React viewer",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.viewer",
+    "section.viewer.use",
+    "section.viewer.assurance"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.viewer": {
+     "x": 0,
+     "y": 0
+    },
+    "section.viewer.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.viewer.assurance": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.layout",
+   "title": "Lay out a view deterministically",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.layout",
+    "section.layout.implementation",
+    "section.layout.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.layout": {
+     "x": 0,
+     "y": 0
+    },
+    "section.layout.implementation": {
+     "x": 320,
+     "y": 0
+    },
+    "section.layout.limits": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.capability-guide",
+   "title": "Compile a capability guide",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.capability-guide",
+    "section.capability-guide.implementation",
+    "section.capability-guide.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.capability-guide": {
+     "x": 0,
+     "y": 0
+    },
+    "section.capability-guide.implementation": {
+     "x": 320,
+     "y": 0
+    },
+    "section.capability-guide.limits": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.qualification",
+   "title": "Check a change before it ships",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.qualification",
+    "section.qualification.use",
+    "section.qualification.origins"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.qualification": {
+     "x": 0,
+     "y": 0
+    },
+    "section.qualification.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.qualification.origins": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "guide-list",
+   "title": "Capability catalogue",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.document",
+    "cap.public-projection",
+    "cap.observations",
+    "cap.scan",
+    "cap.atlas",
+    "cap.import",
+    "cap.exports",
+    "cap.design",
+    "cap.cli",
+    "cap.mcp",
+    "cap.proposals",
+    "cap.viewer",
+    "cap.layout",
+    "cap.capability-guide",
+    "cap.qualification"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.document": {
+     "x": 0,
+     "y": 0
+    },
+    "cap.public-projection": {
+     "x": 320,
+     "y": 0
+    },
+    "cap.observations": {
+     "x": 640,
+     "y": 0
+    },
+    "cap.scan": {
+     "x": 0,
+     "y": 180
+    },
+    "cap.atlas": {
+     "x": 320,
+     "y": 180
+    },
+    "cap.import": {
+     "x": 640,
+     "y": 180
+    },
+    "cap.exports": {
+     "x": 0,
+     "y": 360
+    },
+    "cap.design": {
+     "x": 320,
+     "y": 360
+    },
+    "cap.cli": {
+     "x": 640,
+     "y": 360
+    },
+    "cap.mcp": {
+     "x": 0,
+     "y": 540
+    },
+    "cap.proposals": {
+     "x": 320,
+     "y": 540
+    },
+    "cap.viewer": {
+     "x": 640,
+     "y": 540
+    },
+    "cap.layout": {
+     "x": 0,
+     "y": 720
+    },
+    "cap.capability-guide": {
+     "x": 320,
+     "y": 720
+    },
+    "cap.qualification": {
+     "x": 640,
+     "y": 720
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "guide-implementation",
+   "title": "Implementation and reuse",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.document",
+    "cap.public-projection",
+    "cap.observations",
+    "cap.scan",
+    "cap.atlas",
+    "cap.import",
+    "cap.exports",
+    "cap.design",
+    "cap.cli",
+    "cap.mcp",
+    "cap.proposals",
+    "cap.viewer",
+    "cap.layout",
+    "cap.capability-guide",
+    "cap.qualification",
+    "tech.react",
+    "tech.fluent",
+    "tech.reactflow",
+    "tech.zod",
+    "tech.pptxgenjs",
+    "tech.treesitter",
+    "tech.indexeddb",
+    "tech.diagram-design"
+   ],
+   "edgeIds": [
+    "uses.document.react",
+    "uses.document.zod",
+    "uses.document.indexeddb",
+    "uses.scan.treesitter",
+    "uses.exports.pptxgenjs",
+    "uses.design.diagram-design",
+    "uses.viewer.reactflow"
+   ],
+   "positions": {
+    "cap.document": {
+     "x": 0,
+     "y": 0
+    },
+    "cap.public-projection": {
+     "x": 320,
+     "y": 0
+    },
+    "cap.observations": {
+     "x": 640,
+     "y": 0
+    },
+    "cap.scan": {
+     "x": 0,
+     "y": 180
+    },
+    "cap.atlas": {
+     "x": 320,
+     "y": 180
+    },
+    "cap.import": {
+     "x": 640,
+     "y": 180
+    },
+    "cap.exports": {
+     "x": 0,
+     "y": 360
+    },
+    "cap.design": {
+     "x": 320,
+     "y": 360
+    },
+    "cap.cli": {
+     "x": 640,
+     "y": 360
+    },
+    "cap.mcp": {
+     "x": 0,
+     "y": 540
+    },
+    "cap.proposals": {
+     "x": 320,
+     "y": 540
+    },
+    "cap.viewer": {
+     "x": 640,
+     "y": 540
+    },
+    "cap.layout": {
+     "x": 0,
+     "y": 720
+    },
+    "cap.capability-guide": {
+     "x": 320,
+     "y": 720
+    },
+    "cap.qualification": {
+     "x": 640,
+     "y": 720
+    },
+    "tech.react": {
+     "x": 0,
+     "y": 900
+    },
+    "tech.fluent": {
+     "x": 320,
+     "y": 900
+    },
+    "tech.reactflow": {
+     "x": 640,
+     "y": 900
+    },
+    "tech.zod": {
+     "x": 0,
+     "y": 1080
+    },
+    "tech.pptxgenjs": {
+     "x": 320,
+     "y": 1080
+    },
+    "tech.treesitter": {
+     "x": 640,
+     "y": 1080
+    },
+    "tech.indexeddb": {
+     "x": 0,
+     "y": 1260
+    },
+    "tech.diagram-design": {
+     "x": 320,
+     "y": 1260
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.7723fc58ac504bfb",
+   "title": "Browser studio",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.document",
+    "cap.public-projection",
+    "cap.observations",
+    "cap.scan",
+    "cap.atlas",
+    "cap.import",
+    "cap.exports",
+    "cap.design",
+    "cap.proposals",
+    "cap.layout"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.document": {
+     "x": 0,
+     "y": 0
+    },
+    "cap.public-projection": {
+     "x": 320,
+     "y": 0
+    },
+    "cap.observations": {
+     "x": 640,
+     "y": 0
+    },
+    "cap.scan": {
+     "x": 0,
+     "y": 180
+    },
+    "cap.atlas": {
+     "x": 320,
+     "y": 180
+    },
+    "cap.import": {
+     "x": 640,
+     "y": 180
+    },
+    "cap.exports": {
+     "x": 0,
+     "y": 360
+    },
+    "cap.design": {
+     "x": 320,
+     "y": 360
+    },
+    "cap.proposals": {
+     "x": 640,
+     "y": 360
+    },
+    "cap.layout": {
+     "x": 0,
+     "y": 540
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.2036e7375306763f",
+   "title": "JSON file",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.document"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.document": {
+     "x": 0,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.7e5a4c8649c9f960",
+   "title": "Exports",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.public-projection",
+    "cap.exports"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.public-projection": {
+     "x": 0,
+     "y": 0
+    },
+    "cap.exports": {
+     "x": 320,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.12ece685d75d64bd",
+   "title": "JSON patch",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.observations"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.observations": {
+     "x": 0,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.ba44e19aa603c29",
+   "title": "CLI",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.scan",
+    "cap.atlas",
+    "cap.design",
+    "cap.cli",
+    "cap.proposals",
+    "cap.qualification"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.scan": {
+     "x": 0,
+     "y": 0
+    },
+    "cap.atlas": {
+     "x": 320,
+     "y": 0
+    },
+    "cap.design": {
+     "x": 640,
+     "y": 0
+    },
+    "cap.cli": {
+     "x": 0,
+     "y": 180
+    },
+    "cap.proposals": {
+     "x": 320,
+     "y": 180
+    },
+    "cap.qualification": {
+     "x": 640,
+     "y": 180
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.1e8c4519b588d223",
+   "title": "MCP",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.mcp",
+    "cap.proposals"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.mcp": {
+     "x": 0,
+     "y": 0
+    },
+    "cap.proposals": {
+     "x": 320,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.339407d2cc5e09fc",
+   "title": "React module",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.viewer"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.viewer": {
+     "x": 0,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.25de8e328c58d852",
+   "title": "TypeScript module",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.capability-guide"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.capability-guide": {
+     "x": 0,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.90f3707b5a6bfe1",
+   "title": "CI",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.qualification"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.qualification": {
+     "x": 0,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "guide-surfaces",
+   "title": "Entry surfaces",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "surface.7723fc58ac504bfb",
+    "surface.2036e7375306763f",
+    "surface.7e5a4c8649c9f960",
+    "surface.12ece685d75d64bd",
+    "surface.ba44e19aa603c29",
+    "surface.1e8c4519b588d223",
+    "surface.339407d2cc5e09fc",
+    "surface.25de8e328c58d852",
+    "surface.90f3707b5a6bfe1"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "surface.7723fc58ac504bfb": {
+     "x": 0,
+     "y": 0
+    },
+    "surface.2036e7375306763f": {
+     "x": 320,
+     "y": 0
+    },
+    "surface.7e5a4c8649c9f960": {
+     "x": 640,
+     "y": 0
+    },
+    "surface.12ece685d75d64bd": {
+     "x": 0,
+     "y": 180
+    },
+    "surface.ba44e19aa603c29": {
+     "x": 320,
+     "y": 180
+    },
+    "surface.1e8c4519b588d223": {
+     "x": 640,
+     "y": 180
+    },
+    "surface.339407d2cc5e09fc": {
+     "x": 0,
+     "y": 360
+    },
+    "surface.25de8e328c58d852": {
+     "x": 320,
+     "y": 360
+    },
+    "surface.90f3707b5a6bfe1": {
+     "x": 640,
+     "y": 360
+    }
+   },
+   "visibility": "public"
+  }
+ ],
+ "blocks": [
+  {
+   "id": "scope.document",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-what",
+    "model-validate",
+    "readme-modes"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Author a project as one validated document\nSurfaces: Browser studio, JSON file\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Local browser (Chromium is the qualified browser)\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.document",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "model-validate",
+    "readme-node"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "Static web build (npm run build)",
+     "any static host"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.document.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-node",
+    "readme-modes"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Open the studio (npm ci, then npm run dev with Node.js 22). Explore is read-only; Edit adds components, connections, child views, evidence, sources and undo; Portfolio shows the public projection."
+  },
+  {
+   "id": "text.document.implementation",
+   "title": "How it is built",
+   "visibility": "public",
+   "sourceIds": [
+    "model-validate",
+    "model-provenances"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Every document goes through validateDocument in src/core/model.ts. Evidence blocks carry a provenance from a fixed vocabulary (source-derived, synthetic, reference, author)."
+  },
+  {
+   "id": "text.document.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-not",
+    "readme-lim-runtime",
+    "readme-lim-browser"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "DiagramCloud is not a cloud runtime, IDE, notebook kernel, query engine, Git or task authority. Code and rows are displayed, never executed. Chromium is the only qualified browser."
+  },
+  {
+   "id": "scope.public-projection",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "ops-public",
+    "readme-public"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Share only the public projection\nSurfaces: Browser studio, Exports\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Local browser and CLI\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.public-projection",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "ops-public"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.public-projection.implementation",
+   "title": "How it is built",
+   "visibility": "public",
+   "sourceIds": [
+    "ops-public",
+    "readme-public"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "publicDocument in src/core/operations.ts builds the public copy that every export reads."
+  },
+  {
+   "id": "text.public-projection.assurance",
+   "title": "Checks and trust boundaries",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-secrets"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Credential-like values are refused where content crosses an app boundary, but this is not secret scanning, DLP or access control: a sensitive fact marked public stays public."
+  },
+  {
+   "id": "scope.observations",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "real-patch",
+    "guide-observed"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Keep planned, read-from-source and observed apart\nSurfaces: Browser studio, JSON patch\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Local browser\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.observations",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "real-patch"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.observations.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "real-patch",
+    "guide-observed"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "An observation arrives as a patch through the JSON / AI review; it arrives private, unreviewed and not shareable, and only a person reviews it in Edit mode."
+  },
+  {
+   "id": "text.observations.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-lim-observe",
+    "guide-synthetic"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Observations are one-time reviewed imports, not subscriptions; DiagramCloud never polls another app. A scan is never observed."
+  },
+  {
+   "id": "scope.scan",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "scan-cli",
+    "scan-fn",
+    "guide-cmd-scan"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Diagram a repository from its declarations\nSurfaces: Browser studio, CLI\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Local browser or Node.js 22 command line\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.scan",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "scan-fn"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.scan.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "scan-cli",
+    "guide-cmd-scan"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "CLI: npm run scan -- <folder> --out repo.json. In the browser: Diagram from a repository in the gallery."
+  },
+  {
+   "id": "text.scan.implementation",
+   "title": "How it is built",
+   "visibility": "public",
+   "sourceIds": [
+    "scan-fn",
+    "scan-cli"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "scanRepository in src/core/scan/scanner.ts is the deterministic scanner shared by the browser and the CLI."
+  },
+  {
+   "id": "text.scan.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-scan-limit",
+    "readme-lim-scan"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "It reads declarations, not runtime behaviour: no call graph, no traffic, imports only for TypeScript/JavaScript and Python, Terraform by pattern."
+  },
+  {
+   "id": "scope.atlas",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "atlas-cli",
+    "guide-cmd-atlas"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Join several repositories in one atlas\nSurfaces: CLI, Browser studio\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Node.js 22 command line\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.atlas",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "atlas-cli"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.atlas.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "guide-cmd-atlas",
+    "atlas-cli"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Write a project manifest, then npm run atlas -- project.manifest.json --out atlas.json; add --previous to compare revision vectors."
+  },
+  {
+   "id": "text.atlas.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "atlas-cli"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Membership comes only from the manifest; repositories are read like a scan, read-only, without git commands or network."
+  },
+  {
+   "id": "scope.import",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "import-accept",
+    "import-fn"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Import draw.io, Mermaid and Visio diagrams\nSurfaces: Browser studio\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Local browser\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.import",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "import-fn"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.import.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "import-accept",
+    "import-fn"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Choose Import draw.io / Mermaid / Visio in the gallery. Accepted files include .drawio, .xml, .drawio.svg, .drawio.png, .mmd, .mermaid, .md and Visio .vsdx."
+  },
+  {
+   "id": "text.import.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-lim-import"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Adapters with a loss report: no styles or vendor artwork, no binary .vsd, no lossless Mermaid round trip."
+  },
+  {
+   "id": "scope.exports",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "export-html",
+    "export-svg",
+    "export-drawio",
+    "export-pptx",
+    "export-manual",
+    "export-mermaid"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Export public formats\nSurfaces: Browser studio, Exports\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Local browser\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.exports",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "export-html",
+    "export-svg",
+    "export-drawio",
+    "export-pptx",
+    "export-manual",
+    "export-mermaid"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.exports.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "export-html",
+    "export-svg",
+    "export-mermaid",
+    "export-drawio",
+    "export-pptx",
+    "export-manual",
+    "readme-public"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Use the export menu of the studio. Interactive HTML, SVG, Mermaid, draw.io, PowerPoint and the technical manual each read the public projection."
+  },
+  {
+   "id": "text.exports.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-lim-pptx"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "PPTX is a semantic reconstruction, not a pixel copy of arbitrary layouts."
+  },
+  {
+   "id": "scope.design",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "design-cli",
+    "design-recommend",
+    "guide-cmd-design"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Draw publication figures\nSurfaces: CLI, Browser studio\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Node.js 22 command line or local browser\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.design",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "design-cli",
+    "design-recommend"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.design.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "guide-cmd-design",
+    "design-cli"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "npm run design -- doc.json --out figures/ writes one SVG per view, an index, a figure book and suggestions; --brief applies a design brief in memory."
+  },
+  {
+   "id": "text.design.implementation",
+   "title": "How it is built",
+   "visibility": "public",
+   "sourceIds": [
+    "design-recommend"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "recommendFigures in src/export/design/recommend.ts ranks figure suggestions."
+  },
+  {
+   "id": "text.design.origins",
+   "title": "Origins and reuse",
+   "visibility": "public",
+   "sourceIds": [
+    "notices-design"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "The visual grammar is adapted from diagram-design (MIT, attributed); no code, icons or fonts are copied."
+  },
+  {
+   "id": "scope.cli",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "cli-header",
+    "cli-modes"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Run the local intelligence CLI\nSurfaces: CLI\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Node.js 22 command line\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.cli",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "cli-modes"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.cli.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "cli-modes",
+    "cli-header"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "npm run intelligence -- <mode> --input <file> --out <new-directory>. Modes include inspect, brief, graph, query, catalogue, suggest-mapping and validate-proposal."
+  },
+  {
+   "id": "text.cli.assurance",
+   "title": "Checks and trust boundaries",
+   "visibility": "public",
+   "sourceIds": [
+    "cli-header",
+    "cli-newdir"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "No network, no execution of analysed code, no remote upload; the output directory must be new and existing files are never overwritten."
+  },
+  {
+   "id": "scope.mcp",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "mcp-header",
+    "mcp-query"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Answer agents through a local stdio MCP\nSurfaces: MCP\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Node.js 22 stdio process\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.mcp",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "mcp-header"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.mcp.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "mcp-header",
+    "mcp-query",
+    "mcp-render",
+    "mcp-catalogue",
+    "mcp-validate"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "npm run intelligence:mcp -- <selected-document.json>. Tools include diagramcloud_query, diagramcloud_render, diagramcloud_catalogue and diagramcloud_validate_proposal."
+  },
+  {
+   "id": "text.mcp.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "mcp-header"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "No listener, arbitrary paths, mutations, execution, polling, settings changes or model."
+  },
+  {
+   "id": "scope.proposals",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "proposal-validate"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Validate change proposals without applying them\nSurfaces: Browser studio, CLI, MCP\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Local browser and Node.js 22\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.proposals",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "proposal-validate"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.proposals.implementation",
+   "title": "How it is built",
+   "visibility": "public",
+   "sourceIds": [
+    "proposal-validate",
+    "mcp-validate"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "validateProposal in src/core/proposal.ts is pure and never throws for a bad payload; the MCP tool validates against the public projection."
+  },
+  {
+   "id": "text.proposals.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "mcp-validate"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Validation never applies, reviews, executes or launches a provider."
+  },
+  {
+   "id": "scope.viewer",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "react-entry",
+    "host-negotiate"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Embed a read-only React viewer\nSurfaces: React module\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Host application (local source module)\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.viewer",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "react-entry"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.viewer.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "react-entry"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Import DiagramCloudViewer from src/react/index.ts. The host session is explicit, read-only by default and never applies."
+  },
+  {
+   "id": "text.viewer.assurance",
+   "title": "Checks and trust boundaries",
+   "visibility": "public",
+   "sourceIds": [
+    "host-negotiate"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Granted capabilities are the intersection of what the host offers and what is implemented; unknown grants are listed with a reason."
+  },
+  {
+   "id": "scope.layout",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "layout-fn"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Lay out a view deterministically\nSurfaces: Browser studio\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Local browser\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.layout",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "layout-fn"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.layout.implementation",
+   "title": "How it is built",
+   "visibility": "public",
+   "sourceIds": [
+    "layout-fn"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "layeredLayout in src/core/layout.ts."
+  },
+  {
+   "id": "text.layout.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-lim-layout"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Grid layout and Auto layout only; Auto layout is not a general graph layout engine."
+  },
+  {
+   "id": "scope.capability-guide",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "capguide-doc",
+    "capguide-fn"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Compile a capability guide\nSurfaces: TypeScript module\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Local Node.js or browser\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.capability-guide",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "capguide-fn"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "Present in source",
+     "source cut ecf4af6"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.capability-guide.implementation",
+   "title": "How it is built",
+   "visibility": "public",
+   "sourceIds": [
+    "capguide-fn"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "compileCapabilityGuide in src/intelligence/capabilityGuide.ts validates the brief and materialises nodes, views and text/table blocks."
+  },
+  {
+   "id": "text.capability-guide.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "capguide-doc"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "It is an authoring brief, not a source scanner, live feature registry or new persisted schema; no observations or permissions are generated."
+  },
+  {
+   "id": "scope.qualification",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "guide-cmd-check",
+    "ci-workflow"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Check a change before it ships\nSurfaces: CLI, CI\nVersion: 1.29.1 at source cut ecf4af6\nEnvironment: Node.js 22 and GitHub Actions\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.qualification",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "ci-workflow"
+   ],
+   "provenance": "author",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "verification",
+     "Checks declared in CI",
+     "workflow definition, not a run result"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.qualification.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "guide-cmd-check",
+    "ci-workflow"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "npx tsc --noEmit, npm test, npm run build and npx playwright test; CI runs the same steps."
+  },
+  {
+   "id": "text.qualification.origins",
+   "title": "Origins and reuse",
+   "visibility": "public",
+   "sourceIds": [
+    "license",
+    "notices-deps"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Original source is MIT licensed; dependencies keep their own terms."
+  },
+  {
+   "id": "technology.react",
+   "title": "React and React DOM",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-what",
+    "notices-deps"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Named as the UI foundation and distributed under its upstream MIT licence. The exact installed version is not cited here and stays UNKNOWN in this guide."
+  },
+  {
+   "id": "technology.fluent",
+   "title": "Fluent UI React components",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-what",
+    "notices-deps"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Named UI component library under its upstream MIT licence. Version UNKNOWN in this guide."
+  },
+  {
+   "id": "technology.reactflow",
+   "title": "React Flow (@xyflow/react)",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-what",
+    "notices-deps"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Draws the interactive canvas; the domain model stays independent of it. MIT licence. Version UNKNOWN in this guide."
+  },
+  {
+   "id": "technology.zod",
+   "title": "Zod",
+   "visibility": "public",
+   "sourceIds": [
+    "notices-deps",
+    "model-validate"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Schema library used by the document validator. MIT licence. Version UNKNOWN in this guide."
+  },
+  {
+   "id": "technology.pptxgenjs",
+   "title": "PptxGenJS",
+   "visibility": "public",
+   "sourceIds": [
+    "notices-deps",
+    "export-pptx"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Builds the PowerPoint export. MIT licence. Version UNKNOWN in this guide."
+  },
+  {
+   "id": "technology.treesitter",
+   "title": "web-tree-sitter",
+   "visibility": "public",
+   "sourceIds": [
+    "notices-tree"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Optional syntax runtime with pinned local grammars; analysed code is never executed and no grammar is fetched."
+  },
+  {
+   "id": "technology.indexeddb",
+   "title": "Browser IndexedDB",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-what",
+    "readme-storage"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Projects are stored in the browser; there is no server, account or database."
+  },
+  {
+   "id": "technology.diagram-design",
+   "title": "diagram-design visual grammar",
+   "visibility": "public",
+   "sourceIds": [
+    "notices-design"
+   ],
+   "provenance": "author",
+   "type": "text",
+   "text": "Diagram Design mode adapts the visual grammar of diagram-design (MIT, attributed). DiagramCloud renderers are an independent implementation; no code, icons or fonts are copied."
+  },
+  {
+   "id": "reuse.document.react",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-what"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Author a project as one validated document -> React and React DOM: renders the studio. Basis: static-source. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.document.zod",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "notices-deps"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Author a project as one validated document -> Zod: validates the document schema. Basis: static-source. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.document.indexeddb",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-storage"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Author a project as one validated document -> Browser IndexedDB: stores projects locally. Basis: static-source. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.scan.treesitter",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "notices-tree"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Diagram a repository from its declarations -> web-tree-sitter: optional local syntax parsing. Basis: static-source. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.exports.pptxgenjs",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "notices-deps",
+    "export-pptx"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Export public formats -> PptxGenJS: writes the PowerPoint export. Basis: static-source. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.design.diagram-design",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "notices-design"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Draw publication figures -> diagram-design visual grammar: adapts its visual grammar. Basis: static-source. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.viewer.reactflow",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-what"
+   ],
+   "provenance": "source-derived",
+   "type": "text",
+   "text": "Embed a read-only React viewer -> React Flow (@xyflow/react): reuses the canvas. Basis: static-source. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "guide-context",
+   "title": "Original guide context (private)",
+   "visibility": "private",
+   "sourceIds": [],
+   "provenance": "author",
+   "type": "text",
+   "text": "{\n  \"title\": \"DiagramCloud capabilities (self-description)\",\n  \"summary\": \"What DiagramCloud does, how it is used (browser studio, CLI commands, stdio MCP tools, import and export formats), how it is built, where it comes from and where it stops. Every statement cites a file and line of the public repository at the recorded source cut. Static source only: nothing here was observed running, reviewed or certified; runtime and verification stay UNKNOWN unless a cited line says otherwise.\",\n  \"sourceCut\": [\n    {\n      \"repository\": \"github.com/julian-passebecq/diagramcloud\",\n      \"revision\": \"ecf4af6f45816a62c456a7ebd9aa8f108aae5452\"\n    }\n  ]\n}"
+  }
+ ],
+ "assets": [],
+ "sources": [
+  {
+   "id": "readme-what",
+   "title": "README: what it is",
+   "location": "README.md:47",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L47",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-not",
+   "title": "README: what it is not",
+   "location": "README.md:49",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L49",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-modes",
+   "title": "README: Explore, Edit and Portfolio modes",
+   "location": "README.md:102",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L102",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-node",
+   "title": "README: start locally with Node.js 22",
+   "location": "README.md:87",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L87",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-storage",
+   "title": "README: browser storage",
+   "location": "README.md:273",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L273",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-secrets",
+   "title": "README: credential refusal is not DLP",
+   "location": "README.md:275",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L275",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-public",
+   "title": "README: exports built from publicDocument",
+   "location": "README.md:261",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L261",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-scan-limit",
+   "title": "README: scanner reads declarations only",
+   "location": "README.md:202",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L202",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-browser",
+   "title": "README limit: Chromium only",
+   "location": "README.md:281",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L281",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-scan",
+   "title": "README limit: declaration-based scanner",
+   "location": "README.md:282",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L282",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-import",
+   "title": "README limit: import adapters with loss report",
+   "location": "README.md:283",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L283",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-layout",
+   "title": "README limit: grid and auto layout only",
+   "location": "README.md:284",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L284",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-runtime",
+   "title": "README limit: no execution or live discovery",
+   "location": "README.md:285",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L285",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-observe",
+   "title": "README limit: observations are reviewed imports",
+   "location": "README.md:286",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L286",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-pptx",
+   "title": "README limit: PPTX is a reconstruction",
+   "location": "README.md:289",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L289",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-observed",
+   "title": "AI guide: observed or verified meaning",
+   "location": "docs/AI_GUIDE.md:18",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L18",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-synthetic",
+   "title": "AI guide: a scan is never observed",
+   "location": "docs/AI_GUIDE.md:20",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L20",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-cmd-scan",
+   "title": "AI guide command: graph one repository",
+   "location": "docs/AI_GUIDE.md:30",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L30",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-cmd-atlas",
+   "title": "AI guide command: graph several repositories",
+   "location": "docs/AI_GUIDE.md:31",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L31",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-cmd-design",
+   "title": "AI guide command: draw every public view",
+   "location": "docs/AI_GUIDE.md:34",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L34",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-cmd-check",
+   "title": "AI guide command: check edits",
+   "location": "docs/AI_GUIDE.md:41",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L41",
+   "visibility": "public"
+  },
+  {
+   "id": "model-validate",
+   "title": "validateDocument",
+   "location": "src/core/model.ts:214",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/model.ts#L214",
+   "visibility": "public"
+  },
+  {
+   "id": "model-provenances",
+   "title": "Evidence provenance vocabulary",
+   "location": "src/core/model.ts:19",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/model.ts#L19",
+   "visibility": "public"
+  },
+  {
+   "id": "ops-public",
+   "title": "publicDocument",
+   "location": "src/core/operations.ts:9",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/operations.ts#L9",
+   "visibility": "public"
+  },
+  {
+   "id": "real-patch",
+   "title": "observationPatch",
+   "location": "src/core/realization.ts:52",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/realization.ts#L52",
+   "visibility": "public"
+  },
+  {
+   "id": "proposal-validate",
+   "title": "validateProposal",
+   "location": "src/core/proposal.ts:101",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/proposal.ts#L101",
+   "visibility": "public"
+  },
+  {
+   "id": "cli-header",
+   "title": "Intelligence CLI header",
+   "location": "scripts/intelligence.ts:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence.ts#L1",
+   "visibility": "public"
+  },
+  {
+   "id": "cli-modes",
+   "title": "Intelligence CLI modes",
+   "location": "scripts/intelligence.ts:40",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence.ts#L40",
+   "visibility": "public"
+  },
+  {
+   "id": "cli-newdir",
+   "title": "Intelligence CLI writes a new directory",
+   "location": "scripts/intelligence.ts:120",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence.ts#L120",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-header",
+   "title": "Stdio MCP header",
+   "location": "scripts/intelligence-mcp.ts:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L1",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-query",
+   "title": "MCP tool diagramcloud_query",
+   "location": "scripts/intelligence-mcp.ts:24",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L24",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-render",
+   "title": "MCP tool diagramcloud_render",
+   "location": "scripts/intelligence-mcp.ts:25",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L25",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-catalogue",
+   "title": "MCP tool diagramcloud_catalogue",
+   "location": "scripts/intelligence-mcp.ts:30",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L30",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-validate",
+   "title": "MCP tool diagramcloud_validate_proposal",
+   "location": "scripts/intelligence-mcp.ts:32",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L32",
+   "visibility": "public"
+  },
+  {
+   "id": "scan-cli",
+   "title": "Scanner CLI header",
+   "location": "scripts/scan-repo.ts:2",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/scan-repo.ts#L2",
+   "visibility": "public"
+  },
+  {
+   "id": "scan-fn",
+   "title": "scanRepository",
+   "location": "src/core/scan/scanner.ts:71",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/scan/scanner.ts#L71",
+   "visibility": "public"
+  },
+  {
+   "id": "atlas-cli",
+   "title": "Atlas CLI header",
+   "location": "scripts/atlas.ts:2",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/atlas.ts#L2",
+   "visibility": "public"
+  },
+  {
+   "id": "design-cli",
+   "title": "Diagram Design CLI header",
+   "location": "scripts/design.ts:2",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/design.ts#L2",
+   "visibility": "public"
+  },
+  {
+   "id": "design-recommend",
+   "title": "recommendFigures",
+   "location": "src/export/design/recommend.ts:26",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/design/recommend.ts#L26",
+   "visibility": "public"
+  },
+  {
+   "id": "import-accept",
+   "title": "Accepted interchange file types",
+   "location": "src/core/interchange/index.ts:10",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/interchange/index.ts#L10",
+   "visibility": "public"
+  },
+  {
+   "id": "import-fn",
+   "title": "importDiagram",
+   "location": "src/core/interchange/index.ts:21",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/interchange/index.ts#L21",
+   "visibility": "public"
+  },
+  {
+   "id": "export-drawio",
+   "title": "drawioDiagram",
+   "location": "src/export/drawio.ts:33",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/drawio.ts#L33",
+   "visibility": "public"
+  },
+  {
+   "id": "export-html",
+   "title": "portfolioHtml",
+   "location": "src/export/html.ts:10",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/html.ts#L10",
+   "visibility": "public"
+  },
+  {
+   "id": "export-svg",
+   "title": "svgDiagram",
+   "location": "src/export/diagram.ts:23",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/diagram.ts#L23",
+   "visibility": "public"
+  },
+  {
+   "id": "export-mermaid",
+   "title": "mermaidDiagram",
+   "location": "src/export/diagram.ts:54",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/diagram.ts#L54",
+   "visibility": "public"
+  },
+  {
+   "id": "export-pptx",
+   "title": "exportPptx",
+   "location": "src/export/pptx.ts:24",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/pptx.ts#L24",
+   "visibility": "public"
+  },
+  {
+   "id": "export-manual",
+   "title": "technicalManualHtml",
+   "location": "src/export/manual.ts:77",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/manual.ts#L77",
+   "visibility": "public"
+  },
+  {
+   "id": "react-entry",
+   "title": "React viewer entrypoint",
+   "location": "src/react/index.ts:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/react/index.ts#L1",
+   "visibility": "public"
+  },
+  {
+   "id": "host-negotiate",
+   "title": "negotiateCapabilities",
+   "location": "src/react/hostSession.ts:45",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/react/hostSession.ts#L45",
+   "visibility": "public"
+  },
+  {
+   "id": "layout-fn",
+   "title": "layeredLayout",
+   "location": "src/core/layout.ts:56",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/layout.ts#L56",
+   "visibility": "public"
+  },
+  {
+   "id": "capguide-doc",
+   "title": "Capability guide contract comment",
+   "location": "src/intelligence/capabilityGuide.ts:3",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/intelligence/capabilityGuide.ts#L3",
+   "visibility": "public"
+  },
+  {
+   "id": "capguide-fn",
+   "title": "compileCapabilityGuide",
+   "location": "src/intelligence/capabilityGuide.ts:60",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/intelligence/capabilityGuide.ts#L60",
+   "visibility": "public"
+  },
+  {
+   "id": "notices-deps",
+   "title": "Third-party notices: runtime libraries",
+   "location": "THIRD_PARTY_NOTICES.md:7",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/THIRD_PARTY_NOTICES.md#L7",
+   "visibility": "public"
+  },
+  {
+   "id": "notices-design",
+   "title": "Third-party notices: diagram-design grammar",
+   "location": "THIRD_PARTY_NOTICES.md:69",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/THIRD_PARTY_NOTICES.md#L69",
+   "visibility": "public"
+  },
+  {
+   "id": "notices-tree",
+   "title": "Third-party notices: tree-sitter runtime",
+   "location": "THIRD_PARTY_NOTICES.md:110",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/THIRD_PARTY_NOTICES.md#L110",
+   "visibility": "public"
+  },
+  {
+   "id": "license",
+   "title": "Project licence",
+   "location": "LICENSE:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/LICENSE#L1",
+   "visibility": "public"
+  },
+  {
+   "id": "ci-workflow",
+   "title": "CI workflow",
+   "location": ".github/workflows/ci.yml:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/.github/workflows/ci.yml#L1",
+   "visibility": "public"
+  }
+ ],
+ "story": [
+  {
+   "title": "Start with the user goal",
+   "viewId": "guide-list",
+   "narration": "Each capability links a user goal to its scope, usage, implementation and evidence. Declared does not mean qualified.",
+   "highlightEdgeIds": []
+  },
+  {
+   "title": "Inspect the entry surface",
+   "viewId": "guide-surfaces",
+   "narration": "Browse by interface without treating every command, endpoint or tool as a separately proven feature.",
+   "highlightEdgeIds": []
+  }
+ ],
+ "observations": []
+}

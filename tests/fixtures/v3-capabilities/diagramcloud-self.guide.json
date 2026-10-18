@@ -1,0 +1,1363 @@
+{
+ "id": "diagramcloud-self-capabilities",
+ "title": "DiagramCloud capabilities (self-description)",
+ "summary": "What DiagramCloud does, how it is used (browser studio, CLI commands, stdio MCP tools, import and export formats), how it is built, where it comes from and where it stops. Every statement cites a file and line of the public repository at the recorded source cut. Static source only: nothing here was observed running, reviewed or certified; runtime and verification stay UNKNOWN unless a cited line says otherwise.",
+ "visibility": "public",
+ "capturedAt": "2026-10-19T00:00:00Z",
+ "sourceCut": [
+  {
+   "repository": "github.com/julian-passebecq/diagramcloud",
+   "revision": "ecf4af6f45816a62c456a7ebd9aa8f108aae5452"
+  }
+ ],
+ "sources": [
+  {
+   "id": "readme-what",
+   "title": "README: what it is",
+   "location": "README.md:47",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L47",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-not",
+   "title": "README: what it is not",
+   "location": "README.md:49",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L49",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-modes",
+   "title": "README: Explore, Edit and Portfolio modes",
+   "location": "README.md:102",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L102",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-node",
+   "title": "README: start locally with Node.js 22",
+   "location": "README.md:87",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L87",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-storage",
+   "title": "README: browser storage",
+   "location": "README.md:273",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L273",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-secrets",
+   "title": "README: credential refusal is not DLP",
+   "location": "README.md:275",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L275",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-public",
+   "title": "README: exports built from publicDocument",
+   "location": "README.md:261",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L261",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-scan-limit",
+   "title": "README: scanner reads declarations only",
+   "location": "README.md:202",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L202",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-browser",
+   "title": "README limit: Chromium only",
+   "location": "README.md:281",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L281",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-scan",
+   "title": "README limit: declaration-based scanner",
+   "location": "README.md:282",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L282",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-import",
+   "title": "README limit: import adapters with loss report",
+   "location": "README.md:283",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L283",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-layout",
+   "title": "README limit: grid and auto layout only",
+   "location": "README.md:284",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L284",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-runtime",
+   "title": "README limit: no execution or live discovery",
+   "location": "README.md:285",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L285",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-observe",
+   "title": "README limit: observations are reviewed imports",
+   "location": "README.md:286",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L286",
+   "visibility": "public"
+  },
+  {
+   "id": "readme-lim-pptx",
+   "title": "README limit: PPTX is a reconstruction",
+   "location": "README.md:289",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L289",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-observed",
+   "title": "AI guide: observed or verified meaning",
+   "location": "docs/AI_GUIDE.md:18",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L18",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-synthetic",
+   "title": "AI guide: a scan is never observed",
+   "location": "docs/AI_GUIDE.md:20",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L20",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-cmd-scan",
+   "title": "AI guide command: graph one repository",
+   "location": "docs/AI_GUIDE.md:30",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L30",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-cmd-atlas",
+   "title": "AI guide command: graph several repositories",
+   "location": "docs/AI_GUIDE.md:31",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L31",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-cmd-design",
+   "title": "AI guide command: draw every public view",
+   "location": "docs/AI_GUIDE.md:34",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L34",
+   "visibility": "public"
+  },
+  {
+   "id": "guide-cmd-check",
+   "title": "AI guide command: check edits",
+   "location": "docs/AI_GUIDE.md:41",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L41",
+   "visibility": "public"
+  },
+  {
+   "id": "model-validate",
+   "title": "validateDocument",
+   "location": "src/core/model.ts:214",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/model.ts#L214",
+   "visibility": "public"
+  },
+  {
+   "id": "model-provenances",
+   "title": "Evidence provenance vocabulary",
+   "location": "src/core/model.ts:19",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/model.ts#L19",
+   "visibility": "public"
+  },
+  {
+   "id": "ops-public",
+   "title": "publicDocument",
+   "location": "src/core/operations.ts:9",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/operations.ts#L9",
+   "visibility": "public"
+  },
+  {
+   "id": "real-patch",
+   "title": "observationPatch",
+   "location": "src/core/realization.ts:52",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/realization.ts#L52",
+   "visibility": "public"
+  },
+  {
+   "id": "proposal-validate",
+   "title": "validateProposal",
+   "location": "src/core/proposal.ts:101",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/proposal.ts#L101",
+   "visibility": "public"
+  },
+  {
+   "id": "cli-header",
+   "title": "Intelligence CLI header",
+   "location": "scripts/intelligence.ts:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence.ts#L1",
+   "visibility": "public"
+  },
+  {
+   "id": "cli-modes",
+   "title": "Intelligence CLI modes",
+   "location": "scripts/intelligence.ts:40",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence.ts#L40",
+   "visibility": "public"
+  },
+  {
+   "id": "cli-newdir",
+   "title": "Intelligence CLI writes a new directory",
+   "location": "scripts/intelligence.ts:120",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence.ts#L120",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-header",
+   "title": "Stdio MCP header",
+   "location": "scripts/intelligence-mcp.ts:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L1",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-query",
+   "title": "MCP tool diagramcloud_query",
+   "location": "scripts/intelligence-mcp.ts:24",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L24",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-render",
+   "title": "MCP tool diagramcloud_render",
+   "location": "scripts/intelligence-mcp.ts:25",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L25",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-catalogue",
+   "title": "MCP tool diagramcloud_catalogue",
+   "location": "scripts/intelligence-mcp.ts:30",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L30",
+   "visibility": "public"
+  },
+  {
+   "id": "mcp-validate",
+   "title": "MCP tool diagramcloud_validate_proposal",
+   "location": "scripts/intelligence-mcp.ts:32",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L32",
+   "visibility": "public"
+  },
+  {
+   "id": "scan-cli",
+   "title": "Scanner CLI header",
+   "location": "scripts/scan-repo.ts:2",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/scan-repo.ts#L2",
+   "visibility": "public"
+  },
+  {
+   "id": "scan-fn",
+   "title": "scanRepository",
+   "location": "src/core/scan/scanner.ts:71",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/scan/scanner.ts#L71",
+   "visibility": "public"
+  },
+  {
+   "id": "atlas-cli",
+   "title": "Atlas CLI header",
+   "location": "scripts/atlas.ts:2",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/atlas.ts#L2",
+   "visibility": "public"
+  },
+  {
+   "id": "design-cli",
+   "title": "Diagram Design CLI header",
+   "location": "scripts/design.ts:2",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/design.ts#L2",
+   "visibility": "public"
+  },
+  {
+   "id": "design-recommend",
+   "title": "recommendFigures",
+   "location": "src/export/design/recommend.ts:26",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/design/recommend.ts#L26",
+   "visibility": "public"
+  },
+  {
+   "id": "import-accept",
+   "title": "Accepted interchange file types",
+   "location": "src/core/interchange/index.ts:10",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/interchange/index.ts#L10",
+   "visibility": "public"
+  },
+  {
+   "id": "import-fn",
+   "title": "importDiagram",
+   "location": "src/core/interchange/index.ts:21",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/interchange/index.ts#L21",
+   "visibility": "public"
+  },
+  {
+   "id": "export-drawio",
+   "title": "drawioDiagram",
+   "location": "src/export/drawio.ts:33",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/drawio.ts#L33",
+   "visibility": "public"
+  },
+  {
+   "id": "export-html",
+   "title": "portfolioHtml",
+   "location": "src/export/html.ts:10",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/html.ts#L10",
+   "visibility": "public"
+  },
+  {
+   "id": "export-svg",
+   "title": "svgDiagram",
+   "location": "src/export/diagram.ts:23",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/diagram.ts#L23",
+   "visibility": "public"
+  },
+  {
+   "id": "export-mermaid",
+   "title": "mermaidDiagram",
+   "location": "src/export/diagram.ts:54",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/diagram.ts#L54",
+   "visibility": "public"
+  },
+  {
+   "id": "export-pptx",
+   "title": "exportPptx",
+   "location": "src/export/pptx.ts:24",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/pptx.ts#L24",
+   "visibility": "public"
+  },
+  {
+   "id": "export-manual",
+   "title": "technicalManualHtml",
+   "location": "src/export/manual.ts:77",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/manual.ts#L77",
+   "visibility": "public"
+  },
+  {
+   "id": "react-entry",
+   "title": "React viewer entrypoint",
+   "location": "src/react/index.ts:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/react/index.ts#L1",
+   "visibility": "public"
+  },
+  {
+   "id": "host-negotiate",
+   "title": "negotiateCapabilities",
+   "location": "src/react/hostSession.ts:45",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/react/hostSession.ts#L45",
+   "visibility": "public"
+  },
+  {
+   "id": "layout-fn",
+   "title": "layeredLayout",
+   "location": "src/core/layout.ts:56",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/layout.ts#L56",
+   "visibility": "public"
+  },
+  {
+   "id": "capguide-doc",
+   "title": "Capability guide contract comment",
+   "location": "src/intelligence/capabilityGuide.ts:3",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/intelligence/capabilityGuide.ts#L3",
+   "visibility": "public"
+  },
+  {
+   "id": "capguide-fn",
+   "title": "compileCapabilityGuide",
+   "location": "src/intelligence/capabilityGuide.ts:60",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/intelligence/capabilityGuide.ts#L60",
+   "visibility": "public"
+  },
+  {
+   "id": "notices-deps",
+   "title": "Third-party notices: runtime libraries",
+   "location": "THIRD_PARTY_NOTICES.md:7",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/THIRD_PARTY_NOTICES.md#L7",
+   "visibility": "public"
+  },
+  {
+   "id": "notices-design",
+   "title": "Third-party notices: diagram-design grammar",
+   "location": "THIRD_PARTY_NOTICES.md:69",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/THIRD_PARTY_NOTICES.md#L69",
+   "visibility": "public"
+  },
+  {
+   "id": "notices-tree",
+   "title": "Third-party notices: tree-sitter runtime",
+   "location": "THIRD_PARTY_NOTICES.md:110",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/THIRD_PARTY_NOTICES.md#L110",
+   "visibility": "public"
+  },
+  {
+   "id": "license",
+   "title": "Project licence",
+   "location": "LICENSE:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/LICENSE#L1",
+   "visibility": "public"
+  },
+  {
+   "id": "ci-workflow",
+   "title": "CI workflow",
+   "location": ".github/workflows/ci.yml:1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/.github/workflows/ci.yml#L1",
+   "visibility": "public"
+  }
+ ],
+ "technologies": [
+  {
+   "id": "react",
+   "title": "React and React DOM",
+   "kind": "UI library",
+   "version": null,
+   "explanation": "Named as the UI foundation and distributed under its upstream MIT licence. The exact installed version is not cited here and stays UNKNOWN in this guide.",
+   "sourceIds": [
+    "readme-what",
+    "notices-deps"
+   ],
+   "visibility": "public"
+  },
+  {
+   "id": "fluent",
+   "title": "Fluent UI React components",
+   "kind": "UI component library",
+   "version": null,
+   "explanation": "Named UI component library under its upstream MIT licence. Version UNKNOWN in this guide.",
+   "sourceIds": [
+    "readme-what",
+    "notices-deps"
+   ],
+   "visibility": "public"
+  },
+  {
+   "id": "reactflow",
+   "title": "React Flow (@xyflow/react)",
+   "kind": "canvas library",
+   "version": null,
+   "explanation": "Draws the interactive canvas; the domain model stays independent of it. MIT licence. Version UNKNOWN in this guide.",
+   "sourceIds": [
+    "readme-what",
+    "notices-deps"
+   ],
+   "visibility": "public"
+  },
+  {
+   "id": "zod",
+   "title": "Zod",
+   "kind": "validation library",
+   "version": null,
+   "explanation": "Schema library used by the document validator. MIT licence. Version UNKNOWN in this guide.",
+   "sourceIds": [
+    "notices-deps",
+    "model-validate"
+   ],
+   "visibility": "public"
+  },
+  {
+   "id": "pptxgenjs",
+   "title": "PptxGenJS",
+   "kind": "export library",
+   "version": null,
+   "explanation": "Builds the PowerPoint export. MIT licence. Version UNKNOWN in this guide.",
+   "sourceIds": [
+    "notices-deps",
+    "export-pptx"
+   ],
+   "visibility": "public"
+  },
+  {
+   "id": "treesitter",
+   "title": "web-tree-sitter",
+   "kind": "parser runtime",
+   "version": "0.25.10",
+   "explanation": "Optional syntax runtime with pinned local grammars; analysed code is never executed and no grammar is fetched.",
+   "sourceIds": [
+    "notices-tree"
+   ],
+   "visibility": "public"
+  },
+  {
+   "id": "indexeddb",
+   "title": "Browser IndexedDB",
+   "kind": "browser storage",
+   "version": null,
+   "explanation": "Projects are stored in the browser; there is no server, account or database.",
+   "sourceIds": [
+    "readme-what",
+    "readme-storage"
+   ],
+   "visibility": "public"
+  },
+  {
+   "id": "diagram-design",
+   "title": "diagram-design visual grammar",
+   "kind": "design reference",
+   "version": null,
+   "explanation": "Diagram Design mode adapts the visual grammar of diagram-design (MIT, attributed). DiagramCloud renderers are an independent implementation; no code, icons or fonts are copied.",
+   "sourceIds": [
+    "notices-design"
+   ],
+   "visibility": "public"
+  }
+ ],
+ "capabilities": [
+  {
+   "id": "document",
+   "title": "Author a project as one validated document",
+   "goal": "Describe a project as components, connections, views and evidence in one JSON document that always passes the canonical validator.",
+   "surfaces": [
+    "Browser studio",
+    "JSON file"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Local browser (Chromium is the qualified browser)",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "readme-what",
+    "model-validate",
+    "readme-modes"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "Open the studio (npm ci, then npm run dev with Node.js 22). Explore is read-only; Edit adds components, connections, child views, evidence, sources and undo; Portfolio shows the public projection.",
+     "sourceIds": [
+      "readme-node",
+      "readme-modes"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "implementation",
+     "text": "Every document goes through validateDocument in src/core/model.ts. Evidence blocks carry a provenance from a fixed vocabulary (source-derived, synthetic, reference, author).",
+     "sourceIds": [
+      "model-validate",
+      "model-provenances"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "DiagramCloud is not a cloud runtime, IDE, notebook kernel, query engine, Git or task authority. Code and rows are displayed, never executed. Chromium is the only qualified browser.",
+     "sourceIds": [
+      "readme-not",
+      "readme-lim-runtime",
+      "readme-lim-browser"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "model-validate"
+     ]
+    },
+    {
+     "facet": "distribution",
+     "value": "Static web build (npm run build)",
+     "scope": "any static host",
+     "sourceIds": [
+      "readme-node"
+     ]
+    }
+   ],
+   "uses": [
+    {
+     "technologyId": "react",
+     "relation": "renders the studio",
+     "basis": "static-source",
+     "sourceIds": [
+      "readme-what"
+     ]
+    },
+    {
+     "technologyId": "zod",
+     "relation": "validates the document schema",
+     "basis": "static-source",
+     "sourceIds": [
+      "notices-deps"
+     ]
+    },
+    {
+     "technologyId": "indexeddb",
+     "relation": "stores projects locally",
+     "basis": "static-source",
+     "sourceIds": [
+      "readme-storage"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "public-projection",
+   "title": "Share only the public projection",
+   "goal": "Produce public outputs from which private components, connections, evidence and repositories are removed rather than hidden.",
+   "surfaces": [
+    "Browser studio",
+    "Exports"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Local browser and CLI",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "ops-public",
+    "readme-public"
+   ],
+   "sections": [
+    {
+     "kind": "implementation",
+     "text": "publicDocument in src/core/operations.ts builds the public copy that every export reads.",
+     "sourceIds": [
+      "ops-public",
+      "readme-public"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "assurance",
+     "text": "Credential-like values are refused where content crosses an app boundary, but this is not secret scanning, DLP or access control: a sensitive fact marked public stays public.",
+     "sourceIds": [
+      "readme-secrets"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "ops-public"
+     ]
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "observations",
+   "title": "Keep planned, read-from-source and observed apart",
+   "goal": "Record external observations only through a reviewed patch, never by authoring them directly or marking them reviewed on the author's behalf.",
+   "surfaces": [
+    "Browser studio",
+    "JSON patch"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Local browser",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "real-patch",
+    "guide-observed"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "An observation arrives as a patch through the JSON / AI review; it arrives private, unreviewed and not shareable, and only a person reviews it in Edit mode.",
+     "sourceIds": [
+      "real-patch",
+      "guide-observed"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "Observations are one-time reviewed imports, not subscriptions; DiagramCloud never polls another app. A scan is never observed.",
+     "sourceIds": [
+      "readme-lim-observe",
+      "guide-synthetic"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "real-patch"
+     ]
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "scan",
+   "title": "Diagram a repository from its declarations",
+   "goal": "Build a drilldown project (system, containers, components, files, data lineage, infrastructure) from a local folder, each finding backed by file:line evidence.",
+   "surfaces": [
+    "Browser studio",
+    "CLI"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Local browser or Node.js 22 command line",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "scan-cli",
+    "scan-fn",
+    "guide-cmd-scan"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "CLI: npm run scan -- <folder> --out repo.json. In the browser: Diagram from a repository in the gallery.",
+     "sourceIds": [
+      "scan-cli",
+      "guide-cmd-scan"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "implementation",
+     "text": "scanRepository in src/core/scan/scanner.ts is the deterministic scanner shared by the browser and the CLI.",
+     "sourceIds": [
+      "scan-fn",
+      "scan-cli"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "It reads declarations, not runtime behaviour: no call graph, no traffic, imports only for TypeScript/JavaScript and Python, Terraform by pattern.",
+     "sourceIds": [
+      "readme-scan-limit",
+      "readme-lim-scan"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "scan-fn"
+     ]
+    }
+   ],
+   "uses": [
+    {
+     "technologyId": "treesitter",
+     "relation": "optional local syntax parsing",
+     "basis": "static-source",
+     "sourceIds": [
+      "notices-tree"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "atlas",
+   "title": "Join several repositories in one atlas",
+   "goal": "Combine the repositories a manifest lists into one document where each repository keeps its own revision.",
+   "surfaces": [
+    "CLI",
+    "Browser studio"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Node.js 22 command line",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "atlas-cli",
+    "guide-cmd-atlas"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "Write a project manifest, then npm run atlas -- project.manifest.json --out atlas.json; add --previous to compare revision vectors.",
+     "sourceIds": [
+      "guide-cmd-atlas",
+      "atlas-cli"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "Membership comes only from the manifest; repositories are read like a scan, read-only, without git commands or network.",
+     "sourceIds": [
+      "atlas-cli"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "atlas-cli"
+     ]
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "import",
+   "title": "Import draw.io, Mermaid and Visio diagrams",
+   "goal": "Turn an existing diagram file into a new reviewed project with a report of what was kept and dropped.",
+   "surfaces": [
+    "Browser studio"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Local browser",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "import-accept",
+    "import-fn"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "Choose Import draw.io / Mermaid / Visio in the gallery. Accepted files include .drawio, .xml, .drawio.svg, .drawio.png, .mmd, .mermaid, .md and Visio .vsdx.",
+     "sourceIds": [
+      "import-accept",
+      "import-fn"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "Adapters with a loss report: no styles or vendor artwork, no binary .vsd, no lossless Mermaid round trip.",
+     "sourceIds": [
+      "readme-lim-import"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "import-fn"
+     ]
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "exports",
+   "title": "Export public formats",
+   "goal": "Hand the public projection to other tools and readers as HTML, SVG, Mermaid, draw.io, PowerPoint and a technical manual.",
+   "surfaces": [
+    "Browser studio",
+    "Exports"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Local browser",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "export-html",
+    "export-svg",
+    "export-drawio",
+    "export-pptx",
+    "export-manual",
+    "export-mermaid"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "Use the export menu of the studio. Interactive HTML, SVG, Mermaid, draw.io, PowerPoint and the technical manual each read the public projection.",
+     "sourceIds": [
+      "export-html",
+      "export-svg",
+      "export-mermaid",
+      "export-drawio",
+      "export-pptx",
+      "export-manual",
+      "readme-public"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "PPTX is a semantic reconstruction, not a pixel copy of arbitrary layouts.",
+     "sourceIds": [
+      "readme-lim-pptx"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "export-html",
+      "export-svg",
+      "export-drawio",
+      "export-pptx",
+      "export-manual",
+      "export-mermaid"
+     ]
+    }
+   ],
+   "uses": [
+    {
+     "technologyId": "pptxgenjs",
+     "relation": "writes the PowerPoint export",
+     "basis": "static-source",
+     "sourceIds": [
+      "notices-deps",
+      "export-pptx"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "design",
+   "title": "Draw publication figures",
+   "goal": "Render each public view as a Diagram Design figure, with suggested figure types that each carry a reason.",
+   "surfaces": [
+    "CLI",
+    "Browser studio"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Node.js 22 command line or local browser",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "design-cli",
+    "design-recommend",
+    "guide-cmd-design"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "npm run design -- doc.json --out figures/ writes one SVG per view, an index, a figure book and suggestions; --brief applies a design brief in memory.",
+     "sourceIds": [
+      "guide-cmd-design",
+      "design-cli"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "implementation",
+     "text": "recommendFigures in src/export/design/recommend.ts ranks figure suggestions.",
+     "sourceIds": [
+      "design-recommend"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "origins",
+     "text": "The visual grammar is adapted from diagram-design (MIT, attributed); no code, icons or fonts are copied.",
+     "sourceIds": [
+      "notices-design"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "design-cli",
+      "design-recommend"
+     ]
+    }
+   ],
+   "uses": [
+    {
+     "technologyId": "diagram-design",
+     "relation": "adapts its visual grammar",
+     "basis": "static-source",
+     "sourceIds": [
+      "notices-design"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cli",
+   "title": "Run the local intelligence CLI",
+   "goal": "Read a validated project or compile a candidate locally and write results into a new directory.",
+   "surfaces": [
+    "CLI"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Node.js 22 command line",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "cli-header",
+    "cli-modes"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "npm run intelligence -- <mode> --input <file> --out <new-directory>. Modes include inspect, brief, graph, query, catalogue, suggest-mapping and validate-proposal.",
+     "sourceIds": [
+      "cli-modes",
+      "cli-header"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "assurance",
+     "text": "No network, no execution of analysed code, no remote upload; the output directory must be new and existing files are never overwritten.",
+     "sourceIds": [
+      "cli-header",
+      "cli-newdir"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "cli-modes"
+     ]
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "mcp",
+   "title": "Answer agents through a local stdio MCP",
+   "goal": "Let an agent query and render the public projection of one selected document without mutating it.",
+   "surfaces": [
+    "MCP"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Node.js 22 stdio process",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "mcp-header",
+    "mcp-query"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "npm run intelligence:mcp -- <selected-document.json>. Tools include diagramcloud_query, diagramcloud_render, diagramcloud_catalogue and diagramcloud_validate_proposal.",
+     "sourceIds": [
+      "mcp-header",
+      "mcp-query",
+      "mcp-render",
+      "mcp-catalogue",
+      "mcp-validate"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "No listener, arbitrary paths, mutations, execution, polling, settings changes or model.",
+     "sourceIds": [
+      "mcp-header"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "mcp-header"
+     ]
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "proposals",
+   "title": "Validate change proposals without applying them",
+   "goal": "Check a diagramcloud.patch proposal with one validator shared by the import dialog, the CLI and the MCP.",
+   "surfaces": [
+    "Browser studio",
+    "CLI",
+    "MCP"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Local browser and Node.js 22",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "proposal-validate"
+   ],
+   "sections": [
+    {
+     "kind": "implementation",
+     "text": "validateProposal in src/core/proposal.ts is pure and never throws for a bad payload; the MCP tool validates against the public projection.",
+     "sourceIds": [
+      "proposal-validate",
+      "mcp-validate"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "Validation never applies, reviews, executes or launches a provider.",
+     "sourceIds": [
+      "mcp-validate"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "proposal-validate"
+     ]
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "viewer",
+   "title": "Embed a read-only React viewer",
+   "goal": "Reuse the canvas as a public read-only viewer inside a host application.",
+   "surfaces": [
+    "React module"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Host application (local source module)",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "react-entry",
+    "host-negotiate"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "Import DiagramCloudViewer from src/react/index.ts. The host session is explicit, read-only by default and never applies.",
+     "sourceIds": [
+      "react-entry"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "assurance",
+     "text": "Granted capabilities are the intersection of what the host offers and what is implemented; unknown grants are listed with a reason.",
+     "sourceIds": [
+      "host-negotiate"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "react-entry"
+     ]
+    }
+   ],
+   "uses": [
+    {
+     "technologyId": "reactflow",
+     "relation": "reuses the canvas",
+     "basis": "static-source",
+     "sourceIds": [
+      "readme-what"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "layout",
+   "title": "Lay out a view deterministically",
+   "goal": "Place the components of a view in layered columns computed from its connections.",
+   "surfaces": [
+    "Browser studio"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Local browser",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "layout-fn"
+   ],
+   "sections": [
+    {
+     "kind": "implementation",
+     "text": "layeredLayout in src/core/layout.ts.",
+     "sourceIds": [
+      "layout-fn"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "Grid layout and Auto layout only; Auto layout is not a general graph layout engine.",
+     "sourceIds": [
+      "readme-lim-layout"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "layout-fn"
+     ]
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "capability-guide",
+   "title": "Compile a capability guide",
+   "goal": "Turn an explicit, cited capability brief into an ordinary project (the mechanism used for this very example).",
+   "surfaces": [
+    "TypeScript module"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Local Node.js or browser",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "capguide-doc",
+    "capguide-fn"
+   ],
+   "sections": [
+    {
+     "kind": "implementation",
+     "text": "compileCapabilityGuide in src/intelligence/capabilityGuide.ts validates the brief and materialises nodes, views and text/table blocks.",
+     "sourceIds": [
+      "capguide-fn"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "limits",
+     "text": "It is an authoring brief, not a source scanner, live feature registry or new persisted schema; no observations or permissions are generated.",
+     "sourceIds": [
+      "capguide-doc"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "implementation",
+     "value": "Present in source",
+     "scope": "source cut ecf4af6",
+     "sourceIds": [
+      "capguide-fn"
+     ]
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "qualification",
+   "title": "Check a change before it ships",
+   "goal": "Run type checks, unit tests, the build and browser tests locally and in CI.",
+   "surfaces": [
+    "CLI",
+    "CI"
+   ],
+   "version": "1.29.1 at source cut ecf4af6",
+   "environment": "Node.js 22 and GitHub Actions",
+   "basis": "static-source",
+   "visibility": "public",
+   "sourceIds": [
+    "guide-cmd-check",
+    "ci-workflow"
+   ],
+   "sections": [
+    {
+     "kind": "use",
+     "text": "npx tsc --noEmit, npm test, npm run build and npx playwright test; CI runs the same steps.",
+     "sourceIds": [
+      "guide-cmd-check",
+      "ci-workflow"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    },
+    {
+     "kind": "origins",
+     "text": "Original source is MIT licensed; dependencies keep their own terms.",
+     "sourceIds": [
+      "license",
+      "notices-deps"
+     ],
+     "basis": "static-source",
+     "visibility": "public"
+    }
+   ],
+   "states": [
+    {
+     "facet": "verification",
+     "value": "Checks declared in CI",
+     "scope": "workflow definition, not a run result",
+     "sourceIds": [
+      "ci-workflow"
+     ]
+    }
+   ],
+   "uses": []
+  }
+ ]
+}

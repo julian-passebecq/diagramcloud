@@ -1,0 +1,1634 @@
+{
+ "schemaVersion": 1,
+ "id": "synthetic-rag-capabilities",
+ "revision": 0,
+ "title": "Synthetic example: document question-answering service",
+ "summary": "SYNTHETIC teaching example. A generic retrieval-augmented question-answering service with an agentic planner, described as capabilities. It is invented: no repository, deployment, model choice or measurement exists. Product choices, versions, runtime and verification stay UNKNOWN.",
+ "author": "",
+ "category": "Reference",
+ "tags": [
+  "Capability guide",
+  "synthetic"
+ ],
+ "rootViewId": "guide-root",
+ "provenance": "SYNTHETIC example: invented for teaching, never a measured or observed result. Explicit source-bound authoring brief. No code, tool, scan or provider is executed. No observation or approval is created.",
+ "nodes": [
+  {
+   "id": "cap.ingest",
+   "label": "Ingest and index documents",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Split documents into passages, embed them and store them for retrieval (traditional batch pipeline).",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.ingest",
+   "blockIds": [
+    "reuse.ingest.embedder",
+    "reuse.ingest.vector-index"
+   ],
+   "sourceIds": [
+    "spec-ingest",
+    "spec-embed",
+    "spec-index"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "status.ingest",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.ingest",
+    "states.ingest"
+   ],
+   "sourceIds": [
+    "spec-label"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.ingest.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.ingest.use"
+   ],
+   "sourceIds": [
+    "spec-cli-ingest"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.ingest.implementation",
+   "label": "How it is built",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.ingest.implementation"
+   ],
+   "sourceIds": [
+    "spec-ingest",
+    "spec-embed",
+    "spec-index"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.ingest.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.ingest.limits"
+   ],
+   "sourceIds": [
+    "spec-lim-select"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.ask",
+   "label": "Answer a question with citations",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Return an answer and the passage identifiers it used.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.ask",
+   "blockIds": [
+    "reuse.ask.llm",
+    "reuse.ask.vector-index"
+   ],
+   "sourceIds": [
+    "spec-purpose",
+    "spec-retrieve",
+    "spec-answer"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "status.ask",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.ask",
+    "states.ask"
+   ],
+   "sourceIds": [
+    "spec-label"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.ask.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.ask.use"
+   ],
+   "sourceIds": [
+    "spec-http"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.ask.implementation",
+   "label": "How it is built",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.ask.implementation"
+   ],
+   "sourceIds": [
+    "spec-retrieve",
+    "spec-answer"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.ask.origins",
+   "label": "Origins and reuse",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.ask.origins"
+   ],
+   "sourceIds": [
+    "spec-origin-rag"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.ask.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.ask.limits"
+   ],
+   "sourceIds": [
+    "spec-lim-truth",
+    "spec-lim-numbers"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.plan",
+   "label": "Plan tool calls (agentic step)",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Decide whether to answer from passages or call a tool first.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.plan",
+   "blockIds": [
+    "reuse.plan.llm"
+   ],
+   "sourceIds": [
+    "spec-planner",
+    "spec-mix"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "status.plan",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.plan",
+    "states.plan"
+   ],
+   "sourceIds": [
+    "spec-label"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.plan.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.plan.use"
+   ],
+   "sourceIds": [
+    "spec-planner"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.plan.origins",
+   "label": "Origins and reuse",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.plan.origins"
+   ],
+   "sourceIds": [
+    "spec-origin-agent"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.plan.limits",
+   "label": "Limits and alternatives",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.plan.limits"
+   ],
+   "sourceIds": [
+    "spec-lim-loop"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "cap.evaluate",
+   "label": "Evaluate answers against a question set",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Replay a fixed question set and compare cited passages with expected passages.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "detail.evaluate",
+   "blockIds": [],
+   "sourceIds": [
+    "spec-eval"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "status.evaluate",
+   "label": "Scope and source claims",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Dated declarations; not a computed current availability verdict.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "scope.evaluate",
+    "states.evaluate"
+   ],
+   "sourceIds": [
+    "spec-label"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.evaluate.use",
+   "label": "How to use",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.evaluate.use"
+   ],
+   "sourceIds": [
+    "spec-cli-eval"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "section.evaluate.assurance",
+   "label": "Checks and trust boundaries",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "planned; read the supplied detail and sources. No action executes.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "text.evaluate.assurance"
+   ],
+   "sourceIds": [
+    "spec-eval",
+    "spec-lim-truth"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.llm",
+   "label": "Language model (not chosen)",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "model; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.llm"
+   ],
+   "sourceIds": [
+    "spec-answer",
+    "spec-lim-select"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.embedder",
+   "label": "Embedding model (not chosen)",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "model; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.embedder"
+   ],
+   "sourceIds": [
+    "spec-embed",
+    "spec-lim-select"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "tech.vector-index",
+   "label": "Vector index (not chosen)",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "datastore; version UNKNOWN. Package presence does not prove feature use.",
+   "role": "",
+   "status": "idle",
+   "blockIds": [
+    "technology.vector-index"
+   ],
+   "sourceIds": [
+    "spec-index",
+    "spec-lim-select"
+   ],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "guide.capabilities",
+   "label": "Capabilities",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "What can this application do, and how is each capability used?",
+   "role": "",
+   "status": "idle",
+   "childViewId": "guide-list",
+   "blockIds": [
+    "guide-context"
+   ],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "guide.surfaces",
+   "label": "Interfaces",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "The same capabilities grouped by supplied entry surface, without duplicate identities.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "guide-surfaces",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "guide.implementation",
+   "label": "Implementation and reuse",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Explicit capability-to-technology associations. Not an automatically inferred dependency map.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "guide-implementation",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.ba889e66652bceaf",
+   "label": "Command line (ingest)",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.ba889e66652bceaf",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.44113fdca6b7fa15",
+   "label": "HTTP API",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.44113fdca6b7fa15",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "surface.8d25b5799eefe19a",
+   "label": "Command line (evaluate)",
+   "kind": "app",
+   "provider": "Generic",
+   "icon": "generic",
+   "summary": "Supplied interface grouping; not a deployment or execution grant.",
+   "role": "",
+   "status": "idle",
+   "childViewId": "surface-view.8d25b5799eefe19a",
+   "blockIds": [],
+   "sourceIds": [],
+   "tags": [
+    "capability-guide",
+    "synthetic"
+   ],
+   "basis": "planned",
+   "visibility": "public"
+  }
+ ],
+ "edges": [
+  {
+   "id": "uses.ingest.embedder",
+   "source": "cap.ingest",
+   "target": "tech.embedder",
+   "label": "embeds passages",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.ingest.vector-index",
+   "source": "cap.ingest",
+   "target": "tech.vector-index",
+   "label": "stores passages",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.ask.llm",
+   "source": "cap.ask",
+   "target": "tech.llm",
+   "label": "writes the answer",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.ask.vector-index",
+   "source": "cap.ask",
+   "target": "tech.vector-index",
+   "label": "retrieves passages",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "planned",
+   "visibility": "public"
+  },
+  {
+   "id": "uses.plan.llm",
+   "source": "cap.plan",
+   "target": "tech.llm",
+   "label": "plans tool calls",
+   "kind": "dependency",
+   "speed": "medium",
+   "basis": "planned",
+   "visibility": "public"
+  }
+ ],
+ "views": [
+  {
+   "id": "guide-root",
+   "title": "Capability guide",
+   "description": "",
+   "nodeIds": [
+    "guide.capabilities",
+    "guide.surfaces",
+    "guide.implementation"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "guide.capabilities": {
+     "x": 0,
+     "y": 0
+    },
+    "guide.surfaces": {
+     "x": 320,
+     "y": 0
+    },
+    "guide.implementation": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.ingest",
+   "title": "Ingest and index documents",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.ingest",
+    "section.ingest.use",
+    "section.ingest.implementation",
+    "section.ingest.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.ingest": {
+     "x": 0,
+     "y": 0
+    },
+    "section.ingest.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.ingest.implementation": {
+     "x": 640,
+     "y": 0
+    },
+    "section.ingest.limits": {
+     "x": 0,
+     "y": 180
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.ask",
+   "title": "Answer a question with citations",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.ask",
+    "section.ask.use",
+    "section.ask.implementation",
+    "section.ask.origins",
+    "section.ask.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.ask": {
+     "x": 0,
+     "y": 0
+    },
+    "section.ask.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.ask.implementation": {
+     "x": 640,
+     "y": 0
+    },
+    "section.ask.origins": {
+     "x": 0,
+     "y": 180
+    },
+    "section.ask.limits": {
+     "x": 320,
+     "y": 180
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.plan",
+   "title": "Plan tool calls (agentic step)",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.plan",
+    "section.plan.use",
+    "section.plan.origins",
+    "section.plan.limits"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.plan": {
+     "x": 0,
+     "y": 0
+    },
+    "section.plan.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.plan.origins": {
+     "x": 640,
+     "y": 0
+    },
+    "section.plan.limits": {
+     "x": 0,
+     "y": 180
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "detail.evaluate",
+   "title": "Evaluate answers against a question set",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "status.evaluate",
+    "section.evaluate.use",
+    "section.evaluate.assurance"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "status.evaluate": {
+     "x": 0,
+     "y": 0
+    },
+    "section.evaluate.use": {
+     "x": 320,
+     "y": 0
+    },
+    "section.evaluate.assurance": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "guide-list",
+   "title": "Capability catalogue",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.ingest",
+    "cap.ask",
+    "cap.plan",
+    "cap.evaluate"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.ingest": {
+     "x": 0,
+     "y": 0
+    },
+    "cap.ask": {
+     "x": 320,
+     "y": 0
+    },
+    "cap.plan": {
+     "x": 640,
+     "y": 0
+    },
+    "cap.evaluate": {
+     "x": 0,
+     "y": 180
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "guide-implementation",
+   "title": "Implementation and reuse",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.ingest",
+    "cap.ask",
+    "cap.plan",
+    "cap.evaluate",
+    "tech.llm",
+    "tech.embedder",
+    "tech.vector-index"
+   ],
+   "edgeIds": [
+    "uses.ingest.embedder",
+    "uses.ingest.vector-index",
+    "uses.ask.llm",
+    "uses.ask.vector-index",
+    "uses.plan.llm"
+   ],
+   "positions": {
+    "cap.ingest": {
+     "x": 0,
+     "y": 0
+    },
+    "cap.ask": {
+     "x": 320,
+     "y": 0
+    },
+    "cap.plan": {
+     "x": 640,
+     "y": 0
+    },
+    "cap.evaluate": {
+     "x": 0,
+     "y": 180
+    },
+    "tech.llm": {
+     "x": 320,
+     "y": 180
+    },
+    "tech.embedder": {
+     "x": 640,
+     "y": 180
+    },
+    "tech.vector-index": {
+     "x": 0,
+     "y": 360
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.ba889e66652bceaf",
+   "title": "Command line (ingest)",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.ingest"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.ingest": {
+     "x": 0,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.44113fdca6b7fa15",
+   "title": "HTTP API",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.ask",
+    "cap.plan"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.ask": {
+     "x": 0,
+     "y": 0
+    },
+    "cap.plan": {
+     "x": 320,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "surface-view.8d25b5799eefe19a",
+   "title": "Command line (evaluate)",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "cap.evaluate"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "cap.evaluate": {
+     "x": 0,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  },
+  {
+   "id": "guide-surfaces",
+   "title": "Entry surfaces",
+   "description": "Supplied records only. Missing evidence is not proof of missing functionality.",
+   "nodeIds": [
+    "surface.ba889e66652bceaf",
+    "surface.44113fdca6b7fa15",
+    "surface.8d25b5799eefe19a"
+   ],
+   "edgeIds": [],
+   "positions": {
+    "surface.ba889e66652bceaf": {
+     "x": 0,
+     "y": 0
+    },
+    "surface.44113fdca6b7fa15": {
+     "x": 320,
+     "y": 0
+    },
+    "surface.8d25b5799eefe19a": {
+     "x": 640,
+     "y": 0
+    }
+   },
+   "visibility": "public"
+  }
+ ],
+ "blocks": [
+  {
+   "id": "scope.ingest",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-ingest",
+    "spec-embed",
+    "spec-index"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Ingest and index documents\nSurfaces: Command line (ingest)\nVersion: Synthetic design 0\nEnvironment: Not chosen (UNKNOWN)\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.ingest",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-label"
+   ],
+   "provenance": "synthetic",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "Designed only (synthetic)",
+     "synthetic example; no implementation exists"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.ingest.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-cli-ingest"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Run the ingest command for a folder; it runs the ingestion job once."
+  },
+  {
+   "id": "text.ingest.implementation",
+   "title": "How it is built",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-ingest",
+    "spec-embed",
+    "spec-index"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Ingestion job, then embedding step, then vector index."
+  },
+  {
+   "id": "text.ingest.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-lim-select"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "No embedding model or index product is chosen."
+  },
+  {
+   "id": "scope.ask",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-purpose",
+    "spec-retrieve",
+    "spec-answer"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Answer a question with citations\nSurfaces: HTTP API\nVersion: Synthetic design 0\nEnvironment: Not chosen (UNKNOWN)\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.ask",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-label"
+   ],
+   "provenance": "synthetic",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "Designed only (synthetic)",
+     "synthetic example; no implementation exists"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.ask.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-http"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "POST /ask with a question; the response holds the answer and cited passage identifiers."
+  },
+  {
+   "id": "text.ask.implementation",
+   "title": "How it is built",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-retrieve",
+    "spec-answer"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Retrieval API returns top passages; the answer generator writes an answer that must cite them."
+  },
+  {
+   "id": "text.ask.origins",
+   "title": "Origins and reuse",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-origin-rag"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Follows the common retrieval-augmented generation pattern."
+  },
+  {
+   "id": "text.ask.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-lim-truth",
+    "spec-lim-numbers"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Answers may be wrong even with citations. No latency, cost or accuracy figure exists."
+  },
+  {
+   "id": "scope.plan",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-planner",
+    "spec-mix"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Plan tool calls (agentic step)\nSurfaces: HTTP API\nVersion: Synthetic design 0\nEnvironment: Not chosen (UNKNOWN)\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.plan",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-label"
+   ],
+   "provenance": "synthetic",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "Designed only (synthetic)",
+     "synthetic example; no implementation exists"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.plan.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-planner"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Runs inside /ask; it may search again or call a calculator before answering."
+  },
+  {
+   "id": "text.plan.origins",
+   "title": "Origins and reuse",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-origin-agent"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Follows the common tool-calling agent loop: plan, call a tool, observe the output, answer."
+  },
+  {
+   "id": "text.plan.limits",
+   "title": "Limits and alternatives",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-lim-loop"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "At most three tool calls per question is a design rule, not a measured behaviour."
+  },
+  {
+   "id": "scope.evaluate",
+   "title": "Selected capability scope",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-eval"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Evaluate answers against a question set\nSurfaces: Command line (evaluate)\nVersion: Synthetic design 0\nEnvironment: Not chosen (UNKNOWN)\nCaptured: 2026-10-19T00:00:00Z\nDeclarations below may coexist. A frozen lifecycle does not remove a previously delivered feature."
+  },
+  {
+   "id": "states.evaluate",
+   "title": "Independent source claims",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-label"
+   ],
+   "provenance": "synthetic",
+   "type": "table",
+   "columns": [
+    "Axis",
+    "Supplied value",
+    "Scope"
+   ],
+   "rows": [
+    [
+     "lifecycle",
+     "Designed only (synthetic)",
+     "synthetic example; no implementation exists"
+    ],
+    [
+     "selection",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "implementation",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "verification",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "distribution",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ],
+    [
+     "runtime",
+     "UNKNOWN - not supplied",
+     "Not supplied"
+    ]
+   ]
+  },
+  {
+   "id": "text.evaluate.use",
+   "title": "How to use",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-cli-eval"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Run the evaluate command with a question set file."
+  },
+  {
+   "id": "text.evaluate.assurance",
+   "title": "Checks and trust boundaries",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-eval",
+    "spec-lim-truth"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Checks cited passages only; it does not establish that an answer is true."
+  },
+  {
+   "id": "technology.llm",
+   "title": "Language model (not chosen)",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-answer",
+    "spec-lim-select"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Synthetic placeholder. No model or provider is selected; identity, licence and cost are UNKNOWN."
+  },
+  {
+   "id": "technology.embedder",
+   "title": "Embedding model (not chosen)",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-embed",
+    "spec-lim-select"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Synthetic placeholder. No embedding model is selected."
+  },
+  {
+   "id": "technology.vector-index",
+   "title": "Vector index (not chosen)",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-index",
+    "spec-lim-select"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Synthetic placeholder. No vector index product is selected."
+  },
+  {
+   "id": "reuse.ingest.embedder",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-embed"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Ingest and index documents -> Embedding model (not chosen): embeds passages. Basis: planned. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.ingest.vector-index",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-index"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Ingest and index documents -> Vector index (not chosen): stores passages. Basis: planned. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.ask.llm",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-answer"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Answer a question with citations -> Language model (not chosen): writes the answer. Basis: planned. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.ask.vector-index",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-retrieve"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Answer a question with citations -> Vector index (not chosen): retrieves passages. Basis: planned. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "reuse.plan.llm",
+   "title": "Supplied reuse relation",
+   "visibility": "public",
+   "sourceIds": [
+    "spec-planner"
+   ],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "Plan tool calls (agentic step) -> Language model (not chosen): plans tool calls. Basis: planned. This is an explicit association, not inferred runtime usage."
+  },
+  {
+   "id": "guide-context",
+   "title": "Original guide context (private)",
+   "visibility": "private",
+   "sourceIds": [],
+   "provenance": "synthetic",
+   "type": "text",
+   "text": "{\n  \"title\": \"Synthetic example: document question-answering service\",\n  \"summary\": \"SYNTHETIC teaching example. A generic retrieval-augmented question-answering service with an agentic planner, described as capabilities. It is invented: no repository, deployment, model choice or measurement exists. Product choices, versions, runtime and verification stay UNKNOWN.\",\n  \"sourceCut\": [\n    {\n      \"repository\": \"diagramcloud examples/v3-capabilities/synthetic-rag (synthetic specification)\",\n      \"revision\": \"synthetic specification, no product revision\"\n    }\n  ]\n}"
+  }
+ ],
+ "assets": [],
+ "sources": [
+  {
+   "id": "spec-label",
+   "title": "Synthetic label",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:3",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-purpose",
+   "title": "Purpose",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:8",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-mix",
+   "title": "Traditional and agentic mix",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:9",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-ingest",
+   "title": "Ingestion job",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:13",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-embed",
+   "title": "Embedding step",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:14",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-index",
+   "title": "Vector index",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:15",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-retrieve",
+   "title": "Retrieval API",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:16",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-planner",
+   "title": "Agent planner",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:17",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-answer",
+   "title": "Answer generator",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:18",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-eval",
+   "title": "Evaluation harness",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:19",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-http",
+   "title": "HTTP interface",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:23",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-cli-ingest",
+   "title": "ingest command",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:24",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-cli-eval",
+   "title": "evaluate command",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:25",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-origin-rag",
+   "title": "Origin: retrieval-augmented generation",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:29",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-origin-agent",
+   "title": "Origin: tool-calling agent loop",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:30",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-lim-select",
+   "title": "Limit: nothing selected",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:34",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-lim-numbers",
+   "title": "Limit: no figures",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:35",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-lim-loop",
+   "title": "Limit: planner loop rule",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:36",
+   "visibility": "public"
+  },
+  {
+   "id": "spec-lim-truth",
+   "title": "Limit: citations are not truth",
+   "location": "examples/v3-capabilities/synthetic-rag/SPEC.md:37",
+   "visibility": "public"
+  }
+ ],
+ "story": [
+  {
+   "title": "Start with the user goal",
+   "viewId": "guide-list",
+   "narration": "Each capability links a user goal to its scope, usage, implementation and evidence. Declared does not mean qualified.",
+   "highlightEdgeIds": []
+  },
+  {
+   "title": "Inspect the entry surface",
+   "viewId": "guide-surfaces",
+   "narration": "Browse by interface without treating every command, endpoint or tool as a separately proven feature.",
+   "highlightEdgeIds": []
+  }
+ ],
+ "observations": []
+}

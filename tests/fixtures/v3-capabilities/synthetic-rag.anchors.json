@@ -1,0 +1,24 @@
+{
+ "sourceCut": "ecf4af6f45816a62c456a7ebd9aa8f108aae5452",
+ "anchors": {
+  "spec-label": "SYNTHETIC. This specification is invented",
+  "spec-purpose": "The service answers questions about a collection",
+  "spec-mix": "It mixes a traditional batch pipeline",
+  "spec-ingest": "- Ingestion job:",
+  "spec-embed": "- Embedding step:",
+  "spec-index": "- Vector index:",
+  "spec-retrieve": "- Retrieval API:",
+  "spec-planner": "- Agent planner:",
+  "spec-answer": "- Answer generator:",
+  "spec-eval": "- Evaluation harness:",
+  "spec-http": "- HTTP: POST /ask",
+  "spec-cli-ingest": "an `ingest` command",
+  "spec-cli-eval": "an `evaluate` command",
+  "spec-origin-rag": "follows the common retrieval-augmented generation pattern",
+  "spec-origin-agent": "follows the common tool-calling agent loop",
+  "spec-lim-select": "- No language model, embedding model",
+  "spec-lim-numbers": "- No latency, cost, accuracy",
+  "spec-lim-loop": "- The planner may loop",
+  "spec-lim-truth": "- Answers may be wrong even with citations"
+ }
+}
