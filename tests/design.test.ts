@@ -144,10 +144,10 @@ test('sequence: every connection of the view is one numbered message; the order 
  assert.deepEqual(attr(svg,'data-edge-id').sort(),spec.edges.map(e=>e.id).sort());assert.ok(texts(svg).includes('not from timing'));
 });
 
-test('story timeline: public steps only, private ones counted; no story is said, not invented',()=>{
+test('story timeline: public steps only, private ones said but not counted; no story is said, not invented',()=>{
  const d=structuredClone(contosoForecasting());d.views.find(v=>v.id==='policy')!.visibility='private';
  const doc=validateDocument(d),svg=designSvg(doc,doc.rootViewId,{type:'timeline',now:NOW}),shown=publicDocument(doc).story.length;
- assert.equal(attr(svg,'data-step').length,shown);if(shown<doc.story.length)assert.ok(texts(svg).includes('on private views not drawn'));
+ assert.equal(attr(svg,'data-step').length,shown);if(shown<doc.story.length){assert.ok(texts(svg).includes('Some steps on private views are not drawn.'));assert.doesNotMatch(texts(svg),/\d+ step\(s\) on private/);}
  const empty=validateDocument({...structuredClone(contosoForecasting()),story:[]});assert.ok(texts(designSvg(empty,empty.rootViewId,{type:'timeline',now:NOW})).includes('no public story yet'));
 });
 

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {samples} from '../src/data/samples';
 import {technicalManualHtml} from '../src/export/manual';
+import {PUBLIC_OMISSION_NOTICE} from '../src/core/viewspec';
 import {publicDocument} from '../src/core/operations';
 import type {Project} from '../src/core/model';
 
@@ -24,7 +25,7 @@ test('technical manual: offline, no script, escaped, private items removed, dete
  const priv:Project={...s,nodes:[...s.nodes.map((n,i)=>i?n:{...n,label:'A <script>alert(1)</script> & "q"'}),{...s.nodes[0],id:'secret-node',label:'SECRET-XYZ',visibility:'private',childViewId:undefined}],
   views:s.views.map(v=>v.id===s.rootViewId?{...v,nodeIds:[...v.nodeIds,'secret-node']}:v)};
  const html=technicalManualHtml(priv,{now:NOW});
- assert.ok(!html.includes('SECRET-XYZ'));assert.match(html,/1 private or unreachable component\(s\) removed/);
+ assert.ok(!html.includes('SECRET-XYZ'));assert.ok(html.includes(PUBLIC_OMISSION_NOTICE));assert.doesNotMatch(html,/\d+ private/);
  assert.ok(!/<script/i.test(html),'no script element');assert.ok(html.includes('A &lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;q&quot;'));
  const urls=[...html.matchAll(/(?:src|href)="(https?:[^"]+)"/g)].map(m=>m[1]);assert.deepEqual(urls,[],'nothing loads from the network');
  assert.match(html,/default-src 'none'/);
@@ -57,7 +58,7 @@ test('compact business manual retains zero, missing, exact provenance and notes 
  for(const text of ['zero-edge','missing-edge','Amount: 0','Unit: jobs/day','Provenance: synthetic','Not supplied','Synthetic &lt;script&gt;not executed&lt;/script&gt; &amp; &quot;note&quot;'])assert.ok(ledger.includes(text),text);
  for(const provenance of ['source-derived','reference','author']){assert.ok(ledger.includes('supplied-'+provenance));assert.ok(ledger.includes('Provenance: '+provenance));assert.ok(ledger.includes('Exact '+provenance+' note'));}assert.ok(ledger.includes('Unit:  units/day '),'unit whitespace is not normalized');
  const missing=ledger.match(/<tr><td\b[^>]*>missing-edge<\/td>[\s\S]*?<\/tr>/)![0];assert.ok(missing.includes('Not supplied'));assert.ok(!missing.includes('Amount: 0'));
- for(const text of ['PRIVATE_QUANTITY_','private-edge','OTHER_CHAPTER_UNIT','OTHER_CHAPTER_NOTE'])assert.ok(!html.includes(text),text);assert.match(html,/private connection\(s\) removed/);assert.ok(!/<script\b|(?:src|href)="https?:/i.test(html));assert.deepEqual(project.observations,[]);assert.equal(JSON.stringify(project),before);assert.equal(technicalManualHtml(project,{brief,now:NOW}),html);
+ for(const text of ['PRIVATE_QUANTITY_','private-edge','OTHER_CHAPTER_UNIT','OTHER_CHAPTER_NOTE'])assert.ok(!html.includes(text),text);assert.ok(html.includes(PUBLIC_OMISSION_NOTICE));assert.doesNotMatch(html,/\d+ private/);assert.ok(!/<script\b|(?:src|href)="https?:/i.test(html));assert.deepEqual(project.observations,[]);assert.equal(JSON.stringify(project),before);assert.equal(technicalManualHtml(project,{brief,now:NOW}),html);
 });
 
 test('compact Editorial default includes stable connection IDs and exact quantity notes; unavailable chapter cannot broaden public publication',async()=>{
