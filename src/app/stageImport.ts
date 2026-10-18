@@ -1,3 +1,4 @@
+import {isPmTaskDocument,compilePmTasks} from '../development/pmTasks';
 import {MAX_DOCUMENT_BYTES,validateDocument,type Project} from '../core/model';
 import {withoutUnknownModules} from '../core/moduleCompat';
 import {digestErrors} from '../core/assetIdentity';
@@ -45,8 +46,8 @@ function validated(project:Project,obj:unknown,applied:readonly AppliedProposal[
 
 /**
  * Pasted or loaded text in the JSON / AI workspace becomes a staged review: a whole document, a guarded
- * diagramcloud.patch, a completion response, a publication snapshot, a GraphSnapshot, a delivery brief or a
- * draw.io / Mermaid diagram. Pure staging: throws with the user-facing reason, never mutates `project` or `library`.
+ * diagramcloud.patch, a completion response, a publication snapshot, a private read-only PM task snapshot
+ * (datapass.owner-tasks/1, a new project), a GraphSnapshot, a delivery brief or a draw.io / Mermaid diagram. Pure staging: throws with the user-facing reason, never mutates `project` or `library`.
  */
 export async function stageImportText(input:{project:Project;library:readonly Project[];raw:string;importName:string;completionRequest:CompletionRequest|null;applied?:readonly AppliedProposal[];
  /** Exactly the unknown modules the author agreed to drop; any other set throws UnknownModulesError again. */
@@ -60,6 +61,13 @@ export async function stageImportText(input:{project:Project;library:readonly Pr
  if(completionRequest){const validation=validated(project,obj,applied),out=previewCompletionPatch(project,completionRequest,obj);return {staged:out.result,patched:{...out,validation},report:null};}
  if(isPatch(obj)){const validation=validated(project,obj,applied),out=applyDocumentPatch(project,obj);return {staged:out.result,patched:{...out,validation},report:null};}
  if(isPublicationSnapshot(obj)){const snap=stagePublicationSnapshot(project,obj);if(!snap.patch)throw new Error(`Publication snapshot ${snap.snapshot.snapshot_id} from ${snap.snapshot.producer.app_id} has no claim to stage for this project.${snap.unresolved.length?` Unresolved: ${snap.unresolved.map(u=>`${u.claim_id} (${u.reason.replace(/_/g,' ')})`).join('; ')}.`:''}`);const out=applyDocumentPatch(project,snap.patch);return {staged:out.result,patched:{...out,snapshot:snap},report:null};}
+ if(isPmTaskDocument(obj)){
+  const out=compilePmTasks(raw,'pm-plan-'+crypto.randomUUID());
+  // A projection is a new snapshot, not task adoption or a live synchronized document.
+  // Never overwrite an edited presentation of the same input, including cross-project imports.
+  if([project,...library].some(d=>d.provenance==='PM task projection; source authenticity and authority are unverified.'&&d.sources.some(s=>s.id==='pm-task-source'&&s.location==='sha256:'+out.inputDigest)))throw new Error('This PM task snapshot is already loaded. Open the existing projection; no presentation edits were replaced.');
+  return {staged:out.document,patched:null,report:null,importName:'PM task snapshot (private, not adopted)'};
+ }
  if(isGraphSnapshot(obj)){const compiled=compileGraphSnapshot(obj),existing=library.find(d=>d.id===compiled.document.id),proposal=existing?previewGraphReimport(existing,obj,existing.revision):null;return {staged:proposal?.document??compiled.document,patched:proposal?{patch:proposal.patch,result:proposal.document}:null,report:null,importName:'GraphSnapshot (offline)'};}
  if(obj&&typeof obj==='object'&&(obj as {format?:string}).format==='diagramcloud.delivery-brief'){const out=previewDeliveryBrief(project,obj);return {staged:out.document,patched:{patch:out.patch,result:out.document},report:null};}
  if(isProviderRequest(obj))throw new Error(PROVIDER_LAUNCH_MESSAGE);
