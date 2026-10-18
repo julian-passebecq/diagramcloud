@@ -1,0 +1,796 @@
+{
+  "schemaVersion": 1,
+  "id": "agent-context",
+  "revision": 1,
+  "title": "Product agents, skills, tools and approvals",
+  "summary": "What is instruction, what is capability, and who actually authorizes an action?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "human",
+      "label": "Human owner",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "host",
+      "label": "Agent host",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "model",
+      "label": "Model",
+      "kind": "model",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "skill",
+      "label": "Skill files",
+      "kind": "source",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "mcp",
+      "label": "Tool interface",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "system",
+      "label": "Business system",
+      "kind": "storage",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson",
+      "label": "Product agents, skills, tools and approvals",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.index",
+      "blockIds": [
+        "walk-lesson.intro"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.context.note",
+      "label": "Loading a skill is not a permission grant",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.context.text"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.context.entry",
+      "label": "Loading a skill is not a permission grant",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.context.view",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.tool.note",
+      "label": "The host controls actual invocation",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.tool.text"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.tool.entry",
+      "label": "The host controls actual invocation",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.tool.view",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.human.note",
+      "label": "Approvals stay with their real owner",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.human.text"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.human.entry",
+      "label": "Approvals stay with their real owner",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.human.view",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.contributors.note",
+      "label": "Build contributors are not runtime product agents",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.contributors.text"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.contributors.entry",
+      "label": "Build contributors are not runtime product agents",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.contributors.view",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "intent",
+      "source": "human",
+      "target": "host",
+      "label": "selected goal",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "prompt",
+      "source": "host",
+      "target": "model",
+      "label": "context and tool schemas",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "instructions",
+      "source": "skill",
+      "target": "host",
+      "label": "read selected instructions",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "tool",
+      "source": "host",
+      "target": "mcp",
+      "label": "validated tool request",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "operation",
+      "source": "mcp",
+      "target": "system",
+      "label": "permitted operation",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "approval",
+      "source": "human",
+      "target": "host",
+      "label": "specific approval if required",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "Product agents, skills, tools and approvals",
+      "description": "What is instruction, what is capability, and who actually authorizes an action?",
+      "nodeIds": [
+        "human",
+        "host",
+        "model",
+        "skill",
+        "mcp",
+        "system",
+        "walk-lesson"
+      ],
+      "edgeIds": [
+        "intent",
+        "prompt",
+        "instructions",
+        "tool",
+        "operation",
+        "approval"
+      ],
+      "positions": {
+        "human": {
+          "x": 0,
+          "y": 0
+        },
+        "host": {
+          "x": 340,
+          "y": 0
+        },
+        "model": {
+          "x": 680,
+          "y": 0
+        },
+        "skill": {
+          "x": 0,
+          "y": 180
+        },
+        "mcp": {
+          "x": 340,
+          "y": 180
+        },
+        "system": {
+          "x": 680,
+          "y": 180
+        },
+        "walk-lesson": {
+          "x": 0,
+          "y": -300
+        }
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.index",
+      "title": "Walkthrough: Product agents, skills, tools and approvals",
+      "description": "What is instruction, what is capability, and who actually authorizes an action?\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "walk-lesson.context.entry",
+        "walk-lesson.tool.entry",
+        "walk-lesson.human.entry",
+        "walk-lesson.contributors.entry"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "walk-lesson.context.entry": {
+          "x": 0,
+          "y": 0
+        },
+        "walk-lesson.tool.entry": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.human.entry": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.contributors.entry": {
+          "x": 0,
+          "y": 150
+        }
+      },
+      "perspective": "evidence",
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.context.view",
+      "title": "Loading a skill is not a permission grant",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "host",
+        "model",
+        "skill",
+        "walk-lesson.context.note"
+      ],
+      "edgeIds": [
+        "prompt",
+        "instructions"
+      ],
+      "positions": {
+        "host": {
+          "x": 0,
+          "y": 0
+        },
+        "model": {
+          "x": 310,
+          "y": 0
+        },
+        "skill": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.context.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.context.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.tool.view",
+      "title": "The host controls actual invocation",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "host",
+        "mcp",
+        "system",
+        "walk-lesson.tool.note"
+      ],
+      "edgeIds": [
+        "tool",
+        "operation"
+      ],
+      "positions": {
+        "host": {
+          "x": 0,
+          "y": 0
+        },
+        "mcp": {
+          "x": 310,
+          "y": 0
+        },
+        "system": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.tool.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.tool.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.human.view",
+      "title": "Approvals stay with their real owner",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "human",
+        "host",
+        "walk-lesson.human.note"
+      ],
+      "edgeIds": [
+        "intent",
+        "approval"
+      ],
+      "positions": {
+        "human": {
+          "x": 0,
+          "y": 0
+        },
+        "host": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.human.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.human.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.contributors.view",
+      "title": "Build contributors are not runtime product agents",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "model",
+        "host",
+        "system",
+        "walk-lesson.contributors.note"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "model": {
+          "x": 0,
+          "y": 0
+        },
+        "host": {
+          "x": 310,
+          "y": 0
+        },
+        "system": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.contributors.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.contributors.note"
+        ]
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "walk-lesson.intro",
+      "title": "Product agents, skills, tools and approvals",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "author",
+      "type": "text",
+      "text": "Question: What is instruction, what is capability, and who actually authorizes an action?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: agent-context revision 1; fingerprint 55d8d5e78faae67d.\n\nThis private addition changes no existing feature, deployment, approval or observation."
+    },
+    {
+      "id": "walk-lesson.context.text",
+      "title": "Loading a skill is not a permission grant",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Instructions, model configuration and execution capability are distinct. This conceptual fixture does not describe any currently running ChatGPT or Claude session.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of agent-context revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.tool.text",
+      "title": "The host controls actual invocation",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "A model can propose a tool call; the host validates available operations and scope. Displaying an MCP connection does not enable access or prove an installed integration.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of agent-context revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.human.text",
+      "title": "Approvals stay with their real owner",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "A task card can explain what is waiting. A visualization must not answer MFA, permissions or publication decisions on the owner's behalf.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of agent-context revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.contributors.text",
+      "title": "Build contributors are not runtime product agents",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "The team or agents that built this system belong to a separate contributor lens. Hiding that lens must not remove the deployed product agent, its tools or trust boundaries.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nQuestion to explore: Which model was requested and which was observed?\n\nQuestion to explore: Is this a proposed workflow, a recorded run, or an illustrative explanation?\n\nSnapshot of agent-context revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    }
+  ],
+  "assets": [],
+  "sources": [],
+  "story": [
+    {
+      "title": "Loading a skill is not a permission grant",
+      "viewId": "walk-lesson.context.view",
+      "nodeId": "walk-lesson.context.note",
+      "narration": "Instructions, model configuration and execution capability are distinct. This conceptual fixture does not describe any currently running ChatGPT or Claude session.",
+      "highlightEdgeIds": [
+        "prompt",
+        "instructions"
+      ]
+    },
+    {
+      "title": "The host controls actual invocation",
+      "viewId": "walk-lesson.tool.view",
+      "nodeId": "walk-lesson.tool.note",
+      "narration": "A model can propose a tool call; the host validates available operations and scope. Displaying an MCP connection does not enable access or prove an installed integration.",
+      "highlightEdgeIds": [
+        "tool",
+        "operation"
+      ]
+    },
+    {
+      "title": "Approvals stay with their real owner",
+      "viewId": "walk-lesson.human.view",
+      "nodeId": "walk-lesson.human.note",
+      "narration": "A task card can explain what is waiting. A visualization must not answer MFA, permissions or publication decisions on the owner's behalf.",
+      "highlightEdgeIds": [
+        "intent",
+        "approval"
+      ]
+    },
+    {
+      "title": "Build contributors are not runtime product agents",
+      "viewId": "walk-lesson.contributors.view",
+      "nodeId": "walk-lesson.contributors.note",
+      "narration": "The team or agents that built this system belong to a separate contributor lens. Hiding that lens must not remove the deployed product agent, its tools or trust boundaries.",
+      "highlightEdgeIds": []
+    }
+  ],
+  "observations": [],
+  "tours": [
+    {
+      "id": "walk-lesson.tour",
+      "title": "Product agents, skills, tools and approvals",
+      "sourceRevision": 1,
+      "stops": [
+        {
+          "id": "stop-a12f132c9d",
+          "viewId": "walk-lesson.context.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "host"
+            },
+            {
+              "kind": "node",
+              "id": "model"
+            },
+            {
+              "kind": "node",
+              "id": "skill"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.context.note"
+            },
+            {
+              "kind": "edge",
+              "id": "prompt"
+            },
+            {
+              "kind": "edge",
+              "id": "instructions"
+            }
+          ],
+          "fingerprint": "5fd62e71e3dd458c",
+          "narration": "Instructions, model configuration and execution capability are distinct. This conceptual fixture does not describe any currently running ChatGPT or Claude session."
+        },
+        {
+          "id": "stop-67cf131f22",
+          "viewId": "walk-lesson.tool.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "host"
+            },
+            {
+              "kind": "node",
+              "id": "mcp"
+            },
+            {
+              "kind": "node",
+              "id": "system"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.tool.note"
+            },
+            {
+              "kind": "edge",
+              "id": "tool"
+            },
+            {
+              "kind": "edge",
+              "id": "operation"
+            }
+          ],
+          "fingerprint": "786f8a302891d9dd",
+          "narration": "A model can propose a tool call; the host validates available operations and scope. Displaying an MCP connection does not enable access or prove an installed integration."
+        },
+        {
+          "id": "stop-1d54885310",
+          "viewId": "walk-lesson.human.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "human"
+            },
+            {
+              "kind": "node",
+              "id": "host"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.human.note"
+            },
+            {
+              "kind": "edge",
+              "id": "intent"
+            },
+            {
+              "kind": "edge",
+              "id": "approval"
+            }
+          ],
+          "fingerprint": "6abb97946c759b92",
+          "narration": "A task card can explain what is waiting. A visualization must not answer MFA, permissions or publication decisions on the owner's behalf."
+        },
+        {
+          "id": "stop-92d40f9d3e",
+          "viewId": "walk-lesson.contributors.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "model"
+            },
+            {
+              "kind": "node",
+              "id": "host"
+            },
+            {
+              "kind": "node",
+              "id": "system"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.contributors.note"
+            }
+          ],
+          "fingerprint": "ce084a49fea53c23",
+          "narration": "The team or agents that built this system belong to a separate contributor lens. Hiding that lens must not remove the deployed product agent, its tools or trust boundaries."
+        }
+      ],
+      "visibility": "public"
+    }
+  ]
+}

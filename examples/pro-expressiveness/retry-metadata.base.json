@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "id": "retry-metadata",
+  "revision": 1,
+  "title": "Retries, decorators and function identity",
+  "summary": "Why is a wrapper not the same thing as the operation it wraps?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "pipeline",
+      "label": "Pipeline",
+      "kind": "process",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "wrapper",
+      "label": "Retry wrapper",
+      "kind": "function",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "retry-code",
+        "policy"
+      ],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "weather",
+      "label": "Weather API",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "invoke",
+      "source": "pipeline",
+      "target": "wrapper",
+      "label": "fetch_weather()",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "get",
+      "source": "wrapper",
+      "target": "weather",
+      "label": "GET /forecast",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "response",
+      "source": "weather",
+      "target": "wrapper",
+      "label": "HTTP response",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "Retries, decorators and function identity",
+      "description": "Why is a wrapper not the same thing as the operation it wraps?",
+      "nodeIds": [
+        "pipeline",
+        "wrapper",
+        "weather"
+      ],
+      "edgeIds": [
+        "invoke",
+        "get",
+        "response"
+      ],
+      "positions": {
+        "pipeline": {
+          "x": 0,
+          "y": 0
+        },
+        "wrapper": {
+          "x": 340,
+          "y": 0
+        },
+        "weather": {
+          "x": 680,
+          "y": 0
+        }
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "retry-code",
+      "title": "retry.py - teaching excerpt, not a complete client",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "python",
+      "code": "from functools import wraps\n\ndef retry(func):\n    @wraps(func)\n    def wrapper(*args, **kwargs):\n        # A bounded retry policy belongs here.\n        return func(*args, **kwargs)\n    return wrapper"
+    },
+    {
+      "id": "policy",
+      "title": "Explicit retry policy choices",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Question",
+        "This illustrative scenario"
+      ],
+      "rows": [
+        [
+          "Attempts",
+          "At most 3 including the first request"
+        ],
+        [
+          "Delay",
+          "2 seconds is an authored example, not measured latency"
+        ],
+        [
+          "Safety",
+          "Only operations known to be safe to retry"
+        ],
+        [
+          "Terminal state",
+          "Exhaustion propagates a failure; do not loop indefinitely"
+        ],
+        [
+          "Sensitive data",
+          "Do not log credentials or unrestricted inputs"
+        ]
+      ]
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "python",
+      "title": "Python functools reference",
+      "location": "",
+      "url": "https://docs.python.org/3/library/functools.html",
+      "visibility": "public"
+    },
+    {
+      "id": "http",
+      "title": "HTTP semantics - RFC 9110",
+      "location": "",
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "visibility": "public"
+    }
+  ],
+  "story": [],
+  "observations": [],
+  "tours": []
+}

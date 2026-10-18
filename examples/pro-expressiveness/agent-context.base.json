@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "id": "agent-context",
+  "revision": 1,
+  "title": "Product agents, skills, tools and approvals",
+  "summary": "What is instruction, what is capability, and who actually authorizes an action?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "human",
+      "label": "Human owner",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "host",
+      "label": "Agent host",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "model",
+      "label": "Model",
+      "kind": "model",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "skill",
+      "label": "Skill files",
+      "kind": "source",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "mcp",
+      "label": "Tool interface",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "system",
+      "label": "Business system",
+      "kind": "storage",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "intent",
+      "source": "human",
+      "target": "host",
+      "label": "selected goal",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "prompt",
+      "source": "host",
+      "target": "model",
+      "label": "context and tool schemas",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "instructions",
+      "source": "skill",
+      "target": "host",
+      "label": "read selected instructions",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "tool",
+      "source": "host",
+      "target": "mcp",
+      "label": "validated tool request",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "operation",
+      "source": "mcp",
+      "target": "system",
+      "label": "permitted operation",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "approval",
+      "source": "human",
+      "target": "host",
+      "label": "specific approval if required",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "Product agents, skills, tools and approvals",
+      "description": "What is instruction, what is capability, and who actually authorizes an action?",
+      "nodeIds": [
+        "human",
+        "host",
+        "model",
+        "skill",
+        "mcp",
+        "system"
+      ],
+      "edgeIds": [
+        "intent",
+        "prompt",
+        "instructions",
+        "tool",
+        "operation",
+        "approval"
+      ],
+      "positions": {
+        "human": {
+          "x": 0,
+          "y": 0
+        },
+        "host": {
+          "x": 340,
+          "y": 0
+        },
+        "model": {
+          "x": 680,
+          "y": 0
+        },
+        "skill": {
+          "x": 0,
+          "y": 180
+        },
+        "mcp": {
+          "x": 340,
+          "y": 180
+        },
+        "system": {
+          "x": 680,
+          "y": 180
+        }
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [],
+  "assets": [],
+  "sources": [],
+  "story": [],
+  "observations": [],
+  "tours": []
+}

@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "id": "api-event-contract",
+  "revision": 1,
+  "title": "HTTP contract, event contract and observed behavior",
+  "summary": "How does an accepted request become a completed business operation?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "client",
+      "label": "Client",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "api",
+      "label": "Order API",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "http-contract"
+      ],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "broker",
+      "label": "Events channel",
+      "kind": "storage",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "event-contract"
+      ],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "worker",
+      "label": "Order processor",
+      "kind": "process",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "post",
+      "source": "client",
+      "target": "api",
+      "label": "POST /orders (declared)",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "accepted",
+      "source": "api",
+      "target": "client",
+      "label": "202 Accepted",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "publish",
+      "source": "api",
+      "target": "broker",
+      "label": "OrderRequested v1",
+      "kind": "stream",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "consume",
+      "source": "broker",
+      "target": "worker",
+      "label": "deliver message",
+      "kind": "stream",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "HTTP contract, event contract and observed behavior",
+      "description": "How does an accepted request become a completed business operation?",
+      "nodeIds": [
+        "client",
+        "api",
+        "broker",
+        "worker"
+      ],
+      "edgeIds": [
+        "post",
+        "accepted",
+        "publish",
+        "consume"
+      ],
+      "positions": {
+        "client": {
+          "x": 0,
+          "y": 0
+        },
+        "api": {
+          "x": 340,
+          "y": 0
+        },
+        "broker": {
+          "x": 680,
+          "y": 0
+        },
+        "worker": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "http-contract",
+      "title": "Contract excerpt - synthetic",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\"operationId\":\"createOrder\",\"path\":\"/orders\",\"method\":\"POST\",\"successResponse\":202,\"idempotency\":\"application policy required\"}"
+    },
+    {
+      "id": "event-contract",
+      "title": "Event fields - synthetic",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Role"
+      ],
+      "rows": [
+        [
+          "eventId",
+          "deduplication candidate, policy required"
+        ],
+        [
+          "correlationId",
+          "explicit association across systems"
+        ],
+        [
+          "schemaVersion",
+          "payload compatibility"
+        ],
+        [
+          "orderId",
+          "business entity identity"
+        ]
+      ]
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "openapi",
+      "title": "OpenAPI 3.1 specification",
+      "location": "",
+      "url": "https://spec.openapis.org/oas/v3.1.2.html",
+      "visibility": "public"
+    },
+    {
+      "id": "asyncapi",
+      "title": "AsyncAPI - defining operations",
+      "location": "",
+      "url": "https://www.asyncapi.com/docs/concepts/asyncapi-document/adding-operations",
+      "visibility": "public"
+    },
+    {
+      "id": "http",
+      "title": "HTTP semantics - RFC 9110",
+      "location": "",
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "visibility": "public"
+    },
+    {
+      "id": "otel",
+      "title": "OpenTelemetry trace concepts",
+      "location": "",
+      "url": "https://opentelemetry.io/docs/concepts/signals/traces/",
+      "visibility": "public"
+    }
+  ],
+  "story": [],
+  "observations": [],
+  "tours": []
+}

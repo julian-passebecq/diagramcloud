@@ -1,0 +1,116 @@
+{
+  "format": "diagramcloud.explanation-walkthrough",
+  "version": 1,
+  "projectId": "cloud-boundaries",
+  "baseRevision": 1,
+  "baseFingerprint": "ad65629392ed6411",
+  "id": "lesson",
+  "title": "Logical software, deployment and trust",
+  "question": "Where does this component run, and which boundary does a request cross?",
+  "sourceIds": [
+    "c4"
+  ],
+  "steps": [
+    {
+      "id": "logical",
+      "title": "Logical components are not deployment instances",
+      "viewId": "overview",
+      "nodeIds": [
+        "browser",
+        "gateway",
+        "service",
+        "warehouse"
+      ],
+      "edgeIds": [
+        "request",
+        "route",
+        "data"
+      ],
+      "narration": "This view explains software responsibilities. It does not imply a specific cloud vendor or a provisioned resource.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [],
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "environment",
+      "title": "The environment selects deployment evidence",
+      "viewId": "overview",
+      "nodeIds": [
+        "service",
+        "warehouse"
+      ],
+      "edgeIds": [
+        "data"
+      ],
+      "narration": "One logical service can have several environment-specific instances. A TEST configuration is not proof of PROD configuration, reachability, identity or installed version.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [],
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "trust",
+      "title": "Network reachability and authorization differ",
+      "viewId": "overview",
+      "nodeIds": [
+        "browser",
+        "gateway",
+        "identity"
+      ],
+      "edgeIds": [
+        "request",
+        "token"
+      ],
+      "narration": "A route and a token are not blanket authorization. Tenant isolation, allowed actions, secret handling and rejected requests need explicit explanation and evidence.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [],
+      "takeaway": "",
+      "questions": [
+        "Which identity makes the downstream query?",
+        "What is denied?",
+        "Which data may cross this boundary?"
+      ]
+    },
+    {
+      "id": "failure",
+      "title": "Failure domains need their own viewpoint",
+      "viewId": "overview",
+      "nodeIds": [
+        "gateway",
+        "service",
+        "warehouse"
+      ],
+      "edgeIds": [
+        "route",
+        "data"
+      ],
+      "narration": "A resilient design must describe capacity, timeout, failover, backup and recovery assumptions. No availability percentage or recovery time is inferred from replica icons.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [
+        {
+          "name": "RTO / RPO",
+          "value": "not supplied"
+        },
+        {
+          "name": "failover tested",
+          "value": "unknown"
+        }
+      ],
+      "takeaway": "",
+      "questions": []
+    }
+  ]
+}

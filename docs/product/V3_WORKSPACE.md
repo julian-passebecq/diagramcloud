@@ -62,6 +62,17 @@ UX01-UX25 stay as written in the V3 mission. These rows extend them:
 | UX29 | Estimates distinguish effort, dependency bounds, tokens and queue/access uncertainty; unknown values and actual usage stay distinct. |
 | UX30 | A viewer can follow plan, adopted task or prepared prompt, actual native result, then source, artifact, qualification and release where supplied, and sees explicit gaps otherwise. |
 
+### Expressiveness rows (UX31-UX34, complement E)
+
+From ChatGPT Pro complement PP-20261019-02, source aaba5c3; design and 27-domain coverage in [EXPRESSIVENESS](EXPRESSIVENESS.md). A status moves only when a test proves it; source-module tests are not App acceptance.
+
+| ID | Acceptance | Status |
+| --- | --- | --- |
+| UX31 | One concept can be explained from its surrounding architecture through repeated authored behaviour to exact code, state, contract and evidence, with an explicit synthetic or frozen basis and no execution claim; invalid, stale or colliding input leaves existing work intact. | partial: compiler, CLI and six examples tested (`tests/explanation-walkthrough.test.ts`, `tests/explanation-cli.test.ts`, `tests/expressiveness-example-files.test.ts`); no App authoring entry yet |
+| UX32 | Related context uses exact permitted identities, explicit depth, scope and relation filters and visible bounded coverage; Follow/Pin, a keyboard and list alternative and detour return preserve context. | partial: projection tested (`tests/related-context.test.ts`); companion pane, Follow/Pin and detour return not implemented |
+| UX33 | Focused exports keep the current view, context access, code and table details, manual next/previous and explicit return after a detour; no autoplay or network, source privacy and keyboard focus kept; compact and printed forms inspected independently. | partial: opt-in `focusStory` HTML tested as source (`tests/explanation-focus-export.test.ts`) and offline in Chromium at 1440 px (`tests/e2e/explanation-focus-export.spec.ts`: next step, context detour, explicit return, focus toggle, code first, keyboard focus kept, no request); compact and print inspection not done; not reachable from the App export menu |
+| UX34 | Changing relevant referenced code, evidence or source cannot leave an apparently current tour stop without qualification; compatibility and public-projection tests cover old and new fingerprints. | not implemented (W4): `stopFingerprint` does not cover referenced contents |
+
 ## State chain
 
 Each step is a distinct state with its own evidence; one never implies the next:

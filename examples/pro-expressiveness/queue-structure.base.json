@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "id": "queue-structure",
+  "revision": 1,
+  "title": "A queue, its storage and its workers",
+  "summary": "What changes when an event leaves the queue, and what does not?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "events",
+      "label": "Events API",
+      "kind": "source",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "queue",
+      "label": "FIFO waiting items",
+      "kind": "storage",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "list-code",
+        "deque-code"
+      ],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "worker",
+      "label": "Worker",
+      "kind": "process",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "enqueue",
+      "source": "events",
+      "target": "queue",
+      "label": "append event",
+      "kind": "stream",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "dequeue",
+      "source": "queue",
+      "target": "worker",
+      "label": "remove oldest waiting item",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "A queue, its storage and its workers",
+      "description": "What changes when an event leaves the queue, and what does not?",
+      "nodeIds": [
+        "events",
+        "queue",
+        "worker"
+      ],
+      "edgeIds": [
+        "enqueue",
+        "dequeue"
+      ],
+      "positions": {
+        "events": {
+          "x": 0,
+          "y": 0
+        },
+        "queue": {
+          "x": 340,
+          "y": 0
+        },
+        "worker": {
+          "x": 680,
+          "y": 0
+        }
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "list-code",
+      "title": "List-backed queue",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "python",
+      "code": "queue = []\nqueue.append(event)\nevent = queue.pop(0)"
+    },
+    {
+      "id": "deque-code",
+      "title": "Deque-backed local queue",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "python",
+      "code": "from collections import deque\nqueue = deque()\nqueue.append(event)\nevent = queue.popleft()"
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "deque",
+      "title": "Python collections deque reference",
+      "location": "",
+      "url": "https://docs.python.org/3.14/library/collections.html",
+      "visibility": "public"
+    },
+    {
+      "id": "queue-doc",
+      "title": "Python synchronized queue reference",
+      "location": "",
+      "url": "https://docs.python.org/3/library/queue.html",
+      "visibility": "public"
+    }
+  ],
+  "story": [],
+  "observations": [],
+  "tours": []
+}

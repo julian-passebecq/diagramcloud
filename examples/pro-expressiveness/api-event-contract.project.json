@@ -1,0 +1,990 @@
+{
+  "schemaVersion": 1,
+  "id": "api-event-contract",
+  "revision": 1,
+  "title": "HTTP contract, event contract and observed behavior",
+  "summary": "How does an accepted request become a completed business operation?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "client",
+      "label": "Client",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "api",
+      "label": "Order API",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "http-contract"
+      ],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "broker",
+      "label": "Events channel",
+      "kind": "storage",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "event-contract"
+      ],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "worker",
+      "label": "Order processor",
+      "kind": "process",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson",
+      "label": "HTTP contract, event contract and observed behavior",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.index",
+      "blockIds": [
+        "walk-lesson.intro"
+      ],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.contract.note",
+      "label": "The interface is a declaration",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.contract.text",
+        "walk-lesson.contract.code",
+        "walk-lesson.contract.locator"
+      ],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.contract.entry",
+      "label": "The interface is a declaration",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.contract.view",
+      "blockIds": [],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.accept.note",
+      "label": "Accepted is not completed",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.accept.text",
+        "walk-lesson.accept.after"
+      ],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.accept.entry",
+      "label": "Accepted is not completed",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.accept.view",
+      "blockIds": [],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.delivery.note",
+      "label": "Delivery and processing are separate",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.delivery.text"
+      ],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.delivery.entry",
+      "label": "Delivery and processing are separate",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.delivery.view",
+      "blockIds": [],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.evidence.note",
+      "label": "A trace has stronger structure than an animation",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.evidence.text",
+        "walk-lesson.evidence.after"
+      ],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.evidence.entry",
+      "label": "A trace has stronger structure than an animation",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.evidence.view",
+      "blockIds": [],
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "post",
+      "source": "client",
+      "target": "api",
+      "label": "POST /orders (declared)",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "accepted",
+      "source": "api",
+      "target": "client",
+      "label": "202 Accepted",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "publish",
+      "source": "api",
+      "target": "broker",
+      "label": "OrderRequested v1",
+      "kind": "stream",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "consume",
+      "source": "broker",
+      "target": "worker",
+      "label": "deliver message",
+      "kind": "stream",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "HTTP contract, event contract and observed behavior",
+      "description": "How does an accepted request become a completed business operation?",
+      "nodeIds": [
+        "client",
+        "api",
+        "broker",
+        "worker",
+        "walk-lesson"
+      ],
+      "edgeIds": [
+        "post",
+        "accepted",
+        "publish",
+        "consume"
+      ],
+      "positions": {
+        "client": {
+          "x": 0,
+          "y": 0
+        },
+        "api": {
+          "x": 340,
+          "y": 0
+        },
+        "broker": {
+          "x": 680,
+          "y": 0
+        },
+        "worker": {
+          "x": 0,
+          "y": 180
+        },
+        "walk-lesson": {
+          "x": 0,
+          "y": -300
+        }
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.index",
+      "title": "Walkthrough: HTTP contract, event contract and observed behavior",
+      "description": "How does an accepted request become a completed business operation?\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "walk-lesson.contract.entry",
+        "walk-lesson.accept.entry",
+        "walk-lesson.delivery.entry",
+        "walk-lesson.evidence.entry"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "walk-lesson.contract.entry": {
+          "x": 0,
+          "y": 0
+        },
+        "walk-lesson.accept.entry": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.delivery.entry": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.evidence.entry": {
+          "x": 0,
+          "y": 150
+        }
+      },
+      "perspective": "evidence",
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.contract.view",
+      "title": "The interface is a declaration",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "client",
+        "api",
+        "walk-lesson.contract.note"
+      ],
+      "edgeIds": [
+        "post"
+      ],
+      "positions": {
+        "client": {
+          "x": 0,
+          "y": 0
+        },
+        "api": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.contract.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "code",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.contract.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.accept.view",
+      "title": "Accepted is not completed",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "client",
+        "api",
+        "broker",
+        "walk-lesson.accept.note"
+      ],
+      "edgeIds": [
+        "accepted",
+        "publish"
+      ],
+      "positions": {
+        "client": {
+          "x": 0,
+          "y": 0
+        },
+        "api": {
+          "x": 310,
+          "y": 0
+        },
+        "broker": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.accept.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.accept.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.delivery.view",
+      "title": "Delivery and processing are separate",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "broker",
+        "worker",
+        "walk-lesson.delivery.note"
+      ],
+      "edgeIds": [
+        "consume"
+      ],
+      "positions": {
+        "broker": {
+          "x": 0,
+          "y": 0
+        },
+        "worker": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.delivery.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.delivery.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.evidence.view",
+      "title": "A trace has stronger structure than an animation",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "api",
+        "broker",
+        "worker",
+        "walk-lesson.evidence.note"
+      ],
+      "edgeIds": [
+        "publish",
+        "consume"
+      ],
+      "positions": {
+        "api": {
+          "x": 0,
+          "y": 0
+        },
+        "broker": {
+          "x": 310,
+          "y": 0
+        },
+        "worker": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.evidence.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.evidence.note"
+        ]
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "http-contract",
+      "title": "Contract excerpt - synthetic",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\"operationId\":\"createOrder\",\"path\":\"/orders\",\"method\":\"POST\",\"successResponse\":202,\"idempotency\":\"application policy required\"}"
+    },
+    {
+      "id": "event-contract",
+      "title": "Event fields - synthetic",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Role"
+      ],
+      "rows": [
+        [
+          "eventId",
+          "deduplication candidate, policy required"
+        ],
+        [
+          "correlationId",
+          "explicit association across systems"
+        ],
+        [
+          "schemaVersion",
+          "payload compatibility"
+        ],
+        [
+          "orderId",
+          "business entity identity"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.intro",
+      "title": "HTTP contract, event contract and observed behavior",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "author",
+      "type": "text",
+      "text": "Question: How does an accepted request become a completed business operation?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: api-event-contract revision 1; fingerprint d5000950ef82b0e5.\n\nThis private addition changes no existing feature, deployment, approval or observation."
+    },
+    {
+      "id": "walk-lesson.contract.text",
+      "title": "The interface is a declaration",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Operation name, request, response and authorization requirements belong to the versioned interface. A contract does not prove a deployment or successful call.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of api-event-contract revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.contract.code",
+      "title": "Contract excerpt - synthetic : 1-1",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "transform": "logic",
+      "type": "code",
+      "language": "json",
+      "code": "{\"operationId\":\"createOrder\",\"path\":\"/orders\",\"method\":\"POST\",\"successResponse\":202,\"idempotency\":\"application policy required\"}"
+    },
+    {
+      "id": "walk-lesson.contract.locator",
+      "title": "Code excerpt source cut",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "api-event-contract revision 1, block http-contract, lines 1-1, content fingerprint 4a91dd7179f479cb. Frozen excerpt, not live code. Display-only; no execution."
+    },
+    {
+      "id": "walk-lesson.accept.text",
+      "title": "Accepted is not completed",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "HTTP acceptance and event publication are distinct milestones. This illustrative scenario assumes an outbox or equivalent consistency policy would be specified; it is not implemented here.\n\nExplicit prerequisites: contract.\n\nSnapshot of api-event-contract revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.accept.after",
+      "title": "After - Accepted is not completed",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "request",
+          "accepted"
+        ],
+        [
+          "business operation",
+          "not yet completed"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.delivery.text",
+      "title": "Delivery and processing are separate",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "A redelivery may repeat the same event. Deduplication, transaction boundaries, ordering and compensation require their own explicit contracts.\n\nExplicit prerequisites: accept.\n\nQuestion to explore: What uniquely identifies one event and one processing attempt?\n\nQuestion to explore: What happens if writing succeeds but acknowledgement fails?\n\nSnapshot of api-event-contract revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.evidence.text",
+      "title": "A trace has stronger structure than an animation",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Actual telemetry needs trace/span identities, links and timestamps from a producer. Clock order alone is not causality; an authored animation cannot supply a missing span.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of api-event-contract revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.evidence.after",
+      "title": "After - A trace has stronger structure than an animation",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "trace supplied",
+          "no"
+        ],
+        [
+          "rendered basis",
+          "synthetic explanation"
+        ]
+      ]
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "openapi",
+      "title": "OpenAPI 3.1 specification",
+      "location": "",
+      "url": "https://spec.openapis.org/oas/v3.1.2.html",
+      "visibility": "public"
+    },
+    {
+      "id": "asyncapi",
+      "title": "AsyncAPI - defining operations",
+      "location": "",
+      "url": "https://www.asyncapi.com/docs/concepts/asyncapi-document/adding-operations",
+      "visibility": "public"
+    },
+    {
+      "id": "http",
+      "title": "HTTP semantics - RFC 9110",
+      "location": "",
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "visibility": "public"
+    },
+    {
+      "id": "otel",
+      "title": "OpenTelemetry trace concepts",
+      "location": "",
+      "url": "https://opentelemetry.io/docs/concepts/signals/traces/",
+      "visibility": "public"
+    }
+  ],
+  "story": [
+    {
+      "title": "The interface is a declaration",
+      "viewId": "walk-lesson.contract.view",
+      "nodeId": "walk-lesson.contract.note",
+      "narration": "Operation name, request, response and authorization requirements belong to the versioned interface. A contract does not prove a deployment or successful call.",
+      "highlightEdgeIds": [
+        "post"
+      ]
+    },
+    {
+      "title": "Accepted is not completed",
+      "viewId": "walk-lesson.accept.view",
+      "nodeId": "walk-lesson.accept.note",
+      "narration": "HTTP acceptance and event publication are distinct milestones. This illustrative scenario assumes an outbox or equivalent consistency policy would be specified; it is not implemented here.",
+      "highlightEdgeIds": [
+        "accepted",
+        "publish"
+      ]
+    },
+    {
+      "title": "Delivery and processing are separate",
+      "viewId": "walk-lesson.delivery.view",
+      "nodeId": "walk-lesson.delivery.note",
+      "narration": "A redelivery may repeat the same event. Deduplication, transaction boundaries, ordering and compensation require their own explicit contracts.",
+      "highlightEdgeIds": [
+        "consume"
+      ]
+    },
+    {
+      "title": "A trace has stronger structure than an animation",
+      "viewId": "walk-lesson.evidence.view",
+      "nodeId": "walk-lesson.evidence.note",
+      "narration": "Actual telemetry needs trace/span identities, links and timestamps from a producer. Clock order alone is not causality; an authored animation cannot supply a missing span.",
+      "highlightEdgeIds": [
+        "publish",
+        "consume"
+      ]
+    }
+  ],
+  "observations": [],
+  "tours": [
+    {
+      "id": "walk-lesson.tour",
+      "title": "HTTP contract, event contract and observed behavior",
+      "sourceRevision": 1,
+      "stops": [
+        {
+          "id": "stop-29b37cba99",
+          "viewId": "walk-lesson.contract.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "client"
+            },
+            {
+              "kind": "node",
+              "id": "api"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.contract.note"
+            },
+            {
+              "kind": "edge",
+              "id": "post"
+            }
+          ],
+          "fingerprint": "b7c43e2f0a38603e",
+          "narration": "Operation name, request, response and authorization requirements belong to the versioned interface. A contract does not prove a deployment or successful call."
+        },
+        {
+          "id": "stop-8b5ddfbe3a",
+          "viewId": "walk-lesson.accept.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "client"
+            },
+            {
+              "kind": "node",
+              "id": "api"
+            },
+            {
+              "kind": "node",
+              "id": "broker"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.accept.note"
+            },
+            {
+              "kind": "edge",
+              "id": "accepted"
+            },
+            {
+              "kind": "edge",
+              "id": "publish"
+            }
+          ],
+          "fingerprint": "370eee617cb1f8f3",
+          "narration": "HTTP acceptance and event publication are distinct milestones. This illustrative scenario assumes an outbox or equivalent consistency policy would be specified; it is not implemented here."
+        },
+        {
+          "id": "stop-f3fbb5c170",
+          "viewId": "walk-lesson.delivery.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "broker"
+            },
+            {
+              "kind": "node",
+              "id": "worker"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.delivery.note"
+            },
+            {
+              "kind": "edge",
+              "id": "consume"
+            }
+          ],
+          "fingerprint": "bd9abf8ad0343bac",
+          "narration": "A redelivery may repeat the same event. Deduplication, transaction boundaries, ordering and compensation require their own explicit contracts."
+        },
+        {
+          "id": "stop-c1fe1379ac",
+          "viewId": "walk-lesson.evidence.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "api"
+            },
+            {
+              "kind": "node",
+              "id": "broker"
+            },
+            {
+              "kind": "node",
+              "id": "worker"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.evidence.note"
+            },
+            {
+              "kind": "edge",
+              "id": "publish"
+            },
+            {
+              "kind": "edge",
+              "id": "consume"
+            }
+          ],
+          "fingerprint": "0f89339f72b472ee",
+          "narration": "Actual telemetry needs trace/span identities, links and timestamps from a producer. Clock order alone is not causality; an authored animation cannot supply a missing span."
+        }
+      ],
+      "visibility": "public"
+    }
+  ]
+}

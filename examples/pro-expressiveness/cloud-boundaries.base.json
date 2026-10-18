@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud-boundaries",
+  "revision": 1,
+  "title": "Logical software, deployment and trust",
+  "summary": "Where does this component run, and which boundary does a request cross?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "browser",
+      "label": "Browser",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "gateway",
+      "label": "API gateway",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "service",
+      "label": "Business service",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "deployments"
+      ],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "warehouse",
+      "label": "Warehouse",
+      "kind": "storage",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "identity",
+      "label": "Identity provider",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "request",
+      "source": "browser",
+      "target": "gateway",
+      "label": "HTTPS request",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "route",
+      "source": "gateway",
+      "target": "service",
+      "label": "declared route",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "data",
+      "source": "service",
+      "target": "warehouse",
+      "label": "scoped query",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "token",
+      "source": "identity",
+      "target": "gateway",
+      "label": "verify token and policy",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "Logical software, deployment and trust",
+      "description": "Where does this component run, and which boundary does a request cross?",
+      "nodeIds": [
+        "browser",
+        "gateway",
+        "service",
+        "warehouse",
+        "identity"
+      ],
+      "edgeIds": [
+        "request",
+        "route",
+        "data",
+        "token"
+      ],
+      "positions": {
+        "browser": {
+          "x": 0,
+          "y": 0
+        },
+        "gateway": {
+          "x": 340,
+          "y": 0
+        },
+        "service": {
+          "x": 680,
+          "y": 0
+        },
+        "warehouse": {
+          "x": 0,
+          "y": 180
+        },
+        "identity": {
+          "x": 340,
+          "y": 180
+        }
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "deployments",
+      "title": "Synthetic environment mapping",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Environment",
+        "Instance",
+        "Placement",
+        "Evidence"
+      ],
+      "rows": [
+        [
+          "TEST",
+          "service-test",
+          "private subnet A",
+          "authored only"
+        ],
+        [
+          "PROD",
+          "service-prod",
+          "private subnet B",
+          "deployment unverified"
+        ]
+      ]
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "c4",
+      "title": "C4 deployment view",
+      "location": "",
+      "url": "https://c4model.com/diagrams/deployment",
+      "visibility": "public"
+    }
+  ],
+  "story": [],
+  "observations": [],
+  "tours": []
+}

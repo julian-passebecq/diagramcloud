@@ -22,6 +22,7 @@
     "package:vsix": "tsx scripts/package-vsix.ts",
     "concept:preview": "tsx scripts/concept-preview.ts",
     "concept:host": "tsx scripts/concept-host.ts",
+    "explain": "tsx scripts/prepare-explanation.ts",
     "test:host:vscode": "tsx --test tests/host/vscode-host.test.ts"
   },
   "dependencies": {

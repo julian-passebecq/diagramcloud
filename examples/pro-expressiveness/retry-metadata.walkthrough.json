@@ -1,0 +1,184 @@
+{
+  "format": "diagramcloud.explanation-walkthrough",
+  "version": 1,
+  "projectId": "retry-metadata",
+  "baseRevision": 1,
+  "baseFingerprint": "518bf69f45de6782",
+  "id": "lesson",
+  "title": "Retries, decorators and function identity",
+  "question": "Why is a wrapper not the same thing as the operation it wraps?",
+  "sourceIds": [
+    "python",
+    "http"
+  ],
+  "steps": [
+    {
+      "id": "call",
+      "title": "The caller invokes one logical operation",
+      "viewId": "overview",
+      "nodeIds": [
+        "pipeline",
+        "wrapper"
+      ],
+      "edgeIds": [
+        "invoke"
+      ],
+      "narration": "The caller names fetch_weather. A decorator can wrap that callable without being the application itself.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [
+        {
+          "name": "attempt",
+          "value": "not started"
+        }
+      ],
+      "after": [],
+      "code": {
+        "blockId": "retry-code",
+        "fromLine": 3,
+        "toLine": 8
+      },
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "failure",
+      "title": "First response is 503 in this selected scenario",
+      "viewId": "overview",
+      "nodeIds": [
+        "wrapper",
+        "weather"
+      ],
+      "edgeIds": [
+        "get",
+        "response"
+      ],
+      "narration": "This synthetic response selects the transient-failure branch. It does not prove every 503 is absorbed or every request should retry.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [
+        "call"
+      ],
+      "before": [],
+      "after": [
+        {
+          "name": "attempt",
+          "value": "1"
+        },
+        {
+          "name": "response",
+          "value": "503"
+        },
+        {
+          "name": "decision",
+          "value": "Check idempotency, retry policy and remaining deadline"
+        }
+      ],
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "retry",
+      "title": "Repeat the same request edge with a new attempt",
+      "viewId": "overview",
+      "nodeIds": [
+        "wrapper",
+        "weather"
+      ],
+      "edgeIds": [
+        "get"
+      ],
+      "narration": "The same participant and connection IDs are used again. The frame is another authored attempt, not another API or a new observed run.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [
+        "failure"
+      ],
+      "before": [
+        {
+          "name": "backoff",
+          "value": "illustrative 2 seconds"
+        }
+      ],
+      "after": [
+        {
+          "name": "attempt",
+          "value": "2"
+        }
+      ],
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "success",
+      "title": "This branch succeeds; another branch can exhaust retries",
+      "viewId": "overview",
+      "nodeIds": [
+        "wrapper",
+        "weather"
+      ],
+      "edgeIds": [
+        "response"
+      ],
+      "narration": "200 is the selected success case. A separate failure walkthrough must explain deadline expiry, exhausted attempts and error propagation.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [
+        "retry"
+      ],
+      "before": [],
+      "after": [
+        {
+          "name": "selected response",
+          "value": "200"
+        },
+        {
+          "name": "actual runtime evidence",
+          "value": "not supplied"
+        }
+      ],
+      "takeaway": "",
+      "questions": [
+        "What if the operation already wrote data before the timeout?",
+        "Where is the final error recorded?"
+      ]
+    },
+    {
+      "id": "identity",
+      "title": "wraps preserves metadata, not retry correctness",
+      "viewId": "overview",
+      "nodeIds": [
+        "wrapper"
+      ],
+      "edgeIds": [],
+      "narration": "functools.wraps copies metadata and exposes the wrapped callable for introspection. It does not implement retries, guarantee every logger name or configure an orchestrator task ID.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [
+        {
+          "name": "__name__ without wraps",
+          "value": "wrapper"
+        }
+      ],
+      "after": [
+        {
+          "name": "__name__ with wraps",
+          "value": "fetch_weather in this example"
+        },
+        {
+          "name": "__wrapped__",
+          "value": "original callable"
+        }
+      ],
+      "code": {
+        "blockId": "retry-code",
+        "fromLine": 4,
+        "toLine": 5
+      },
+      "takeaway": "Separate operation identity, wrapper policy, framework task identity and observed attempt.",
+      "questions": []
+    }
+  ]
+}

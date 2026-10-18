@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "id": "data-grain",
+  "revision": 1,
+  "title": "Tables, transformation and business meaning",
+  "summary": "Why can a plausible join double a business measure?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "sales",
+      "label": "Sales facts",
+      "kind": "table",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "sales-data"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "dim",
+      "label": "Customer history",
+      "kind": "table",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "dimension-data"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "join",
+      "label": "Join and aggregate",
+      "kind": "function",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "join-code",
+        "meaning"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "metric",
+      "label": "Revenue metric",
+      "kind": "report",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "read-sales",
+      "source": "sales",
+      "target": "join",
+      "label": "",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "read-customer",
+      "source": "dim",
+      "target": "join",
+      "label": "",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "derive",
+      "source": "join",
+      "target": "metric",
+      "label": "",
+      "kind": "batch",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "Tables, transformation and business meaning",
+      "description": "Why can a plausible join double a business measure?",
+      "nodeIds": [
+        "sales",
+        "dim",
+        "join",
+        "metric"
+      ],
+      "edgeIds": [
+        "read-sales",
+        "read-customer",
+        "derive"
+      ],
+      "positions": {
+        "sales": {
+          "x": 0,
+          "y": 0
+        },
+        "dim": {
+          "x": 340,
+          "y": 0
+        },
+        "join": {
+          "x": 680,
+          "y": 0
+        },
+        "metric": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "sales-data",
+      "title": "Illustrative facts",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "sale_id",
+        "customer_id",
+        "amount"
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          20
+        ],
+        [
+          2,
+          7,
+          15
+        ]
+      ]
+    },
+    {
+      "id": "dimension-data",
+      "title": "Illustrative historical dimension",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "customer_id",
+        "version"
+      ],
+      "rows": [
+        [
+          7,
+          "old"
+        ],
+        [
+          7,
+          "new"
+        ]
+      ]
+    },
+    {
+      "id": "join-code",
+      "title": "Unsafe historical join for this grain",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "sql",
+      "code": "SELECT SUM(s.amount)\nFROM sales s\nJOIN customer_history d\n  ON s.customer_id = d.customer_id;"
+    },
+    {
+      "id": "meaning",
+      "title": "Grain contract",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Each sale contributes once. Select a unique applicable dimension version, using the correct validity interval when required. A diagram edge alone cannot establish key uniqueness."
+    }
+  ],
+  "assets": [],
+  "sources": [],
+  "story": [],
+  "observations": [],
+  "tours": []
+}

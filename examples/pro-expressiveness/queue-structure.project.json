@@ -1,0 +1,912 @@
+{
+  "schemaVersion": 1,
+  "id": "queue-structure",
+  "revision": 1,
+  "title": "A queue, its storage and its workers",
+  "summary": "What changes when an event leaves the queue, and what does not?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "events",
+      "label": "Events API",
+      "kind": "source",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "queue",
+      "label": "FIFO waiting items",
+      "kind": "storage",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "list-code",
+        "deque-code"
+      ],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "worker",
+      "label": "Worker",
+      "kind": "process",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson",
+      "label": "A queue, its storage and its workers",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "queue-structure@revision 1; source fingerprint 98c310d88f35a982. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.index",
+      "blockIds": [
+        "walk-lesson.intro"
+      ],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.arrival.note",
+      "label": "Waiting order is visible",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "queue-structure@revision 1; source fingerprint 98c310d88f35a982. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.arrival.text",
+        "walk-lesson.arrival.after"
+      ],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.arrival.entry",
+      "label": "Waiting order is visible",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "queue-structure@revision 1; source fingerprint 98c310d88f35a982. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.arrival.view",
+      "blockIds": [],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.list.note",
+      "label": "Removing the first list element shifts the remainder",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "queue-structure@revision 1; source fingerprint 98c310d88f35a982. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.list.text",
+        "walk-lesson.list.before",
+        "walk-lesson.list.after",
+        "walk-lesson.list.code",
+        "walk-lesson.list.locator"
+      ],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.list.entry",
+      "label": "Removing the first list element shifts the remainder",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "queue-structure@revision 1; source fingerprint 98c310d88f35a982. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.list.view",
+      "blockIds": [],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.deque.note",
+      "label": "A different data structure serves the same interface",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "queue-structure@revision 1; source fingerprint 98c310d88f35a982. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.deque.text",
+        "walk-lesson.deque.code",
+        "walk-lesson.deque.locator"
+      ],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.deque.entry",
+      "label": "A different data structure serves the same interface",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "queue-structure@revision 1; source fingerprint 98c310d88f35a982. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.deque.view",
+      "blockIds": [],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.delivery.note",
+      "label": "Dequeued is not completed or acknowledged",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "queue-structure@revision 1; source fingerprint 98c310d88f35a982. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.delivery.text",
+        "walk-lesson.delivery.before",
+        "walk-lesson.delivery.after"
+      ],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.delivery.entry",
+      "label": "Dequeued is not completed or acknowledged",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "queue-structure@revision 1; source fingerprint 98c310d88f35a982. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.delivery.view",
+      "blockIds": [],
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "enqueue",
+      "source": "events",
+      "target": "queue",
+      "label": "append event",
+      "kind": "stream",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "dequeue",
+      "source": "queue",
+      "target": "worker",
+      "label": "remove oldest waiting item",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "A queue, its storage and its workers",
+      "description": "What changes when an event leaves the queue, and what does not?",
+      "nodeIds": [
+        "events",
+        "queue",
+        "worker",
+        "walk-lesson"
+      ],
+      "edgeIds": [
+        "enqueue",
+        "dequeue"
+      ],
+      "positions": {
+        "events": {
+          "x": 0,
+          "y": 0
+        },
+        "queue": {
+          "x": 340,
+          "y": 0
+        },
+        "worker": {
+          "x": 680,
+          "y": 0
+        },
+        "walk-lesson": {
+          "x": 0,
+          "y": -300
+        }
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.index",
+      "title": "Walkthrough: A queue, its storage and its workers",
+      "description": "What changes when an event leaves the queue, and what does not?\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "walk-lesson.arrival.entry",
+        "walk-lesson.list.entry",
+        "walk-lesson.deque.entry",
+        "walk-lesson.delivery.entry"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "walk-lesson.arrival.entry": {
+          "x": 0,
+          "y": 0
+        },
+        "walk-lesson.list.entry": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.deque.entry": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.delivery.entry": {
+          "x": 0,
+          "y": 150
+        }
+      },
+      "perspective": "evidence",
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.arrival.view",
+      "title": "Waiting order is visible",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "events",
+        "queue",
+        "walk-lesson.arrival.note"
+      ],
+      "edgeIds": [
+        "enqueue"
+      ],
+      "positions": {
+        "events": {
+          "x": 0,
+          "y": 0
+        },
+        "queue": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.arrival.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.arrival.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.list.view",
+      "title": "Removing the first list element shifts the remainder",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "queue",
+        "worker",
+        "walk-lesson.list.note"
+      ],
+      "edgeIds": [
+        "dequeue"
+      ],
+      "positions": {
+        "queue": {
+          "x": 0,
+          "y": 0
+        },
+        "worker": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.list.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "code",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.list.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.deque.view",
+      "title": "A different data structure serves the same interface",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "queue",
+        "walk-lesson.deque.note"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "queue": {
+          "x": 0,
+          "y": 0
+        },
+        "walk-lesson.deque.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "code",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.deque.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.delivery.view",
+      "title": "Dequeued is not completed or acknowledged",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "queue",
+        "worker",
+        "walk-lesson.delivery.note"
+      ],
+      "edgeIds": [
+        "dequeue"
+      ],
+      "positions": {
+        "queue": {
+          "x": 0,
+          "y": 0
+        },
+        "worker": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.delivery.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.delivery.note"
+        ]
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "list-code",
+      "title": "List-backed queue",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "python",
+      "code": "queue = []\nqueue.append(event)\nevent = queue.pop(0)"
+    },
+    {
+      "id": "deque-code",
+      "title": "Deque-backed local queue",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "python",
+      "code": "from collections import deque\nqueue = deque()\nqueue.append(event)\nevent = queue.popleft()"
+    },
+    {
+      "id": "walk-lesson.intro",
+      "title": "A queue, its storage and its workers",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "author",
+      "type": "text",
+      "text": "Question: What changes when an event leaves the queue, and what does not?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: queue-structure revision 1; fingerprint 98c310d88f35a982.\n\nThis private addition changes no existing feature, deployment, approval or observation."
+    },
+    {
+      "id": "walk-lesson.arrival.text",
+      "title": "Waiting order is visible",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "An authored state snapshot shows three waiting events. Arrival order is a property of this scenario, not evidence of all distributed producers.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of queue-structure revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.arrival.after",
+      "title": "After - Waiting order is visible",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "front to back",
+          "A, B, C"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.list.text",
+      "title": "Removing the first list element shifts the remainder",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Python list pop(0) incurs O(n) movement. No milliseconds or speed ratio are inferred from that asymptotic statement.\n\nExplicit prerequisites: arrival.\n\nSnapshot of queue-structure revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.list.before",
+      "title": "Before - Removing the first list element shifts the remainder",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "transform": "input",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "queue",
+          "A, B, C"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.list.after",
+      "title": "After - Removing the first list element shifts the remainder",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "worker holds",
+          "A"
+        ],
+        [
+          "queue",
+          "B, C"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.list.code",
+      "title": "List-backed queue : 1-3",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "transform": "logic",
+      "type": "code",
+      "language": "python",
+      "code": "queue = []\nqueue.append(event)\nevent = queue.pop(0)"
+    },
+    {
+      "id": "walk-lesson.list.locator",
+      "title": "Code excerpt source cut",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "queue-structure revision 1, block list-code, lines 1-3, content fingerprint 1c10e545e5feb4c8. Frozen excerpt, not live code. Display-only; no execution."
+    },
+    {
+      "id": "walk-lesson.deque.text",
+      "title": "A different data structure serves the same interface",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "deque provides approximately O(1) append/pop at its ends. This is a local data-structure choice, not durable message storage.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nTakeaway: Use measured workload evidence before claiming a performance gain.\n\nSnapshot of queue-structure revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.deque.code",
+      "title": "Deque-backed local queue : 1-4",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "transform": "logic",
+      "type": "code",
+      "language": "python",
+      "code": "from collections import deque\nqueue = deque()\nqueue.append(event)\nevent = queue.popleft()"
+    },
+    {
+      "id": "walk-lesson.deque.locator",
+      "title": "Code excerpt source cut",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "queue-structure revision 1, block deque-code, lines 1-4, content fingerprint 33ae7545f0d87f07. Frozen excerpt, not live code. Display-only; no execution."
+    },
+    {
+      "id": "walk-lesson.delivery.text",
+      "title": "Dequeued is not completed or acknowledged",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "A worker may fail after dequeue. Multiple workers can complete out of order. A durable broker, bounded queue, acknowledgement, dead-letter policy and backpressure are separate design choices.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nQuestion to explore: How are failures retried?\n\nQuestion to explore: What happens when producers outrun consumers?\n\nQuestion to explore: Is task_done only accounting, or a durable acknowledgement?\n\nSnapshot of queue-structure revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.delivery.before",
+      "title": "Before - Dequeued is not completed or acknowledged",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "transform": "input",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "queue state",
+          "A removed"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.delivery.after",
+      "title": "After - Dequeued is not completed or acknowledged",
+      "visibility": "public",
+      "sourceIds": [
+        "deque",
+        "queue-doc"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "completion",
+          "unknown"
+        ],
+        [
+          "durability",
+          "not provided by this example"
+        ]
+      ]
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "deque",
+      "title": "Python collections deque reference",
+      "location": "",
+      "url": "https://docs.python.org/3.14/library/collections.html",
+      "visibility": "public"
+    },
+    {
+      "id": "queue-doc",
+      "title": "Python synchronized queue reference",
+      "location": "",
+      "url": "https://docs.python.org/3/library/queue.html",
+      "visibility": "public"
+    }
+  ],
+  "story": [
+    {
+      "title": "Waiting order is visible",
+      "viewId": "walk-lesson.arrival.view",
+      "nodeId": "walk-lesson.arrival.note",
+      "narration": "An authored state snapshot shows three waiting events. Arrival order is a property of this scenario, not evidence of all distributed producers.",
+      "highlightEdgeIds": [
+        "enqueue"
+      ]
+    },
+    {
+      "title": "Removing the first list element shifts the remainder",
+      "viewId": "walk-lesson.list.view",
+      "nodeId": "walk-lesson.list.note",
+      "narration": "Python list pop(0) incurs O(n) movement. No milliseconds or speed ratio are inferred from that asymptotic statement.",
+      "highlightEdgeIds": [
+        "dequeue"
+      ]
+    },
+    {
+      "title": "A different data structure serves the same interface",
+      "viewId": "walk-lesson.deque.view",
+      "nodeId": "walk-lesson.deque.note",
+      "narration": "deque provides approximately O(1) append/pop at its ends. This is a local data-structure choice, not durable message storage.",
+      "highlightEdgeIds": []
+    },
+    {
+      "title": "Dequeued is not completed or acknowledged",
+      "viewId": "walk-lesson.delivery.view",
+      "nodeId": "walk-lesson.delivery.note",
+      "narration": "A worker may fail after dequeue. Multiple workers can complete out of order. A durable broker, bounded queue, acknowledgement, dead-letter policy and backpressure are separate design choices.",
+      "highlightEdgeIds": [
+        "dequeue"
+      ]
+    }
+  ],
+  "observations": [],
+  "tours": [
+    {
+      "id": "walk-lesson.tour",
+      "title": "A queue, its storage and its workers",
+      "sourceRevision": 1,
+      "stops": [
+        {
+          "id": "stop-4b8eb3ffd1",
+          "viewId": "walk-lesson.arrival.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "events"
+            },
+            {
+              "kind": "node",
+              "id": "queue"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.arrival.note"
+            },
+            {
+              "kind": "edge",
+              "id": "enqueue"
+            }
+          ],
+          "fingerprint": "b98eb076904047f3",
+          "narration": "An authored state snapshot shows three waiting events. Arrival order is a property of this scenario, not evidence of all distributed producers."
+        },
+        {
+          "id": "stop-9316bd970e",
+          "viewId": "walk-lesson.list.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "queue"
+            },
+            {
+              "kind": "node",
+              "id": "worker"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.list.note"
+            },
+            {
+              "kind": "edge",
+              "id": "dequeue"
+            }
+          ],
+          "fingerprint": "5bd69ebb5e0f5821",
+          "narration": "Python list pop(0) incurs O(n) movement. No milliseconds or speed ratio are inferred from that asymptotic statement."
+        },
+        {
+          "id": "stop-7d7febedad",
+          "viewId": "walk-lesson.deque.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "queue"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.deque.note"
+            }
+          ],
+          "fingerprint": "4ca137dccf51a4f6",
+          "narration": "deque provides approximately O(1) append/pop at its ends. This is a local data-structure choice, not durable message storage."
+        },
+        {
+          "id": "stop-20671ee6a2",
+          "viewId": "walk-lesson.delivery.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "queue"
+            },
+            {
+              "kind": "node",
+              "id": "worker"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.delivery.note"
+            },
+            {
+              "kind": "edge",
+              "id": "dequeue"
+            }
+          ],
+          "fingerprint": "c33092f4b103b37d",
+          "narration": "A worker may fail after dequeue. Multiple workers can complete out of order. A durable broker, bounded queue, acknowledgement, dead-letter policy and backpressure are separate design choices."
+        }
+      ],
+      "visibility": "public"
+    }
+  ]
+}
