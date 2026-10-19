@@ -13,6 +13,7 @@ import {LearningCatalogue,lessonContextFor,reviewCitations,tickedEvidence} from 
 import {lessonInstanceFacts,suggestMapping} from '../src/intelligence/learning/mappings';
 import {matcherSnapshot} from './helpers/matcherSnapshot';
 import {R4_LEARNING_CARDS} from '../src/intelligence/learning/cards';
+import {PRACTICAL_RECONCILIATION} from '../src/intelligence/learning/practicalCards';
 const ragCard=R4_LEARNING_CARDS.find(card=>(card as {id:string}).id==='rag-pipeline') as Record<string,unknown>;
 
 const lesson=(id:string)=>structuredClone(learningCatalogue.find(entry=>entry.id===id)!);
@@ -21,12 +22,16 @@ test('legacy matcher output is byte-identical to the snapshot recorded before th
  assert.deepEqual(matcherSnapshot(),recorded);
 });
 test('twelve authored lessons adopt as typed entries; legacy pattern and recipe entries decode unchanged',()=>{
- assert.equal(learningCatalogue.length,12);
- assert.deepEqual([...new Set(learningCatalogue.map(entry=>entry.entryKind))].sort(),['case-study','concept']);
+ // Twelve R4 lessons first, then the twelve practical cards kept by the reconciliation (docs/product/CATALOGUE-RETURN.md).
+ assert.equal(learningCatalogue.length,24);assert.equal(R4_LEARNING_CARDS.length,12);
+ assert.deepEqual(learningCatalogue.slice(0,12).map(e=>e.id),R4_LEARNING_CARDS.map(card=>(card as {id:string}).id));
+ assert.deepEqual(learningCatalogue.slice(12).map(e=>e.id),PRACTICAL_RECONCILIATION.filter(d=>d.decision==='keep').map(d=>d.id));
+ assert.deepEqual([...new Set(learningCatalogue.map(entry=>entry.entryKind))].sort(),['case-study','concept','pattern']);
+ assert.deepEqual([...new Set(learningCatalogue.slice(12).map(entry=>entry.entryKind))],['pattern']);
  const rows=catalogueRows();
  assert.deepEqual(rows.filter(row=>row.state==='legacy-pattern').map(row=>row.state==='legacy-pattern'&&row.pattern),patternCatalog);
  assert.deepEqual(rows.filter(row=>row.state==='legacy-recipe').map(row=>row.state==='legacy-recipe'&&row.recipe),recipeRegistry);
- assert.equal(rows.filter(row=>row.state==='lesson').length,12);
+ assert.equal(rows.filter(row=>row.state==='lesson').length,24);
  // Tagged legacy entries also decode; decoded rows are copies, never the matcher's registry objects.
  const tagged=decodeCatalogueEntry({...structuredClone(patternCatalog[0]),entryKind:'pattern'});assert.equal(tagged.state,'legacy-pattern');
  assert.equal(decodeCatalogueEntry({...structuredClone(recipeRegistry[0]),entryKind:'view-recipe'}).state,'legacy-recipe');
@@ -50,7 +55,7 @@ test('unknown future kinds are visible omissions, not crashes, in decoding and i
  const html=renderToStaticMarkup(createElement(LearningCatalogue,{entries:[...learningCatalogue,future]}));
  assert.match(html,/Omitted catalogue entry future-entry of unsupported kind simulation/);
  assert.match(html,/RAG indexing, query-time retrieval and evaluation/);
- assert.match(html,/Showing 25 of 25 catalogue entries/);
+ assert.match(html,/Showing 37 of 37 catalogue entries/);
 });
 test('a learning proposal envelope is adopted, never decoded or validated as a native document',()=>{
  assert.equal(decodeCatalogueEntry(ragCard).state,'invalid');
@@ -83,9 +88,9 @@ test('new topics carry editorial metadata, never the five source-pinned families
  assert.throws(()=>validateLearningCatalogue(wrongTopic),/canonical topic/);
  const rows=catalogueRows();
  assert.deepEqual(rows.filter(row=>matchesCatalogueRow(row,'',{family:'Data'})).map(row=>row.id),['medallion','jobs']);
- assert.equal(rows.filter(row=>row.state==='lesson'&&matchesCatalogueRow(row,'',{family:'not-supplied'})).length,12);
+ assert.equal(rows.filter(row=>row.state==='lesson'&&matchesCatalogueRow(row,'',{family:'not-supplied'})).length,24);
  assert.deepEqual(rows.filter(row=>matchesCatalogueRow(row,'',{kind:'case-study'})).map(row=>row.id),['anthropic-scion']);
- assert.deepEqual(rows.filter(row=>matchesCatalogueRow(row,'',{domain:'warehousing'})).map(row=>row.id),['oltp-olap','star-grain','scd-history']);
+ assert.deepEqual(rows.filter(row=>matchesCatalogueRow(row,'',{domain:'warehousing'})).map(row=>row.id),['oltp-olap','star-grain','scd-history','ssas-semantic-migration','report-app-coexistence']);
  assert.deepEqual(rows.filter(row=>matchesCatalogueRow(row,'temporal')).map(row=>row.id),['scd-history']);
 });
 test('the Scion card stays a dated Anthropic case study, distinct from GoogleCloudPlatform Scion and never a dependency',()=>{

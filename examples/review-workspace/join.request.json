@@ -1,0 +1,112 @@
+{
+  "id": "order-join",
+  "title": "Customer history fanout",
+  "scope": "Four invented order lines; amounts in illustrative EUR",
+  "provenance": "synthetic",
+  "sourceIds": [
+    "s.fixture"
+  ],
+  "kind": "inner",
+  "expectedRightMatches": "one",
+  "previewLimit": 40,
+  "left": {
+    "id": "order-lines",
+    "title": "Order lines",
+    "grain": "One order line",
+    "coverage": "sample",
+    "columns": [
+      {
+        "id": "customer",
+        "type": "string",
+        "nullable": true
+      },
+      {
+        "id": "amount",
+        "type": "number",
+        "nullable": false
+      }
+    ],
+    "rows": [
+      {
+        "id": "line.a",
+        "values": [
+          "c1",
+          10
+        ]
+      },
+      {
+        "id": "line.b",
+        "values": [
+          "c1",
+          25
+        ]
+      },
+      {
+        "id": "line.c",
+        "values": [
+          "c2",
+          5
+        ]
+      },
+      {
+        "id": "line.d",
+        "values": [
+          null,
+          2
+        ]
+      }
+    ]
+  },
+  "right": {
+    "id": "customer-history",
+    "title": "Customer versions",
+    "grain": "One customer x version",
+    "coverage": "sample",
+    "columns": [
+      {
+        "id": "customer",
+        "type": "string",
+        "nullable": true
+      },
+      {
+        "id": "region",
+        "type": "string",
+        "nullable": false
+      }
+    ],
+    "rows": [
+      {
+        "id": "version.1",
+        "values": [
+          "c1",
+          "North"
+        ]
+      },
+      {
+        "id": "version.2",
+        "values": [
+          "c1",
+          "South"
+        ]
+      },
+      {
+        "id": "version.3",
+        "values": [
+          null,
+          "Unknown"
+        ]
+      }
+    ]
+  },
+  "keys": [
+    {
+      "left": "customer",
+      "right": "customer"
+    }
+  ],
+  "measure": {
+    "leftColumn": "amount",
+    "unit": "EUR (synthetic)",
+    "meaning": "Illustrative additive order amount; not a financial accounting calculation"
+  }
+}

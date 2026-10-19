@@ -17,6 +17,22 @@ The catalogue is a client corpus. Start with the user's question, then choose a 
 | AI and knowledge | LLM, RAG, vector index, property graph, graph retrieval, tools/MCP, skills, evaluation | Product architecture / retrieval or tool evidence | What was retrieved or executed, and which claims remain unsupported? |
 | Migration and operation | SSIS/SSAS, Databricks/Fabric, multicloud, Git/CI, tests, artifacts, environments, rollout/rollback | Current/target / compatibility and qualification | What changes for the user, how is parity checked, and can data be recovered? |
 
-This release adds eight bounded migration/engineering pattern candidates beside the prior technical and practical cases. It does not require a new repository, taxonomy service, training pipeline or automatic content collector. Start with three example clients (Galaxy, synthetic commerce, FOIL) and extend only when a new case reveals a genuine semantic or UX gap.
+## Worked journey: from the physical world to a data decision
+
+The domain-data example (`examples/domain-data/build.ts`, project `domain-data-reference`, "From the physical world to a data decision") is an original synthetic reference: a renewable-energy surrogate, logistics and project-delivery scenarios, with no client CAD, credentials, real telemetry or measured performance. A device, a row, an aggregate and a decision keep different IDs. Generate it, with its linked reading and the practical patterns project, into a new directory:
+
+```sh
+./node_modules/.bin/tsx scripts/prepare-domain-examples.ts NEW_DIRECTORY
+```
+
+Read it in three steps, each opening a catalogue entry (Business overview > Learning catalogue, or `/?catalogue`; the CLI `npm run intelligence -- catalogue --op lesson --id <id> --out NEW_DIRECTORY` writes the same entry):
+
+1. Physical or business meaning to records: open the pattern **`dual-world-data`** ("Physical equipment to data product"). Unknown calibration and missing mappings stay visible; nothing converts units or infers a mapping.
+2. A new application beside an existing report: open the pattern **`report-app-coexistence`** ("Power BI and Fabric App: reuse before migration"). Its alternatives ("Keep Power BI", "Add an application") are shown as "Candidate, not selected": the lesson is never a recommended replacement, and applicability stays `UNKNOWN_NOT_ASSESSED`.
+3. Joins in the data path: open **`star-grain`**, then the pattern **`join-lineage-review`**; the review workspace example (`docs/contracts/review-workspace.md`) shows the same 42 to 70 change on four invented rows.
+
+Opening a lesson maps nothing to the project: a mapping is a reviewed `learningMappings` entry made by the author in Edit mode, never inferred from a shared word.
+
+This release adds eight bounded migration/engineering pattern candidates beside the prior technical and practical cases; twelve of the fourteen practical candidates are in the App catalogue and two were dropped as duplicates of R4 lessons (`CATALOGUE-RETURN.md`). It does not require a new repository, taxonomy service, training pipeline or automatic content collector. Start with three example clients (Galaxy, synthetic commerce, FOIL) and extend only when a new case reveals a genuine semantic or UX gap.
 
 For each lesson: define the concept, distinguish neighbouring concepts, show a small mechanism/example, state when to use it and alternatives, identify failure modes, and point to source/version evidence. The right pane may be a table, code excerpt or short report. Not every concept deserves a node-link graph.

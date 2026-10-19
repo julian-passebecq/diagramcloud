@@ -2,7 +2,7 @@ import {z} from 'zod';
 import {patternSchema,recipeSchema,patternCatalog,recipeRegistry,type ViewRecipe,type CatalogueFamilyFilter} from '../recipes';
 import {R4_LEARNING_SOURCES} from './sources';
 import {R4_LEARNING_CARDS} from './cards';
-import {AUTHORED_FAILURE_MODES,CASE_STUDIES,LEARNING_ADOPTED_ON} from './content';import {lessonContentProblems} from './guards';
+import {AUTHORED_FAILURE_MODES,CASE_STUDIES,LEARNING_ADOPTED_ON} from './content';import {lessonContentProblems} from './guards';import {practicalCatalogueEntries,practicalCatalogueSources} from './practicalCards';
 /** Optional typed catalogue entries. Editorial lesson content is separate from recognition rules: nothing here reads a Project or changes a match. */
 export const CATALOGUE_ENTRY_KINDS=['concept','pattern','procedure','technology','case-study','view-recipe'] as const;
 export type CatalogueEntryKind=typeof CATALOGUE_ENTRY_KINDS[number];
@@ -16,7 +16,7 @@ const safeUrl=z.string().url().max(2048).refine(value=>{try{const url=new URL(va
 /** Static documentation records for lessons. A citation is not proof of an owner installation, runtime or applicability. */
 export const learningSourceSchema=z.object({id:sourceRef,title:text(200),url:safeUrl,kind:z.enum(['primary-documentation','primary-provider-case-study','primary-project-documentation','inspected-repository-source','inspected-repository-search-excerpt','observed-github-metadata']),retrievedOn:date,externalRevision:z.string().regex(/^[a-f0-9]{40}$/).nullable(),contentSha256:z.string().regex(/^[a-f0-9]{64}$/).nullable(),limits:text(300)}).strict();
 export type LearningSource=z.infer<typeof learningSourceSchema>;
-export const learningSources:readonly LearningSource[]=(()=>{const rows=z.array(learningSourceSchema).min(1).max(100).parse(R4_LEARNING_SOURCES.sources);if(new Set(rows.map(row=>row.id)).size!==rows.length)throw new Error('Duplicate learning source ID');return rows;})();
+export const learningSources:readonly LearningSource[]=(()=>{const rows=z.array(learningSourceSchema).min(1).max(100).parse([...R4_LEARNING_SOURCES.sources,...practicalCatalogueSources()]);if(new Set(rows.map(row=>row.id)).size!==rows.length)throw new Error('Duplicate learning source ID');if(new Set(rows.map(row=>row.url)).size!==rows.length)throw new Error('Duplicate learning source URL under a second ID');return rows;})();
 const claimSchema=z.object({text:text(),basis:z.enum(['primary-source-summary','provider-reported','authored-reasoning']),sourceRefs:z.array(sourceRef).max(6)}).strict();
 /** Optional lesson sections. Absent optional sections are hidden, never an error. */
 export const lessonSchema=z.object({
@@ -93,7 +93,10 @@ export function adoptLearningCard(input:unknown):LearningEntry{
   ...(caseStudy?{caseStudy}:{}),instanceMappings:[],instanceMappingPolicy:card.instanceMappingPolicy});
 }
 /** Curriculum order: warehousing, data engineering, AI systems, agentic development, case study. */
-export const learningCatalogue:readonly LearningEntry[]=validateLearningCatalogue(R4_LEARNING_CARDS.map(adoptLearningCard));
+export const learningCatalogue:readonly LearningEntry[]=validateLearningCatalogue(withoutRepeatedProblems(R4_LEARNING_CARDS.map(adoptLearningCard),practicalCatalogueEntries()));
+/** Practical cards follow the R4 cards; one whose problem repeats an earlier card's problem (case and spacing ignored) is not added. */
+function withoutRepeatedProblems(base:readonly LearningEntry[],extra:readonly unknown[]):unknown[]{const seen=new Set(base.map(entry=>problemKey(entry.lesson.problem))),kept:unknown[]=[...base];for(const row of extra){const entry=learningEntrySchema.parse(row),key=problemKey(entry.lesson.problem);if(seen.has(key))continue;seen.add(key);kept.push(entry);}return kept;}
+export function problemKey(problem:string){return problem.trim().replace(/\s+/g,' ').toLowerCase();}
 /** Every catalogue row: legacy registry entries decoded unchanged, then authored lessons. Legacy objects are copied, never shared with the matcher. */
 export function catalogueRows(lessons:readonly unknown[]=learningCatalogue):CatalogueRow[]{
  return [...patternCatalog.map(row=>decodeCatalogueEntry(structuredClone(row))),...recipeRegistry.map(row=>decodeCatalogueEntry(structuredClone(row))),...lessons.map(row=>decodeCatalogueEntry(structuredClone(row)))];
