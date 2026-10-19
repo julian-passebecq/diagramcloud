@@ -47,9 +47,9 @@ Explain the selected subject in the main pane; a companion offers Explanation, C
 
 Both are optional adapter candidates for a concrete need, never release dependencies or default runtime. ConceptMotion (teaching, algorithm and data-platform scenes with a controlled player) suits queue, heap and loop state; VizForge (a D3 analytical engine with scene and story validation) suits time series, rankings, distributions, flows and comparable cost/quality stories. If one is selected: permitted data, then payload-specific validation, then one frame index and reduced-motion state owned by DiagramCloud or the host (never two players' clocks at once), then the renderer, then explicit subject selection and export. Test missing renderer, invalid payload, stale source, unmount cleanup, reduced motion, fallback text and export. Donor notices are kept and redistribution scope is settled before any donor byte ships; no donor code is copied here. T3 stays optional.
 
-## Tour staleness gap (UX34, owned by W4)
+## Tour staleness (UX34, implemented in #105)
 
-`stopFingerprint` in `src/core/tours.ts` covers the view and the selected component and connection objects, but not the code, evidence or source contents they reference: changing a referenced code block leaves a stop "current". The fix belongs to W4: define the reference closure, versioned fingerprint semantics, behaviour of old stops and public projection; never re-record old stops silently and never hash private content into a public identity. Until a test proves it, UX34 is not implemented.
+A stop records `referencedFingerprint` over the reference closure of its subjects (evidence blocks, cited sources, image assets) in `src/core/tours.ts`, so changing referenced code, a table or a source makes the stop stale. Legacy stops keep their old comparison and are never re-recorded silently; `publicTours` recomputes it on the public document, so no private content is hashed into a public identity. Proof: `tests/tour-referenced-content.test.ts`.
 
 ## Coverage review (27 domains)
 
