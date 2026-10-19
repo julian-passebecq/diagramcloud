@@ -1,8 +1,17 @@
-# Now / Next (2026-10-18, V3 integration in progress on 1.29.1)
+# Now / Next (2026-10-19, 1.30.0 V3 workspace)
 
-**Now.** V3 integration is in progress. W0 (adopt) lands the four handoff patches and the adoption report [V3_WORKSPACE](docs/product/V3_WORKSPACE.md): view routes and workbench layout presets, reading perspectives and a history lane over supplied records, capability briefs and usage arithmetic, and the private read-only PM task import (`datapass.owner-tasks/1`) reachable from the import dialog with a browser journey. The workbench, perspective, history, capability and usage modules are not yet mounted in the App. One Claude lead coordinates a workflow; W2 runs as a native subagent lane; no external Codex writer.
+**Now.** 1.30.0 ([notes](docs/release-1.30/RELEASE_NOTES.md)) integrates the V3 lanes: foundation and PM task import (#102), the opt-in V3 workspace (#106), cited capability examples (#103), linked comparison (#107), interruptible presentation (#108) and the expressiveness complement with its companion pane (#104, #105, #109). `tests/e2e/v3-release.spec.ts` runs one offline journey through the real App (workspace, PM import, Follow/Pin, capability brief, comparison, presentation with detour and resume, HTML export); it found that recording a tour left the unsaved-edit guard armed, fixed in `src/ui/Tours.tsx`. Acceptance UX26-UX34 with the test behind each status is in [V3_WORKSPACE](docs/product/V3_WORKSPACE.md); AGENTS.md "Current limits (1.30.0)" has the boundaries. The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.30.0-<sha>/` (never committed).
 
-**Next.** W1 (mount the workbench and route resolution in `src/App.tsx`), W2 (cited capability examples) and W5 follow-ups in parallel after W0; then W3 and W4 after W1; W6 integrates, versions and qualifies. Filesets and acceptance UX26-UX30 are in V3_WORKSPACE.
+**Next.** These are still open:
+- V3: UX26 and UX27 have no App view (handoff identities, ownership and fileset conflicts); UX29 is partial (usage arithmetic not shown, no effort or queue model); UX30 is partial (no prompt, native result, qualification or release links); UX33 partial (printed form of the focused HTML not inspected); UX31 has no in-App walkthrough request editor.
+- Workspace: free drag docking, saved layouts, builder identities, Git/work/question/decision dock panels.
+- Carried from 1.29.x: owner decisions AC02, AC09, AC11; completeness badge, folder-picker AbortSignal, a host calling `acceptPublicReturn`, navigator/search/story honouring a chosen parent outside the workspace; host runs in CI, extension update, signing and Marketplace; R4-W7 adapters.
+
+Estimates in the V3 handoff were uncalibrated allowances; no measured effort is recorded here.
+
+## Previous: V3 integration in progress (2026-10-18, on 1.29.1)
+
+W0 (adopt) landed the four handoff patches and the adoption report; W1-W5 followed as separate PRs, and W6 (this release) integrated them.
 
 ## Previous: 1.29.1
 

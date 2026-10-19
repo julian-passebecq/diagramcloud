@@ -1,6 +1,6 @@
 # DiagramCloud V3 workspace: adoption report (W0)
 
-State on 2026-10-18. This page records how the V3 handoff was adopted into this repository. It is a status and boundary page for the existing [roadmap](../ROADMAP.md), not a second backlog. The V3 mission rows UX01-UX25 live in the [V3 handoff entrypoint](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/workstreams/diagramcloud-v3-handoff-20261018/START.md); this page adds UX26-UX30 below and never restates or reinterprets UX01-UX25.
+State on 2026-10-19 (1.30.0 integrated W0-W5 and the release journey; see "Integration (W6, 1.30.0)" below). This page records how the V3 handoff was adopted into this repository. It is a status and boundary page for the existing [roadmap](../ROADMAP.md), not a second backlog. The V3 mission rows UX01-UX25 live in the [V3 handoff entrypoint](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/workstreams/diagramcloud-v3-handoff-20261018/START.md); this page adds UX26-UX30 below and never restates or reinterprets UX01-UX25.
 
 ## Source cut
 
@@ -52,15 +52,15 @@ W0 and the source half of W5 land together in the foundation PR (this page, the 
 
 ## Acceptance added (UX26-UX30)
 
-UX01-UX25 stay as written in the V3 mission. These rows extend them:
+UX01-UX25 stay as written in the V3 mission. These rows extend them. Status as of 1.30.0: a row is implemented only when a named test proves it in the App; a source-module test alone makes it partial.
 
-| ID | Acceptance |
-| --- | --- |
-| UX26 | Handoff source, proposed work, acceptance and original prompt/checkpoint identities are inspectable; preparation never becomes execution. |
-| UX27 | Declared ownership, fileset and resource conflicts are visible; one integrator and an optional disjoint lane do not create competing App writers. |
-| UX28 | An existing PM task JSON enters the ordinary DiagramCloud preview as a private read-only projection, with stable task identity, state, dependency and detail views, and refusal without mutation. |
-| UX29 | Estimates distinguish effort, dependency bounds, tokens and queue/access uncertainty; unknown values and actual usage stay distinct. |
-| UX30 | A viewer can follow plan, adopted task or prepared prompt, actual native result, then source, artifact, qualification and release where supplied, and sees explicit gaps otherwise. |
+| ID | Acceptance | Status (1.30.0) |
+| --- | --- | --- |
+| UX26 | Handoff source, proposed work, acceptance and original prompt/checkpoint identities are inspectable; preparation never becomes execution. | partial: the source cut and patch sha256 are recorded on this page (documentation, no test); a PM task or capability brief stays inert text and is never launched (`tests/pm-task-import.test.ts` "an unselected or unsupported instruction string remains inert", "provider request is still refused"; `tests/capability-guide.test.ts` "code-looking instructions stay text, never run"); the App has no view of handoff, prompt or checkpoint identities |
+| UX27 | Declared ownership, fileset and resource conflicts are visible; one integrator and an optional disjoint lane do not create competing App writers. | not implemented in the App: the block plan and filesets are recorded on this page only, with no test |
+| UX28 | An existing PM task JSON enters the ordinary DiagramCloud preview as a private read-only projection, with stable task identity, state, dependency and detail views, and refusal without mutation. | implemented (#102): `tests/pm-task-import.test.ts`; `tests/e2e/pm-task-import.spec.ts` "PM task snapshot: import dialog preview, Apply, state/dependency/detail views, reload keeps it" and "PM task snapshot: an invalid or cyclic file is refused without mutation"; `tests/e2e/v3-release.spec.ts` (in the V3 workspace) |
+| UX29 | Estimates distinguish effort, dependency bounds, tokens and queue/access uncertainty; unknown values and actual usage stay distinct. | partial: `src/intelligence/usageEconomics.ts` keeps unknown and zero cost apart and never merges metered, estimated and allocated cost (`tests/usage-economics.test.ts` "unknown input/output/cost stays counted globally and by attributed feature", "zero cost is valid and distinct from missing cost", "metered, estimate, subscription allocation and currencies never merge"); it is not shown in the App, and effort, dependency-bound and queue estimates have no model |
+| UX30 | A viewer can follow plan, adopted task or prepared prompt, actual native result, then source, artifact, qualification and release where supplied, and sees explicit gaps otherwise. | partial: the plan's tasks, states and dependencies are views (`tests/e2e/pm-task-import.spec.ts`), and the workspace dock shows a read-only history lane over recorded repository revisions (`tests/history-lens.test.ts`); prompt, native result, qualification and release links are not modelled, so the chain is not followable end to end |
 
 ### Expressiveness rows (UX31-UX34, complement E)
 
@@ -98,3 +98,14 @@ W1 mounts the foundation modules in the real App (`src/App.tsx`). The workspace 
 - **Responsive.** Below the desktop width the frame shows one pane at a time with a pane switcher, the reading controls fold into one disclosure, and focus moves to a visible control when its pane hides. `tests/e2e/v3-workspace.spec.ts` checks the explorer, Follow / Pin, parent-preserving drill and choice, Back / Forward and a deep link, the unsaved-edit guard, audience change and source replacement without private text in the page, and a 390 x 844 keyboard walk.
 
 Not in W1: free drag docking, saved workspace layouts, builder identity facets, Git / work / question / decision dock panels (no supplied source yet) and a capability guide view beyond the compiled project. W3 (linked comparison) and W4 (meeting return) build on this workspace.
+
+## Integration (W6, 1.30.0)
+
+Merged lanes: foundation W0 + W5 (#102), W1 workspace (#106), W2 capability examples (#103), W3 linked comparison (#107), W4 meeting return (#108), and complement E (#104, #105, #109). No lane is left unmerged.
+
+- **W3 linked comparison.** The workspace's Compare task opens a variant, two revisions of the session or two declared environments (`src/core/variantDraft.ts`, `src/ui/VariantCompare.tsx`). Pairs are exact stable IDs, or a recorded correspondence across projects; an absent counterpart is shown as absent, selecting applies nothing (Apply stays the Variants panel's one-revision patch), a source change marks the comparison stale without re-pairing, and Return restores the view and selection. Tests: `tests/linked-comparison.test.ts`, `tests/e2e/v3-comparison.spec.ts`.
+- **W4 meeting return.** Pause for a question keeps the presentation on its stop through any detour; Return and resume finds the stop again by its identity in the audience's permitted copy, and a source or audience change during the pause is offered as a choice, never followed. Tests: `tests/tour-presentation.test.ts`, `tests/e2e/v3-meeting.spec.ts`.
+- **Release journey.** `tests/e2e/v3-release.spec.ts` runs one pass through the real App with every non-loopback request aborted: open the workspace, import a PM task snapshot, Follow then Pin in the companion, load the synthetic capability brief through the import review, compare the session's open revision, record a public tour, present it with a pause, a drill detour and Return and resume, and export the public HTML, opened with no network.
+- **Fix found by the journey.** Recording a tour left the workspace's unsaved-edit guard armed (the record buttons did not submit their form), so the next mode change asked about an edit already used. The record buttons now submit the form; Enter in the title field does not.
+
+Still open after 1.30.0: UX26 and UX27 have no App view; UX29 and UX30 are partial (above); UX33 is partial (printed form not inspected); free drag docking, saved layouts, builder identities and the Git / work / question / decision dock panels are not built.
