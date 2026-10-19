@@ -101,11 +101,11 @@ Not in W1: free drag docking, saved workspace layouts, builder identity facets, 
 
 ## Integration (W6, 1.30.0)
 
-Merged lanes: foundation W0 + W5 (#102), W1 workspace (#106), W2 capability examples (#103), W3 linked comparison (#107), W4 meeting return (#108), and complement E (#104, #105). No lane is left unmerged.
+Merged lanes: foundation W0 + W5 (#102), W1 workspace (#106), W2 capability examples (#103), W3 linked comparison (#107), W4 meeting return (#108), and complement E (#104, #105, #109). No lane is left unmerged.
 
 - **W3 linked comparison.** The workspace's Compare task opens a variant, two revisions of the session or two declared environments (`src/core/variantDraft.ts`, `src/ui/VariantCompare.tsx`). Pairs are exact stable IDs, or a recorded correspondence across projects; an absent counterpart is shown as absent, selecting applies nothing (Apply stays the Variants panel's one-revision patch), a source change marks the comparison stale without re-pairing, and Return restores the view and selection. Tests: `tests/linked-comparison.test.ts`, `tests/e2e/v3-comparison.spec.ts`.
 - **W4 meeting return.** Pause for a question keeps the presentation on its stop through any detour; Return and resume finds the stop again by its identity in the audience's permitted copy, and a source or audience change during the pause is offered as a choice, never followed. Tests: `tests/tour-presentation.test.ts`, `tests/e2e/v3-meeting.spec.ts`.
 - **Release journey.** `tests/e2e/v3-release.spec.ts` runs one pass through the real App with every non-loopback request aborted: open the workspace, import a PM task snapshot, Follow then Pin in the companion, load the synthetic capability brief through the import review, compare the session's open revision, record a public tour, present it with a pause, a drill detour and Return and resume, and export the public HTML, opened with no network.
 - **Fix found by the journey.** Recording a tour left the workspace's unsaved-edit guard armed (the record buttons did not submit their form), so the next mode change asked about an edit already used. The record buttons now submit the form; Enter in the title field does not.
 
-Still open after 1.30.0: UX26 and UX27 have no App view; UX29 and UX30 are partial (above); UX31-UX33 stay partial; free drag docking, saved layouts, builder identities and the Git / work / question / decision dock panels are not built.
+Still open after 1.30.0: UX26 and UX27 have no App view; UX29 and UX30 are partial (above); UX33 is partial (printed form not inspected); free drag docking, saved layouts, builder identities and the Git / work / question / decision dock panels are not built.
