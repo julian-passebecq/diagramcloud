@@ -7,9 +7,6 @@
 **State (2026-10-20).** 1.32.0 is merged (PR #112, `5dbcd6768c40c954466713f0d6c137672d1b29d7`, main CI run 39336345397 success) and its package is published privately in juliandatapass-group/galaxy-release-vault as generic package diagramcloud/1.32.0-5dbcd67 (14 files; authenticated re-download matched every sha256; anonymous access refused). Receipt in `outcome.json` `privatePackages[0]`. No tag, public release, Marketplace entry or separate deploy check; `ownerVerified` stays false.
 
 **Left.** Still open as product gaps (the saved-context dimension for the linked pair landed after 1.32.0 in PR #113): cross-project correspondence in linked views, free docking, delivery block to PM task links, token forecast and queue model, live collectors or dispatch, a capacityScenario App surface, PDF/PPTX meeting outputs, semantic diagrams for the new lessons, Cursor/VSIX changes. Carried: owner decisions AC02, AC09, AC11; host runs in CI, extension update, signing and Marketplace.
-=======
-**Left.** Lead: open the PR from `lane/unified-integrate`, wait for CI, squash-merge on green. Still open as product gaps (the saved-context dimension for the linked pair landed after 1.32.0): cross-project correspondence in linked views, free docking, delivery block to PM task links, token forecast and queue model, live collectors or dispatch, a capacityScenario App surface, PDF/PPTX meeting outputs, semantic diagrams for the new lessons, Cursor/VSIX changes. Carried: owner decisions AC02, AC09, AC11; host runs in CI, extension update, signing and Marketplace.
->>>>>>> origin/main
 
 **How to verify.** `npx tsc --noEmit`, `npm test`, `npm run build`, then `DIAGRAMCLOUD_E2E_PORT=<free port> npx playwright test --reporter=line`; the three new journeys are in `tests/e2e/v3-release.spec.ts`.
 
