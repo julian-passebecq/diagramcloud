@@ -84,6 +84,9 @@ import {learningCatalogue} from './intelligence/learning/catalogue';
 import type {LessonContext} from './intelligence/learning/mappings';
 import type {LearningHost} from './ui/LearningCatalogue';
 import {WorkbenchFrame} from './ui/WorkbenchFrame';
+import {LinkedPerspective} from './ui/LinkedPerspective';
+import {LINKED_PERSPECTIVE_UNAVAILABLE,linkedChildView,linkedMappings,linkedParentView,openLinkedPerspective,pickLinked,reconcileLinkedPerspective,setLinkedView,suggestRightView,swapLinkedSides,type LinkedPerspective as LinkedState,type LinkedResult} from './core/linkedPerspective';
+import {readDefaultSurface,resolveInitialSurface,writeDefaultSurface,type DefaultSurfaceStorage} from './core/defaultSurface';
 import {PerspectiveBar} from './ui/PerspectiveBar';
 import {HistoryLensPanel,type HistoryLensControls} from './ui/HistoryLensPanel';
 import {defaultWorkbenchLayout,selectWorkbenchPane,setWorkbenchPreset,type WorkbenchLayout} from './core/workbenchLayout';
@@ -100,10 +103,16 @@ function savedContextStorage():Storage|null{try{return window.localStorage;}catc
 function studioPreferenceStorage():StudioLayoutPreferenceStorage|null{try{return window.localStorage;}catch{return null;}}
 const layoutReadNotice=(status:string)=>status==='corrupt'?'Saved panel placement is unreadable. Defaults are shown; your project is unchanged.':status==='unavailable'?'Panel preferences cannot be read here. These choices apply only for this session.':undefined;
 type Surface='studio'|'workspace';
-/** The V3 workspace is opt-in for this session: ?workspace=v3 opens it, the header toggle switches it. */
-function initialSurface():Surface{try{return new URLSearchParams(window.location.search).get('workspace')==='v3'?'workspace':'studio';}catch{return 'studio';}}
+function defaultSurfaceStorage():DefaultSurfaceStorage|null{try{return window.localStorage;}catch{return null;}}
+/** The V3 workspace is opt-in: ?workspace=studio (legacy escape) > ?workspace=v3 > the reader's stored default > the classic studio. */
+function initialSurface():Surface{try{return resolveInitialSurface(window.location.search,defaultSurfaceStorage());}catch{return 'studio';}}
+/** A linked pair from the deep link (linked=<left>~<right>, anchor=), read once at start; stable IDs only. */
+type LinkedRoute={left:string;right:string;anchor:string|null};
+function initialLinkedRoute():(LinkedRoute&{project:string|null})|null{try{const q=new URLSearchParams(window.location.search),raw=q.get('linked');if(!raw)return null;const parts=raw.split('~');if(parts.length!==2||!parts[0]||!parts[1])return null;return {project:q.get('project'),left:parts[0],right:parts[1],anchor:q.get('anchor')||null};}catch{return null;}}
 /** One browser history entry of the workspace: stable-ID pointers into the permitted document only. */
-type WorkspaceRoute={dc:'v3';projectId:string;audience:'author'|'public';path:string[];view:string;selected:string|null;sheet:NavigationSheet};
+type WorkspaceRoute={dc:'v3';projectId:string;audience:'author'|'public';path:string[];view:string;selected:string|null;sheet:NavigationSheet;linked:LinkedRoute|null};
+/** The route part of a history state: its session position `n` is not part of the route. */
+const routeStateKey=(state:{n?:unknown}&Record<string,unknown>)=>{const rest:Record<string,unknown>={...state};delete rest.n;return JSON.stringify(rest);};
 const SHEET_CHOICES:[NavigationSheet,string][]=[['diagram','Diagram'],['overview','Business overview'],['structure','Structure'],['relationships','Relationships'],['evidence','Evidence / gaps']];
 const DOCK_LABEL:Record<DockPanel,string>={route:'Route and parents',evidence:'Selection evidence',changes:'Repository revisions',git:'Git',work:'Work',questions:'Questions',decisions:'Decisions'};
 const HISTORY_INSTANT=/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{1,3})?(?:Z|[+-]\d\d:\d\d)$/;
@@ -201,6 +210,10 @@ const focus=useMemo(()=>basisFilter==='all'?null:new Set(doc.nodes.filter(n=>(n.
  type ComparisonReturn={projectId:string;path:string[];view:string;selected:string|null;selectedEdge:string|null;sheet:typeof sheet};
  const [comparison,setComparison]=useState<{session:LinkedComparison;back:ComparisonReturn}|null>(null);
  useEffect(()=>{if(publicMode||!workspaceSurface)setComparison(null);},[publicMode,workspaceSurface]);
+ // Linked perspective (V3 workspace): two permitted views of this project side by side. Session-only; its pair and anchor are route entries.
+ const [linked,setLinkedState]=useState<LinkedState|null>(null),initialLinked=useRef(initialLinkedRoute()),[linkedBoot,setLinkedBoot]=useState(0);
+ const [navPosition,setNavPosition]=useState({at:0,max:0});
+ const [defaultWorkspace,setDefaultWorkspace]=useState(()=>readDefaultSurface(defaultSurfaceStorage())==='workspace');
  // A route change in the workspace never discards an unsaved form edit: it waits for Keep editing or an explicit Discard.
  const dirtyField=useRef<HTMLElement|null>(null),frameElement=useRef<HTMLDivElement>(null),keepEditingButton=useRef<HTMLButtonElement>(null),routeChoiceFirst=useRef<HTMLButtonElement>(null);
  const [pendingRoute,setPendingRoute]=useState<{scope:string;run:()=>void;cancel?:()=>void}|null>(null);
@@ -227,7 +240,8 @@ const focus=useMemo(()=>basisFilter==='all'?null:new Set(doc.nodes.filter(n=>(n.
   setRouteChoice(null);setMessage(VIEW_ROUTE_UNAVAILABLE);return null;
  }
  const setSurface=(next:Surface)=>routeGuard(()=>{setSurfaceState(next);setRouteChoice(null);if(next==='workspace')setSidebar(s=>s==='gallery'?'navigation':s);
-  try{const url=new URL(window.location.href);if(next==='workspace')url.searchParams.set('workspace','v3');else for(const key of ['workspace','view','node'])url.searchParams.delete(key);window.history.replaceState(null,'',url);}catch{/* the surface still applies for this session */}});
+  if(next==='studio')setLinkedState(null);
+  try{const url=new URL(window.location.href);if(next==='workspace')url.searchParams.set('workspace','v3');else{for(const key of ['workspace','view','node','linked','anchor'])url.searchParams.delete(key);if(readDefaultSurface(defaultSurfaceStorage())==='workspace')url.searchParams.set('workspace','studio');}window.history.replaceState(null,'',url);}catch{/* the surface still applies for this session */}});
  // One transient authoring context; an object replacement at the same ID/revision still invalidates old drafts.
  const viewEditScope=JSON.stringify([mode,activeView,path,sheet,selected,selectedEdge,modal,designMode,experienceStart]);
  const viewEditLive=useRef({project,scope:viewEditScope,mode,sheet,designMode,modal,experienceStart,path:effectivePath,epoch:0});
@@ -409,26 +423,39 @@ const focus=useMemo(()=>basisFilter==='all'?null:new Set(doc.nodes.filter(n=>(n.
  const renderingControls=<><Button size="small" onClick={()=>setMotion(!motion)} aria-pressed={motion}>{motion?'Pause motion':'Enable motion'}</Button><Button size="small" appearance={blueprint?"primary":"secondary"} aria-pressed={blueprint} title="Blueprint rendering of the canvas (same diagram, engineering-drawing style)" onClick={()=>{const next=!blueprint;setBlueprint(next);try{localStorage.setItem('diagramcloud.blueprint',next?'on':'off');}catch{/* private window: this visit only */}}}>Blueprint</Button><Button size="small" appearance={designMode?"primary":"secondary"} aria-pressed={designMode} title="Diagram Design mode: the current public view as an editorial figure (architecture, layer stack, exploded 3D stack, drilldown tree)" onClick={()=>{const next=!designMode;setDesignMode(next);try{localStorage.setItem('diagramcloud.design',next?'on':'off');}catch{/* private window: this visit only */}}}>Diagram Design</Button><label className="trace-label">Trace <select aria-label="Trace direction" value={trace} onChange={e=>setTrace(e.target.value as Trace)}><option value="none">Off</option><option value="upstream">Upstream</option><option value="downstream">Downstream</option></select></label></>;
  // Workspace routes: every navigation is one browser history entry (Back/Forward) and a deep link (?workspace=v3&project=&view=&node=).
  const routeView=effectivePath.includes(activeView)?activeView:effectivePath[effectivePath.length-1];
- const routeEntry:WorkspaceRoute={dc:'v3',projectId:doc.id,audience,path:effectivePath,view:routeView,selected:selected&&doc.views.find(v=>v.id===routeView)?.nodeIds.includes(selected)?selected:null,sheet};
+ const routeEntry:WorkspaceRoute={dc:'v3',projectId:doc.id,audience,path:effectivePath,view:routeView,selected:selected&&doc.views.find(v=>v.id===routeView)?.nodeIds.includes(selected)?selected:null,sheet,linked:linked?{left:linked.leftViewId,right:linked.rightViewId,anchor:linked.anchorNodeId}:null};
  const routeKey=JSON.stringify(routeEntry);
- const routeUrl=(entry:WorkspaceRoute)=>{const url=new URL(window.location.href);url.searchParams.set('workspace','v3');url.searchParams.set('project',entry.projectId);url.searchParams.set('view',entry.view);if(entry.selected)url.searchParams.set('node',entry.selected);else url.searchParams.delete('node');for(const key of ['collection','publication'])url.searchParams.delete(key);return url;};
- useEffect(()=>{if(!workspaceSurface||!ready)return;const current=window.history.state as {dc?:string}|null;if(current?.dc==='v3'&&JSON.stringify(current)===routeKey)return;
-  try{const entry=JSON.parse(routeKey) as WorkspaceRoute;if(current?.dc==='v3')window.history.pushState(entry,'',routeUrl(entry));else window.history.replaceState(entry,'',routeUrl(entry));}catch{/* the in-app route still applies */}},[workspaceSurface,ready,routeKey]);
+ const routeUrl=(entry:WorkspaceRoute)=>{const url=new URL(window.location.href);url.searchParams.set('workspace','v3');url.searchParams.set('project',entry.projectId);url.searchParams.set('view',entry.view);if(entry.selected)url.searchParams.set('node',entry.selected);else url.searchParams.delete('node');for(const key of ['collection','publication'])url.searchParams.delete(key);
+  if(entry.linked){url.searchParams.set('linked',`${entry.linked.left}~${entry.linked.right}`);if(entry.linked.anchor)url.searchParams.set('anchor',entry.linked.anchor);else url.searchParams.delete('anchor');}else{url.searchParams.delete('linked');url.searchParams.delete('anchor');}return url;};
+ useEffect(()=>{if(!workspaceSurface||!ready||initialLinked.current)return;const current=window.history.state as ({dc?:string;n?:number}&Record<string,unknown>)|null;if(current?.dc==='v3'&&routeStateKey(current)===routeKey)return;
+  try{const entry=JSON.parse(routeKey) as WorkspaceRoute;if(current?.dc==='v3'){const n=(typeof current.n==='number'?current.n:0)+1;window.history.pushState({...entry,n},'',routeUrl(entry));setNavPosition({at:n,max:n});}else{window.history.replaceState({...entry,n:0},'',routeUrl(entry));setNavPosition({at:0,max:0});}}catch{/* the in-app route still applies */}},[workspaceSurface,ready,routeKey,linkedBoot]);
  const applyRoute=(route:WorkspaceRoute)=>{
   if(route.audience!==audience){setMessage(NAVIGATION_UNAVAILABLE_MESSAGE);return;}
   const target=route.projectId===project.id?project:library.find(d=>d.id===route.projectId);if(!target){setMessage(NAVIGATION_UNAVAILABLE_MESSAGE);return;}
-  const entry=resolveNavigationEntry(publicMode?publicDocument(target):target,{path:route.path,view:route.view,selected:route.selected,selectedEdge:null,sheet:route.sheet});
+  const permitted=publicMode?publicDocument(target):target;
+  const entry=resolveNavigationEntry(permitted,{path:route.path,view:route.view,selected:route.selected,selectedEdge:null,sheet:route.sheet});
   if(!entry){setMessage(NAVIGATION_UNAVAILABLE_MESSAGE);return;}
+  // The linked pair is restored by stable ID on the permitted copy; one that no longer resolves closes linked mode with the generic message.
+  let restored:LinkedState|null=null;
+  if(route.linked){const out=openLinkedPerspective(permitted,{binding:{projectId:permitted.id,audience,epoch:permitted.revision},leftViewId:route.linked.left,rightViewId:route.linked.right,anchorNodeId:route.linked.anchor,detailPlacement:linked?.detailPlacement});if(out.ok)restored=out.state;else setMessage(out.reason);}
   if(target!==project)openProject(target);
-  setPath(entry.path);setActiveView(entry.view);setSelected(entry.selected);setSelectedEdge(null);setSheet(entry.sheet);setStep(-1);setRouteChoice(null);};
+  setPath(entry.path);setActiveView(entry.view);setSelected(entry.selected);setSelectedEdge(null);setSheet(entry.sheet);setStep(-1);setRouteChoice(null);setLinkedState(restored);};
  const popRoute=useRef<(state:unknown)=>void>(()=>{});
- popRoute.current=state=>{const route=state as WorkspaceRoute|null;if(!workspaceSurface||!route||route.dc!=='v3')return;
-  const restore=()=>{try{const entry=JSON.parse(routeKey) as WorkspaceRoute;window.history.pushState(entry,'',routeUrl(entry));}catch{/* the in-app route still applies */}};
-  routeGuard(()=>applyRoute(route),restore);};
+ popRoute.current=state=>{const route=state as (WorkspaceRoute&{n?:number})|null;if(!workspaceSurface||!route||route.dc!=='v3')return;
+  const restore=()=>{try{const entry=JSON.parse(routeKey) as WorkspaceRoute,n=navPosition.at;window.history.pushState({...entry,n},'',routeUrl(entry));}catch{/* the in-app route still applies */}};
+  if(typeof route.n==='number'){const n=route.n;setNavPosition(p=>({at:n,max:Math.max(p.max,n)}));}
+  routeGuard(()=>applyRoute({...route,linked:route.linked??null}),restore);};
  useEffect(()=>{const handler=(event:PopStateEvent)=>popRoute.current(event.state);window.addEventListener('popstate',handler);return()=>window.removeEventListener('popstate',handler);},[]);
  // Reading perspective: transient, bound to project, audience and revision. Its choices are what this permitted document supports.
  const perspectiveBinding=useMemo<PerspectiveBinding>(()=>({projectId:doc.id,audience,epoch:doc.revision}),[doc.id,audience,doc.revision]);
  const reachableViews=useMemo(()=>doc.views.filter(v=>pathTo(doc,v.id).length>0),[doc]);
+ // A project or audience change resets linked mode with the generic message; a revision keeps what still resolves.
+ useEffect(()=>{if(!linked)return;if(!workspaceSurface){setLinkedState(null);return;}if(samePerspectiveBinding(linked.binding,perspectiveBinding))return;
+  const out=reconcileLinkedPerspective(linked,doc,perspectiveBinding);setLinkedState(out.state);if(out.notice)setMessage(out.notice);},[linked,doc,perspectiveBinding,workspaceSurface]);
+ useEffect(()=>{const pending=initialLinked.current;if(!pending||!ready)return;initialLinked.current=null;if(!workspaceSurface)return;
+  if(pending.project&&pending.project!==doc.id){setMessage(LINKED_PERSPECTIVE_UNAVAILABLE);return;}
+  const out=openLinkedPerspective(doc,{binding:perspectiveBinding,leftViewId:pending.left,rightViewId:pending.right,anchorNodeId:pending.anchor});
+  if(out.ok)setLinkedState(out.state);else setMessage(out.reason);setLinkedBoot(b=>b+1);},[ready,doc,perspectiveBinding,workspaceSurface]);
  const historySlice=useMemo(()=>atlasHistorySlice(doc),[doc]);
  const perspectiveSupport=useMemo<PerspectiveSupport>(()=>({binding:perspectiveBinding,
   lenses:(Object.keys(PERSPECTIVE_LABEL) as Perspective[]).map(p=>({id:p,label:PERSPECTIVE_LABEL[p],state:reachableViews.some(v=>perspectiveOf(v)===p)?'available' as const:'unsupported' as const})),
@@ -478,7 +505,33 @@ const focus=useMemo(()=>basisFilter==='all'?null:new Set(doc.nodes.filter(n=>(n.
  const evidencePanel=node?<NodeEvidence doc={doc} node={node}/>:<p className="micro">Select a component to read its evidence here.</p>;
  const historyPanel=historySlice?<HistoryLensPanel compact={frameSize.width<=1200} slice={historySlice} controls={historyControls} binding={perspectiveBinding} onQuery={(query,issuedAt)=>{if(samePerspectiveBinding(issuedAt,perspectiveBinding))setHistoryControls({binding:issuedAt,query});}} onSelect={(ref,issuedAt)=>{if(samePerspectiveBinding(issuedAt,perspectiveBinding))navigateRepository(ref.repository);}}/>:null;
  const dockPanels=[perspectiveView.dock.primary,perspectiveView.dock.secondary].filter((p):p is DockPanel=>!!p&&perspectiveSupport.panels.includes(p)),activityPanels=dockPanels.filter(p=>p!=='route');
- const dockPanel=(p:DockPanel)=>p==='evidence'?evidencePanel:p==='changes'?historyPanel:p==='route'?routePanel:null;
+ const linkedOn=!!linked&&workspaceSurface;
+ const changeLinked=(next:LinkedState)=>{const current=linked;if(!current)return;
+  const route=current.leftViewId!==next.leftViewId||current.rightViewId!==next.rightViewId||current.anchorNodeId!==next.anchorNodeId;
+  if(route)routeGuard(()=>setLinkedState(next));else setLinkedState(next);};
+ const applyLinked=(out:LinkedResult)=>{if(out.ok)changeLinked(out.state);else setMessage(out.reason);};
+ const toggleLinked=()=>routeGuard(()=>{if(linked){setLinkedState(null);return;}
+  const anchor=selected&&doc.nodes.some(n=>n.id===selected)?selected:null;
+  const probe=openLinkedPerspective(doc,{binding:perspectiveBinding,leftViewId:routeView,rightViewId:routeView,anchorNodeId:anchor});if(!probe.ok){setMessage(probe.reason);return;}
+  const out=openLinkedPerspective(doc,{binding:perspectiveBinding,leftViewId:routeView,rightViewId:suggestRightView(doc,routeView,linkedMappings(probe.state,doc))??routeView,anchorNodeId:anchor});
+  if(out.ok){setLinkedState(out.state);setComparison(null);setWorkbench(w=>selectWorkbenchPane(w,'primary'));}else setMessage(out.reason);});
+ // Back to business question: the anchor is picked where a pane shows it; otherwise linked mode closes on the anchor's view (Back restores the pair).
+ const backToQuestion=()=>{const current=linked;if(!current?.anchorNodeId)return;const anchorId=current.anchorNodeId;
+  for(const side of ['left','right'] as const){if(doc.views.find(v=>v.id===(side==='left'?current.leftViewId:current.rightViewId))?.nodeIds.includes(anchorId)){applyLinked(pickLinked(current,doc,perspectiveBinding,side,anchorId));return;}}
+  const view=reachableViews.find(v=>v.nodeIds.includes(anchorId));if(!view){setMessage(LINKED_PERSPECTIVE_UNAVAILABLE);return;}
+  routeGuard(()=>{setLinkedState(null);openViewRoute(view.id,anchorId);});recoverFocus();};
+ const linkedSide=linked?.pick?.side??'left',linkedSideView=linked?(linkedSide==='left'?linked.leftViewId:linked.rightViewId):'';
+ const linkedUp=linked?linkedParentView(doc,linkedSideView):null,linkedDown=linked?linkedChildView(doc,linked):null;
+ const linkedRouteButton=(name:string,text:string,available:boolean,run:()=>void)=><button type="button" aria-label={name} title={available?name:`${name}: unavailable`} aria-disabled={!available} onClick={()=>{if(available)run();}}>{text}</button>;
+ const linkedRoutePanel=linked?<div className="v3-route" data-testid="linked-route" role="group" aria-label="Linked route">
+  <p className="micro">{`${viewTitle(linked.leftViewId)} | ${viewTitle(linked.rightViewId)}. Up and Down act on the ${linkedSide} view; each move is one history entry.`}</p>
+  <div className="toolbar">{linkedRouteButton('Back','← Back',navPosition.at>0,()=>window.history.back())}{linkedRouteButton('Forward','Forward →',navPosition.at<navPosition.max,()=>window.history.forward())}
+  {linkedRouteButton('Up to parent view','↑ Up',!!linkedUp,()=>{if(linkedUp)applyLinked(setLinkedView(linked,doc,perspectiveBinding,linkedSide,linkedUp));})}
+  {linkedRouteButton('Down to child view','↓ Down',!!linkedDown,()=>{if(linkedDown)applyLinked(setLinkedView(linked,doc,perspectiveBinding,linkedSide,linkedDown));})}
+  {linkedRouteButton('Swap sides','⇄ Swap sides',true,()=>applyLinked(swapLinkedSides(linked,perspectiveBinding)))}
+  {linkedRouteButton('Back to business question','Back to business question',!!linked.anchorNodeId,backToQuestion)}</div></div>:null;
+ const routeDock=linkedOn?linkedRoutePanel:routePanel;
+ const dockPanel=(p:DockPanel)=>p==='evidence'?evidencePanel:p==='changes'?historyPanel:p==='route'?routeDock:null;
  const dockControls=<details className="wb-layout v3-dock-controls"><summary className="wb-native">Dock panels</summary><div className="wb-layout-fields">
   <label>Main dock panel<select className="wb-native" aria-label="Main dock panel" value={perspectiveView.dock.primary} onChange={e=>onPerspective({type:'dock-primary',value:e.target.value as DockPanel},perspectiveBinding)}>{perspectiveSupport.panels.map(p=><option key={p} value={p}>{DOCK_LABEL[p]}</option>)}</select></label>
   <label>Second dock panel<select className="wb-native" aria-label="Second dock panel" value={perspectiveView.dock.secondary??''} onChange={e=>onPerspective({type:'dock-secondary',value:(e.target.value||null) as DockPanel|null},perspectiveBinding)}><option value="">None</option>{perspectiveSupport.panels.filter(p=>p!==perspectiveView.dock.primary).map(p=><option key={p} value={p}>{DOCK_LABEL[p]}</option>)}</select></label>
@@ -503,11 +556,12 @@ const focus=useMemo(()=>basisFilter==='all'?null:new Set(doc.nodes.filter(n=>(n.
  {routeChoice&&routeChoice.scope===routeScope&&<div className="v3-notice" role="group" aria-label="Choose a parent path"><strong>{`${viewTitle(routeChoice.viewId)} has ${routeChoice.truncated?'more than ':''}${routeChoice.paths.length} parent paths`}</strong><p>Choose the parent to open it under. Nothing is chosen for you; the choice is navigation only.</p><ul>{routeChoice.paths.map((p,i)=><li key={p.viewIds.join('>')}><button ref={i===0?routeChoiceFirst:undefined} type="button" onClick={()=>{const choice=routeChoice;routeGuard(()=>{openViewRoute(choice.viewId,choice.nodeId,p.viewIds);});recoverFocus();}}>{p.viewIds.slice(0,-1).map(viewTitle).join(' › ')}</button></li>)}</ul><button type="button" onClick={()=>{setRouteChoice(null);recoverFocus();}}>Cancel</button></div>}
  <div className="v3-frame-box" ref={frameBox}><WorkbenchFrame id="dc-workspace" title={doc.title} scopeCaption={`${audience==='author'?'Author context':'Permitted public copy'} · ${mode} · revision ${doc.revision}`} layout={workbench} width={frameSize.width} height={frameSize.height} onLayoutChange={setWorkbench}
   explorer={<div className="v3-explorer">{sideTabs}<div className="side-scroll">{sideContent}</div>{!publicMode&&<label className={`file-button v3-capability${busy?' disabled':''}`} title="An explicit capability brief (sources, capabilities, technologies). It is compiled into an ordinary project and opened in the import review; nothing is executed.">Load capability brief<input type="file" accept=".json,application/json" aria-label="Load capability brief" disabled={busy} onChange={e=>{const file=e.target.files?.[0];e.target.value='';if(file)void readCapabilityBrief(file);}}/></label>}</div>}
-  primary={<main className={`main-workspace${blueprint?' blueprint-mode':''}`}>{comparisonView??mainContent}</main>} primaryTitle={activeViewItem?.title??'Architecture view'}
+  primary={<main className={`main-workspace${blueprint?' blueprint-mode':''}`}>{comparisonView??(linkedOn&&linked?<LinkedPerspective doc={doc} state={linked} binding={perspectiveBinding} compact={frameSize.width<=1200||frameSize.height<540} motion={motion} hostId={window.location.host} storage={studioPreferenceStorage} onChange={changeLinked} onBackToQuestion={backToQuestion} onMessage={setMessage}/>:mainContent)}</main>} primaryTitle={activeViewItem?.title??'Architecture view'}
   companion={<div key={routeScope} className="v3-companion">{projectContext}</div>} companionTitle="Context and explanation"
-  navigationMap={dockPanels.includes('route')?routePanel:undefined}
+  navigationMap={dockPanels.includes('route')?routeDock:undefined}
   activity={activityPanels.length||comparisonLauncher?<>{comparisonLauncher&&<div className="v3-dock-panel"><h3>Compare</h3>{comparisonLauncher}</div>}{activityPanels.map(p=><div key={p} className="v3-dock-panel">{(activityPanels.length>1||!!comparisonLauncher)&&<h3>{DOCK_LABEL[p]}</h3>}{dockPanel(p)}</div>)}</>:undefined} activityTitle={[...(comparisonLauncher?['Compare']:[]),...activityPanels.map(p=>DOCK_LABEL[p])].join(' and ')||undefined}
-  controls={dockControls} status={`Layout, dock and reading choices are session-only. ${saveState}. The project JSON stays the source of truth.`}/></div>
+  controls={<><button className="wb-native" type="button" aria-pressed={linkedOn} title="Two permitted views of this project side by side; session-only, never a revision" onClick={toggleLinked}>Linked views</button>{dockControls}</>}
+  layoutExtras={<div className="v3-default-surface"><label><input type="checkbox" checked={defaultWorkspace} onChange={e=>{const want=e.target.checked;if(writeDefaultSurface(defaultSurfaceStorage(),want?'workspace':'studio'))setDefaultWorkspace(want);else setMessage('This browser cannot store the default surface. The classic studio stays the default.');}}/> Open the V3 workspace by default</label><p>Stored in this browser only. <a href="?workspace=studio">Classic studio</a> always opens the classic studio.</p></div>} status={`Layout, dock and reading choices are session-only. ${saveState}. The project JSON stays the source of truth.`}/></div>
 </div>:<div ref={workspaceElement} className={`workspace studio-layout${layoutFit.detailsVisible?' with-context':''}`} data-sidebar-side={layout.sidebarSide} data-sidebar-collapsed={layout.sidebarCollapsed} data-details-visible={layoutFit.detailsVisible} data-compact={!layoutFit.desktop} style={{'--studio-sidebar-width':`${layoutFit.sidebar}px`,'--studio-details-width':`${layoutFit.details}px`} as CSSProperties}><aside id="studio-sidebar-panel" className="side-panel" aria-label="Studio sidebar" hidden={layout.sidebarCollapsed}>{sideTabs}<div className="side-scroll">{sideContent}</div></aside>
  <main className={`main-workspace${blueprint?' blueprint-mode':''}`}>{mainContent}</main>{contextOpen&&<div id="studio-details-panel" className="context-drawer" hidden={layout.detailsCollapsed}><Button size="small" onClick={()=>setContextOpen(false)}>Close details</Button>{projectContext}</div>}</div>}
  {modal==='start'&&<Modal title="Start project analysis" onClose={()=>{cancelAnalysis();setModal(null);}}>{analysisSource==='hybrid'&&<label className="micro" style={{display:'block',whiteSpace:'normal'}}><input type="checkbox" aria-label="Capture private Galaxy import provenance" checked={captureGalaxyProvenance} disabled={busy||publicMode} onChange={e=>chooseGalaxyCapture(e.target.checked)}/> Capture private Galaxy import provenance for a new local project only. No namespace binding or ID reuse. Existing-project capture is unavailable.</label>}<ProjectStart initialSource={analysisSource} onSource={value=>{chooseGalaxyCapture(false);setAnalysisSource(value);}} initialOptions={analysisOptions} onOptions={setAnalysisOptions} busy={busy} error={importError} onRepository={scanFolder} onBrief={stageBrief} onGraph={stageGraph}/>{busy&&<Button onClick={cancelAnalysis}>Cancel analysis</Button>}</Modal>}

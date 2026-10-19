@@ -9,6 +9,8 @@ export type WorkbenchFrameProps={
  navigationMap?:React.ReactNode;activity?:React.ReactNode;rail?:React.ReactNode;
  primaryTitle?:string;companionTitle?:string;activityTitle?:string;
  controls?:React.ReactNode;status?:React.ReactNode;
+ /** Host choices shown inside the Layout details (for example the default surface); never layout state of this frame. */
+ layoutExtras?:React.ReactNode;
 };
 const present=(slot:React.ReactNode)=>slot!==undefined&&slot!==null&&slot!==false;
 
@@ -71,6 +73,7 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
       <label>Bottom height <input className="wb-native" aria-label="Requested desktop bottom height" type="range" min={140} max={360} step={10} value={layout.dockHeight} onChange={e=>change({...layout,dockHeight:Number(e.target.value)})}/></label>
       <p>Session-only layout. Compact screens show one pane at a time. These sizes are desktop requests, not current measured dimensions.</p>
       <button className="wb-native" type="button" onClick={()=>change(defaultWorkbenchLayout())}>Reset session layout</button>
+      {p.layoutExtras}
      </div></details>
      {p.controls}
     </div>
