@@ -54,3 +54,20 @@ test('default export keeps the classic layout: no context bar, no return button'
  await page.getByRole('button',{name:'Next step'}).click();
  await expect(page.locator('#story')).toContainText(`1 / ${project.story.length}`);
 });
+
+test('focused export prints whole: no toolbar, the detail pane and the figure are not clipped',async({page},info)=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.setContent(portfolioHtml(project,undefined,{focusStory:true}));
+ await page.getByRole('button',{name:'Next step'}).click();
+ await page.locator('#views g[data-node-id="wrapper"]').click();
+ await expect(page.locator('#details h2')).toHaveText('Retry wrapper');
+ await page.emulateMedia({media:'print'});
+ await expect(page.locator('.toolbar')).toBeHidden();
+ // Nothing that holds the explanation scrolls or clips on paper.
+ const clipped=await page.evaluate(()=>[...document.querySelectorAll<HTMLElement>('#details, #views .figure-region')].filter(e=>{const s=getComputedStyle(e);return s.maxHeight!=='none'||e.scrollHeight>e.clientHeight+1;}).map(e=>e.id||e.className));
+ expect(clipped).toEqual([]);
+ await expect(page.locator('#details pre').first()).toBeVisible();
+ const pdf=await page.pdf({format:'A4',printBackground:true});
+ expect(pdf.subarray(0,5).toString()).toBe('%PDF-');
+ await info.attach('focused-export-print.pdf',{body:pdf,contentType:'application/pdf'});
+});

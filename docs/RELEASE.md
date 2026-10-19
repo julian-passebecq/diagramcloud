@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.30.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.31.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -44,6 +44,7 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
+| 1.31.0 | head of the `release/1.31.0` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [1.31.0 notes](release-1.31/RELEASE_NOTES.md): expressiveness complement qualified on its own (UX31-UX34 implemented with their tests); the focused explanation HTML prints whole (detail pane and figure no longer clipped on paper); AGENTS.md expressiveness limits (walkthroughs authored not executed, bounded related context, opt-in focused export, referenced-content tour fingerprint, ConceptMotion/VizForge not integrated); Chromium only |
 | 1.30.0 | head of the `release/1.30.0` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [1.30.0 notes](release-1.30/RELEASE_NOTES.md): V3 workspace (opt-in frame, parent-preserving routes, Follow/Pin, unsaved-edit guard), private read-only PM task import, cited capability examples, linked comparison by stable ID, interruptible presentation with explicit resume, explanation walkthroughs and the companion pane; one offline release journey through the App; UX26/UX27 not in the App, UX29/UX30 partial; Chromium only |
 | 1.29.1 | head of the `claude/v2-1.29.1` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [1.29.1 notes](release-1.29/RELEASE_NOTES-1.29.1.md): public figures print one uncounted omission notice instead of private counts (AC25), the watched concept host takes its change baseline synchronously; Chromium only |
 | 1.29.0 | head of the `claude/v2-1.29.0` PR; no tag | linked from the PR (exact-head `validate`) | per the CI receipt of that head | Vercel production from `main`; not verified separately | [1.29.0 notes](release-1.29/RELEASE_NOTES.md): hierarchy rail and Choose parent, evidence forms and compatibility evidence, host refusals and Linux packaging dry run, studio environment, public noninterference, uncertain writes and unknown modules, image digests, artifact entry and declared-workflow playback, instruction files as declared rules; Chromium only |
