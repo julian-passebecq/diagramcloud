@@ -4,24 +4,24 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 
 The selected r3/r4 V2 scope is the complete standalone architectural Studio: general core, Studio UX, Galaxy/external projects, IT catalogue, source analyses/bridges, visualizations, integrations and publication. The [eight-workstream status and original acceptance crosswalk](product/V2_WORKSTREAM_STATUS.md) is a navigation/status view of those contracts, not a replacement roadmap or permission grant. Mosaic/T3 remains one integration; its owner-side limits do not block independent authorized DiagramCloud work. All unfinished criteria remain open.
 
-## V3 workspace (in progress, 2026-10-18)
+## V3 workspace (integrated in 1.30.0, 2026-10-19)
 
 V3 is adopted into this roadmap, not tracked in a parallel backlog. The adoption report, patch hashes, block filesets and acceptance UX26-UX30 are in [V3_WORKSPACE](product/V3_WORKSPACE.md); the mission rows UX01-UX25 are in the [V3 handoff entrypoint](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/workstreams/diagramcloud-v3-handoff-20261018/START.md).
 
-- **W0 adopt** (foundation PR): four source patches (frame and view routes, perspectives and history lane, capability briefs and usage arithmetic, PM task import) and this report. A-C compile and pass their unit tests but are not yet mounted in the App.
-- **W1 workspace and context navigation** (after W0): mount WorkbenchFrame, PerspectiveBar and `resolveViewRoute` in `src/App.tsx` on the real components.
-- **W2 capability and project examples** (after W0): cited DiagramCloud-self and one non-Galaxy project; unknown stays unknown.
-- **W3 linked comparison** (after W1): exact IDs or explicit correspondence, absent counterparts visible.
-- **W4 interruptible presentation** (after W1): pause, inspect, return and explicit resume.
-- **W5 PM plan consumption** (after W0): the `datapass.owner-tasks/1` reader is reachable from the import dialog, private and read-only, with a browser journey; no write-back, no launch.
-- **W6 integrate, qualify and deliver** (after W2-W5): version, release notes, AGENTS.md limits and the private candidate.
+- **W0 adopt and W5 PM plan consumption** ([#102](https://github.com/julian-passebecq/diagramcloud/pull/102)): four source patches (frame and view routes, perspectives and history lane, capability briefs and usage arithmetic, PM task import) and the adoption report; the `datapass.owner-tasks/1` reader is reachable from the import dialog, private and read-only, with a browser journey; no write-back, no launch.
+- **W1 workspace and context navigation** ([#106](https://github.com/julian-passebecq/diagramcloud/pull/106)): WorkbenchFrame, PerspectiveBar and `resolveViewRoute` mounted in `src/App.tsx` on the real components, opt-in with `?workspace=v3`.
+- **W2 capability and project examples** ([#103](https://github.com/julian-passebecq/diagramcloud/pull/103)): cited DiagramCloud self-description and a synthetic RAG service; unknown stays unknown.
+- **W3 linked comparison** ([#107](https://github.com/julian-passebecq/diagramcloud/pull/107)): exact IDs or recorded correspondence, absent counterparts visible, stale without re-pairing.
+- **W4 interruptible presentation** ([#108](https://github.com/julian-passebecq/diagramcloud/pull/108)): pause, detour, return and explicit resume by stop identity.
+- **W6 integrate and qualify** (1.30.0, [notes](release-1.30/RELEASE_NOTES.md)): version, release notes, AGENTS.md limits, the offline release journey `tests/e2e/v3-release.spec.ts` and the local candidate. Still open: UX26 and UX27 have no App view, UX29 and UX30 are partial (status per row in [V3_WORKSPACE](product/V3_WORKSPACE.md)); free drag docking, saved layouts, builder identities and the Git/work/question/decision dock panels.
 
 - **Complement E, expressiveness** (source, 2026-10-19): ChatGPT Pro complement PP-20261019-02, source aaba5c3. Adds the authored explanation walkthrough compiler with `npm run explain`, a read-only related-context projection, opt-in focused portfolio HTML and six synthetic teaching examples; acceptance UX31-UX34 and the 27-domain coverage review are in [EXPRESSIVENESS](product/EXPRESSIVENESS.md). Still open: the related-context companion pane with Follow/Pin (W1), and a compact and print inspection of the focused export (its offline Chromium journey passes). ConceptMotion and VizForge stay optional adapters for a concrete need, never release dependencies; the coverage rows are not release gates.
 
 Estimates in the handoff are uncalibrated allowances; calendar completion is unknown.
 
-## Current state (2026-10-18): 1.29.1 V2 standalone continuation
+## Current state (2026-10-19): 1.30.0 V3 workspace
 
+- **1.30.0** ([notes](release-1.30/RELEASE_NOTES.md)): V3 workspace, PM task import, capability examples, linked comparison and interruptible presentation (#102-#108), integrated with one offline release journey through the App. V3 is integrated, not complete.
 - **1.29.1** ([notes](release-1.29/RELEASE_NOTES-1.29.1.md)): public figures never count private items, they print one generic notice (#100, AC25 implemented); the watched concept host takes its change baseline synchronously (#99).
 - **1.29.0** ([notes](release-1.29/RELEASE_NOTES.md)): eight packages (#89-#96): hierarchy rail with Choose parent and a real Tab walk at 390x844, schedule and measure forms with cited compatibility evidence, host refusals that keep their input (Cursor proven locally, Linux packaging dry run in CI), one studio environment selection, public noninterference and private-ID refusal, uncertain repository writes, unknown-module imports, image digests and duplicates, artifact entry with unique-vs-membership counts and declared-workflow playback, instruction files read as declared rules and bounded cancelable scans. Rows are in the [R4 crosswalk](product/R4_CROSSWALK.md). Still not a complete V2.
 

@@ -73,6 +73,10 @@ export function ToursPanel({doc,edit,viewId,selectedNodeId,selectedEdgeId,live,o
  const resumeTour=(tourId:string)=>{const p=resume.positions[tourId];if(!p)return;setNotice(null);const out=resolveTourResume(doc,{tourId,stopRef:p.stopRef,index:p.index});
   if(out.state==='resumed'){clearChoice();go(tourId,out.index);setNotice({kind:'ok',text:out.message});}else if(out.state==='choose'){setOwnChoice(out);focusTo('[data-focus="resume-choice"] button');}else setNotice({kind:'refused',text:out.message});};
  const recorded=tour&&index>=0?tour.stops[index]:undefined,draftKey=play?`${play.tourId}\0${index}\0${recorded?.id??''}\0${recorded?.narration??''}`:'',draftText=draft?.key===draftKey?draft.text:null;
+ // Recording submits its form, so the workspace guard knows the typed narration and title were used.
+ const addStop=()=>{if(!tour)return;try{const stop=recordStop(live(),viewId,subjects(),narration);if(commit(d=>addTourStop(d,tour.id,stop),`Added stop ${tour.stops.length+1} to ${tour.title}.`))setNarration('');}catch(e){setNotice({kind:'refused',text:errorMessage(e)});}};
+ const newTour=()=>{try{const d=live(),base='tour-'+(slug(title)||'untitled');let id=base;for(let n=2;(d.tours??[]).some(t=>t.id===id);n++)id=`${base}-${n}`;const stop=recordStop(d,viewId,subjects(),narration);
+    if(commit(x=>addTour(x,{id,title:title.trim(),visibility,stop}),`Recorded tour ${title.trim()} at revision ${d.revision}.`)){setTitle('');setNarration('');onPlay(playOf(live(),id,0));focusTo('[data-focus="tour-player"]');}}catch(e){setNotice({kind:'refused',text:errorMessage(e)});}};
  const selectionText=selectedNodeId?<>, subject component {selectedNodeId}</>:selectedEdgeId?<>, subject connection {selectedEdgeId}</>:', no subject selected';
  return <section ref={root} className="inspector tours-panel" aria-label="Tours">
   <div className="eyebrow">TOURS</div><h2 tabIndex={-1} data-focus="tours-heading">Guided tours</h2>
@@ -128,15 +132,14 @@ export function ToursPanel({doc,edit,viewId,selectedNodeId,selectedEdgeId,live,o
    </form>}
   </section>}
   {notice&&<p className={notice.kind==='ok'?'micro':'validation-error'} role={notice.kind==='ok'?'status':'alert'} data-testid="tour-notice">{notice.text}</p>}
-  {edit&&<form className="property-form" aria-label="Record a tour stop" onSubmit={e=>e.preventDefault()}>
+  {edit&&<form className="property-form" aria-label="Record a tour stop" onSubmit={e=>{e.preventDefault();const by=(e.nativeEvent as SubmitEvent).submitter?.getAttribute('data-record');if(by==='stop')addStop();else if(by==='tour')newTour();}}>
    <h3>Record a stop</h3>
    <p className="micro">From view {viewId}{selectionText}.</p>
    <label>Narration<textarea value={narration} onChange={e=>setNarration(e.target.value)} rows={3} maxLength={2000}/></label>
-   {tour&&<Button onClick={()=>{try{const stop=recordStop(live(),viewId,subjects(),narration);if(commit(d=>addTourStop(d,tour.id,stop),`Added stop ${tour.stops.length+1} to ${tour.title}.`))setNarration('');}catch(e){setNotice({kind:'refused',text:errorMessage(e)});}}}>{`Add stop to ${tour.title}`}</Button>}
-   <label>New tour title<input value={title} onChange={e=>setTitle(e.target.value)} maxLength={160}/></label>
+   {tour&&<Button type="submit" data-record="stop">{`Add stop to ${tour.title}`}</Button>}
+   <label>New tour title<input value={title} onChange={e=>setTitle(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')e.preventDefault();}} maxLength={160}/></label>
    <label>Visibility<select value={visibility} onChange={e=>setVisibility(e.target.value as 'public'|'private')}><option value="public">Public (hidden subjects are omitted in public copies)</option><option value="private">Private</option></select></label>
-   <Button disabled={!title.trim()} onClick={()=>{try{const d=live(),base='tour-'+(slug(title)||'untitled');let id=base;for(let n=2;(d.tours??[]).some(t=>t.id===id);n++)id=`${base}-${n}`;const stop=recordStop(d,viewId,subjects(),narration);
-    if(commit(x=>addTour(x,{id,title:title.trim(),visibility,stop}),`Recorded tour ${title.trim()} at revision ${d.revision}.`)){setTitle('');setNarration('');onPlay(playOf(live(),id,0));focusTo('[data-focus="tour-player"]');}}catch(e){setNotice({kind:'refused',text:errorMessage(e)});}}}>New tour from this stop</Button>
+   <Button disabled={!title.trim()} type="submit" data-record="tour">New tour from this stop</Button>
   </form>}
  </section>;
 }
