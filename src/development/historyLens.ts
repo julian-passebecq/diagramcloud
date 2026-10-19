@@ -183,3 +183,110 @@ export function projectHistory(input: HistorySlice, query: HistoryQuery = {}, au
     hasMore: offset + page.length < matched.length, coverage: input.coverage, capturedAt: input.capturedAt,
     lanes: maxLane + 1, notice: 'Source history, not live activity. Filters do not establish ancestry, attribution or release completion.'};
 }
+
+/** Five questions over one supplied slice. Each reads only the permitted records; none infers a fact from another. */
+export const HISTORY_QUESTIONS = ['ancestry', 'associations', 'attempts', 'impact', 'lineage'] as const;
+export type HistoryQuestion = typeof HISTORY_QUESTIONS[number];
+export const HISTORY_QUESTION_LABELS: Record<HistoryQuestion, string> = {
+  ancestry: 'Where did each revision come from? (native parents)',
+  associations: 'What work is grouped together? (features, problems, decisions)',
+  attempts: 'Which attempts and runs were recorded, in time order?',
+  impact: 'Which components does the history name?',
+  lineage: 'What was released, built, checked or reviewed per revision?'
+};
+export const HISTORY_SLICE_LIMITS = {bytes: 2097152, records: 5000} as const;
+const SLICE_KEYS = ['capturedAt', 'coverage', 'records'];
+const RECORD_KEYS = ['ref', 'kind', 'vcs', 'title', 'visibility', 'occurredAt', 'basis', 'sourceRef', 'ancestry', 'facets'];
+
+/** Reads a supplied slice file. Bounded and strict: any invalid, unknown or oversized part refuses the whole input. */
+export function parseHistorySlice(raw: string): HistorySlice {
+  if (typeof raw !== 'string' || new TextEncoder().encode(raw).byteLength > HISTORY_SLICE_LIMITS.bytes) return fail();
+  let input: unknown;
+  try {input = JSON.parse(raw);} catch {return fail();}
+  const obj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+  if (!obj(input) || Object.keys(input).some(k => !SLICE_KEYS.includes(k)) || !Array.isArray(input.records) ||
+    input.records.length > HISTORY_SLICE_LIMITS.records) return fail();
+  for (const r of input.records) {
+    if (!obj(r) || Object.keys(r).some(k => !RECORD_KEYS.includes(k)) || !obj(r.ref) || Object.keys(r.ref).some(k => !['repository', 'id'].includes(k))) return fail();
+    if (r.ancestry !== null && (!obj(r.ancestry) || Object.keys(r.ancestry).some(k => !['parents', 'completeness', 'semantics'].includes(k)))) return fail();
+  }
+  const slice = input as unknown as HistorySlice;
+  instant(slice.capturedAt);
+  if (!['complete-in-scope', 'partial', 'unknown'].includes(slice.coverage)) return fail();
+  // The existing record validation and topology check, over every record (author scope), before anything is returned.
+  orderedRecords(checkedRecords(slice, 'author'));
+  return structuredClone(slice);
+}
+
+export type HistoryAnswer = {
+  question: HistoryQuestion; answerable: boolean; rows: HistoryRow[];
+  groups: {facet: HistoryFacet; value: string; recordKeys: string[]}[];
+  componentMatches: {componentId: string; recordKeys: string[]}[];
+  unresolved: string[]; missing: string[]; notice: string;
+};
+const ASSOCIATION_FACETS: readonly HistoryFacet[] = ['feature', 'problem', 'decision'];
+const LINEAGE_FACETS: readonly HistoryFacet[] = ['release', 'artifact', 'check', 'review'];
+const IMPACT_FACETS: readonly HistoryFacet[] = ['surface', 'path'];
+const NOTICES: Record<HistoryQuestion, string> = {
+  ancestry: 'Native parent links only. Associations, titles and times never become parents; a boundary means a parent is not shown.',
+  associations: 'Supplied facet groups, not ancestry or causation. Records sharing a value are associated, never connected by an edge.',
+  attempts: 'Supplied attempt and run records in recorded time order. Records without a time are listed apart, never placed.',
+  impact: 'Exact component ID matches only. A value that is not exactly a permitted component ID stays unresolved; labels are never matched.',
+  lineage: 'Supplied release, artifact, check and review values per record. Not a qualified release, executed check or completed review.'
+};
+
+/**
+ * Answers one question over the permitted records. The public filter runs before any question reads a record.
+ * Rows of every question other than ancestry carry ancestry 'not-applicable' and lane 0: they are lists, never a graph.
+ * `unresolved` holds, for impact, facet values that are not exactly a permitted component ID and, for attempts, the keys
+ * of records without a time.
+ */
+export function answerHistoryQuestion(input: HistorySlice, question: HistoryQuestion, audience: 'author' | 'public',
+  componentIds?: readonly string[]): HistoryAnswer {
+  if (!HISTORY_QUESTIONS.includes(question)) return fail();
+  instant(input?.capturedAt);
+  const permitted = orderedRecords(checkedRecords(input, audience));
+  const row = (r: HistoryRecord): HistoryRow => ({key: revisionKey(r.ref), ref: {...r.ref}, kind: r.kind, vcs: r.vcs, title: r.title,
+    occurredAt: r.occurredAt, basis: r.basis, sourceRef: r.sourceRef, facets: structuredClone(r.facets), lane: 0, ancestry: 'not-applicable'});
+  const answer = (a: Partial<HistoryAnswer>): HistoryAnswer => ({question, answerable: false, rows: [], groups: [], componentMatches: [],
+    unresolved: [], missing: [], notice: NOTICES[question], ...a});
+  const groupsOf = (facets: readonly HistoryFacet[], records: HistoryRecord[]) => facets.flatMap(facet => {
+    const byValue = new Map<string, string[]>();
+    for (const r of records) for (const v of r.facets[facet] ?? []) byValue.set(v, [...(byValue.get(v) ?? []), revisionKey(r.ref)]);
+    return [...byValue.keys()].sort().map(value => ({facet, value, recordKeys: byValue.get(value)!}));
+  });
+  const absent = (facets: readonly HistoryFacet[]) => facets.filter(f => !permitted.some(r => r.facets[f]?.length));
+
+  if (question === 'ancestry') {
+    if (!permitted.some(r => r.kind === 'revision' && r.ancestry?.semantics === 'native')) return answer({missing: ['ancestry']});
+    // The existing projection: native parents only, with generic boundaries for parents that are not shown.
+    const projected = projectHistory(input, {kinds: ['revision'], limit: 500}, audience);
+    return answer({answerable: true, rows: projected.rows,
+      notice: NOTICES.ancestry + (projected.hasMore ? ` Showing the first ${projected.rows.length} of ${projected.matched} revisions.` : '')});
+  }
+  if (question === 'associations' || question === 'lineage') {
+    const facets = question === 'associations' ? ASSOCIATION_FACETS : LINEAGE_FACETS;
+    const records = permitted.filter(r => facets.some(f => r.facets[f]?.length));
+    const groups = groupsOf(facets, records);
+    return answer({answerable: groups.length > 0, rows: records.map(row), groups, missing: absent(facets)});
+  }
+  if (question === 'attempts') {
+    const attempts = permitted.filter(r => r.kind === 'attempt' || !!r.facets.run?.length);
+    if (!attempts.length) return answer({missing: ['run']});
+    const timed = attempts.filter(r => r.occurredAt !== null)
+      .sort((a, b) => Date.parse(a.occurredAt!) - Date.parse(b.occurredAt!) || (revisionKey(a.ref) < revisionKey(b.ref) ? -1 : 1));
+    return answer({answerable: true, rows: timed.map(row), unresolved: attempts.filter(r => r.occurredAt === null).map(r => revisionKey(r.ref))});
+  }
+  // impact: exact equality with a permitted component ID, never a label, prefix or case-folded match.
+  const records = permitted.filter(r => IMPACT_FACETS.some(f => r.facets[f]?.length));
+  if (!records.length) return answer({missing: [...IMPACT_FACETS]});
+  const ids = new Set(componentIds ?? []), matches = new Map<string, string[]>(), unresolved = new Set<string>();
+  for (const r of records) for (const f of IMPACT_FACETS) for (const v of r.facets[f] ?? []) {
+    const key = revisionKey(r.ref);
+    if (ids.has(v)) {const keys = matches.get(v) ?? []; if (!keys.includes(key)) keys.push(key); matches.set(v, keys);}
+    else unresolved.add(v);
+  }
+  return answer({answerable: true, rows: records.map(row),
+    componentMatches: [...matches.keys()].sort().map(componentId => ({componentId, recordKeys: matches.get(componentId)!})),
+    unresolved: [...unresolved].sort()});
+}

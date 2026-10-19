@@ -1,5 +1,6 @@
 import {z} from 'zod';
-import {blockSchema,type EvidenceBlock} from '../core/model';
+import {blockSchema,type EvidenceBlock,type Project} from '../core/model';
+import {PATCH_FORMAT,type Patch} from '../core/patch';
 
 const id=z.string().regex(/^[a-z][a-z0-9_.-]{0,79}$/);
 const text=z.string().trim().min(1).max(160);
@@ -85,4 +86,68 @@ export function joinInspectionBlocks(result:JoinInspection):EvidenceBlock[]{
    ...result.limits.map(v=>['Limit',v] as JoinCell[])
   ])
  ];
+}
+
+export const JOIN_EVIDENCE_SUFFIXES=['left','right','logic','output','mapping','rules'] as const;
+const NOT_SUPPLIED='Not supplied or no non-null values';
+const NONE_PREFIX='None within these supplied rows';
+const MAPPING_COLUMNS=['Left row ID','Right match IDs','Matches','Output rows'];
+
+/** What a document already says about one join, read back from its six evidence blocks. Shown as read, never repaired. */
+export type JoinEvidenceView={prefix:string;nodeId:string;provenance:'synthetic'|'source-derived';blockIds:string[];
+ inputRows:{left:number;right:number};outputRows:number;previewOmitted:number;
+ measure:{before:string|number|null;after:string|number|null}|null;
+ unmatchedLeft:string[];grainViolations:string[];
+ perLeft:{rowId:string;rightMatchIds:string[];matches:number;outputRows:number}[];
+ limits:string[];consistent:boolean};
+
+/**
+ * Reads the join evidence attached to one component of an already permitted projection (pass publicDocument for a
+ * public audience). Returns null unless all six `${prefix}.left/right/logic/output/mapping/rules` blocks are on the
+ * node, resolve, have the expected shapes and share one provenance. Counts come from the rules and mapping tables;
+ * `consistent` is false when the mapping's output rows do not add up to the rules' calculated output rows.
+ */
+export function readJoinEvidence(doc:Project,nodeId:string):JoinEvidenceView|null{
+ const node=doc.nodes.find(n=>n.id===nodeId);if(!node)return null;
+ const blocks=new Map(doc.blocks.map(b=>[b.id,b]));
+ for(const leftId of node.blockIds.filter(id=>id.endsWith('.left'))){
+  const prefix=leftId.slice(0,-'.left'.length),ids=JOIN_EVIDENCE_SUFFIXES.map(s=>`${prefix}.${s}`);
+  if(!ids.every(id=>node.blockIds.includes(id)&&blocks.has(id)))continue;
+  const [left,right,logic,output,mapping,rules]=ids.map(id=>blocks.get(id)!);
+  const provenance=left.provenance;
+  if((provenance!=='synthetic'&&provenance!=='source-derived')||[right,logic,output,mapping,rules].some(b=>b.provenance!==provenance))continue;
+  if(left.type!=='table'||right.type!=='table'||logic.type!=='code'||output.type!=='table'||mapping.type!=='table'||rules.type!=='table')continue;
+  if(JSON.stringify(mapping.columns)!==JSON.stringify(MAPPING_COLUMNS)||rules.columns.length!==2)continue;
+  const rule=(aspect:string)=>rules.rows.find(r=>r[0]===aspect)?.[1];
+  const count=(v:unknown)=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0?v:null;
+  const list=(v:unknown)=>typeof v!=='string'||v.startsWith(NONE_PREFIX)?[]:v.split(',').map(s=>s.trim()).filter(Boolean);
+  const perLeft=mapping.rows.map(r=>({rowId:String(r[0]??''),rightMatchIds:r[1]==='No match'?[]:list(r[1]),matches:count(r[2])??0,outputRows:count(r[3])??0}));
+  const mappedOutput=perLeft.reduce((s,r)=>s+r.outputRows,0),declaredOutput=count(rule('Calculated output rows'));
+  const measureValue=(v:unknown):string|number|null=>v===undefined||v===null||v===NOT_SUPPLIED?null:typeof v==='number'||typeof v==='string'?v:null;
+  const before=measureValue(rule('Measure before')),after=measureValue(rule('Measure after'));
+  const mappingIntact=mapping.rows.every(r=>count(r[2])!==null&&count(r[3])!==null);
+  return {prefix,nodeId,provenance,blockIds:ids,inputRows:{left:left.rows.length,right:right.rows.length},
+   outputRows:declaredOutput??mappedOutput,previewOmitted:count(rule('Preview rows omitted'))??0,
+   measure:before===null&&after===null?null:{before,after},
+   unmatchedLeft:list(rule('Unmatched left rows')),grainViolations:list(rule('Grain violation row IDs')),perLeft,
+   limits:rules.rows.filter(r=>r[0]==='Limit').map(r=>String(r[1])),
+   consistent:declaredOutput!==null&&mappingIntact&&mappedOutput===declaredOutput&&perLeft.length===left.rows.length};
+ }
+ return null;
+}
+
+/**
+ * A revision-guarded diagramcloud.patch that appends the (private) join evidence blocks to one component. It goes through
+ * the ordinary import review; it is never applied here. Refuses an unknown node or a block ID that already exists.
+ */
+export function joinInspectionPatch(project:Project,nodeId:string,result:JoinInspection):Patch{
+ if(!project.nodes.some(n=>n.id===nodeId))refuse('unknown component '+nodeId);
+ const blocks=joinInspectionBlocks(result),existing=new Set(project.blocks.map(b=>b.id));
+ if(blocks.some(b=>existing.has(b.id)))refuse(`evidence prefix ${result.request.id} is already used in this document`);
+ const at=`/nodes/@${nodeId.replace(/~/g,'~0').replace(/\//g,'~1')}`;
+ return {format:PATCH_FORMAT,version:1,target:'project',targetId:project.id,baseRevision:project.revision,
+  summary:`Attach private join evidence ${result.request.id} (calculated over supplied rows) to ${nodeId}`,
+  operations:[{op:'test',path:at+'/id',value:nodeId},
+   ...blocks.map(b=>({op:'add' as const,path:'/blocks/-',value:b})),
+   ...blocks.map(b=>({op:'add' as const,path:at+'/blockIds/-',value:b.id}))]};
 }

@@ -1,0 +1,27 @@
+{
+  "capturedAt": "2026-10-01T12:00:00Z",
+  "coverage": "partial",
+  "records": [
+    {"ref": {"repository": "example/service", "id": "r3"}, "kind": "revision", "vcs": "git", "title": "Synthetic: add request form", "visibility": "public", "occurredAt": "2026-09-03T10:00:00Z", "basis": "source", "sourceRef": "synthetic-log",
+     "ancestry": {"parents": [{"repository": "example/service", "id": "r2"}], "completeness": "complete", "semantics": "native"},
+     "facets": {"feature": ["request-form"], "surface": ["svc.ui", "Request Form"], "check": ["unit-tests"]}},
+    {"ref": {"repository": "example/service", "id": "r2"}, "kind": "revision", "vcs": "git", "title": "Synthetic: serve endpoint", "visibility": "public", "occurredAt": "2026-09-02T10:00:00Z", "basis": "source", "sourceRef": "synthetic-log",
+     "ancestry": {"parents": [{"repository": "example/service", "id": "r1"}], "completeness": "complete", "semantics": "native"},
+     "facets": {"feature": ["request-form"], "path": ["svc.api", "src/api/routes.ts"], "release": ["0.4.0"]}},
+    {"ref": {"repository": "example/service", "id": "r1"}, "kind": "revision", "vcs": "git", "title": "Synthetic: define schema", "visibility": "public", "occurredAt": "2026-09-01T10:00:00Z", "basis": "source", "sourceRef": "synthetic-log",
+     "ancestry": {"parents": [], "completeness": "complete", "semantics": "native"},
+     "facets": {"problem": ["schema-drift"], "decision": ["use-json-schema"]}},
+    {"ref": {"repository": "example/service", "id": "r9"}, "kind": "revision", "vcs": "git", "title": "Synthetic: unrelated revision sharing a feature", "visibility": "public", "occurredAt": "2026-09-04T10:00:00Z", "basis": "source", "sourceRef": "synthetic-log",
+     "ancestry": {"parents": [], "completeness": "complete", "semantics": "native"},
+     "facets": {"feature": ["request-form"]}},
+    {"ref": {"repository": "example/service", "id": "run-2"}, "kind": "attempt", "vcs": "ci", "title": "Synthetic: second test run", "visibility": "public", "occurredAt": "2026-09-03T11:00:00Z", "basis": "declared", "sourceRef": "synthetic-ci",
+     "ancestry": null, "facets": {"run": ["ci-2"]}},
+    {"ref": {"repository": "example/service", "id": "run-1"}, "kind": "attempt", "vcs": "ci", "title": "Synthetic: first test run", "visibility": "public", "occurredAt": "2026-09-02T11:00:00Z", "basis": "declared", "sourceRef": "synthetic-ci",
+     "ancestry": null, "facets": {"run": ["ci-1"]}},
+    {"ref": {"repository": "example/service", "id": "run-x"}, "kind": "attempt", "vcs": "ci", "title": "Synthetic: run without a time", "visibility": "public", "occurredAt": null, "basis": "declared", "sourceRef": "synthetic-ci",
+     "ancestry": null, "facets": {"run": ["ci-x"]}},
+    {"ref": {"repository": "example/service", "id": "hidden"}, "kind": "revision", "vcs": "git", "title": "Synthetic private revision", "visibility": "private", "occurredAt": "2026-09-05T10:00:00Z", "basis": "source", "sourceRef": "synthetic-log",
+     "ancestry": {"parents": [{"repository": "example/service", "id": "r3"}], "completeness": "complete", "semantics": "native"},
+     "facets": {"feature": ["PRIVATE_FEATURE"], "surface": ["svc.secret"], "release": ["PRIVATE_RELEASE"]}}
+  ]
+}
