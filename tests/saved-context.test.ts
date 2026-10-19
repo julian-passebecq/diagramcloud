@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {clone,documentSchema,validateDocument,type Project} from '../src/core/model';
 import {publicDocument} from '../src/core/operations';
 import {SAVED_CONTEXT_LIMIT,SAVED_CONTEXT_UNAVAILABLE,addSavedContext,captureSemanticContext,clearSavedContexts,isSemanticContext,parseSavedContextFile,readSavedContexts,
- removeSavedContext,resolveSemanticContext,savedContextKey,savedContextScope,serializeSavedContextFile,watchSavedContexts,type SavedContext,type SemanticContext} from '../src/core/savedContext';
+ removeSavedContext,resolveSemanticContext,savedContextKey,savedContextScope,serializeSavedContextFile,watchSavedContexts,type LinkedContext,type SavedContext,type SemanticContext} from '../src/core/savedContext';
 
 const PRIVATE='SYNTHETIC_PRIVATE_SAVED_CONTEXT';
 function fixture():Project{return validateDocument(documentSchema.parse({schemaVersion:1,id:'saved-context-fixture',title:'Synthetic saved context',rootViewId:'root',summary:'Synthetic pointers only.',
@@ -106,4 +106,63 @@ test('the storage listener fires only for this scope (or a full clear)',()=>{
  listeners.forEach(l=>l({key:savedContextKey('p','public','h')} as StorageEvent));assert.equal(calls,0);
  listeners.forEach(l=>l({key:savedContextKey('p','author','h')} as StorageEvent));listeners.forEach(l=>l({key:null} as StorageEvent));assert.equal(calls,2);
  stop();assert.equal(listeners.length,0);
+});
+
+// Linked views pair (V3 workspace): an optional dimension, absent from contexts saved outside linked mode.
+const linkedPair=(over:Partial<LinkedContext>={}):LinkedContext=>({leftViewId:'root',rightViewId:'child',anchorNodeId:'parent',detailPlacement:'below-right',...over});
+const navInput={path:['root','child'],view:'child',selected:'code',selectedEdge:null,sheet:'diagram' as const};
+
+test('capture records the linked pair as stable-ID pointers only, and omits the key outside linked mode',()=>{
+ const doc=fixture(),c=captureSemanticContext(doc,{...navInput,linked:linkedPair()});
+ assert.deepEqual(c?.linked,{leftViewId:'root',rightViewId:'child',anchorNodeId:'parent',detailPlacement:'below-right'});
+ assert.ok(!JSON.stringify(c).includes('Synthetic'),'no labels or facts are copied');
+ assert.equal(Object.hasOwn(captureSemanticContext(doc,{...navInput,linked:null})!,'linked'),false);
+ assert.equal(Object.hasOwn(captureSemanticContext(doc,navInput)!,'linked'),false);
+ assert.equal(captureSemanticContext(publicDocument(doc),{...navInput,linked:linkedPair({rightViewId:'secret-view'})}),undefined,'a private pair is not capturable in public');
+});
+
+test('a saved linked pair restores by exact ID: pair, anchor and detail placement',()=>{
+ const doc=fixture(),out=resolveSemanticContext(doc,context({linked:linkedPair()}),always);
+ assert.equal(out.state,'restored');assert.deepEqual(out.linked,linkedPair());
+ assert.deepEqual(out.dimensions.filter(d=>d.dimension==='linked'||d.dimension==='anchor').map(d=>[d.dimension,d.state]),[['linked','kept'],['anchor','kept']]);
+ assert.deepEqual(out.navigation,{path:['root','child'],view:'child',selected:'code',selectedEdge:null,sheet:'diagram',lesson:null},'the main navigation is resolved as before');
+});
+
+test('a lost right view closes the pair with the generic reason and never rebinds to another view; a lost anchor is cleared on its own',()=>{
+ const doc=fixture(),changed=clone(doc);delete changed.nodes.find(n=>n.id==='parent')!.childViewId;
+ const out=resolveSemanticContext(validateDocument(changed),context({path:['root'],view:'root',selected:null,perspective:null,linked:linkedPair()}),always);
+ assert.equal(out.linked,null,'no substitute right view');assert.equal(out.state,'partial');
+ assert.deepEqual(out.dimensions.filter(d=>d.dimension==='linked'||d.dimension==='anchor').map(d=>[d.dimension,d.state,d.explanation]),[['linked','fallback',SAVED_CONTEXT_UNAVAILABLE],['anchor','fallback',SAVED_CONTEXT_UNAVAILABLE]]);
+ assert.equal(out.navigation.view,'root','valid dimensions are kept');
+ const noAnchor=clone(doc);noAnchor.nodes=noAnchor.nodes.filter(n=>n.id!=='other');noAnchor.views.find(v=>v.id==='root')!.nodeIds=['parent','secret'];delete noAnchor.views.find(v=>v.id==='root')!.positions.other;
+ const anchorLost=resolveSemanticContext(validateDocument(noAnchor),context({linked:linkedPair({anchorNodeId:'other'})}),always);
+ assert.deepEqual(anchorLost.linked,linkedPair({anchorNodeId:null}));
+ assert.equal(anchorLost.dimensions.find(d=>d.dimension==='linked')!.state,'kept');assert.equal(anchorLost.dimensions.find(d=>d.dimension==='anchor')!.state,'fallback');
+});
+
+test('public mode never resolves a private view or anchor of a saved pair, and never names it',()=>{
+ const doc=fixture(),pub=publicDocument(doc);
+ const view=resolveSemanticContext(pub,context({linked:linkedPair({rightViewId:'secret-view'})}),always);
+ assert.equal(view.linked,null);assert.equal(view.dimensions.find(d=>d.dimension==='linked')!.state,'fallback');
+ const anchor=resolveSemanticContext(pub,context({linked:linkedPair({anchorNodeId:'secret'})}),always);
+ assert.deepEqual(anchor.linked,linkedPair({anchorNodeId:null}));assert.equal(anchor.dimensions.find(d=>d.dimension==='anchor')!.state,'fallback');
+ for(const out of [view,anchor]){assert.ok(!JSON.stringify(out.dimensions).includes(PRIVATE));assert.ok(!JSON.stringify(out.dimensions).includes('secret'));}
+});
+
+test('a legacy version-1 record without the linked key loads and resolves unchanged; a malformed pair is refused whole',()=>{
+ const storage=new Memory(),legacy=entry('context-legacy'),key=savedContextKey('p','author','h');
+ const text=serializeSavedContextFile(savedContextScope('p','author','h'),[legacy]);assert.ok(!text.includes('linked'));
+ storage.setItem(key,text);const read=readSavedContexts(storage,'p','author','h');
+ assert.equal(read.status,'ok');assert.deepEqual(read.entries,[legacy]);assert.equal(Object.hasOwn(read.entries[0].context,'linked'),false);
+ const out=resolveSemanticContext(fixture(),read.entries[0].context,always);
+ assert.equal(Object.hasOwn(out,'linked'),false);assert.ok(out.dimensions.every(d=>d.dimension!=='linked'&&d.dimension!=='anchor'));
+ assert.equal(addSavedContext(storage,'p','author','h',entry('context-linked',context({linked:linkedPair()}))).ok,true);
+ assert.equal(readSavedContexts(storage,'p','author','h').entries.length,2,'a linked entry and a legacy entry share one version-1 file');
+ for(const bad of [{...linkedPair(),extra:1},{...linkedPair(),detailPlacement:'floating'},{leftViewId:'root',rightViewId:'child',anchorNodeId:'parent'},linkedPair({rightViewId:'Not An Id'}),null])
+  assert.equal(isSemanticContext({...context(),linked:bad}),false,JSON.stringify(bad));
+});
+
+test('restoring a linked context never creates a revision',()=>{
+ const doc=fixture(),before=JSON.stringify(doc);resolveSemanticContext(doc,context({linked:linkedPair()}),always);
+ assert.equal(JSON.stringify(doc),before);
 });
