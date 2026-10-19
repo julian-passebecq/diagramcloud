@@ -331,7 +331,8 @@ const focus=useMemo(()=>basisFilter==='all'?null:new Set(doc.nodes.filter(n=>(n.
  // Tour player position (navigation only, never a revision) and the host-selected variant; both reset with the project or audience.
  const [tourPlay,setTourPlay]=useState<TourPlay|null>(null),[tourPending,setTourPending]=useState<Extract<TourResumeResolution,{state:'choose'}>|null>(null),[variantSelection,setVariantSelection]=useState<string|null>(null);
  useEffect(()=>{setTourPlay(null);setTourPending(null);setVariantSelection(null);},[project.id]);
- useEffect(()=>{setTourPlay(null);setTourPending(null);},[publicMode]);
+ // An audience change pauses a presentation instead of ending it: Return and resume revalidates its stop for the new audience (Tours).
+ useEffect(()=>{setTourPlay(p=>p?{...p,paused:true}:null);setTourPending(null);},[publicMode]);
  const showTourStop=(viewId:string,subject?:TourSubject)=>{goToView(viewId,subject?.kind==='node'?subject.id:undefined);if(subject?.kind==='edge'&&pathTo(doc,viewId).length&&doc.views.find(v=>v.id===viewId)?.edgeIds.includes(subject.id))setSelectedEdge(subject.id);};
  /** Generated projects (repository scan, project atlas, rescan) are staged in the JSON review, keeping the stored revision. */
  const stageGenerated=(out:ImportResult,preserve=false)=>{const existing=library.find(d=>d.id===out.document.id),proposal=existing&&preserve?previewCandidateReimport(existing,out.document,existing.revision):null,analysis=readAcquisitionAnalysis(out.document),next=proposal&&analysis?attachAcquisitionContext(proposal.document,analysis):proposal?.document??(existing?{...out.document,revision:existing.revision}:out.document);
