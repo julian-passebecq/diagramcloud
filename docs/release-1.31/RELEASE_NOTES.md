@@ -1,0 +1,22 @@
+# DiagramCloud 1.31.0: expressiveness
+
+A minor release on top of [1.30.0](../release-1.30/RELEASE_NOTES.md). Document schema stays 1 and the model is unchanged. 1.31.0 qualifies the expressiveness complement (UX31-UX34) on its own. The complement's lanes were merged before 1.30.0 ([#104](https://github.com/julian-passebecq/diagramcloud/pull/104), [#105](https://github.com/julian-passebecq/diagramcloud/pull/105), [#109](https://github.com/julian-passebecq/diagramcloud/pull/109)). This release closes the last open acceptance gap, the printed form of the focused export. It also states the boundaries of the complement in one place, the AGENTS.md section "Current limits (1.31.0)". The status of each row, with the test behind it, is in [V3_WORKSPACE](../product/V3_WORKSPACE.md). The 27-domain coverage review is in [EXPRESSIVENESS](../product/EXPRESSIVENESS.md).
+
+## What changed
+
+- **The focused export prints whole (UX33).** In print, the focused explanation HTML kept the screen's height limits: 80vh on the detail pane and 65vh on the scrolling figure region. A printed page therefore cut the code, the tables and the figure. A print rule in the focus-only CSS now lifts both limits. The default export is unchanged byte for byte. The new Chromium test `tests/e2e/explanation-focus-export.spec.ts` ("focused export prints whole: no toolbar, the detail pane and the figure are not clipped") emulates print, checks that nothing clips and produces an A4 PDF. The PDF of the retry example was viewed: two pages, with the figure, the code, the table and the sources whole and the toolbar hidden. The release agent inspected it, not the owner.
+- **Acceptance.** UX31 (walkthrough import), UX32 (related context in the companion pane), UX33 (focused export, now with its printed form) and UX34 (tour referenced-content staleness) are each marked implemented, and each cites the test that proves it.
+- **Documentation.** AGENTS.md "Current limits (1.31.0)" adds an expressiveness paragraph, summarised under Limits below. RESUME, ROADMAP, RELEASE and EXPRESSIVENESS now match the code: the companion pane is mounted in the V3 workspace, and the focused export is an option in the export menu.
+
+## Limits
+
+- **Walkthroughs are authored, not executed.** The compiler and `npm run explain` produce a patch and apply nothing. The patch enters a document only through the ordinary JSON review. Its steps are presentation order, never causal order, elapsed time, a run or a trace. Code excerpts are frozen at the source cut. The source fingerprint is a change detector, not a signature. Requests are written as JSON; there is no request editor in the App.
+- **Related context is bounded.** It follows explicit connections only: depth 0 to 3, at most 40 nodes and 120 connections, a chosen direction and relation kinds, and view scope unless project scope is asked for. It never matches labels or infers an ontology or a concept mapping. A public or Present audience reads it through publicDocument. A coverage line says when a limit was reached.
+- **The focused export is opt-in.** It is an option of `portfolioHtml` and a separate entry in the export menu. It has no autoplay, timer or network access. Without the option the export is byte-identical.
+- **Tour referenced-content fingerprint.** A stop recorded since 1.30.0 covers the evidence blocks, sources and images that its subject components reference. It does not cover choice citations, compatibility evidence, observations, concept mappings, child views or connections. A legacy stop keeps its subject-only comparison and says that its references are not covered; it is never re-recorded silently. The public copy recomputes the fingerprint on public content only.
+- **ConceptMotion and VizForge are not integrated.** No dependency, code or player was added. They stay optional adapter candidates for a concrete need. The six teaching examples are synthetic, with illustrative numbers.
+- Formal UML or BPMN, code execution, trace import and model checking are out of scope. The coverage rows are not release gates. Only Chromium is qualified.
+
+## Qualification
+
+The commands in [RELEASE.md](../RELEASE.md) were run: `npm run check`, `npm test`, `npm run build`, the full `npm run test:e2e`, and the design-quality and AI-guide tests. The integration pull request records the results for the exact head, the CI run and the sha256 of the local candidate package. This page makes no claim about a tag, a public release or a deployment.
