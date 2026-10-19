@@ -1,6 +1,9 @@
 import {test,expect,type Page,type BrowserContext} from '@playwright/test';
-import {readFileSync} from 'node:fs';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {validateDocument,type Project} from '../../src/core/model';
+import {buildReviewWorkspace} from '../../examples/review-workspace/build';
+import {buildDomainDataReference} from '../../examples/domain-data/build';
 
 /**
  * V3 release journey (1.30.0, W6): one pass through the real App with every non-loopback request aborted.
@@ -129,4 +132,143 @@ test('V3 release journey: workspace, PM import, Follow/Pin, capability example, 
 
  expect(attempted,'no request left the loopback test server').toEqual([]);
  expect(errors).toEqual([]);
+});
+
+/*
+ * 1.32.0 release journeys (UX36-UX38 and the Galaxy-style rows UX26/UX27/UX29/UX30). Every input is synthetic and labelled
+ * synthetic: the delivery and history fixtures under tests/fixtures/, the review-workspace example and the domain-data example.
+ */
+async function importProject(page:Page,doc:Project){
+ await page.getByRole('button',{name:'JSON / AI',exact:true}).click();await page.getByLabel('Project JSON',{exact:true}).fill(JSON.stringify(doc));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
+ await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();
+}
+async function dock(page:Page,primary:string){
+ if(await workspace(page).getByRole('region',{name:'Navigation map and contextual activity'}).isHidden())await workspace(page).getByRole('button',{name:'Bottom panel',exact:true}).click();
+ await page.getByText('Dock panels',{exact:true}).click();await page.getByLabel('Main dock panel',{exact:true}).selectOption(primary);await page.getByText('Dock panels',{exact:true}).click();
+}
+// A synthetic project whose component IDs equal the history fixture's exact surface and path values.
+function exampleService():Project{
+ const n=(id:string,label:string,kind:Project['nodes'][number]['kind'])=>({id,label,kind,provider:'Synthetic',icon:'generic',summary:`Synthetic ${label}. Not a real service.`,role:'Synthetic',status:'idle' as const,basis:'planned' as const,sourceIds:[],blockIds:[],tags:['synthetic'],visibility:'public' as const});
+ return validateDocument({schemaVersion:1,id:'synthetic-example-service',title:'Example Service (synthetic)',category:'Reference',summary:'Synthetic service for the delivery and history journey.',author:'Synthetic author',rootViewId:'overview',provenance:'Synthetic fixture.',
+  nodes:[n('svc.api','Request endpoint','process'),n('svc.ui','Request form','app')],edges:[],
+  views:[{id:'overview',title:'Example Service',description:'Synthetic.',nodeIds:['svc.api','svc.ui'],edgeIds:[],positions:{'svc.api':{x:0,y:0},'svc.ui':{x:330,y:0}},visibility:'public'}],
+  blocks:[],sources:[],story:[],tours:[],observations:[]});
+}
+
+test('Galaxy-style plan: source identity, owner conflict, named gaps, remaining range, intervals, results and five history questions',async({page})=>{
+ test.setTimeout(90000);
+ const attempted=await offline(page.context()),errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.setViewportSize({width:1440,height:1000});
+ await page.goto('/?workspace=v3');await expect(workspace(page)).toBeVisible();await importProject(page,exampleService());
+ const before=await current(page);
+ await dock(page,'work');
+ const plan=workspace(page).getByRole('region',{name:'Delivery evidence'});await expect(plan).toContainText('No delivery plan loaded');
+ await plan.getByLabel('Load delivery plan').setInputFiles('tests/fixtures/delivery-evidence/example-service.json');
+ const sha=createHash('sha256').update(readFileSync('tests/fixtures/delivery-evidence/example-service.json')).digest('hex');
+ await expect(plan).toContainText(sha);await expect(plan).toContainText('Example Service delivery plan (synthetic)');
+ await expect(plan.getByText('Unordered overlap',{exact:true})).toHaveCount(1);
+ await expect(plan).toContainText('NO_ESTIMATE');await expect(plan).toContainText('TOKENS_UNKNOWN');
+ await expect(plan.getByRole('note').filter({hasText:'Uncalibrated'})).toBeVisible();
+ await expect(plan.getByRole('region',{name:'Remaining effort'})).toContainText('UNKNOWN');
+ const intervals=plan.getByRole('region',{name:'Dated intervals'});await expect(intervals.locator('tbody tr')).toHaveCount(1);await expect(intervals).toContainText('Europe/Paris');
+ const results=plan.getByRole('region',{name:'Result and artifact references'});await expect(results).toContainText('abc1234');await expect(results).toContainText('DECLARED');
+ await expect(plan.getByRole('button',{name:/dispatch|launch|approve/i})).toHaveCount(0);
+ // Portfolio: the private plan is withheld (an audience change resets the session dock, so it is chosen again).
+ await page.getByRole('tab',{name:'Portfolio',exact:true}).click();await dock(page,'work');
+ await expect(workspace(page).getByRole('region',{name:'Delivery evidence'})).toContainText('This delivery plan is private and is not shown to this audience.');
+ expect(await page.content()).not.toContain('Define the request schema');
+ await page.getByRole('tab',{name:'Explore',exact:true}).click();
+
+ // Five history questions over a supplied synthetic slice.
+ await dock(page,'git');
+ const history=workspace(page).getByRole('region',{name:'Change history'});
+ await history.getByLabel('Load history records').setInputFiles('tests/fixtures/history-questions/example-history.json');
+ await expect(history.getByLabel('History question',{exact:true})).toBeVisible();
+ await expect(history.locator('.dc-ancestry').first()).toBeVisible();
+ await history.getByLabel('History question',{exact:true}).selectOption('associations');
+ await expect(history).toContainText('request-form');
+ await history.getByLabel('History question',{exact:true}).selectOption('impact');
+ await history.getByRole('button',{name:'svc.ui',exact:true}).click();
+ await expect(page).toHaveURL(/node=svc\.ui/);
+ expect(await current(page),'reading a plan and history never edits the project').toEqual(before);
+ expect(attempted).toEqual([]);expect(errors).toEqual([]);
+});
+
+test('Synthetic commerce: join 42 to 70, stage evidence, meeting summary',async({page},testInfo)=>{
+ test.setTimeout(90000);
+ const attempted=await offline(page.context()),errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.setViewportSize({width:1440,height:1000});
+ await page.goto('/?workspace=v3');await expect(workspace(page)).toBeVisible();
+ await importProject(page,buildReviewWorkspace().project);
+ await page.getByRole('tab',{name:'Explore',exact:true}).click();
+ await card(page,'overview','Inspect the join').click();
+ await dock(page,'evidence');
+ const join=workspace(page).getByRole('region',{name:'Selection evidence'}).getByRole('region',{name:'Join evidence'});
+ await expect(join).toContainText('42');await expect(join).toContainText('70');await expect(join).toContainText('ynthetic');
+ const base=await current(page);
+ // Edit mode: the committed request collides with the existing prefix and is refused; a renamed copy stages one patch.
+ await page.getByRole('tab',{name:'Edit',exact:true}).click();
+ const request=workspace(page).getByRole('region',{name:'Inspect a join'});
+ await request.getByLabel('Load join request').setInputFiles('examples/review-workspace/join.request.json');
+ await expect(request.getByRole('alert')).toContainText('already used');
+ const renamed=testInfo.outputPath('join.request.renamed.json');
+ writeFileSync(renamed,JSON.stringify({...JSON.parse(readFileSync('examples/review-workspace/join.request.json','utf8')),id:'order-join-review'}));
+ await request.getByLabel('Load join request').setInputFiles(renamed);
+ await request.getByRole('button',{name:'Stage as evidence',exact:true}).click();
+ const review=page.getByRole('dialog',{name:'JSON / AI workspace'});await expect(review).toBeVisible();
+ await review.getByRole('button',{name:'Close dialog',exact:true}).click();
+ expect(await current(page),'preview applies nothing').toEqual(base);
+ await request.getByRole('button',{name:'Stage as evidence',exact:true}).click();
+ await review.getByRole('button',{name:'Apply imported document',exact:true}).click();await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();
+ const applied=await current(page);expect(applied.revision).toBe(base.revision+1);
+ const added=applied.blocks.filter(b=>b.id.startsWith('order-join-review.'));expect(added).toHaveLength(6);expect(added.every(b=>b.visibility==='private')).toBe(true);
+ await page.getByRole('button',{name:'Undo',exact:true}).click();
+ await expect.poll(async()=>(await current(page)).blocks.some(b=>b.id.startsWith('order-join-review.'))).toBe(false);
+ // Export & share > Meeting summary: the overview view, offline HTML.
+ await page.getByRole('tab',{name:'Explore',exact:true}).click();
+ await page.getByRole('button',{name:'Export & share',exact:true}).click();
+ await page.getByRole('button',{name:/^Meeting summary \(HTML\)/}).click();
+ const form=page.getByRole('form',{name:'Meeting summary'});await expect(form).toBeVisible();
+ await expect(form.getByRole('checkbox',{name:'Business question and data path',exact:true})).toBeChecked();
+ await form.getByLabel('Audience',{exact:true}).fill('Synthetic business owner and data engineer');
+ const pending=page.waitForEvent('download');await form.getByRole('button',{name:'Download meeting summary',exact:true}).click();const download=await pending;
+ expect(download.suggestedFilename()).toBe('review-workspace-reference.meeting-summary.html');
+ const html=readFileSync((await download.path())!,'utf8');
+ expect(html).toContain('Why the joined total changed');expect(html).toContain('Revision');expect(html).not.toMatch(/<script/i);expect(html).not.toContain('order-join-review');
+ expect(attempted).toEqual([]);expect(errors).toEqual([]);
+});
+
+for(const size of [{width:1440,height:1000},{width:390,height:844}])test(`World/data correspondence with a catalogue pattern (${size.width})`,async({page})=>{
+ test.setTimeout(90000);
+ const attempted=await offline(page.context()),errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.setViewportSize(size);await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('/?workspace=v3');await expect(workspace(page)).toBeVisible();
+ await importProject(page,buildDomainDataReference().project);
+ const before=await current(page);
+ await page.getByRole('tab',{name:'Explore',exact:true}).click();
+ await page.getByTestId('view-overview').getByRole('button',{name:'Explore Renewable-energy client',exact:true}).click();
+ const toggle=workspace(page).getByRole('button',{name:'Linked views',exact:true});await toggle.click();await expect(toggle).toHaveAttribute('aria-pressed','true');
+ const linked=page.getByTestId('linked-perspective'),toolbar=linked.getByRole('group',{name:'Linked views controls'});
+ await toolbar.getByLabel('Left view',{exact:true}).selectOption('physical');await toolbar.getByLabel('Right view',{exact:true}).selectOption('data');
+ const banner=linked.getByRole('region',{name:'Business question'});await expect(banner).toContainText('Renewable-energy client');
+ await page.locator('.linked-pane[data-side="left"]').getByRole('button',{name:'Select component Wind sensor channel',exact:true}).click();
+ if(size.width<=600)await linked.getByRole('navigation',{name:'Linked panes'}).getByRole('button',{name:'Show right view',exact:true}).click();
+ const right=page.locator('.linked-pane[data-side="right"]');
+ await expect(right.getByRole('status',{name:'Right view state'})).toContainText('Related, not the same object');
+ await expect(right.locator('[data-mapping-target]')).toHaveCount(2);
+ // The data-only view on the left: the business question stays.
+ await toolbar.getByLabel('Left view',{exact:true}).selectOption('data');await expect(banner).toContainText('Renewable-energy client');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+ expect(await current(page),'linked reading never edits the project').toEqual(before);
+ // Learning catalogue: a practical pattern is a candidate alternative, never a recommended replacement.
+ await page.goto('/?workspace=studio');
+ await page.getByRole('button',{name:'Business overview',exact:true}).click();
+ const catalogue=page.getByRole('region',{name:'Learning catalogue',exact:true});await expect(catalogue).toBeVisible();
+ await catalogue.getByLabel('Entry kind',{exact:true}).selectOption('pattern');
+ await catalogue.getByRole('button',{name:'Open lesson Power BI and Fabric App: reuse before migration',exact:true}).click();
+ const lesson=catalogue.getByRole('article',{name:'Lesson: Power BI and Fabric App: reuse before migration'});
+ await expect(lesson.getByRole('region',{name:'Alternatives'}).getByText('Candidate, not selected.')).toHaveCount(2);
+ await expect(lesson).not.toContainText(/recommended replacement|we recommend/i);
+ expect(attempted).toEqual([]);expect(errors).toEqual([]);
 });
