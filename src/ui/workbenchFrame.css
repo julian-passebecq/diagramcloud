@@ -2,6 +2,9 @@
 .workbench-frame{height:100%;min-height:0;min-width:0;display:grid;grid-template-rows:auto minmax(0,1fr) var(--wb-dock) auto;background:var(--bg,#fff);color:var(--text,#202327);font:inherit}
 .workbench-frame *{box-sizing:border-box}
 .workbench-frame [hidden]{display:none!important}
+/* visibility too: Fluent's tabster tests offsetParent, which SVG focusables (canvas edges) lack, then computed
+   visibility; without this a Tab from the compact pane bar targets an edge in a hidden pane and focus sticks. */
+.workbench-frame [hidden],.workbench-frame [hidden] *{visibility:hidden!important}
 .workbench-frame .wb-native{font:inherit}
 .workbench-frame button.wb-native,.workbench-frame select.wb-native,.workbench-frame summary.wb-native{min-height:34px}
 .workbench-frame button.wb-native,.workbench-frame select.wb-native{border:1px solid var(--border,#bec5cf);border-radius:6px;background:var(--soft,#f4f6f9);color:inherit;padding:5px 9px}
