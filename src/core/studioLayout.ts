@@ -60,3 +60,45 @@ export function writeStudioLayoutPreference(storage:StudioLayoutPreferenceStorag
   storage.setItem(studioLayoutPreferenceKey(projectId,hostId),raw);return true;
  }catch{return false;}
 }
+
+/**
+ * Linked perspective layout (V3 workspace): the physical placement of the one detail slot and the split between the
+ * two views. Its own key and record; the studio record above is unchanged. Semantic choices (views, anchor, pick)
+ * never persist here: they live in the workspace route and the deep link.
+ */
+export type LinkedDetailPlacement='below-both'|'below-right';
+export type LinkedLayout={detailPlacement:LinkedDetailPlacement;splitPercent:number};
+export type LinkedLayoutPreferenceRead={layout:LinkedLayout;status:'saved'|'missing'|'corrupt'|'unavailable';hasStoredValue:boolean};
+export const LINKED_LAYOUT_PREFERENCE_VERSION=1;
+export const LINKED_LAYOUT_SPLIT={min:30,max:70} as const;
+export function defaultLinkedLayout():LinkedLayout{return {detailPlacement:'below-both',splitPercent:50};}
+export function validateLinkedLayout(input:unknown):LinkedLayout{
+ if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('Invalid linked layout');
+ const value=input as Record<string,unknown>,keys=['detailPlacement','splitPercent'];
+ if(Object.keys(value).length!==keys.length||keys.some(key=>!Object.hasOwn(value,key))||!['below-both','below-right'].includes(value.detailPlacement as string)||typeof value.splitPercent!=='number'||!Number.isSafeInteger(value.splitPercent)||value.splitPercent<LINKED_LAYOUT_SPLIT.min||value.splitPercent>LINKED_LAYOUT_SPLIT.max)throw new Error('Invalid linked layout');
+ return {detailPlacement:value.detailPlacement as LinkedDetailPlacement,splitPercent:value.splitPercent};
+}
+export function linkedLayoutPreferenceKey(projectId:string,hostId:string){return `diagramcloud.linked-layout.v1:${encodeURIComponent(studioLayoutScope(projectId,hostId))}`;}
+/** Read-only, like the studio record: a malformed or future record stays untouched. */
+export function readLinkedLayoutPreference(storage:StudioLayoutPreferenceStorage|null,projectId:string,hostId:string):LinkedLayoutPreferenceRead{
+ const fallback=(status:LinkedLayoutPreferenceRead['status'],hasStoredValue=false):LinkedLayoutPreferenceRead=>({layout:defaultLinkedLayout(),status,hasStoredValue});
+ if(!storage)return fallback('unavailable');
+ let raw:string|null;try{raw=storage.getItem(linkedLayoutPreferenceKey(projectId,hostId));}catch{return fallback('unavailable');}
+ if(raw===null)return fallback('missing');
+ if(typeof raw!=='string'||raw.length>STUDIO_LAYOUT_PREFERENCE_MAX_CHARS)return fallback('corrupt',true);
+ try{
+  const value:unknown=JSON.parse(raw);
+  if(!value||typeof value!=='object'||Array.isArray(value))return fallback('corrupt',true);
+  const record=value as Record<string,unknown>,keys=['version','detailPlacement','splitPercent'];
+  if(Object.keys(record).length!==keys.length||keys.some(key=>!Object.hasOwn(record,key))||record.version!==LINKED_LAYOUT_PREFERENCE_VERSION)return fallback('corrupt',true);
+  return {layout:validateLinkedLayout({detailPlacement:record.detailPlacement,splitPercent:record.splitPercent}),status:'saved',hasStoredValue:true};
+ }catch{return fallback('corrupt',true);}
+}
+/** Explicit last-save-wins UI preference only. */
+export function writeLinkedLayoutPreference(storage:StudioLayoutPreferenceStorage|null,projectId:string,hostId:string,input:unknown):boolean{
+ if(!storage)return false;
+ try{const layout=validateLinkedLayout(input),raw=JSON.stringify({version:LINKED_LAYOUT_PREFERENCE_VERSION,...layout});
+  if(raw.length>STUDIO_LAYOUT_PREFERENCE_MAX_CHARS)return false;
+  storage.setItem(linkedLayoutPreferenceKey(projectId,hostId),raw);return true;
+ }catch{return false;}
+}

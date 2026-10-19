@@ -1,0 +1,33 @@
+/* Linked perspective (V3 workspace): two views of one permitted project cut and one movable detail slot. */
+.linked-perspective{display:flex;flex-direction:column;gap:10px;min-width:0}
+.linked-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;min-width:0}
+.linked-toolbar label{display:flex;flex-direction:column;gap:3px;font-size:12px;min-width:0;max-width:100%}
+.linked-toolbar select{max-width:min(260px,100%)}
+.linked-perspective button,.linked-perspective select{font:inherit;min-height:34px;max-width:100%;white-space:normal;text-align:left;overflow-wrap:anywhere;border:1px solid var(--border,#bec5cf);border-radius:6px;background:var(--soft,#f4f6f9);color:inherit;padding:5px 9px;cursor:pointer}
+.linked-perspective button[aria-pressed=true]{border-color:var(--blue,#2c62c5);font-weight:600}
+.linked-perspective button:focus-visible,.linked-perspective select:focus-visible,.linked-perspective input:focus-visible{outline:3px solid var(--accent,#2255aa);outline-offset:2px}
+.linked-anchor{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:flex-start;padding:8px 12px;border:1px solid var(--border,#bec5cf);border-left:4px solid var(--blue,#2c62c5);border-radius:8px;min-width:0;overflow-wrap:anywhere}
+.linked-anchor>div{min-width:0;flex:1 1 220px}
+.linked-anchor p{margin:4px 0 0;font-size:13px}
+.linked-compact-nav{display:flex;flex-wrap:wrap;gap:6px}
+.linked-grid{display:grid;gap:10px;min-width:0;grid-template-columns:minmax(0,var(--linked-split,50%)) minmax(0,1fr);grid-template-areas:"left right" "detail detail"}
+.linked-perspective[data-placement=below-right] .linked-grid{grid-template-areas:"left right" "left detail"}
+.linked-perspective[data-second=false] .linked-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"left" "detail"}
+.linked-perspective[data-compact=true] .linked-grid{display:block}
+.linked-pane[data-side=left]{grid-area:left}
+.linked-pane[data-side=right]{grid-area:right}
+.linked-detail{grid-area:detail;min-width:0;overflow-wrap:anywhere;padding:10px 12px;border:1px solid var(--border,#bec5cf);border-radius:8px;align-self:start}
+.linked-pane{min-width:0;border:1px solid var(--border,#bec5cf);border-radius:8px;overflow:hidden;align-self:start}
+.linked-pane .diagram-section{margin:0;min-width:0}
+.linked-pane .canvas-frame{height:360px}
+.linked-state{padding:8px 12px;border-bottom:1px solid var(--border,#bec5cf);min-width:0;overflow-wrap:anywhere}
+.linked-state p{margin:4px 0;font-size:13px}
+.linked-targets{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.linked-mappings{overflow-x:auto;max-width:100%}
+.linked-mappings table{border-collapse:collapse;font-size:12px;min-width:100%}
+.linked-mappings th,.linked-mappings td{border:1px solid var(--border,#bec5cf);padding:4px 6px;text-align:left;vertical-align:top}
+.linked-gaps p{margin:4px 0}
+.linked-caption{margin:0}
+@media(prefers-reduced-motion:reduce){.linked-perspective *{transition:none!important;animation:none!important}}
+/* Selection is host-controlled (React Flow selection off), so the card button itself takes the pointer. */
+.linked-pane .react-flow__node .node-button{pointer-events:all}

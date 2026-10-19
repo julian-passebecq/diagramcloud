@@ -62,3 +62,5 @@
 .v3-notice .toolbar{display:flex;flex-wrap:wrap;gap:6px}
 .v3-dock-controls .wb-layout-fields{inset-inline-end:auto;inset-inline-start:0}
 .workbench-frame[data-compact=true] .v3-dock-controls .wb-layout-fields{left:12px;right:auto}
+.workbench-frame .wb-layout-fields .v3-default-surface label{flex-direction:row;align-items:center;gap:6px}
+.workbench-frame .wb-layout-fields .v3-default-surface{border-top:1px solid var(--border,#bec5cf);margin-top:10px;padding-top:10px}
