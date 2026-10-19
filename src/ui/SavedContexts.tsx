@@ -7,7 +7,7 @@ import {SAVED_CONTEXT_LIMIT,addSavedContext,clearSavedContexts,readSavedContexts
 
 type Props={projectId:string;projectRevision:number;audience:SavedContextAudience;host:string;storage:()=>SavedContextStorage|null;
  capture:()=>SemanticContext|undefined;onRestore:(entry:SavedContext)=>DimensionResult[]|undefined};
-const DIMENSION_LABELS:Record<DimensionResult['dimension'],string>={path:'Parent path',view:'View',selection:'Selected component or connection',sheet:'Sheet',perspective:'Perspective',environment:'Environment',snapshot:'Snapshot',lesson:'Lesson depth',variant:'Variant',tour:'Tour position'};
+const DIMENSION_LABELS:Record<DimensionResult['dimension'],string>={path:'Parent path',view:'View',selection:'Selected component or connection',sheet:'Sheet',perspective:'Perspective',environment:'Environment',snapshot:'Snapshot',lesson:'Lesson depth',variant:'Variant',tour:'Tour position',linked:'Linked views pair',anchor:'Business question anchor'};
 const STATE_LABELS:Record<DimensionResult['state'],string>={kept:'restored',fallback:'unavailable · safe fallback used',changed:'changed since saved',reserved:'recorded, not restored'};
 const readNotice=(read:SavedContextRead)=>read.status==='corrupt'?'Saved contexts for this project cannot be read. They were left untouched; clear them to save new ones.':read.status==='unavailable'?'Browser storage is unavailable here. Saved contexts cannot be kept; navigation still works.':'';
 
@@ -41,7 +41,7 @@ export function SavedContexts({projectId,projectRevision,audience,host,storage,c
  const problem=readNotice(read);
  return <section ref={root} className="saved-contexts" aria-label="Saved contexts" data-testid="saved-contexts">
   <div className="eyebrow">SAVED CONTEXTS</div>
-  <p className="micro">Saves where you are (path, view, selection, sheet, environment) in this browser only. No project change, no Undo step; private objects never reach a public context.</p>
+  <p className="micro">Saves where you are (path, view, selection, sheet, environment, linked views pair) in this browser only. No project change, no Undo step; private objects never reach a public context.</p>
   {problem&&<p className="revision-warning" role="alert">{problem}</p>}
   {read.status==='corrupt'&&<Button size="small" onClick={clear}>Clear saved contexts</Button>}
   {read.status!=='corrupt'&&read.status!=='unavailable'&&<div className="toolbar"><Input size="small" data-focus="saved-context-name" aria-label="Saved context name" placeholder="Name (optional)" value={label} maxLength={120} onChange={(_,d)=>setLabel(d.value)} onKeyDown={e=>{if(e.key==='Enter')save();}}/><Button size="small" appearance="primary" onClick={save}>Save context</Button></div>}

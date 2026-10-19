@@ -123,6 +123,39 @@ test.describe('1440px linked views',()=>{
   await noHorizontalScroll(page);expect(errors).toEqual([]);
  });
 
+ test('a saved context restores the linked pair, anchor and detail placement by stable ID, never a revision',async({page})=>{
+  const errors=await guardNetwork(page);
+  await page.goto('/?workspace=v3');await expect(workspace(page)).toBeVisible();await importFixture(page,fixture());
+  await openLinked(page);
+  await toolbar(page).getByLabel('Detail placement',{exact:true}).selectOption('below-right');
+  const revision=await page.evaluate(()=>document.body.innerText.match(/revision (\d+)/)?.[1]??'');
+  const explorer=workspace(page).getByRole('complementary',{name:'Explorer',exact:true}),saved=page.getByTestId('saved-contexts');
+  await explorer.getByRole('button',{name:'Navigate',exact:true}).click();await expect(saved).toBeVisible();
+  await saved.getByLabel('Saved context name',{exact:true}).fill('Linked pair');await saved.getByRole('button',{name:'Save context',exact:true}).click();
+  await expect(saved.getByRole('status')).toContainText('Saved “Linked pair” in this browser.');
+  const stored=await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('diagramcloud.saved-contexts.v1:')).map(k=>localStorage.getItem(k)!));
+  expect(stored).toHaveLength(1);expect(stored[0]).toContain('"linked":{"leftViewId":"physical","rightViewId":"data","anchorNodeId":"wind.goal","detailPlacement":"below-right"}');
+  expect(stored[0]).not.toContain('Renewable-energy client');
+
+  // Leave linked mode and change the pair's layout; restoring brings back the pair, the anchor and the placement.
+  await linkedToggle(page).click();await expect(linkedToggle(page)).toHaveAttribute('aria-pressed','false');await expect(linkedView(page)).toHaveCount(0);
+  await saved.getByRole('button',{name:'Restore Linked pair',exact:true}).click();
+  await expect(linkedToggle(page)).toHaveAttribute('aria-pressed','true');await expect(linkedView(page)).toBeVisible();
+  await expect(toolbar(page).getByLabel('Left view',{exact:true})).toHaveValue('physical');await expect(toolbar(page).getByLabel('Right view',{exact:true})).toHaveValue('data');
+  await expect(toolbar(page).getByLabel('Detail placement',{exact:true})).toHaveValue('below-right');
+  await expect(linkedView(page).getByRole('region',{name:'Business question'})).toContainText('Business question: Renewable-energy client');
+  for(const name of ['linked','anchor'])await expect(saved.locator(`[data-dimension="${name}"]`)).toHaveAttribute('data-state','kept');
+  expect(new URL(page.url()).searchParams.get('linked')).toBe('physical~data');expect(new URL(page.url()).searchParams.get('anchor')).toBe('wind.goal');
+  // The restored anchor works: Back to business question returns to the anchor component by its stable ID.
+  await paneCard(page,'left','Wind sensor channel').click();
+  await workspace(page).getByRole('button',{name:'Bottom panel',exact:true}).click();
+  const back=page.getByTestId('linked-route').getByRole('button',{name:'Back to business question',exact:true});
+  await expect(back).not.toHaveAttribute('aria-disabled','true');await back.click();
+  await expect.poll(()=>new URL(page.url()).searchParams.get('node')).toBe('wind.goal');
+  expect(await page.evaluate(()=>document.body.innerText.match(/revision (\d+)/)?.[1]??'')).toBe(revision);
+  expect(errors).toEqual([]);
+ });
+
  test('the V3 workspace can be the default; ?workspace=studio always opens the classic studio',async({page})=>{
   const errors=await guardNetwork(page);
   await page.goto('/');await expect(workspace(page)).toHaveCount(0);

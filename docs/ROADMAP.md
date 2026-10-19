@@ -26,7 +26,7 @@ Estimates in the handoff are uncalibrated allowances; calendar completion is unk
 - **UX37** bounded join evidence in the App, staged as a private revision-guarded patch through the ordinary review.
 - **UX38** meeting summary from Export & share (1-6 public views, HTML only) with the reconciled practical catalogue (24 lessons).
 - **UX26, UX27, UX29, UX30** moved by the Galaxy-style journey: a session-only `delivery-view/1` reading (source identity, owner conflicts, named gaps, uncalibrated ranges, supplied intervals and results) and five history questions.
-- **Cuts recorded as gaps:** a saved-context dimension for the linked pair; cross-project correspondence in linked views; free docking; linking delivery blocks to PM tasks; a token forecast; live collectors or dispatch; a delivery view stored in the Project; a capacityScenario App surface; PDF/PPTX meeting outputs; spatial semantic zoom; semantic diagrams for the new lessons; Cursor/VSIX changes.
+- **Cuts recorded as gaps:** cross-project correspondence in linked views; free docking; linking delivery blocks to PM tasks; a token forecast; live collectors or dispatch; a delivery view stored in the Project; a capacityScenario App surface; PDF/PPTX meeting outputs; spatial semantic zoom; semantic diagrams for the new lessons; Cursor/VSIX changes.
 
 ## Current state (2026-10-19): 1.32.0 unified continuation
 
