@@ -1,0 +1,22 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {buildReviewWorkspace,joinRequestJson} from '../examples/review-workspace/build';
+import {joinInspectionSchema,inspectJoin} from '../src/intelligence/joinInspection';
+import {buildMigrationCandidates} from '../examples/review-workspace/patterns';
+import {publicDocument} from '../src/core/operations';
+import {prepareLinkedReading} from '../src/core/linkedReading';
+import {linkedReadingHtml} from '../src/export/linkedReadingHtml';
+import fs from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import {spawnSync} from 'node:child_process';
+test('worked join example uses native Project validation and linked view IDs',()=>{const f=buildReviewWorkspace();const p=prepareLinkedReading(f.project,f.reading);assert.equal(p.chapters.length,2);assert.equal(f.project.observations.length,0);assert.equal(f.project.blocks.length,7);assert.deepEqual(publicDocument(f.project).nodes,f.project.nodes);});
+test('eight migration/working-pattern candidates validate against the existing catalogue',()=>{const p=buildMigrationCandidates();assert.equal(p.entries.length,8);assert.equal(p.sources.length,8);assert.ok(p.entries.every(e=>e.entryKind==='pattern'));assert.ok(p.entries.every(e=>!e.instanceMappings.length));});
+test('migration content preserves distinctions and does not demand a blanket rewrite',()=>{const s=JSON.stringify(buildMigrationCandidates());for(const term of ['preview','multidimensional','coexist','rollback','unlaunched','Sankey','source-bound'])assert.ok(s.toLowerCase().includes(term.toLowerCase()),term);});
+test('native source key refuses changed project',()=>{const f=buildReviewWorkspace();f.project.title+=' changed';assert.throws(()=>prepareLinkedReading(f.project,f.reading));});
+test('one detail dock can move without manufacturing a second context',()=>{const f=buildReviewWorkspace();const html=linkedReadingHtml(f.project,f.reading);assert.equal((html.match(/id="dock-content"/g)||[]).length,1);assert.ok(html.includes('id="detail-placement"'));assert.ok(html.includes("function placeDock()"));});
+test('explicit example CLI succeeds and refuses overwrite or unknown mode',async()=>{const root=await fs.mkdtemp(path.join(os.tmpdir(),'review-export-'));try{const out=path.join(root,'new');const run=(a:string[])=>spawnSync(process.execPath,[...process.execArgv.filter(a=>a!=='--test'),'scripts/prepare-review-workspace.ts',...a],{encoding:'utf8',timeout:20000});const r=run(['--example',out]);assert.equal(r.status,0,r.stderr);assert.equal((await fs.readdir(out)).length,7);assert.equal(await fs.readFile(path.join(out,'join.request.json'),'utf8'),joinRequestJson());const before=await fs.readFile(path.join(out,'review.project.json'),'utf8');const repeat=run(['--example',out]);assert.notEqual(repeat.status,0);assert.match(repeat.stderr,/EEXIST/);assert.equal(await fs.readFile(path.join(out,'review.project.json'),'utf8'),before);assert.notEqual(run(['--execute',out]).status,0);}finally{await fs.rm(root,{recursive:true,force:true});}});
+test('the committed join request equals the builder output byte for byte and stays a public synthetic fixture',async()=>{
+ const committed=await fs.readFile(new URL('../examples/review-workspace/join.request.json',import.meta.url));
+ assert.ok(committed.equals(Buffer.from(joinRequestJson(),'utf8')),'examples/review-workspace/join.request.json differs from joinRequestJson(); regenerate it from the builder');
+ const request=joinInspectionSchema.parse(JSON.parse(committed.toString('utf8')));
+ assert.equal(request.provenance,'synthetic');assert.match(request.scope,/invented/);assert.match(request.measure!.unit,/synthetic/);
+ const result=inspectJoin(request);assert.equal(result.measure!.before,42);assert.equal(result.measure!.after,70);assert.deepEqual(result.unmatchedLeft,['line.c','line.d']);
+ assert.deepEqual(buildReviewWorkspace().request,request);
+});

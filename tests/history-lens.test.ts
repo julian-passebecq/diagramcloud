@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {projectHistory,revisionKey,type HistoryRecord,type HistorySlice,type HistoryQuery} from '../src/development/historyLens';
+import {readFileSync} from 'node:fs';
+import {createElement} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {answerHistoryQuestion,parseHistorySlice,projectHistory,revisionKey,HISTORY_QUESTIONS,HISTORY_SLICE_LIMITS,type HistoryRecord,type HistorySlice,type HistoryQuery} from '../src/development/historyLens';
+import {HistoryLensPanel} from '../src/ui/HistoryLensPanel';
 const rec=(id:string,parents:string[]|null=[],extra:Partial<HistoryRecord>={}):HistoryRecord=>({ref:{repository:'repo-a',id},kind:'revision',vcs:'git',title:'Change '+id,visibility:'public',occurredAt:'2026-10-18T10:00:00Z',basis:'source',sourceRef:'receipt-1',ancestry:parents===null?null:{parents:parents.map(id=>({repository:'repo-a',id})),completeness:'complete',semantics:'native'},facets:{},...extra});
 const slice=(records:HistoryRecord[]):HistorySlice=>({capturedAt:'2026-10-18T12:00:00Z',coverage:'partial',records});
 const ids=(d:ReturnType<typeof projectHistory>)=>d.rows.map(r=>r.ref.id);
@@ -42,3 +46,68 @@ test('Git author and committer remain distinct attributed filters',()=>{const da
 test('system model and operation filters never infer one from another',()=>{const data=slice([rec('a',[],{facets:{model:['model-x'],system:['assistant-a']}})]);assert.equal(projectHistory(data,{facets:{model:{values:['model-x']}}}).matched,1);assert.equal(projectHistory(data,{facets:{operation:{values:['model-x']}}}).matched,0);});
 test('reference membership must be supplied, not guessed from ancestry',()=>{const data=slice([rec('a',['b'],{facets:{ref:['main']}}),rec('b')]);assert.deepEqual(ids(projectHistory(data,{facets:{ref:{values:['main']}}})),['a']);});
 test('public lane geometry does not reveal an omitted parent position',()=>{const a=projectHistory(slice([rec('m',['p','hidden']),rec('p')]),{},'public');const b=projectHistory(slice([rec('m',['hidden','p']),rec('p')]),{},'public');assert.deepEqual(a,b);});
+
+// Five history questions over a synthetic slice (tests/fixtures/history-questions/example-history.json).
+const QRAW=readFileSync(new URL('./fixtures/history-questions/example-history.json',import.meta.url),'utf8');
+const qslice=()=>parseHistorySlice(QRAW);
+const key=(id:string)=>revisionKey({repository:'example/service',id});
+const qbinding={projectId:'p',audience:'author' as const,epoch:1};
+test('five questions: ancestry never uses associations',()=>{
+ const a=answerHistoryQuestion(qslice(),'ancestry','author');
+ assert.equal(a.answerable,true);assert.deepEqual(a.groups,[]);
+ // r9 shares the request-form feature with r3 and r2 but has no native parent: it stays a root, never a child.
+ assert.equal(a.rows.find(r=>r.ref.id==='r9')?.ancestry,'root');
+ assert.equal(a.rows.find(r=>r.ref.id==='r3')?.ancestry,'shown');
+ // Same answer whatever the association facets say.
+ const s=qslice();for(const r of s.records)delete r.facets.feature;
+ assert.deepEqual(answerHistoryQuestion(s,'ancestry','author').rows.map(r=>[r.key,r.ancestry]),a.rows.map(r=>[r.key,r.ancestry]));
+ assert.deepEqual([...HISTORY_QUESTIONS],['ancestry','associations','attempts','impact','lineage']);
+});
+test('associations never create parent edges',()=>{
+ const a=answerHistoryQuestion(qslice(),'associations','author');
+ assert.deepEqual(a.groups.map(g=>[g.facet,g.value,g.recordKeys.length]),[['feature','PRIVATE_FEATURE',1],['feature','request-form',3],['problem','schema-drift',1],['decision','use-json-schema',1]]);
+ assert.ok(a.rows.every(r=>r.ancestry==='not-applicable'&&r.lane===0));
+ assert.ok(!('edges' in a));
+ // The ancestry projection is unchanged by the association: r9 still has no edge.
+ assert.ok(!projectHistory(qslice()).edges.some(e=>e.child===key('r9')||e.parent===key('r9')));
+ // Attempts are listed in recorded time order, unknown times apart.
+ const t=answerHistoryQuestion(qslice(),'attempts','author');
+ assert.deepEqual(t.rows.map(r=>r.ref.id),['run-1','run-2']);assert.deepEqual(t.unresolved,[key('run-x')]);
+ // Lineage groups supplied release/check values per record.
+ assert.deepEqual(answerHistoryQuestion(qslice(),'lineage','author').groups.map(g=>[g.facet,g.value,g.recordKeys]),[['release','0.4.0',[key('r2')]],['release','PRIVATE_RELEASE',[key('hidden')]],['check','unit-tests',[key('r3')]]]);
+ const html=renderToStaticMarkup(createElement(HistoryLensPanel,{slice:qslice(),controls:{binding:qbinding,query:{}},binding:qbinding,onQuery:()=>{},onSelect:()=>{},question:'associations',onQuestion:()=>{}}));
+ assert.match(html,/request-form/);assert.match(html,/never connected by an edge/);
+});
+test('impact matches exact component IDs only',()=>{
+ const a=answerHistoryQuestion(qslice(),'impact','author',['svc.ui','svc.api','svc.API','request form']);
+ assert.deepEqual(a.componentMatches,[{componentId:'svc.api',recordKeys:[key('r2')]},{componentId:'svc.ui',recordKeys:[key('r3')]}]);
+ // A label-like value and a path stay unresolved, never matched by label, case or prefix.
+ assert.deepEqual(a.unresolved,['Request Form','src/api/routes.ts','svc.secret']);
+ assert.deepEqual(answerHistoryQuestion(qslice(),'impact','author').componentMatches,[]);
+ const html=renderToStaticMarkup(createElement(HistoryLensPanel,{slice:qslice(),controls:{binding:qbinding,query:{}},binding:qbinding,onQuery:()=>{},onSelect:()=>{},question:'impact',onQuestion:()=>{},componentIds:['svc.ui'],onSelectComponent:()=>{}}));
+ assert.match(html,/History question/);assert.match(html,/<button[^>]*>svc\.ui<\/button>/);assert.match(html,/Unresolved/);
+});
+test('unanswerable question names the missing facet',()=>{
+ const s=parseHistorySlice(JSON.stringify({capturedAt:'2026-10-01T12:00:00Z',coverage:'unknown',records:[{ref:{repository:'r',id:'a'},kind:'revision',vcs:'git',title:'Synthetic',visibility:'public',occurredAt:null,basis:'source',sourceRef:'x',ancestry:null,facets:{}}]}));
+ const missing=Object.fromEntries(HISTORY_QUESTIONS.map(q=>{const a=answerHistoryQuestion(s,q,'author');assert.equal(a.answerable,false);return [q,a.missing];}));
+ assert.deepEqual(missing,{ancestry:['ancestry'],associations:['feature','problem','decision'],attempts:['run'],impact:['surface','path'],lineage:['release','artifact','check','review']});
+ const html=renderToStaticMarkup(createElement(HistoryLensPanel,{slice:s,controls:{binding:qbinding,query:{}},binding:qbinding,onQuery:()=>{},onSelect:()=>{},question:'lineage',onQuestion:()=>{}}));
+ assert.match(html,/Not answerable from the supplied records/);assert.match(html,/release, artifact, check, review/);
+ // Bounded, strict file reading refuses the whole input.
+ assert.throws(()=>parseHistorySlice('{'),/Invalid history/);
+ assert.throws(()=>parseHistorySlice(JSON.stringify({...JSON.parse(QRAW),extra:1})),/Invalid history/);
+ assert.throws(()=>parseHistorySlice(' '.repeat(HISTORY_SLICE_LIMITS.bytes+1)),/Invalid history/);
+ const cyc=JSON.parse(QRAW);cyc.records[2].ancestry.parents=[{repository:'example/service',id:'r3'}];assert.throws(()=>parseHistorySlice(JSON.stringify(cyc)),/Invalid history/);
+});
+test('public filter precedes every question',()=>{
+ for(const q of HISTORY_QUESTIONS){
+  const a=answerHistoryQuestion(qslice(),q,'public',['svc.ui','svc.secret']);
+  assert.ok(!/PRIVATE|hidden|svc\.secret/.test(JSON.stringify(a)),q);
+  // One or many private records give the same public answer.
+  const more=qslice();more.records.push(...Array.from({length:5},(_,i)=>({...structuredClone(more.records[7]),ref:{repository:'example/service',id:'hidden'+i}})));
+  assert.deepEqual(answerHistoryQuestion(more,q,'public',['svc.ui','svc.secret']),a,q);
+ }
+ // A private malformed record never affects a public answer.
+ const bad=qslice();bad.records[7].title='';
+ assert.deepEqual(answerHistoryQuestion(bad,'associations','public'),answerHistoryQuestion(qslice(),'associations','public'));
+});

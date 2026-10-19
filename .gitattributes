@@ -2,3 +2,5 @@
 public/icons/** -text
 # Supplied briefs are checked by their SHA-256: keep their bytes (LF) on every checkout.
 examples/workflows/** -text
+# The committed join request fixture must equal the builder output byte for byte (tests/review-workspace.test.ts).
+examples/review-workspace/join.request.json -text

@@ -19,8 +19,18 @@ V3 is adopted into this roadmap, not tracked in a parallel backlog. The adoption
 
 Estimates in the handoff are uncalibrated allowances; calendar completion is unknown.
 
-## Current state (2026-10-19): 1.31.0 expressiveness
+## Unified continuation (1.32.0, 2026-10-19)
 
+- **UX35** linked same-cut and mapped reading as an export (F/G offline reader), source-tested in the F/G/H contribution.
+- **UX36** linked views in the App: two permitted views, exact IDs or mapping tables, business anchor, independent cameras, one movable detail slot with a saved placement, labelled route controls, default-surface choice with the `?workspace=studio` escape.
+- **UX37** bounded join evidence in the App, staged as a private revision-guarded patch through the ordinary review.
+- **UX38** meeting summary from Export & share (1-6 public views, HTML only) with the reconciled practical catalogue (24 lessons).
+- **UX26, UX27, UX29, UX30** moved by the Galaxy-style journey: a session-only `delivery-view/1` reading (source identity, owner conflicts, named gaps, uncalibrated ranges, supplied intervals and results) and five history questions.
+- **Cuts recorded as gaps:** a saved-context dimension for the linked pair; cross-project correspondence in linked views; free docking; linking delivery blocks to PM tasks; a token forecast; live collectors or dispatch; a delivery view stored in the Project; a capacityScenario App surface; PDF/PPTX meeting outputs; spatial semantic zoom; semantic diagrams for the new lessons; Cursor/VSIX changes.
+
+## Current state (2026-10-19): 1.32.0 unified continuation
+
+- **1.32.0** ([notes](release-1.32/RELEASE_NOTES.md)): linked views, delivery plan and history questions, join evidence, meeting summary and the reconciled catalogue in the App, with three offline release journeys. UX29 and UX30 stay partial; V3 is integrated, not complete.
 - **1.31.0** ([notes](release-1.31/RELEASE_NOTES.md)): the expressiveness complement qualified on its own (UX31-UX34 implemented with tests); the focused explanation HTML prints whole; AGENTS.md states the expressiveness limits. V3 is still integrated, not complete.
 - **1.30.0** ([notes](release-1.30/RELEASE_NOTES.md)): V3 workspace, PM task import, capability examples, linked comparison and interruptible presentation and the companion pane (#102-#109), integrated with one offline release journey through the App. V3 is integrated, not complete.
 - **1.29.1** ([notes](release-1.29/RELEASE_NOTES-1.29.1.md)): public figures never count private items, they print one generic notice (#100, AC25 implemented); the watched concept host takes its change baseline synchronously (#99).
