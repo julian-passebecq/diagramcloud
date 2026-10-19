@@ -1,0 +1,744 @@
+{
+  "schemaVersion": 1,
+  "id": "data-grain",
+  "revision": 1,
+  "title": "Tables, transformation and business meaning",
+  "summary": "Why can a plausible join double a business measure?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "sales",
+      "label": "Sales facts",
+      "kind": "table",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "sales-data"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "dim",
+      "label": "Customer history",
+      "kind": "table",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "dimension-data"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "join",
+      "label": "Join and aggregate",
+      "kind": "function",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "join-code",
+        "meaning"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "metric",
+      "label": "Revenue metric",
+      "kind": "report",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson",
+      "label": "Tables, transformation and business meaning",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.index",
+      "blockIds": [
+        "walk-lesson.intro"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.grain.note",
+      "label": "Start with what one row means",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.grain.text",
+        "walk-lesson.grain.before"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.grain.entry",
+      "label": "Start with what one row means",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.grain.view",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.badjoin.note",
+      "label": "One-to-many matching duplicates contributions",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.badjoin.text",
+        "walk-lesson.badjoin.after",
+        "walk-lesson.badjoin.code",
+        "walk-lesson.badjoin.locator"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.badjoin.entry",
+      "label": "One-to-many matching duplicates contributions",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.badjoin.view",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.fix.note",
+      "label": "Repair the relationship and state the assumptions",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.fix.text",
+        "walk-lesson.fix.after"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.fix.entry",
+      "label": "Repair the relationship and state the assumptions",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.fix.view",
+      "blockIds": [],
+      "sourceIds": [],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "read-sales",
+      "source": "sales",
+      "target": "join",
+      "label": "",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "read-customer",
+      "source": "dim",
+      "target": "join",
+      "label": "",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "derive",
+      "source": "join",
+      "target": "metric",
+      "label": "",
+      "kind": "batch",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "Tables, transformation and business meaning",
+      "description": "Why can a plausible join double a business measure?",
+      "nodeIds": [
+        "sales",
+        "dim",
+        "join",
+        "metric",
+        "walk-lesson"
+      ],
+      "edgeIds": [
+        "read-sales",
+        "read-customer",
+        "derive"
+      ],
+      "positions": {
+        "sales": {
+          "x": 0,
+          "y": 0
+        },
+        "dim": {
+          "x": 340,
+          "y": 0
+        },
+        "join": {
+          "x": 680,
+          "y": 0
+        },
+        "metric": {
+          "x": 0,
+          "y": 180
+        },
+        "walk-lesson": {
+          "x": 0,
+          "y": -300
+        }
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.index",
+      "title": "Walkthrough: Tables, transformation and business meaning",
+      "description": "Why can a plausible join double a business measure?\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "walk-lesson.grain.entry",
+        "walk-lesson.badjoin.entry",
+        "walk-lesson.fix.entry"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "walk-lesson.grain.entry": {
+          "x": 0,
+          "y": 0
+        },
+        "walk-lesson.badjoin.entry": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.fix.entry": {
+          "x": 620,
+          "y": 0
+        }
+      },
+      "perspective": "evidence",
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.grain.view",
+      "title": "Start with what one row means",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "sales",
+        "dim",
+        "walk-lesson.grain.note"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "sales": {
+          "x": 0,
+          "y": 0
+        },
+        "dim": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.grain.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.grain.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.badjoin.view",
+      "title": "One-to-many matching duplicates contributions",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "sales",
+        "dim",
+        "join",
+        "walk-lesson.badjoin.note"
+      ],
+      "edgeIds": [
+        "read-sales",
+        "read-customer"
+      ],
+      "positions": {
+        "sales": {
+          "x": 0,
+          "y": 0
+        },
+        "dim": {
+          "x": 310,
+          "y": 0
+        },
+        "join": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.badjoin.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "code",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.badjoin.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.fix.view",
+      "title": "Repair the relationship and state the assumptions",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "join",
+        "metric",
+        "walk-lesson.fix.note"
+      ],
+      "edgeIds": [
+        "derive"
+      ],
+      "positions": {
+        "join": {
+          "x": 0,
+          "y": 0
+        },
+        "metric": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.fix.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.fix.note"
+        ]
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "sales-data",
+      "title": "Illustrative facts",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "sale_id",
+        "customer_id",
+        "amount"
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          20
+        ],
+        [
+          2,
+          7,
+          15
+        ]
+      ]
+    },
+    {
+      "id": "dimension-data",
+      "title": "Illustrative historical dimension",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "customer_id",
+        "version"
+      ],
+      "rows": [
+        [
+          7,
+          "old"
+        ],
+        [
+          7,
+          "new"
+        ]
+      ]
+    },
+    {
+      "id": "join-code",
+      "title": "Unsafe historical join for this grain",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "sql",
+      "code": "SELECT SUM(s.amount)\nFROM sales s\nJOIN customer_history d\n  ON s.customer_id = d.customer_id;"
+    },
+    {
+      "id": "meaning",
+      "title": "Grain contract",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Each sale contributes once. Select a unique applicable dimension version, using the correct validity interval when required. A diagram edge alone cannot establish key uniqueness."
+    },
+    {
+      "id": "walk-lesson.intro",
+      "title": "Tables, transformation and business meaning",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "author",
+      "type": "text",
+      "text": "Question: Why can a plausible join double a business measure?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: data-grain revision 1; fingerprint 19a3b583f846b7cd.\n\nThis private addition changes no existing feature, deployment, approval or observation."
+    },
+    {
+      "id": "walk-lesson.grain.text",
+      "title": "Start with what one row means",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "The synthetic sales total is 35. Customer history has two rows for the same key. Key labels and cardinality assertions need validation against the intended grain.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of data-grain revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.grain.before",
+      "title": "Before - Start with what one row means",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "transform": "input",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "sales rows",
+          "2"
+        ],
+        [
+          "amount total",
+          "35"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.badjoin.text",
+      "title": "One-to-many matching duplicates contributions",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Each fact matches two dimension records. Four rows contribute 70, not 35. These values are calculated from this explicit synthetic fixture, not production metrics.\n\nExplicit prerequisites: grain.\n\nSnapshot of data-grain revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.badjoin.after",
+      "title": "After - One-to-many matching duplicates contributions",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "joined rows",
+          "4"
+        ],
+        [
+          "naive amount sum",
+          "70"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.badjoin.code",
+      "title": "Unsafe historical join for this grain : 1-4",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "transform": "logic",
+      "type": "code",
+      "language": "sql",
+      "code": "SELECT SUM(s.amount)\nFROM sales s\nJOIN customer_history d\n  ON s.customer_id = d.customer_id;"
+    },
+    {
+      "id": "walk-lesson.badjoin.locator",
+      "title": "Code excerpt source cut",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "data-grain revision 1, block join-code, lines 1-4, content fingerprint bdadeada686f3834. Frozen excerpt, not live code. Display-only; no execution."
+    },
+    {
+      "id": "walk-lesson.fix.text",
+      "title": "Repair the relationship and state the assumptions",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Choosing the applicable unique dimension record restores the intended contribution. DISTINCT over an amount is not a general correction: equal-valued legitimate sales can exist.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nQuestion to explore: Which valid-time window applies?\n\nQuestion to explore: How are late-arriving facts handled?\n\nQuestion to explore: Where is uniqueness tested?\n\nSnapshot of data-grain revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.fix.after",
+      "title": "After - Repair the relationship and state the assumptions",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "one dimension match per sale",
+          "required"
+        ],
+        [
+          "expected fixture total",
+          "35"
+        ]
+      ]
+    }
+  ],
+  "assets": [],
+  "sources": [],
+  "story": [
+    {
+      "title": "Start with what one row means",
+      "viewId": "walk-lesson.grain.view",
+      "nodeId": "walk-lesson.grain.note",
+      "narration": "The synthetic sales total is 35. Customer history has two rows for the same key. Key labels and cardinality assertions need validation against the intended grain.",
+      "highlightEdgeIds": []
+    },
+    {
+      "title": "One-to-many matching duplicates contributions",
+      "viewId": "walk-lesson.badjoin.view",
+      "nodeId": "walk-lesson.badjoin.note",
+      "narration": "Each fact matches two dimension records. Four rows contribute 70, not 35. These values are calculated from this explicit synthetic fixture, not production metrics.",
+      "highlightEdgeIds": [
+        "read-sales",
+        "read-customer"
+      ]
+    },
+    {
+      "title": "Repair the relationship and state the assumptions",
+      "viewId": "walk-lesson.fix.view",
+      "nodeId": "walk-lesson.fix.note",
+      "narration": "Choosing the applicable unique dimension record restores the intended contribution. DISTINCT over an amount is not a general correction: equal-valued legitimate sales can exist.",
+      "highlightEdgeIds": [
+        "derive"
+      ]
+    }
+  ],
+  "observations": [],
+  "tours": [
+    {
+      "id": "walk-lesson.tour",
+      "title": "Tables, transformation and business meaning",
+      "sourceRevision": 1,
+      "stops": [
+        {
+          "id": "stop-db80bca992",
+          "viewId": "walk-lesson.grain.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "sales"
+            },
+            {
+              "kind": "node",
+              "id": "dim"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.grain.note"
+            }
+          ],
+          "fingerprint": "cd59a101f5d615fc",
+          "referencedFingerprint": "2f0bdd35b5b5489f",
+          "narration": "The synthetic sales total is 35. Customer history has two rows for the same key. Key labels and cardinality assertions need validation against the intended grain."
+        },
+        {
+          "id": "stop-b4e4039fda",
+          "viewId": "walk-lesson.badjoin.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "sales"
+            },
+            {
+              "kind": "node",
+              "id": "dim"
+            },
+            {
+              "kind": "node",
+              "id": "join"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.badjoin.note"
+            },
+            {
+              "kind": "edge",
+              "id": "read-sales"
+            },
+            {
+              "kind": "edge",
+              "id": "read-customer"
+            }
+          ],
+          "fingerprint": "7c9f7026ab42467f",
+          "referencedFingerprint": "21384c935473deca",
+          "narration": "Each fact matches two dimension records. Four rows contribute 70, not 35. These values are calculated from this explicit synthetic fixture, not production metrics."
+        },
+        {
+          "id": "stop-ce8a526179",
+          "viewId": "walk-lesson.fix.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "join"
+            },
+            {
+              "kind": "node",
+              "id": "metric"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.fix.note"
+            },
+            {
+              "kind": "edge",
+              "id": "derive"
+            }
+          ],
+          "fingerprint": "4e1fe4099325d357",
+          "referencedFingerprint": "6f72208caf880d21",
+          "narration": "Choosing the applicable unique dimension record restores the intended contribution. DISTINCT over an amount is not a general correction: equal-valued legitimate sales can exist."
+        }
+      ],
+      "visibility": "public"
+    }
+  ]
+}

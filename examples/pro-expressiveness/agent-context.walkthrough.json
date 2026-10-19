@@ -1,0 +1,100 @@
+{
+  "format": "diagramcloud.explanation-walkthrough",
+  "version": 1,
+  "projectId": "agent-context",
+  "baseRevision": 1,
+  "baseFingerprint": "55d8d5e78faae67d",
+  "id": "lesson",
+  "title": "Product agents, skills, tools and approvals",
+  "question": "What is instruction, what is capability, and who actually authorizes an action?",
+  "sourceIds": [],
+  "steps": [
+    {
+      "id": "context",
+      "title": "Loading a skill is not a permission grant",
+      "viewId": "overview",
+      "nodeIds": [
+        "host",
+        "model",
+        "skill"
+      ],
+      "edgeIds": [
+        "prompt",
+        "instructions"
+      ],
+      "narration": "Instructions, model configuration and execution capability are distinct. This conceptual fixture does not describe any currently running ChatGPT or Claude session.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [],
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "tool",
+      "title": "The host controls actual invocation",
+      "viewId": "overview",
+      "nodeIds": [
+        "host",
+        "mcp",
+        "system"
+      ],
+      "edgeIds": [
+        "tool",
+        "operation"
+      ],
+      "narration": "A model can propose a tool call; the host validates available operations and scope. Displaying an MCP connection does not enable access or prove an installed integration.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [],
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "human",
+      "title": "Approvals stay with their real owner",
+      "viewId": "overview",
+      "nodeIds": [
+        "human",
+        "host"
+      ],
+      "edgeIds": [
+        "intent",
+        "approval"
+      ],
+      "narration": "A task card can explain what is waiting. A visualization must not answer MFA, permissions or publication decisions on the owner's behalf.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [],
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "contributors",
+      "title": "Build contributors are not runtime product agents",
+      "viewId": "overview",
+      "nodeIds": [
+        "model",
+        "host",
+        "system"
+      ],
+      "edgeIds": [],
+      "narration": "The team or agents that built this system belong to a separate contributor lens. Hiding that lens must not remove the deployed product agent, its tools or trust boundaries.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [],
+      "takeaway": "",
+      "questions": [
+        "Which model was requested and which was observed?",
+        "Is this a proposed workflow, a recorded run, or an illustrative explanation?"
+      ]
+    }
+  ]
+}

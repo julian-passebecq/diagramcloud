@@ -1,0 +1,885 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud-boundaries",
+  "revision": 1,
+  "title": "Logical software, deployment and trust",
+  "summary": "Where does this component run, and which boundary does a request cross?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "browser",
+      "label": "Browser",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "gateway",
+      "label": "API gateway",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "service",
+      "label": "Business service",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "deployments"
+      ],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "warehouse",
+      "label": "Warehouse",
+      "kind": "storage",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "identity",
+      "label": "Identity provider",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson",
+      "label": "Logical software, deployment and trust",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.index",
+      "blockIds": [
+        "walk-lesson.intro"
+      ],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.logical.note",
+      "label": "Logical components are not deployment instances",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.logical.text"
+      ],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.logical.entry",
+      "label": "Logical components are not deployment instances",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.logical.view",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.environment.note",
+      "label": "The environment selects deployment evidence",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.environment.text"
+      ],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.environment.entry",
+      "label": "The environment selects deployment evidence",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.environment.view",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.trust.note",
+      "label": "Network reachability and authorization differ",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.trust.text"
+      ],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.trust.entry",
+      "label": "Network reachability and authorization differ",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.trust.view",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.failure.note",
+      "label": "Failure domains need their own viewpoint",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.failure.text",
+        "walk-lesson.failure.after"
+      ],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.failure.entry",
+      "label": "Failure domains need their own viewpoint",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.failure.view",
+      "blockIds": [],
+      "sourceIds": [
+        "c4"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "request",
+      "source": "browser",
+      "target": "gateway",
+      "label": "HTTPS request",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "route",
+      "source": "gateway",
+      "target": "service",
+      "label": "declared route",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "data",
+      "source": "service",
+      "target": "warehouse",
+      "label": "scoped query",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "token",
+      "source": "identity",
+      "target": "gateway",
+      "label": "verify token and policy",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "Logical software, deployment and trust",
+      "description": "Where does this component run, and which boundary does a request cross?",
+      "nodeIds": [
+        "browser",
+        "gateway",
+        "service",
+        "warehouse",
+        "identity",
+        "walk-lesson"
+      ],
+      "edgeIds": [
+        "request",
+        "route",
+        "data",
+        "token"
+      ],
+      "positions": {
+        "browser": {
+          "x": 0,
+          "y": 0
+        },
+        "gateway": {
+          "x": 340,
+          "y": 0
+        },
+        "service": {
+          "x": 680,
+          "y": 0
+        },
+        "warehouse": {
+          "x": 0,
+          "y": 180
+        },
+        "identity": {
+          "x": 340,
+          "y": 180
+        },
+        "walk-lesson": {
+          "x": 0,
+          "y": -300
+        }
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.index",
+      "title": "Walkthrough: Logical software, deployment and trust",
+      "description": "Where does this component run, and which boundary does a request cross?\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "walk-lesson.logical.entry",
+        "walk-lesson.environment.entry",
+        "walk-lesson.trust.entry",
+        "walk-lesson.failure.entry"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "walk-lesson.logical.entry": {
+          "x": 0,
+          "y": 0
+        },
+        "walk-lesson.environment.entry": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.trust.entry": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.failure.entry": {
+          "x": 0,
+          "y": 150
+        }
+      },
+      "perspective": "evidence",
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.logical.view",
+      "title": "Logical components are not deployment instances",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "browser",
+        "gateway",
+        "service",
+        "warehouse",
+        "walk-lesson.logical.note"
+      ],
+      "edgeIds": [
+        "request",
+        "route",
+        "data"
+      ],
+      "positions": {
+        "browser": {
+          "x": 0,
+          "y": 0
+        },
+        "gateway": {
+          "x": 310,
+          "y": 0
+        },
+        "service": {
+          "x": 620,
+          "y": 0
+        },
+        "warehouse": {
+          "x": 0,
+          "y": 150
+        },
+        "walk-lesson.logical.note": {
+          "x": 0,
+          "y": 330
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.logical.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.environment.view",
+      "title": "The environment selects deployment evidence",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "service",
+        "warehouse",
+        "walk-lesson.environment.note"
+      ],
+      "edgeIds": [
+        "data"
+      ],
+      "positions": {
+        "service": {
+          "x": 0,
+          "y": 0
+        },
+        "warehouse": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.environment.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.environment.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.trust.view",
+      "title": "Network reachability and authorization differ",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "browser",
+        "gateway",
+        "identity",
+        "walk-lesson.trust.note"
+      ],
+      "edgeIds": [
+        "request",
+        "token"
+      ],
+      "positions": {
+        "browser": {
+          "x": 0,
+          "y": 0
+        },
+        "gateway": {
+          "x": 310,
+          "y": 0
+        },
+        "identity": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.trust.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.trust.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.failure.view",
+      "title": "Failure domains need their own viewpoint",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "gateway",
+        "service",
+        "warehouse",
+        "walk-lesson.failure.note"
+      ],
+      "edgeIds": [
+        "route",
+        "data"
+      ],
+      "positions": {
+        "gateway": {
+          "x": 0,
+          "y": 0
+        },
+        "service": {
+          "x": 310,
+          "y": 0
+        },
+        "warehouse": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.failure.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.failure.note"
+        ]
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "deployments",
+      "title": "Synthetic environment mapping",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Environment",
+        "Instance",
+        "Placement",
+        "Evidence"
+      ],
+      "rows": [
+        [
+          "TEST",
+          "service-test",
+          "private subnet A",
+          "authored only"
+        ],
+        [
+          "PROD",
+          "service-prod",
+          "private subnet B",
+          "deployment unverified"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.intro",
+      "title": "Logical software, deployment and trust",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "author",
+      "type": "text",
+      "text": "Question: Where does this component run, and which boundary does a request cross?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: cloud-boundaries revision 1; fingerprint ad65629392ed6411.\n\nThis private addition changes no existing feature, deployment, approval or observation."
+    },
+    {
+      "id": "walk-lesson.logical.text",
+      "title": "Logical components are not deployment instances",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "This view explains software responsibilities. It does not imply a specific cloud vendor or a provisioned resource.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of cloud-boundaries revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.environment.text",
+      "title": "The environment selects deployment evidence",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "One logical service can have several environment-specific instances. A TEST configuration is not proof of PROD configuration, reachability, identity or installed version.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of cloud-boundaries revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.trust.text",
+      "title": "Network reachability and authorization differ",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "A route and a token are not blanket authorization. Tenant isolation, allowed actions, secret handling and rejected requests need explicit explanation and evidence.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nQuestion to explore: Which identity makes the downstream query?\n\nQuestion to explore: What is denied?\n\nQuestion to explore: Which data may cross this boundary?\n\nSnapshot of cloud-boundaries revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.failure.text",
+      "title": "Failure domains need their own viewpoint",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "A resilient design must describe capacity, timeout, failover, backup and recovery assumptions. No availability percentage or recovery time is inferred from replica icons.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of cloud-boundaries revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.failure.after",
+      "title": "After - Failure domains need their own viewpoint",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "RTO / RPO",
+          "not supplied"
+        ],
+        [
+          "failover tested",
+          "unknown"
+        ]
+      ]
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "c4",
+      "title": "C4 deployment view",
+      "location": "",
+      "url": "https://c4model.com/diagrams/deployment",
+      "visibility": "public"
+    }
+  ],
+  "story": [
+    {
+      "title": "Logical components are not deployment instances",
+      "viewId": "walk-lesson.logical.view",
+      "nodeId": "walk-lesson.logical.note",
+      "narration": "This view explains software responsibilities. It does not imply a specific cloud vendor or a provisioned resource.",
+      "highlightEdgeIds": [
+        "request",
+        "route",
+        "data"
+      ]
+    },
+    {
+      "title": "The environment selects deployment evidence",
+      "viewId": "walk-lesson.environment.view",
+      "nodeId": "walk-lesson.environment.note",
+      "narration": "One logical service can have several environment-specific instances. A TEST configuration is not proof of PROD configuration, reachability, identity or installed version.",
+      "highlightEdgeIds": [
+        "data"
+      ]
+    },
+    {
+      "title": "Network reachability and authorization differ",
+      "viewId": "walk-lesson.trust.view",
+      "nodeId": "walk-lesson.trust.note",
+      "narration": "A route and a token are not blanket authorization. Tenant isolation, allowed actions, secret handling and rejected requests need explicit explanation and evidence.",
+      "highlightEdgeIds": [
+        "request",
+        "token"
+      ]
+    },
+    {
+      "title": "Failure domains need their own viewpoint",
+      "viewId": "walk-lesson.failure.view",
+      "nodeId": "walk-lesson.failure.note",
+      "narration": "A resilient design must describe capacity, timeout, failover, backup and recovery assumptions. No availability percentage or recovery time is inferred from replica icons.",
+      "highlightEdgeIds": [
+        "route",
+        "data"
+      ]
+    }
+  ],
+  "observations": [],
+  "tours": [
+    {
+      "id": "walk-lesson.tour",
+      "title": "Logical software, deployment and trust",
+      "sourceRevision": 1,
+      "stops": [
+        {
+          "id": "stop-85b24f4c42",
+          "viewId": "walk-lesson.logical.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "browser"
+            },
+            {
+              "kind": "node",
+              "id": "gateway"
+            },
+            {
+              "kind": "node",
+              "id": "service"
+            },
+            {
+              "kind": "node",
+              "id": "warehouse"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.logical.note"
+            },
+            {
+              "kind": "edge",
+              "id": "request"
+            },
+            {
+              "kind": "edge",
+              "id": "route"
+            },
+            {
+              "kind": "edge",
+              "id": "data"
+            }
+          ],
+          "fingerprint": "57c596ef4bdb2f8a",
+          "referencedFingerprint": "95d2c649c71b3d4f",
+          "narration": "This view explains software responsibilities. It does not imply a specific cloud vendor or a provisioned resource."
+        },
+        {
+          "id": "stop-7162c0e50e",
+          "viewId": "walk-lesson.environment.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "service"
+            },
+            {
+              "kind": "node",
+              "id": "warehouse"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.environment.note"
+            },
+            {
+              "kind": "edge",
+              "id": "data"
+            }
+          ],
+          "fingerprint": "58ea4783c5a4bbda",
+          "referencedFingerprint": "f73a9c7fc6a019f9",
+          "narration": "One logical service can have several environment-specific instances. A TEST configuration is not proof of PROD configuration, reachability, identity or installed version."
+        },
+        {
+          "id": "stop-419b5352b6",
+          "viewId": "walk-lesson.trust.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "browser"
+            },
+            {
+              "kind": "node",
+              "id": "gateway"
+            },
+            {
+              "kind": "node",
+              "id": "identity"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.trust.note"
+            },
+            {
+              "kind": "edge",
+              "id": "request"
+            },
+            {
+              "kind": "edge",
+              "id": "token"
+            }
+          ],
+          "fingerprint": "685175339a13d996",
+          "referencedFingerprint": "21dccf259aefbfb4",
+          "narration": "A route and a token are not blanket authorization. Tenant isolation, allowed actions, secret handling and rejected requests need explicit explanation and evidence."
+        },
+        {
+          "id": "stop-e5fb51327a",
+          "viewId": "walk-lesson.failure.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "gateway"
+            },
+            {
+              "kind": "node",
+              "id": "service"
+            },
+            {
+              "kind": "node",
+              "id": "warehouse"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.failure.note"
+            },
+            {
+              "kind": "edge",
+              "id": "route"
+            },
+            {
+              "kind": "edge",
+              "id": "data"
+            }
+          ],
+          "fingerprint": "9299f1dd9dfb7dab",
+          "referencedFingerprint": "466dd4cee353fee3",
+          "narration": "A resilient design must describe capacity, timeout, failover, backup and recovery assumptions. No availability percentage or recovery time is inferred from replica icons."
+        }
+      ],
+      "visibility": "public"
+    }
+  ]
+}

@@ -1,0 +1,1140 @@
+{
+  "schemaVersion": 1,
+  "id": "retry-metadata",
+  "revision": 1,
+  "title": "Retries, decorators and function identity",
+  "summary": "Why is a wrapper not the same thing as the operation it wraps?",
+  "author": "",
+  "category": "Blank",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "Original synthetic teaching fixture; not a customer system, execution trace or benchmark.",
+  "nodes": [
+    {
+      "id": "pipeline",
+      "label": "Pipeline",
+      "kind": "process",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "wrapper",
+      "label": "Retry wrapper",
+      "kind": "function",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "retry-code",
+        "policy"
+      ],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "weather",
+      "label": "Weather API",
+      "kind": "app",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "",
+      "role": "",
+      "status": "idle",
+      "blockIds": [],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson",
+      "label": "Retries, decorators and function identity",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.index",
+      "blockIds": [
+        "walk-lesson.intro"
+      ],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.call.note",
+      "label": "The caller invokes one logical operation",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.call.text",
+        "walk-lesson.call.before",
+        "walk-lesson.call.code",
+        "walk-lesson.call.locator"
+      ],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.call.entry",
+      "label": "The caller invokes one logical operation",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.call.view",
+      "blockIds": [],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.failure.note",
+      "label": "First response is 503 in this selected scenario",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.failure.text",
+        "walk-lesson.failure.after"
+      ],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.failure.entry",
+      "label": "First response is 503 in this selected scenario",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.failure.view",
+      "blockIds": [],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.retry.note",
+      "label": "Repeat the same request edge with a new attempt",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.retry.text",
+        "walk-lesson.retry.before",
+        "walk-lesson.retry.after"
+      ],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.retry.entry",
+      "label": "Repeat the same request edge with a new attempt",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.retry.view",
+      "blockIds": [],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.success.note",
+      "label": "This branch succeeds; another branch can exhaust retries",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.success.text",
+        "walk-lesson.success.after"
+      ],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.success.entry",
+      "label": "This branch succeeds; another branch can exhaust retries",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.success.view",
+      "blockIds": [],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.identity.note",
+      "label": "wraps preserves metadata, not retry correctness",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "blockIds": [
+        "walk-lesson.identity.text",
+        "walk-lesson.identity.before",
+        "walk-lesson.identity.after",
+        "walk-lesson.identity.code",
+        "walk-lesson.identity.locator"
+      ],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.identity.entry",
+      "label": "wraps preserves metadata, not retry correctness",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic-document",
+      "summary": "Authored explanation at a fixed source cut; not an observed result.",
+      "role": "retry-metadata@revision 1; source fingerprint 518bf69f45de6782. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "status": "idle",
+      "childViewId": "walk-lesson.identity.view",
+      "blockIds": [],
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "tags": [
+        "explanation-snapshot"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "invoke",
+      "source": "pipeline",
+      "target": "wrapper",
+      "label": "fetch_weather()",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "get",
+      "source": "wrapper",
+      "target": "weather",
+      "label": "GET /forecast",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "response",
+      "source": "weather",
+      "target": "wrapper",
+      "label": "HTTP response",
+      "kind": "query",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "Retries, decorators and function identity",
+      "description": "Why is a wrapper not the same thing as the operation it wraps?",
+      "nodeIds": [
+        "pipeline",
+        "wrapper",
+        "weather",
+        "walk-lesson"
+      ],
+      "edgeIds": [
+        "invoke",
+        "get",
+        "response"
+      ],
+      "positions": {
+        "pipeline": {
+          "x": 0,
+          "y": 0
+        },
+        "wrapper": {
+          "x": 340,
+          "y": 0
+        },
+        "weather": {
+          "x": 680,
+          "y": 0
+        },
+        "walk-lesson": {
+          "x": 0,
+          "y": -300
+        }
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.index",
+      "title": "Walkthrough: Retries, decorators and function identity",
+      "description": "Why is a wrapper not the same thing as the operation it wraps?\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "walk-lesson.call.entry",
+        "walk-lesson.failure.entry",
+        "walk-lesson.retry.entry",
+        "walk-lesson.success.entry",
+        "walk-lesson.identity.entry"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "walk-lesson.call.entry": {
+          "x": 0,
+          "y": 0
+        },
+        "walk-lesson.failure.entry": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.retry.entry": {
+          "x": 620,
+          "y": 0
+        },
+        "walk-lesson.success.entry": {
+          "x": 0,
+          "y": 150
+        },
+        "walk-lesson.identity.entry": {
+          "x": 310,
+          "y": 150
+        }
+      },
+      "perspective": "evidence",
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.call.view",
+      "title": "The caller invokes one logical operation",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "pipeline",
+        "wrapper",
+        "walk-lesson.call.note"
+      ],
+      "edgeIds": [
+        "invoke"
+      ],
+      "positions": {
+        "pipeline": {
+          "x": 0,
+          "y": 0
+        },
+        "wrapper": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.call.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "code",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.call.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.failure.view",
+      "title": "First response is 503 in this selected scenario",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "wrapper",
+        "weather",
+        "walk-lesson.failure.note"
+      ],
+      "edgeIds": [
+        "get",
+        "response"
+      ],
+      "positions": {
+        "wrapper": {
+          "x": 0,
+          "y": 0
+        },
+        "weather": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.failure.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.failure.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.retry.view",
+      "title": "Repeat the same request edge with a new attempt",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "wrapper",
+        "weather",
+        "walk-lesson.retry.note"
+      ],
+      "edgeIds": [
+        "get"
+      ],
+      "positions": {
+        "wrapper": {
+          "x": 0,
+          "y": 0
+        },
+        "weather": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.retry.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.retry.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.success.view",
+      "title": "This branch succeeds; another branch can exhaust retries",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "wrapper",
+        "weather",
+        "walk-lesson.success.note"
+      ],
+      "edgeIds": [
+        "response"
+      ],
+      "positions": {
+        "wrapper": {
+          "x": 0,
+          "y": 0
+        },
+        "weather": {
+          "x": 310,
+          "y": 0
+        },
+        "walk-lesson.success.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "system",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.success.note"
+        ]
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "walk-lesson.identity.view",
+      "title": "wraps preserves metadata, not retry correctness",
+      "description": "Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
+      "nodeIds": [
+        "wrapper",
+        "walk-lesson.identity.note"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "wrapper": {
+          "x": 0,
+          "y": 0
+        },
+        "walk-lesson.identity.note": {
+          "x": 0,
+          "y": 180
+        }
+      },
+      "perspective": "code",
+      "design": {
+        "type": "architecture",
+        "focal": [
+          "walk-lesson.identity.note"
+        ]
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "retry-code",
+      "title": "retry.py - teaching excerpt, not a complete client",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "python",
+      "code": "from functools import wraps\n\ndef retry(func):\n    @wraps(func)\n    def wrapper(*args, **kwargs):\n        # A bounded retry policy belongs here.\n        return func(*args, **kwargs)\n    return wrapper"
+    },
+    {
+      "id": "policy",
+      "title": "Explicit retry policy choices",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Question",
+        "This illustrative scenario"
+      ],
+      "rows": [
+        [
+          "Attempts",
+          "At most 3 including the first request"
+        ],
+        [
+          "Delay",
+          "2 seconds is an authored example, not measured latency"
+        ],
+        [
+          "Safety",
+          "Only operations known to be safe to retry"
+        ],
+        [
+          "Terminal state",
+          "Exhaustion propagates a failure; do not loop indefinitely"
+        ],
+        [
+          "Sensitive data",
+          "Do not log credentials or unrestricted inputs"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.intro",
+      "title": "Retries, decorators and function identity",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "author",
+      "type": "text",
+      "text": "Question: Why is a wrapper not the same thing as the operation it wraps?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: retry-metadata revision 1; fingerprint 518bf69f45de6782.\n\nThis private addition changes no existing feature, deployment, approval or observation."
+    },
+    {
+      "id": "walk-lesson.call.text",
+      "title": "The caller invokes one logical operation",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "The caller names fetch_weather. A decorator can wrap that callable without being the application itself.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of retry-metadata revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.call.before",
+      "title": "Before - The caller invokes one logical operation",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "transform": "input",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "attempt",
+          "not started"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.call.code",
+      "title": "retry.py - teaching excerpt, not a complete client : 3-8",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "transform": "logic",
+      "type": "code",
+      "language": "python",
+      "code": "def retry(func):\n    @wraps(func)\n    def wrapper(*args, **kwargs):\n        # A bounded retry policy belongs here.\n        return func(*args, **kwargs)\n    return wrapper"
+    },
+    {
+      "id": "walk-lesson.call.locator",
+      "title": "Code excerpt source cut",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "retry-metadata revision 1, block retry-code, lines 3-8, content fingerprint de823c1035a5d949. Frozen excerpt, not live code. Display-only; no execution."
+    },
+    {
+      "id": "walk-lesson.failure.text",
+      "title": "First response is 503 in this selected scenario",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "This synthetic response selects the transient-failure branch. It does not prove every 503 is absorbed or every request should retry.\n\nExplicit prerequisites: call.\n\nSnapshot of retry-metadata revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.failure.after",
+      "title": "After - First response is 503 in this selected scenario",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "attempt",
+          "1"
+        ],
+        [
+          "response",
+          "503"
+        ],
+        [
+          "decision",
+          "Check idempotency, retry policy and remaining deadline"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.retry.text",
+      "title": "Repeat the same request edge with a new attempt",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "The same participant and connection IDs are used again. The frame is another authored attempt, not another API or a new observed run.\n\nExplicit prerequisites: failure.\n\nSnapshot of retry-metadata revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.retry.before",
+      "title": "Before - Repeat the same request edge with a new attempt",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "transform": "input",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "backoff",
+          "illustrative 2 seconds"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.retry.after",
+      "title": "After - Repeat the same request edge with a new attempt",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "attempt",
+          "2"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.success.text",
+      "title": "This branch succeeds; another branch can exhaust retries",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "200 is the selected success case. A separate failure walkthrough must explain deadline expiry, exhausted attempts and error propagation.\n\nExplicit prerequisites: retry.\n\nQuestion to explore: What if the operation already wrote data before the timeout?\n\nQuestion to explore: Where is the final error recorded?\n\nSnapshot of retry-metadata revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.success.after",
+      "title": "After - This branch succeeds; another branch can exhaust retries",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "selected response",
+          "200"
+        ],
+        [
+          "actual runtime evidence",
+          "not supplied"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.identity.text",
+      "title": "wraps preserves metadata, not retry correctness",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "functools.wraps copies metadata and exposes the wrapped callable for introspection. It does not implement retries, guarantee every logger name or configure an orchestrator task ID.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nTakeaway: Separate operation identity, wrapper policy, framework task identity and observed attempt.\n\nSnapshot of retry-metadata revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.identity.before",
+      "title": "Before - wraps preserves metadata, not retry correctness",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "transform": "input",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "__name__ without wraps",
+          "wrapper"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.identity.after",
+      "title": "After - wraps preserves metadata, not retry correctness",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "transform": "output",
+      "type": "table",
+      "columns": [
+        "State field",
+        "Declared value"
+      ],
+      "rows": [
+        [
+          "__name__ with wraps",
+          "fetch_weather in this example"
+        ],
+        [
+          "__wrapped__",
+          "original callable"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.identity.code",
+      "title": "retry.py - teaching excerpt, not a complete client : 4-5",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "transform": "logic",
+      "type": "code",
+      "language": "python",
+      "code": "    @wraps(func)\n    def wrapper(*args, **kwargs):"
+    },
+    {
+      "id": "walk-lesson.identity.locator",
+      "title": "Code excerpt source cut",
+      "visibility": "public",
+      "sourceIds": [
+        "python",
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "retry-metadata revision 1, block retry-code, lines 4-5, content fingerprint de823c1035a5d949. Frozen excerpt, not live code. Display-only; no execution."
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "python",
+      "title": "Python functools reference",
+      "location": "",
+      "url": "https://docs.python.org/3/library/functools.html",
+      "visibility": "public"
+    },
+    {
+      "id": "http",
+      "title": "HTTP semantics - RFC 9110",
+      "location": "",
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "visibility": "public"
+    }
+  ],
+  "story": [
+    {
+      "title": "The caller invokes one logical operation",
+      "viewId": "walk-lesson.call.view",
+      "nodeId": "walk-lesson.call.note",
+      "narration": "The caller names fetch_weather. A decorator can wrap that callable without being the application itself.",
+      "highlightEdgeIds": [
+        "invoke"
+      ]
+    },
+    {
+      "title": "First response is 503 in this selected scenario",
+      "viewId": "walk-lesson.failure.view",
+      "nodeId": "walk-lesson.failure.note",
+      "narration": "This synthetic response selects the transient-failure branch. It does not prove every 503 is absorbed or every request should retry.",
+      "highlightEdgeIds": [
+        "get",
+        "response"
+      ]
+    },
+    {
+      "title": "Repeat the same request edge with a new attempt",
+      "viewId": "walk-lesson.retry.view",
+      "nodeId": "walk-lesson.retry.note",
+      "narration": "The same participant and connection IDs are used again. The frame is another authored attempt, not another API or a new observed run.",
+      "highlightEdgeIds": [
+        "get"
+      ]
+    },
+    {
+      "title": "This branch succeeds; another branch can exhaust retries",
+      "viewId": "walk-lesson.success.view",
+      "nodeId": "walk-lesson.success.note",
+      "narration": "200 is the selected success case. A separate failure walkthrough must explain deadline expiry, exhausted attempts and error propagation.",
+      "highlightEdgeIds": [
+        "response"
+      ]
+    },
+    {
+      "title": "wraps preserves metadata, not retry correctness",
+      "viewId": "walk-lesson.identity.view",
+      "nodeId": "walk-lesson.identity.note",
+      "narration": "functools.wraps copies metadata and exposes the wrapped callable for introspection. It does not implement retries, guarantee every logger name or configure an orchestrator task ID.",
+      "highlightEdgeIds": []
+    }
+  ],
+  "observations": [],
+  "tours": [
+    {
+      "id": "walk-lesson.tour",
+      "title": "Retries, decorators and function identity",
+      "sourceRevision": 1,
+      "stops": [
+        {
+          "id": "stop-e204565b43",
+          "viewId": "walk-lesson.call.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "pipeline"
+            },
+            {
+              "kind": "node",
+              "id": "wrapper"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.call.note"
+            },
+            {
+              "kind": "edge",
+              "id": "invoke"
+            }
+          ],
+          "fingerprint": "128e6b6242e73d40",
+          "referencedFingerprint": "859eb52aa1efaa2f",
+          "narration": "The caller names fetch_weather. A decorator can wrap that callable without being the application itself."
+        },
+        {
+          "id": "stop-4b80b2a349",
+          "viewId": "walk-lesson.failure.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "wrapper"
+            },
+            {
+              "kind": "node",
+              "id": "weather"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.failure.note"
+            },
+            {
+              "kind": "edge",
+              "id": "get"
+            },
+            {
+              "kind": "edge",
+              "id": "response"
+            }
+          ],
+          "fingerprint": "95931106556ff4f0",
+          "referencedFingerprint": "fd37953bd91d3d12",
+          "narration": "This synthetic response selects the transient-failure branch. It does not prove every 503 is absorbed or every request should retry."
+        },
+        {
+          "id": "stop-53b27f2cdf",
+          "viewId": "walk-lesson.retry.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "wrapper"
+            },
+            {
+              "kind": "node",
+              "id": "weather"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.retry.note"
+            },
+            {
+              "kind": "edge",
+              "id": "get"
+            }
+          ],
+          "fingerprint": "75a0fb4a6fcc5f64",
+          "referencedFingerprint": "df644c25d0c9eb63",
+          "narration": "The same participant and connection IDs are used again. The frame is another authored attempt, not another API or a new observed run."
+        },
+        {
+          "id": "stop-ba56e3dc66",
+          "viewId": "walk-lesson.success.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "wrapper"
+            },
+            {
+              "kind": "node",
+              "id": "weather"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.success.note"
+            },
+            {
+              "kind": "edge",
+              "id": "response"
+            }
+          ],
+          "fingerprint": "c13bab9f08bcd469",
+          "referencedFingerprint": "80fde02ce4930e29",
+          "narration": "200 is the selected success case. A separate failure walkthrough must explain deadline expiry, exhausted attempts and error propagation."
+        },
+        {
+          "id": "stop-e401e0afb1",
+          "viewId": "walk-lesson.identity.view",
+          "subjects": [
+            {
+              "kind": "node",
+              "id": "wrapper"
+            },
+            {
+              "kind": "node",
+              "id": "walk-lesson.identity.note"
+            }
+          ],
+          "fingerprint": "ff8b10af4c576652",
+          "referencedFingerprint": "50f308b10020e678",
+          "narration": "functools.wraps copies metadata and exposes the wrapped callable for introspection. It does not implement retries, guarantee every logger name or configure an orchestrator task ID."
+        }
+      ],
+      "visibility": "public"
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "format": "diagramcloud.explanation-walkthrough",
+  "version": 1,
+  "projectId": "queue-structure",
+  "baseRevision": 1,
+  "baseFingerprint": "98c310d88f35a982",
+  "id": "lesson",
+  "title": "A queue, its storage and its workers",
+  "question": "What changes when an event leaves the queue, and what does not?",
+  "sourceIds": [
+    "deque",
+    "queue-doc"
+  ],
+  "steps": [
+    {
+      "id": "arrival",
+      "title": "Waiting order is visible",
+      "viewId": "overview",
+      "nodeIds": [
+        "events",
+        "queue"
+      ],
+      "edgeIds": [
+        "enqueue"
+      ],
+      "narration": "An authored state snapshot shows three waiting events. Arrival order is a property of this scenario, not evidence of all distributed producers.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [
+        {
+          "name": "front to back",
+          "value": "A, B, C"
+        }
+      ],
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "list",
+      "title": "Removing the first list element shifts the remainder",
+      "viewId": "overview",
+      "nodeIds": [
+        "queue",
+        "worker"
+      ],
+      "edgeIds": [
+        "dequeue"
+      ],
+      "narration": "Python list pop(0) incurs O(n) movement. No milliseconds or speed ratio are inferred from that asymptotic statement.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [
+        "arrival"
+      ],
+      "before": [
+        {
+          "name": "queue",
+          "value": "A, B, C"
+        }
+      ],
+      "after": [
+        {
+          "name": "worker holds",
+          "value": "A"
+        },
+        {
+          "name": "queue",
+          "value": "B, C"
+        }
+      ],
+      "code": {
+        "blockId": "list-code",
+        "fromLine": 1,
+        "toLine": 3
+      },
+      "takeaway": "",
+      "questions": []
+    },
+    {
+      "id": "deque",
+      "title": "A different data structure serves the same interface",
+      "viewId": "overview",
+      "nodeIds": [
+        "queue"
+      ],
+      "edgeIds": [],
+      "narration": "deque provides approximately O(1) append/pop at its ends. This is a local data-structure choice, not durable message storage.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [],
+      "after": [],
+      "code": {
+        "blockId": "deque-code",
+        "fromLine": 1,
+        "toLine": 4
+      },
+      "takeaway": "Use measured workload evidence before claiming a performance gain.",
+      "questions": []
+    },
+    {
+      "id": "delivery",
+      "title": "Dequeued is not completed or acknowledged",
+      "viewId": "overview",
+      "nodeIds": [
+        "queue",
+        "worker"
+      ],
+      "edgeIds": [
+        "dequeue"
+      ],
+      "narration": "A worker may fail after dequeue. Multiple workers can complete out of order. A durable broker, bounded queue, acknowledgement, dead-letter policy and backpressure are separate design choices.",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "dependsOn": [],
+      "before": [
+        {
+          "name": "queue state",
+          "value": "A removed"
+        }
+      ],
+      "after": [
+        {
+          "name": "completion",
+          "value": "unknown"
+        },
+        {
+          "name": "durability",
+          "value": "not provided by this example"
+        }
+      ],
+      "takeaway": "",
+      "questions": [
+        "How are failures retried?",
+        "What happens when producers outrun consumers?",
+        "Is task_done only accounting, or a durable acknowledgement?"
+      ]
+    }
+  ]
+}

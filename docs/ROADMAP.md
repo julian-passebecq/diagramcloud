@@ -16,6 +16,8 @@ V3 is adopted into this roadmap, not tracked in a parallel backlog. The adoption
 - **W5 PM plan consumption** (after W0): the `datapass.owner-tasks/1` reader is reachable from the import dialog, private and read-only, with a browser journey; no write-back, no launch.
 - **W6 integrate, qualify and deliver** (after W2-W5): version, release notes, AGENTS.md limits and the private candidate.
 
+- **Complement E, expressiveness** (source, 2026-10-19): ChatGPT Pro complement PP-20261019-02, source aaba5c3. Adds the authored explanation walkthrough compiler with `npm run explain`, a read-only related-context projection, opt-in focused portfolio HTML and six synthetic teaching examples; acceptance UX31-UX34 and the 27-domain coverage review are in [EXPRESSIVENESS](product/EXPRESSIVENESS.md). Still open: the related-context companion pane with Follow/Pin (W1), and a compact and print inspection of the focused export (its offline Chromium journey passes). ConceptMotion and VizForge stay optional adapters for a concrete need, never release dependencies; the coverage rows are not release gates.
+
 Estimates in the handoff are uncalibrated allowances; calendar completion is unknown.
 
 ## Current state (2026-10-18): 1.29.1 V2 standalone continuation
