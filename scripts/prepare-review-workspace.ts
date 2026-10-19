@@ -1,6 +1,6 @@
 import {mkdir,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-import {buildReviewWorkspace} from '../examples/review-workspace/build';
+import {buildReviewWorkspace,joinRequestJson} from '../examples/review-workspace/build';
 import {linkedReadingHtml} from '../src/export/linkedReadingHtml';
 import {meetingSummaryHtml} from '../src/export/meetingSummary';
 import {inspectJoin} from '../src/intelligence/joinInspection';
@@ -14,7 +14,8 @@ async function main(){
   'review.project.json':JSON.stringify(f.project,null,2),
   'review.reading.json':JSON.stringify(f.reading,null,2),
   'review.publication.json':JSON.stringify(f.brief,null,2),
-  'join.request.json':JSON.stringify(f.request,null,2),
+  // Byte-identical to the committed public fixture examples/review-workspace/join.request.json.
+  'join.request.json':joinRequestJson(),
   'join.result.json':JSON.stringify(inspectJoin(f.request),null,2),
   'join-review.html':linkedReadingHtml(f.project,f.reading,{now:new Date('2026-10-19T00:00:00Z')}),
   'meeting-summary.html':meetingSummaryHtml(f.project,f.brief)

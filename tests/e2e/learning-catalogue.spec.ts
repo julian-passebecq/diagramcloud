@@ -9,15 +9,15 @@ test('learning catalogue opens a warehouse lesson and the RAG lesson, changes de
  await page.getByRole('button',{name:'Business overview',exact:true}).click();
  const catalogue=page.getByRole('region',{name:'Learning catalogue',exact:true});
  await expect(catalogue).toBeVisible();
- await expect(catalogue.getByRole('status',{name:'Learning catalogue results'})).toHaveText('Showing 24 of 24 catalogue entries.');
+ await expect(catalogue.getByRole('status',{name:'Learning catalogue results'})).toHaveText('Showing 36 of 36 catalogue entries.');
 
  await catalogue.getByLabel('Entry kind',{exact:true}).selectOption('case-study');
- await expect(catalogue.getByRole('status',{name:'Learning catalogue results'})).toHaveText('Showing 1 of 24 catalogue entries.');
+ await expect(catalogue.getByRole('status',{name:'Learning catalogue results'})).toHaveText('Showing 1 of 36 catalogue entries.');
  await catalogue.getByLabel('Lesson reference family',{exact:true}).selectOption('Data');
  await expect(catalogue.getByText('No catalogue entries match these filters.',{exact:false})).toBeVisible();
  await catalogue.getByRole('button',{name:'Reset lesson filters',exact:true}).click();
  await catalogue.getByLabel('Learning domain',{exact:true}).selectOption('warehousing');
- await expect(catalogue.getByRole('status',{name:'Learning catalogue results'})).toHaveText('Showing 3 of 24 catalogue entries.');
+ await expect(catalogue.getByRole('status',{name:'Learning catalogue results'})).toHaveText('Showing 5 of 36 catalogue entries.');
 
  await catalogue.getByRole('button',{name:'Open lesson Slowly changing dimensions and temporal joins',exact:true}).click();
  const scd=catalogue.getByRole('article',{name:'Lesson: Slowly changing dimensions and temporal joins'});
@@ -51,6 +51,18 @@ test('learning catalogue opens a warehouse lesson and the RAG lesson, changes de
  await expect(rag.getByRole('status',{name:'Explanation at selected depth'})).toContainText('reranking');
  await rag.getByRole('button',{name:'Training, fine-tuning, inference and RAG',exact:true}).click();
  await expect(catalogue.getByRole('article',{name:'Lesson: Training, fine-tuning, inference and RAG'})).toBeVisible();
+
+ // A practical pattern (reconciled into the catalogue) offers its alternatives as candidates only, never a recommended replacement.
+ await catalogue.getByRole('button',{name:'Reset lesson filters',exact:true}).click();
+ await catalogue.getByLabel('Entry kind',{exact:true}).selectOption('pattern');
+ await catalogue.getByRole('button',{name:'Open lesson Power BI and Fabric App: reuse before migration',exact:true}).click();
+ const coexist=catalogue.getByRole('article',{name:'Lesson: Power BI and Fabric App: reuse before migration'});
+ await expect(coexist.getByRole('status',{name:'Explanation at selected depth'})).toContainText('Overview:');
+ const options=coexist.getByRole('region',{name:'Alternatives'});
+ await expect(options).toContainText('Keep Power BI');await expect(options).toContainText('Add an application');
+ await expect(options.getByText('Candidate, not selected.')).toHaveCount(2);
+ await expect(coexist).not.toContainText(/recommended replacement|we recommend/i);
+ await expect(coexist.getByRole('region',{name:'In my project'})).toContainText('No reviewed mapping.');
 
  // Browsing lessons never changes the authoring document.
  await page.getByRole('button',{name:'JSON / AI',exact:true}).click();
@@ -94,7 +106,7 @@ test('learning catalogue opens from the gallery without a project: no sample, sa
  // A fresh browser opening the catalogue entry never mounts the studio: no project and no IndexedDB workspace is created.
  await page.goto('/?catalogue');
  const catalogue=page.getByRole('region',{name:'Learning catalogue',exact:true});
- await expect(catalogue.getByRole('status',{name:'Learning catalogue results'})).toHaveText('Showing 24 of 24 catalogue entries.');
+ await expect(catalogue.getByRole('status',{name:'Learning catalogue results'})).toHaveText('Showing 36 of 36 catalogue entries.');
  await expect(page.getByRole('note').first()).toContainText('No project is open.');
  await expect(page.locator('.project-hero')).toHaveCount(0);await expect(page.getByRole('tablist',{name:'Workspace mode'})).toHaveCount(0);
  expect(await page.evaluate(async()=>(await indexedDB.databases()).length)).toBe(0);
