@@ -2,6 +2,8 @@ import {canonical} from './learningMapping';
 import {clone,edgeSchema,errorMessage,nodeSchema,validateDocument,type Project,type ProjectEdge,type ProjectNode} from './model';
 import {applyOperations,type Operation} from './patch';
 import {addVariant,reviseVariant,variantState} from './variants';
+import {compareView,type DeltaAxis,type ViewDelta} from '../export/design/delta';
+import {compareEnvironments} from '../intelligence/delivery';
 
 /**
  * Visual variant drafts. A draft is a temporary candidate document derived from a known baseline (the live project, or
@@ -159,4 +161,137 @@ export function rebaseReport(doc:Project,id:string):RebaseReport{
  try{validateDocument(applyOperations(base,v.operations as Operation[]));}
  catch(e){return {status:'broken',checks,conflicts,message:`The operations no longer apply: ${errorMessage(e)}`};}
  return {status:'clean',checks,conflicts,message:`${checks.length} precondition(s) still hold. Rebasing records the current content as the new baseline; compare again before applying.`};
+}
+
+/* ---------------------------------------------------------------------------------------------------------------------
+ * Linked comparison (V3 W3). A comparison is opened on purpose from the workspace and frozen: it records the project, the
+ * revision and the two sides it read, and keeps them until the reader returns or explicitly compares again. A source
+ * change while it is open marks it stale and never re-pairs anything. Objects pair by exact stable ID only, or across two
+ * projects by an explicit recorded correspondence; a label, a name, a tag or a provider never pairs two objects. An
+ * object with no counterpart is shown absent. Comparing selects and reads only: it has no Apply, and Apply of a variant
+ * stays the one revision-guarded patch of the Variants panel.
+ * ------------------------------------------------------------------------------------------------------------------- */
+
+/** What a comparison reads: a variant against its baseline, an earlier session revision against the live one, or two declared environments. */
+export type ComparisonSource={kind:'variant';variantId:string}|{kind:'version';revision:number}|{kind:'environment';from:string;to:string}|{kind:'correspondence';rightProjectId:string};
+export type EnvironmentSideState='reviewed-claim'|'declared'|'not-applicable'|'absent';
+export type EnvironmentSide={state:EnvironmentSideState;text:string;claim?:string};
+/** One component paired across two environments by its explicit componentId (never a label). */
+export type EnvironmentPair={componentId:string;label:string;left:EnvironmentSide;right:EnvironmentSide;equivalence:'UNKNOWN'|'cited-same-revision'|'cited-different-revisions';axes:{axis:DeltaAxis;change:string;text:string}[]};
+export type LinkedComparison={
+ source:ComparisonSource;projectId:string;projectTitle:string;revision:number;viewId:string;
+ title:string;leftLabel:string;rightLabel:string;pairing:'stable-id'|'correspondence';
+ view?:{left:Project;right:Project;delta:ViewDelta};
+ environments?:EnvironmentPair[];
+};
+export type ComparisonChoices={
+ variants:{id:string;title:string;viewId:string;status:'current'|'stale'|'broken';message:string}[];
+ versions:{revision:number;title:string}[];
+ environments:{id:string;label:string}[];
+};
+export const COMPARE_NOTE='Selecting compares only: nothing is accepted, applied or recorded from here. Apply of a variant stays in the Variants panel, as one revision and one Undo.';
+export const PAIRING_TEXT:Record<LinkedComparison['pairing'],string>={'stable-id':'Paired by exact stable ID. A label or name never pairs two objects; an object with no counterpart is shown absent.','correspondence':'Paired by the recorded cross-project correspondence only. Objects it does not name are never paired, even when their IDs or labels are equal.'};
+
+/** What can be compared on the live project: its variants (only a current one opens), earlier revisions held in this session, and declared environments. Pure. */
+export function comparisonChoices(live:Project,versions:Project[]=[]):ComparisonChoices{
+ const seen=new Set<number>(),past:ComparisonChoices['versions']=[];
+ for(const d of [...versions].reverse())if(d.id===live.id&&d.revision!==live.revision&&!seen.has(d.revision)){seen.add(d.revision);past.push({revision:d.revision,title:d.title});}
+ return {variants:(live.variants??[]).map(v=>{const s=variantState(live,v.id);return {id:v.id,title:v.title,viewId:v.viewId,status:s.status,message:s.message};}),
+  versions:past,environments:(live.delivery?.environments??[]).map(e=>({id:e.id,label:e.label}))};
+}
+
+function environmentSide(doc:Project,componentId:string,environmentId:string,rows:ReturnType<typeof compareEnvironments>[number]['from']):EnvironmentSide{
+ const label=doc.delivery?.environments.find(e=>e.id===environmentId)?.label??environmentId;
+ const observed=rows.find(r=>r.observed);
+ if(observed?.observed)return {state:'reviewed-claim',claim:observed.observed.claim,text:`Declared instance in ${label} · reviewed external claim ${observed.observed.claim} by ${observed.observed.authority} at ${observed.observed.capturedAt}`};
+ if(rows.length)return {state:'declared',text:`Declared instance in ${label}${rows.length>1?` (${rows.length} instances)`:''} · declared revision ${rows.map(r=>r.declaredRevision).join(', ')} · no reviewed claim`};
+ if(doc.delivery?.applicability?.some(a=>a.componentId===componentId&&a.environmentId===environmentId))return {state:'not-applicable',text:`Declared not applicable in ${label}`};
+ return {state:'absent',text:`No declaration in ${label}: absent, not matched to another component`};
+}
+/** Components paired across two declared environments by componentId, with the declared and evidence differences labelled. Pure. */
+export function environmentPairs(doc:Project,from:string,to:string):EnvironmentPair[]{
+ if(from===to)throw new Error('Pick two different environments.');
+ const env=(id:string)=>doc.delivery?.environments.find(e=>e.id===id)?.label??id,a=env(from),b=env(to);
+ return compareEnvironments(doc,from,to).map(row=>{
+  const left=environmentSide(doc,row.componentId,from,row.from),right=environmentSide(doc,row.componentId,to,row.to),axes:EnvironmentPair['axes']=[];
+  const present=(s:EnvironmentSide)=>s.state==='declared'||s.state==='reviewed-claim';
+  if(present(left)!==present(right))axes.push({axis:'architecture',change:present(left)?`DECLARED IN ${a.toUpperCase()} ONLY`:`DECLARED IN ${b.toUpperCase()} ONLY`,text:`${row.component}: ${left.text}; ${right.text}`});
+  else if(left.state!==right.state&&(left.state==='not-applicable'||right.state==='not-applicable'))axes.push({axis:'architecture',change:'APPLICABILITY DIFFERS',text:`${row.component}: ${left.text}; ${right.text}`});
+  if((left.claim??'')!==(right.claim??''))axes.push({axis:'evidence',change:'REVIEWED CLAIM DIFFERS',text:`${row.component}: ${left.claim?`${left.claim} in ${a}`:`no reviewed claim in ${a}`}, ${right.claim?`${right.claim} in ${b}`:`no reviewed claim in ${b}`}. A claim in one environment says nothing about the other.`});
+  return {componentId:row.componentId,label:row.component,left,right,equivalence:row.equivalence,axes};
+ });
+}
+
+/**
+ * Open a frozen comparison on the live project. Throws with the reason when the source cannot be compared (a stale or
+ * broken variant, a revision this session no longer holds, a view missing on one side, an undeclared environment).
+ * Never mutates the project.
+ */
+export function openLinkedComparison(live:Project,source:ComparisonSource,options:{viewId:string;versions?:Project[];now?:Date}):LinkedComparison{
+ const base={source,projectId:live.id,projectTitle:live.title,revision:live.revision,pairing:'stable-id' as const};
+ const now=options.now??new Date();
+ if(source.kind==='variant'){
+  const state=variantState(live,source.variantId);
+  if(state.status!=='current'||!state.candidate)throw new Error(`Cannot compare ${state.variant.title}: ${state.message}`);
+  const delta=compareView(live,state.candidate,state.variant.viewId,now,'author');
+  return {...base,viewId:state.variant.viewId,title:`Variant ${state.variant.title} against its baseline`,leftLabel:'Baseline',rightLabel:`Variant ${state.variant.title}`,view:{left:live,right:state.candidate,delta}};
+ }
+ if(source.kind==='version'){
+  const earlier=[...(options.versions??[])].reverse().find(d=>d.id===live.id&&d.revision===source.revision);
+  if(!earlier)throw new Error(`Revision ${source.revision} is not held in this session any more. Nothing was compared.`);
+  if(earlier.revision===live.revision)throw new Error('Pick an earlier revision: this one is the open revision.');
+  const viewId=[options.viewId,live.rootViewId].find(id=>earlier.views.some(v=>v.id===id)&&live.views.some(v=>v.id===id));
+  if(!viewId)throw new Error(`View ${options.viewId} is not in revision ${earlier.revision}: open a view both revisions show.`);
+  const delta=compareView(earlier,live,viewId,now,'author');
+  return {...base,viewId,title:`Revision ${earlier.revision} against revision ${live.revision}`,leftLabel:`Revision ${earlier.revision}`,rightLabel:`Revision ${live.revision} (open)`,view:{left:earlier,right:live,delta}};
+ }
+ if(source.kind==='correspondence')throw new Error('A cross-project comparison needs the other project and its recorded correspondence.');
+ const env=(id:string)=>live.delivery?.environments.find(e=>e.id===id);
+ const from=env(source.from),to=env(source.to);
+ if(!from||!to)throw new Error('Pick two declared environments of this project.');
+ return {...base,viewId:options.viewId,title:`${from.label} against ${to.label}`,leftLabel:from.label,rightLabel:to.label,environments:environmentPairs(live,from.id,to.id)};
+}
+
+/** Stale when the open project or its revision is no longer the one the comparison read. The frozen pairs are kept; nothing is re-paired. Pure. */
+export function comparisonStale(c:LinkedComparison,live:Project):string|null{
+ if(live.id!==c.projectId)return `Another project is open. This comparison still shows ${c.projectTitle} as it was opened; nothing was re-paired.`;
+ if(live.revision!==c.revision)return `The source changed since this comparison was opened (revision ${c.revision}, now ${live.revision}). The pairs below are still those of revision ${c.revision}; nothing was re-paired. Compare again to read the current source.`;
+ return null;
+}
+
+/** An explicit, recorded correspondence between objects of two projects. Only the pairs it names are paired. */
+export type Correspondence={format:'diagramcloud.correspondence';version:1;leftProjectId:string;rightProjectId:string;recordedBy:string;recordedAt:string;
+ views:{left:string;right:string}[];components:{left:string;right:string}[];connections:{left:string;right:string}[]};
+const UNPAIRED='unpaired~';
+/**
+ * Bring the right project into the left project's identity space through a recorded correspondence, for comparison
+ * only. Every named pair takes the left ID; every other right ID is moved into a namespace no left ID can use, so an
+ * equal ID or label in another project is never taken as the same object. Refuses an unrecorded, ambiguous or dangling
+ * correspondence. The result is a comparison input, never a document to save.
+ */
+export function alignByCorrespondence(left:Project,right:Project,c:Correspondence):Project{
+ if(c.format!=='diagramcloud.correspondence'||c.version!==1)throw new Error('Not a diagramcloud.correspondence v1 record.');
+ if(c.leftProjectId!==left.id||c.rightProjectId!==right.id)throw new Error(`This correspondence is recorded for ${c.leftProjectId} and ${c.rightProjectId}, not ${left.id} and ${right.id}.`);
+ if(!c.recordedBy.trim()||Number.isNaN(Date.parse(c.recordedAt)))throw new Error('A correspondence needs who recorded it and when.');
+ const map=(pairs:{left:string;right:string}[],leftIds:string[],rightIds:string[],what:string)=>{const l=new Set(leftIds),r=new Set(rightIds),out=new Map<string,string>(),used=new Set<string>();
+  for(const p of pairs){if(!l.has(p.left)||!r.has(p.right))throw new Error(`The ${what} pair ${p.left} ↔ ${p.right} names an object that does not exist.`);
+   if(out.has(p.right)||used.has(p.left))throw new Error(`The ${what} pair ${p.left} ↔ ${p.right} is ambiguous: each object pairs at most once.`);out.set(p.right,p.left);used.add(p.left);}
+  return (id:string)=>out.get(id)??`${UNPAIRED}${id}`;};
+ const node=map(c.components,left.nodes.map(n=>n.id),right.nodes.map(n=>n.id),'component'),edge=map(c.connections,left.edges.map(e=>e.id),right.edges.map(e=>e.id),'connection'),view=map(c.views,left.views.map(v=>v.id),right.views.map(v=>v.id),'view');
+ const d=clone(right);
+ d.id=left.id;
+ d.nodes=d.nodes.map(n=>({...n,id:node(n.id),...(n.childViewId?{childViewId:view(n.childViewId)}:{})}));
+ d.edges=d.edges.map(e=>({...e,id:edge(e.id),source:node(e.source),target:node(e.target)}));
+ d.views=d.views.map(v=>({...v,id:view(v.id),nodeIds:v.nodeIds.map(node),edgeIds:v.edgeIds.map(edge),positions:Object.fromEntries(Object.entries(v.positions).map(([k,p])=>[node(k),p]))}));
+ d.rootViewId=view(d.rootViewId);
+ d.observations=d.observations.map(o=>({...o,nodeId:node(o.nodeId)}));
+ delete d.variants;
+ return d;
+}
+/** A comparison of one view of two projects through a recorded correspondence. Throws when the view is not paired. */
+export function openCorrespondenceComparison(left:Project,right:Project,c:Correspondence,leftViewId:string,now=new Date()):LinkedComparison{
+ const aligned=alignByCorrespondence(left,right,c);
+ if(!c.views.some(v=>v.left===leftViewId))throw new Error(`View ${leftViewId} has no recorded counterpart in ${right.title}. Nothing was compared.`);
+ return {source:{kind:'correspondence',rightProjectId:right.id},projectId:left.id,projectTitle:left.title,revision:left.revision,viewId:leftViewId,pairing:'correspondence',
+  title:`${left.title} against ${right.title}`,leftLabel:left.title,rightLabel:right.title,view:{left,right:aligned,delta:compareView(left,aligned,leftViewId,now,'author')}};
 }

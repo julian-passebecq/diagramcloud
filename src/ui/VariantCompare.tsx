@@ -1,5 +1,6 @@
-import {useMemo,type CSSProperties,type KeyboardEvent} from 'react';
-import type {Project} from '../core/model';
+import {useMemo,useState,type CSSProperties,type KeyboardEvent} from 'react';
+import {errorMessage,type Project} from '../core/model';
+import {COMPARE_NOTE,PAIRING_TEXT,type ComparisonChoices,type ComparisonSource,type EnvironmentPair,type LinkedComparison} from '../core/variantDraft';
 import {buildScene} from '../export/scene';
 import {AXIS_LABEL,DELTA_AXES,UNKNOWN_OBSERVATION,type DeltaAxis,type ViewDelta} from '../export/design/delta';
 
@@ -62,5 +63,77 @@ export function VariantCompare({baseline,candidate,delta,selectedId,onSelect,bas
     return <p className="micro" data-testid="variant-evidence">Evidence · {baselineLabel.toLowerCase()} {say(ev.before,ev.beforeClaim)} · {candidateLabel.toLowerCase()} {say(ev.after,ev.afterClaim)}.{ev.after==='unknown'?` ${UNKNOWN_OBSERVATION}`:''}</p>;})()}
    <button type="button" className="link-button" onClick={()=>onSelect(null)}>Clear selection</button>
   </div>}
+ </section>;
+}
+
+const ENV_STATE:Record<EnvironmentPair['left']['state'],string>={'reviewed-claim':'reviewed claim',declared:'declared','not-applicable':'not applicable',absent:'absent'};
+/** Two declared environments of one project, paired by componentId. Each side reads only its own declarations and reviewed claims. */
+function EnvironmentCompare({pairs,leftLabel,rightLabel,selectedId,onSelect}:{pairs:EnvironmentPair[];leftLabel:string;rightLabel:string;selectedId:string|null;onSelect:(id:string|null)=>void}){
+ const chosen=pairs.find(p=>p.componentId===selectedId),pick=(id:string)=>onSelect(selectedId===id?null:id);
+ const absent=(s:EnvironmentPair['left'])=>s.state==='absent';
+ return <section aria-label="Environment comparison" className="note-card" data-testid="environment-compare">
+  <h3>{leftLabel} and {rightLabel}, side by side</h3>
+  {pairs.length===0?<p className="micro">No component has a declared instance in either environment.</p>:
+  <table className="micro" data-testid="environment-pairs"><thead><tr><th scope="col">Component</th><th scope="col">{leftLabel}</th><th scope="col">{rightLabel}</th><th scope="col">Equivalence</th></tr></thead>
+   <tbody>{pairs.map(p=><tr key={p.componentId} aria-selected={p.componentId===selectedId} data-component-id={p.componentId}>
+    <td><button type="button" className="link-button" aria-pressed={p.componentId===selectedId} onClick={()=>pick(p.componentId)}>{p.label}</button> <span className="stable-id">{p.componentId}</span></td>
+    <td data-side="left" data-state={p.left.state}>{ENV_STATE[p.left.state]}</td><td data-side="right" data-state={p.right.state}>{ENV_STATE[p.right.state]}</td>
+    <td>{p.equivalence==='UNKNOWN'?'UNKNOWN without separate cited evidence':p.equivalence==='cited-same-revision'?'same revision per cited evidence':'different revisions per cited evidence'}</td></tr>)}</tbody></table>}
+  <h4>Changes by dimension</h4>
+  <div data-testid="variant-axes">{DELTA_AXES.map(axis=>{const list=pairs.flatMap(p=>p.axes.filter(a=>a.axis===axis).map(a=>({...a,id:p.componentId})));
+   return <div key={axis} role="group" aria-label={AXIS_LABEL[axis]} data-axis={axis}><div className="eyebrow">{AXIS_LABEL[axis].toUpperCase()} · {list.length}</div>
+    {axis==='layout'?<p className="micro">Environments share the project's one layout: no layout difference.</p>:list.length?<ul>{list.map((e,i)=><li key={i}><button type="button" className="link-button" aria-pressed={e.id===selectedId} onClick={()=>pick(e.id)}>{e.change}</button> {e.text}</li>)}</ul>:<p className="micro">{axis==='evidence'?'No difference in reviewed claims. A missing claim stays UNKNOWN.':'No change.'}</p>}</div>;})}</div>
+  {chosen&&<div role="region" aria-label="Selected object" data-testid="variant-selected">
+   <p className="micro"><strong>{chosen.label}</strong> <span className="stable-id">{chosen.componentId}</span></p>
+   <p className="micro">{leftLabel}: {chosen.left.text}.</p><p className="micro">{rightLabel}: {chosen.right.text}.</p>
+   {absent(chosen.left)&&<p className="micro" role="status" data-testid="absent-before">{chosen.label} is absent from {leftLabel}.</p>}
+   {absent(chosen.right)&&<p className="micro" role="status" data-testid="absent-after">{chosen.label} is absent from {rightLabel}.</p>}
+   <button type="button" className="link-button" onClick={()=>onSelect(null)}>Clear selection</button>
+  </div>}
+ </section>;
+}
+
+type LinkedProps={comparison:LinkedComparison;stale:string|null;onReturn:()=>void;onRecompare:()=>void};
+/**
+ * A frozen linked comparison opened from the workspace. It shows the two sides it read when it was opened; a source
+ * change marks it stale and the reader compares again explicitly. Selecting a pair reads only: there is no Apply here.
+ */
+export function LinkedComparisonView({comparison:c,stale,onReturn,onRecompare}:LinkedProps){
+ const [selected,setSelected]=useState<string|null>(null);
+ return <section aria-label="Linked comparison workspace" className="linked-comparison" data-testid="linked-comparison" data-stale={stale?'true':'false'}>
+  <div className="toolbar"><button type="button" className="link-button" onClick={onReturn}>Return to workspace</button></div>
+  <div className="eyebrow">LINKED COMPARISON · {c.projectTitle.toUpperCase()} · OPENED ON REVISION {c.revision}</div>
+  <h2>{c.title}</h2>
+  <p className="micro" data-testid="comparison-pairing">{PAIRING_TEXT[c.pairing]}</p>
+  <p className="micro">{COMPARE_NOTE}</p>
+  {stale&&<div role="alert" className="revision-warning" data-testid="comparison-stale"><p>{stale}</p><button type="button" className="link-button" onClick={()=>{setSelected(null);onRecompare();}}>Compare again on the current source</button></div>}
+  {c.view?<VariantCompare baseline={c.view.left} candidate={c.view.right} delta={c.view.delta} selectedId={selected} onSelect={setSelected} baselineLabel={c.leftLabel} candidateLabel={c.rightLabel}/>
+   :<EnvironmentCompare pairs={c.environments??[]} leftLabel={c.leftLabel} rightLabel={c.rightLabel} selectedId={selected} onSelect={setSelected}/>}
+ </section>;
+}
+
+type LauncherProps={choices:ComparisonChoices;onOpen:(source:ComparisonSource)=>void};
+/** Where a comparison starts in the workspace: a variant, an earlier revision of this session, or two declared environments. */
+export function ComparisonLauncher({choices,onOpen}:LauncherProps){
+ const current=choices.variants.filter(v=>v.status==='current');
+ const [variant,setVariant]=useState(''),[revision,setRevision]=useState(''),[from,setFrom]=useState(''),[to,setTo]=useState(''),[error,setError]=useState('');
+ const open=(source:ComparisonSource)=>{setError('');try{onOpen(source);}catch(e){setError(errorMessage(e));}};
+ const variantId=current.some(v=>v.id===variant)?variant:current[0]?.id??'',rev=choices.versions.some(v=>String(v.revision)===revision)?revision:String(choices.versions[0]?.revision??'');
+ const envOk=(id:string)=>choices.environments.some(e=>e.id===id),a=envOk(from)?from:choices.environments[0]?.id??'',b=envOk(to)?to:choices.environments[1]?.id??'';
+ return <section aria-label="Compare" className="v3-route" data-testid="comparison-launcher">
+  <p className="micro">Open a linked comparison of existing evidence. It pairs objects by exact stable ID, shows a missing counterpart as absent and applies nothing.</p>
+  <h4>Variant</h4>
+  {choices.variants.length===0?<p className="micro">No variant in this project.</p>:<>
+   {current.length>0&&<div className="toolbar"><label>Variant to compare<select aria-label="Variant to compare" value={variantId} onChange={e=>setVariant(e.target.value)}>{current.map(v=><option key={v.id} value={v.id}>{v.title}</option>)}</select></label><button type="button" onClick={()=>open({kind:'variant',variantId})}>Compare variant</button></div>}
+   {choices.variants.filter(v=>v.status!=='current').map(v=><p key={v.id} className="micro" data-testid="comparison-variant-refused">{v.title}: {v.message}</p>)}</>}
+  <h4>Two revisions</h4>
+  {choices.versions.length===0?<p className="micro">No earlier revision is held in this session.</p>:
+   <div className="toolbar"><label>Earlier revision<select aria-label="Earlier revision" value={rev} onChange={e=>setRevision(e.target.value)}>{choices.versions.map(v=><option key={v.revision} value={v.revision}>{`Revision ${v.revision}`}</option>)}</select></label><button type="button" onClick={()=>open({kind:'version',revision:Number(rev)})}>Compare with the open revision</button></div>}
+  <h4>Two environments</h4>
+  {choices.environments.length<2?<p className="micro">Fewer than two declared environments.</p>:
+   <div className="toolbar"><label>First environment<select aria-label="First environment" value={a} onChange={e=>setFrom(e.target.value)}>{choices.environments.map(e=><option key={e.id} value={e.id}>{e.label}</option>)}</select></label>
+    <label>Second environment<select aria-label="Second environment" value={b} onChange={e=>setTo(e.target.value)}>{choices.environments.map(e=><option key={e.id} value={e.id}>{e.label}</option>)}</select></label>
+    <button type="button" onClick={()=>open({kind:'environment',from:a,to:b})}>Compare environments</button></div>}
+  {error&&<p className="validation-error" role="alert" data-testid="comparison-error">{error}</p>}
  </section>;
 }
