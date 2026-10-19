@@ -63,6 +63,7 @@ export function ToursPanel({doc,edit,viewId,selectedNodeId,selectedEdgeId,live,o
    <h3 tabIndex={-1} data-focus="tour-player">{tour.title} · stop {index+1} of {stops.length}</h3>
    {stop.status!=='current'&&<p className="revision-warning" role="alert" data-testid="tour-anchor">{stop.message}</p>}
    {stop.note&&<p className="micro" data-testid="tour-omission">{stop.note}</p>}
+   {stop.status==='current'&&stop.coverageNote&&<p className="revision-warning" data-testid="tour-coverage">{stop.coverageNote}</p>}
    {stop.status!=='omitted'&&stop.status!=='missing'&&stop.narration&&<p data-testid="tour-narration">{stop.narration}</p>}
    {stop.status==='current'||stop.status==='stale'?<p className="micro">View {stop.viewId}{stop.subjects.length>0&&<> · {stop.subjects.map(subjectText).join(', ')}</>}</p>:null}
    <div className="toolbar"><Button size="small" disabledFocusable={index<=0} onClick={()=>go(tour.id,index-1)}>Previous stop</Button><Button size="small" disabledFocusable={index>=stops.length-1} onClick={()=>go(tour.id,index+1)}>Next stop</Button><Button size="small" onClick={()=>{const id=tour.id;setDraft(null);onPlay(null);focusTo(`[data-tour-resume="${CSS.escape(id)}"]||[data-tour-play="${CSS.escape(id)}"]`);}}>Stop tour</Button>

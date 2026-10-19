@@ -7,10 +7,27 @@ import {tourSchema,tourStopSchema,validateDocument,type Project,type Tour,type T
  * derives each anchor's state against the document it is read from: current, stale (content changed since recording),
  * missing (view or subject gone or not visible here) or omitted (removed from a public copy, and said so). Nothing is
  * repaired silently: a stale or missing anchor fails visibly and the author re-records it.
+ *
+ * Two fingerprints. `fingerprint` covers the selected view's id and title and each subject's own object (unchanged since
+ * stops existed; stop IDs and legacy Resume keys derive from it, so it never changes meaning). `referencedFingerprint`
+ * covers the reference closure of the subjects, the content a narration explains without it being on the card:
+ *  - every evidence block named in a subject component's `blockIds`, with its full content (code, table rows, text,
+ *    metrics, schedule, caption, provenance, visibility);
+ *  - every source named in a subject component's `sourceIds` or in one of those blocks' `sourceIds` (title, location, URL, visibility);
+ *  - every image asset of an image block in the closure and a subject component's `customIconAssetId`.
+ * Each reference is recorded by ID, with null when it does not resolve in the document read, so a removed or revoked
+ * reference changes it. Connections carry no block or source references (their quantity is part of the connection).
+ * Not covered: choice citations and compatibility evidence, observations, concept mappings and child views.
+ * A stop recorded before `referencedFingerprint` existed keeps its old comparison and reads `coverage: 'subjects-only'`
+ * with a note that its referenced content is not covered; it is never re-recorded automatically (only an explicit
+ * Re-record adds the field). A narration edit keeps the stop's record as it is.
  */
 export type TourSubject={kind:'node'|'edge';id:string};
 export type StopStatus='current'|'stale'|'missing'|'omitted';
-export type StopState={index:number;status:StopStatus;viewId?:string;subjects:TourSubject[];narration:string;message:string;note?:string;missing:TourSubject[]};
+/** Whether the stop's record covers the content its subjects reference (`full`) or only the subjects themselves (a legacy stop). */
+export type StopCoverage='full'|'subjects-only';
+export type StopState={index:number;status:StopStatus;viewId?:string;subjects:TourSubject[];narration:string;message:string;note?:string;missing:TourSubject[];coverage?:StopCoverage;coverageNote?:string};
+export const REFERENCES_NOT_COVERED='Referenced content not covered by this stop\'s record: evidence, code, tables, sources or images its subjects cite may have changed since it was recorded. Re-record the stop to cover them.';
 export const TOUR_LABEL='Presented sequence - not a run, not timing';
 
 const present=(doc:Project,viewId:string,s:TourSubject)=>{const view=doc.views.find(v=>v.id===viewId);if(!view)return undefined;
@@ -21,11 +38,24 @@ export function stopFingerprint(doc:Project,viewId:string,subjects:TourSubject[]
  const items=subjects.map(s=>present(doc,viewId,s));if(items.some(x=>!x))return undefined;
  return fnv64(canonical({view:{id:view.id,title:view.title},subjects:subjects.map((s,i)=>({kind:s.kind,item:items[i]}))}));
 }
-/** Record a stop on the current content. Throws when a subject is not in the selected view. */
+/** Fingerprint of the reference closure of a stop's subjects (header comment). Undefined when an anchor is absent. */
+export function referencedFingerprint(doc:Project,viewId:string,subjects:TourSubject[]):string|undefined{
+ if(!doc.views.some(v=>v.id===viewId))return undefined;
+ if(subjects.some(s=>!present(doc,viewId,s)))return undefined;
+ const nodes=subjects.flatMap(s=>s.kind==='node'?[doc.nodes.find(n=>n.id===s.id)!]:[]);
+ const blockIds=[...new Set(nodes.flatMap(n=>n.blockIds))].sort(),blocks=blockIds.map(id=>doc.blocks.find(b=>b.id===id)??null);
+ const sourceIds=[...new Set([...nodes.flatMap(n=>n.sourceIds),...blocks.flatMap(b=>b?.sourceIds??[])])].sort();
+ const assetIds=[...new Set([...nodes.flatMap(n=>n.customIconAssetId?[n.customIconAssetId]:[]),...blocks.flatMap(b=>b?.type==='image'?[b.assetId]:[])])].sort();
+ return fnv64(canonical({
+  blocks:blockIds.map((id,i)=>({id,item:blocks[i]})),
+  sources:sourceIds.map(id=>({id,item:doc.sources.find(s=>s.id===id)??null})),
+  assets:assetIds.map(id=>({id,item:doc.assets.find(a=>a.id===id)??null}))}));
+}
+/** Record a stop on the current content: both fingerprints. Throws when a subject is not in the selected view. */
 export function recordStop(doc:Project,viewId:string,subjects:TourSubject[],narration:string):TourStop{
  if(!doc.views.some(v=>v.id===viewId))throw new Error(`Unknown view ${viewId}.`);
  const absent=subjects.filter(s=>!present(doc,viewId,s));if(absent.length)throw new Error(`Not in view ${viewId}: ${absent.map(s=>s.id).join(', ')}.`);
- return tourStopSchema.parse({viewId,subjects,fingerprint:stopFingerprint(doc,viewId,subjects),narration});
+ return tourStopSchema.parse({viewId,subjects,fingerprint:stopFingerprint(doc,viewId,subjects),referencedFingerprint:referencedFingerprint(doc,viewId,subjects),narration});
 }
 /**
  * A stop ID unused in `stops`, derived from the stop's recorded content (view, subjects, fingerprint, narration), and
@@ -81,16 +111,26 @@ export function removeTourStop(doc:Project,tourId:string,index:number,expected:T
 /** Each stop's anchor state in this document (authoring, or a public copy). Pure: reading a tour changes nothing. */
 export function tourStops(doc:Project,tour:Tour):StopState[]{
  return tour.stops.map((s,index)=>{
-  const base={index,viewId:s.viewId,subjects:s.subjects,narration:s.narration,missing:[] as TourSubject[],...(s.omitted==='subjects'?{note:'Some subjects of this stop are not public and are omitted from this copy.'}:{})};
+  const base:Omit<StopState,'status'|'message'>={index,viewId:s.viewId,subjects:s.subjects,narration:s.narration,missing:[],...(s.omitted==='subjects'?{note:'Some subjects of this stop are not public and are omitted from this copy.'}:{})};
   if(s.omitted==='stop'||!s.viewId)return {...base,status:'omitted' as const,message:'This stop is not public and is omitted from this copy.'};
+  Object.assign(base,s.referencedFingerprint?{coverage:'full'}:{coverage:'subjects-only',coverageNote:REFERENCES_NOT_COVERED});
   if(!doc.views.some(v=>v.id===s.viewId))return {...base,status:'missing' as const,message:`Anchor missing: view ${s.viewId} is not available here. This stop cannot be shown.`};
   const missing=s.subjects.filter(x=>!present(doc,s.viewId!,x));
   if(missing.length)return {...base,missing,status:'missing' as const,message:`Anchor missing: ${missing.map(x=>`${x.kind==='node'?'component':'connection'} ${x.id}`).join(', ')} ${missing.length===1?'is':'are'} no longer in view ${s.viewId}. This stop cannot be shown as recorded.`};
   if(stopFingerprint(doc,s.viewId,s.subjects)!==s.fingerprint)return {...base,status:'stale' as const,message:`Anchor stale: the content changed after this tour was recorded at revision ${tour.sourceRevision} (now revision ${doc.revision}). Check the narration and re-record the stop.`};
+  if(s.referencedFingerprint&&referencedFingerprint(doc,s.viewId,s.subjects)!==s.referencedFingerprint)return {...base,status:'stale' as const,message:`Anchor stale: content its subjects reference (evidence, code, tables, sources or images) changed after this tour was recorded at revision ${tour.sourceRevision} (now revision ${doc.revision}). Check the narration and re-record the stop.`};
   return {...base,status:'current' as const,message:''};
  });
 }
 
+/** The public copy's referenced fingerprint: recomputed on the public document, never the recorded (possibly private) hash. */
+function publicReferenced(input:Project,pub:Project,s:TourStop,kept:TourSubject[]):{referencedFingerprint?:string}{
+ if(!s.referencedFingerprint||!s.viewId)return {};
+ const shown=referencedFingerprint(pub,s.viewId,kept)!;
+ if(referencedFingerprint(input,s.viewId,s.subjects)===s.referencedFingerprint)return {referencedFingerprint:shown};
+ // Stale in authoring: a value derived from the public content only that cannot equal it, so the copy reads stale too.
+ return {referencedFingerprint:fnv64(canonical({superseded:shown}))};
+}
 /**
  * Public projection, called by publicDocument once the public closure is known. Only public tours. A stop whose view is
  * not public, or whose subjects are all not public, becomes an omitted stop with no view, subjects or narration; a subject that is not public is dropped and the
@@ -98,6 +138,9 @@ export function tourStops(doc:Project,tour:Tour):StopState[]{
  * free text cannot be separated safely into public and private parts. A stop current in authoring carries the
  * fingerprint of its public content; a stale one keeps its recorded fingerprint, so it reads stale in the copy too.
  * A shown stop keeps its stable ID, so a reader can resume it; an omitted stop keeps none.
+ * The referenced fingerprint is never copied: it may cover private blocks, sources or images. It is recomputed on the
+ * public document (`publicReferenced`), so the public copy carries a hash of public content only, and the number of
+ * private references makes no difference. A legacy stop stays without one (not covered) in the copy too.
  */
 export function publicTours(input:Project,pub:Project):Tour[]{
  return (input.tours??[]).filter(t=>t.visibility==='public').map(t=>({...t,stops:t.stops.map((s):TourStop=>{
@@ -107,6 +150,6 @@ export function publicTours(input:Project,pub:Project):Tour[]{
   // Every subject private: the narration is about hidden content, so the stop is omitted like one on a private view.
   if(!kept.length&&s.subjects.length)return {subjects:[],narration:'',omitted:'stop'};
   const current=stopFingerprint(input,s.viewId,s.subjects)===s.fingerprint;
-  return {...(s.id?{id:s.id}:{}),viewId:s.viewId,subjects:kept,fingerprint:current?stopFingerprint(pub,s.viewId,kept)!:s.fingerprint,narration:lost?'':s.narration,...(lost?{omitted:'subjects' as const}:{})};
+  return {...(s.id?{id:s.id}:{}),viewId:s.viewId,subjects:kept,fingerprint:current?stopFingerprint(pub,s.viewId,kept)!:s.fingerprint,...publicReferenced(input,pub,s,kept),narration:lost?'':s.narration,...(lost?{omitted:'subjects' as const}:{})};
  })}));
 }
