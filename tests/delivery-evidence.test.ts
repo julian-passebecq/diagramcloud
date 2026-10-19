@@ -31,6 +31,18 @@ test('delivery plan: unknown fields are listed, never interpreted', () => {
   assert.ok(parseDeliveryView(raw(p)).ignoredFields.includes('handoff.calendar'));
 });
 
+test('delivery plan: descriptive fields of any bounded JSON shape are accepted and never read', () => {
+  // Producers write a product state as a small record and subagent hints as numbers; neither is interpreted.
+  const p = plan(); p.products[0].state = {phase: 'synthetic', blocked: false}; p.handoff.owners[0].subagents_hint = [1, 2];
+  const v = parseDeliveryView(raw(p));
+  assert.equal(v.blocks.length, 5);
+  assert.ok(!JSON.stringify(v).includes('"phase":"synthetic"'));
+  assert.ok(!JSON.stringify(v).includes('subagents_hint'));
+  // Still bounded: too deep or non-finite is refused whole.
+  const deep = plan(); deep.products[0].state = {a: {b: {c: {d: {e: 1}}}}}; refused(raw(deep));
+  const wide = plan(); wide.handoff.owners[0].subagents_hint = Array.from({length: 201}, (_, i) => i); refused(raw(wide));
+});
+
 test('delivery plan: cyclic or oversized input is refused whole', () => {
   refused('{not json');
   refused(raw({...plan(), schema: 'delivery-view/2'}));

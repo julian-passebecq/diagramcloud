@@ -71,12 +71,18 @@ function instant(v: unknown): string {
 }
 const optInstant = (v: unknown): string | null => v === undefined || v === null ? null : instant(v);
 const epoch = (v: string) => Date.parse(v.replace(/(\.\d{3})\d+/, '$1'));
-/** Descriptive fields the schema defines but this reading does not interpret: type-checked, then left alone. */
-function descriptive(v: unknown): void {
+/**
+ * Descriptive fields the schema defines but this reading does not interpret: bounded and type-checked, then left alone.
+ * Producers write them as text, numbers, lists or small objects (a product state record, a list of subagent counts),
+ * so any JSON value within depth 4, 200 items per level and 8000 characters per string is accepted and never read.
+ */
+function descriptive(v: unknown, depth = 0): void {
   if (v === undefined || v === null || typeof v === 'boolean') return;
   if (typeof v === 'string') {if (v.length > 8000) refuse(); return;}
   if (typeof v === 'number') {if (!Number.isFinite(v)) refuse(); return;}
-  if (Array.isArray(v) && v.length <= 200 && v.every(x => typeof x === 'string' && x.length <= 4000)) return;
+  if (depth >= 4) refuse();
+  if (Array.isArray(v)) {if (v.length > 200) refuse(); for (const x of v) descriptive(x, depth + 1); return;}
+  if (isObj(v)) {const keys = Object.keys(v); if (keys.length > 200 || keys.some(k => k.length > 300)) refuse(); for (const k of keys) descriptive(v[k], depth + 1); return;}
   refuse();
 }
 

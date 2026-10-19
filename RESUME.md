@@ -1,4 +1,16 @@
-# Now / Next (2026-10-19, 1.31.0 expressiveness)
+# Now / Next (2026-10-19, 1.32.0 unified continuation)
+
+**Goal.** Land the unified continuation: the F/G/H source contribution (linked reading, domain correspondence, join inspection, meeting summary, review workspace) and three lanes on top of it, wired into the real App, as 1.32.0.
+
+**Done.** Lanes A (linked views, default surface), B (delivery evidence, five history questions, join evidence panels) and C (practical catalogue reconciliation, meeting summary form) merged into `lane/unified-integrate` and wired in `src/App.tsx`: dock panels "Plan, owners and remaining effort" (session-only `delivery-view/1`) and "History questions", join evidence under the selection evidence, "Inspect a join" in the Edit-mode workspace explorer (staged through the ordinary review), Export & share > Meeting summary. `tests/e2e/v3-release.spec.ts` adds the Galaxy-style plan, synthetic commerce and world/data journeys. Acceptance: UX26/UX27 implemented for a supplied plan, UX29/UX30 still partial, UX35 export only, UX36-UX38 implemented ([V3_WORKSPACE](docs/product/V3_WORKSPACE.md)). AGENTS.md "Current limits (1.32.0)" states the boundaries.
+
+**Left.** Lead: open the PR from `lane/unified-integrate`, wait for CI, squash-merge on green. Still open as product gaps: a saved-context dimension for the linked pair, cross-project correspondence in linked views, free docking, delivery block to PM task links, token forecast and queue model, live collectors or dispatch, a capacityScenario App surface, PDF/PPTX meeting outputs, semantic diagrams for the new lessons, Cursor/VSIX changes. Carried: owner decisions AC02, AC09, AC11; host runs in CI, extension update, signing and Marketplace.
+
+**How to verify.** `npx tsc --noEmit`, `npm test`, `npm run build`, then `DIAGRAMCLOUD_E2E_PORT=<free port> npx playwright test --reporter=line`; the three new journeys are in `tests/e2e/v3-release.spec.ts`.
+
+**Forecast (uncalibrated allowance, not a measurement or a date).** The remaining cuts above are roughly 15-45 hours of active agent effort, with queue, CI and owner-access waits unknown; tokens and calendar are UNKNOWN.
+
+## Previous: 1.31.0 expressiveness
 
 **Now.** 1.31.0 ([notes](docs/release-1.31/RELEASE_NOTES.md)) qualifies the expressiveness complement (#104, #105, #109) on its own: UX31-UX34 are implemented, each with the test that proves it, in [V3_WORKSPACE](docs/product/V3_WORKSPACE.md). Checking the printed form of the focused explanation HTML found that the detail pane and figure were cut at 80vh and 65vh on paper; a focus-only print rule fixes it, and `tests/e2e/explanation-focus-export.spec.ts` checks it and produces an A4 PDF. AGENTS.md "Current limits (1.31.0)" has a precise expressiveness paragraph (walkthroughs authored not executed, bounded related context, opt-in focused export, the referenced-content tour fingerprint and its legacy behaviour, ConceptMotion/VizForge not integrated). The integration PR records the exact head, CI and the candidate under `.local/integration/DIAGRAM/1.31.0-<sha>/` (never committed).
 
