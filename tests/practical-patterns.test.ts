@@ -1,0 +1,17 @@
+import test from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';
+import {buildPracticalPatternCandidates,buildPracticalPatternProject,practicalSources} from '../examples/domain-data/patterns';
+import {validateLearningCatalogue,learningEntrySchema} from '../src/intelligence/learning/catalogue';
+import {prepareLinkedReading,linkedReadingKey} from '../src/core/linkedReading';import {linkedReadingHtml} from '../src/export/linkedReadingHtml';
+const {entries}=buildPracticalPatternCandidates();
+test('six patterns validate through real unchanged learning schema',()=>{assert.equal(entries.length,6);assert.equal(validateLearningCatalogue(entries,practicalSources).length,6);entries.forEach(x=>learningEntrySchema.parse(x))});
+test('new patterns do not assign legacy reference family or client mapping',()=>entries.forEach(x=>{assert.equal(x.editorial.applicability,'UNKNOWN_NOT_ASSESSED');assert.deepEqual(x.instanceMappings,[]);assert.equal('family' in x,false)}));
+test('alternatives do not approve themselves',()=>entries.forEach(x=>x.lesson.alternatives?.forEach(o=>assert.equal(o.status,'CANDIDATE_NOT_SELECTED'))));
+test('community experiment is not mislabeled primary-provider case study',()=>{assert.ok(entries.every(x=>x.entryKind==='pattern'));assert.ok(!JSON.stringify(practicalSources).includes('reddit'));assert.ok(entries.every(x=>x.lesson.example?.provenance==='authored-synthetic'))});
+test('all patterns have a reproducible proposed check and limitations',()=>entries.forEach(x=>{assert.ok(x.lesson.example!.steps.length>=4);assert.ok(x.lesson.example!.limits.length>=2);assert.ok(x.lesson.failureModes!.length)}));
+test('missing primary citation is refused not guessed',()=>assert.throws(()=>validateLearningCatalogue(entries,practicalSources.filter(s=>s.id!=='DC-RAYFIN-SEMANTIC'))));
+test('the science pattern retains explicit unmapped validity',()=>assert.ok(JSON.stringify(entries[0]).includes('unknown calibration')));
+test('cost example preserves both denominators and no telemetry claim',()=>{const text=JSON.stringify(entries.find(x=>x.id==='capacity-denominators'));assert.ok(text.includes('3/(2*30)=5'));assert.ok(text.includes('3/(2*300)=0.5'));assert.ok(text.includes('No Capacity Metrics data was fetched'))});
+test('notebooks are not declared unsuitable for production',()=>assert.ok(JSON.stringify(entries.find(x=>x.id==='notebook-vs-job')).includes('Scheduled notebooks can be production work')));
+test('Power BI coexistence is a candidate, not a compulsory migration',()=>assert.ok(JSON.stringify(entries.find(x=>x.id==='report-app-coexistence')).includes('reversible coexistence')));
+test('source model and linked config validate with no observations',()=>{const {project,reading}=buildPracticalPatternProject();assert.equal(project.observations.length,0);assert.equal(prepareLinkedReading(project,reading).chapters.length,6);assert.equal(reading.sourceKey,linkedReadingKey(project))});
+test('pattern HTML compiled script remains parseable and inert offline',()=>{const {project,reading}=buildPracticalPatternProject();const html=linkedReadingHtml(project,reading,{now:new Date('2026-10-19T12:00:00Z')});assert.doesNotThrow(()=>new vm.Script(html.match(/<script>([\s\S]*)<\/script>/)![1]));assert.ok(html.includes("connect-src 'none'"));assert.ok(!/<script[^>]+src=/.test(html))});
