@@ -1034,6 +1034,7 @@
             }
           ],
           "fingerprint": "128e6b6242e73d40",
+          "referencedFingerprint": "859eb52aa1efaa2f",
           "narration": "The caller names fetch_weather. A decorator can wrap that callable without being the application itself."
         },
         {
@@ -1062,6 +1063,7 @@
             }
           ],
           "fingerprint": "95931106556ff4f0",
+          "referencedFingerprint": "fd37953bd91d3d12",
           "narration": "This synthetic response selects the transient-failure branch. It does not prove every 503 is absorbed or every request should retry."
         },
         {
@@ -1086,6 +1088,7 @@
             }
           ],
           "fingerprint": "75a0fb4a6fcc5f64",
+          "referencedFingerprint": "df644c25d0c9eb63",
           "narration": "The same participant and connection IDs are used again. The frame is another authored attempt, not another API or a new observed run."
         },
         {
@@ -1110,6 +1113,7 @@
             }
           ],
           "fingerprint": "c13bab9f08bcd469",
+          "referencedFingerprint": "80fde02ce4930e29",
           "narration": "200 is the selected success case. A separate failure walkthrough must explain deadline expiry, exhausted attempts and error propagation."
         },
         {
@@ -1126,6 +1130,7 @@
             }
           ],
           "fingerprint": "ff8b10af4c576652",
+          "referencedFingerprint": "50f308b10020e678",
           "narration": "functools.wraps copies metadata and exposes the wrapped callable for introspection. It does not implement retries, guarantee every logger name or configure an orchestrator task ID."
         }
       ],

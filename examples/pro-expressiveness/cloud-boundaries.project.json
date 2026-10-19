@@ -784,6 +784,7 @@
             }
           ],
           "fingerprint": "57c596ef4bdb2f8a",
+          "referencedFingerprint": "95d2c649c71b3d4f",
           "narration": "This view explains software responsibilities. It does not imply a specific cloud vendor or a provisioned resource."
         },
         {
@@ -808,6 +809,7 @@
             }
           ],
           "fingerprint": "58ea4783c5a4bbda",
+          "referencedFingerprint": "f73a9c7fc6a019f9",
           "narration": "One logical service can have several environment-specific instances. A TEST configuration is not proof of PROD configuration, reachability, identity or installed version."
         },
         {
@@ -840,6 +842,7 @@
             }
           ],
           "fingerprint": "685175339a13d996",
+          "referencedFingerprint": "21dccf259aefbfb4",
           "narration": "A route and a token are not blanket authorization. Tenant isolation, allowed actions, secret handling and rejected requests need explicit explanation and evidence."
         },
         {
@@ -872,6 +875,7 @@
             }
           ],
           "fingerprint": "9299f1dd9dfb7dab",
+          "referencedFingerprint": "466dd4cee353fee3",
           "narration": "A resilient design must describe capacity, timeout, failover, backup and recovery assumptions. No availability percentage or recovery time is inferred from replica icons."
         }
       ],

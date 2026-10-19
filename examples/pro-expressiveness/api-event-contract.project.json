@@ -893,6 +893,7 @@
             }
           ],
           "fingerprint": "b7c43e2f0a38603e",
+          "referencedFingerprint": "eb9f79460fad3224",
           "narration": "Operation name, request, response and authorization requirements belong to the versioned interface. A contract does not prove a deployment or successful call."
         },
         {
@@ -925,6 +926,7 @@
             }
           ],
           "fingerprint": "370eee617cb1f8f3",
+          "referencedFingerprint": "555c0d310e2f8d63",
           "narration": "HTTP acceptance and event publication are distinct milestones. This illustrative scenario assumes an outbox or equivalent consistency policy would be specified; it is not implemented here."
         },
         {
@@ -949,6 +951,7 @@
             }
           ],
           "fingerprint": "bd9abf8ad0343bac",
+          "referencedFingerprint": "06542fbf51151d41",
           "narration": "A redelivery may repeat the same event. Deduplication, transaction boundaries, ordering and compensation require their own explicit contracts."
         },
         {
@@ -981,6 +984,7 @@
             }
           ],
           "fingerprint": "0f89339f72b472ee",
+          "referencedFingerprint": "7855bf308ac66aee",
           "narration": "Actual telemetry needs trace/span identities, links and timestamps from a producer. Clock order alone is not causality; an authored animation cannot supply a missing span."
         }
       ],

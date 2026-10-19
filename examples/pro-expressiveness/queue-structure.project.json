@@ -839,6 +839,7 @@
             }
           ],
           "fingerprint": "b98eb076904047f3",
+          "referencedFingerprint": "81a0204b36d6625a",
           "narration": "An authored state snapshot shows three waiting events. Arrival order is a property of this scenario, not evidence of all distributed producers."
         },
         {
@@ -863,6 +864,7 @@
             }
           ],
           "fingerprint": "5bd69ebb5e0f5821",
+          "referencedFingerprint": "3232937a8b88c6b7",
           "narration": "Python list pop(0) incurs O(n) movement. No milliseconds or speed ratio are inferred from that asymptotic statement."
         },
         {
@@ -879,6 +881,7 @@
             }
           ],
           "fingerprint": "4ca137dccf51a4f6",
+          "referencedFingerprint": "e3df1786fd06333f",
           "narration": "deque provides approximately O(1) append/pop at its ends. This is a local data-structure choice, not durable message storage."
         },
         {
@@ -903,6 +906,7 @@
             }
           ],
           "fingerprint": "c33092f4b103b37d",
+          "referencedFingerprint": "f70495cd035fd23c",
           "narration": "A worker may fail after dequeue. Multiple workers can complete out of order. A durable broker, bounded queue, acknowledgement, dead-letter policy and backpressure are separate design choices."
         }
       ],

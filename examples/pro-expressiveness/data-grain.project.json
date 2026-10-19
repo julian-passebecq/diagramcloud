@@ -676,6 +676,7 @@
             }
           ],
           "fingerprint": "cd59a101f5d615fc",
+          "referencedFingerprint": "2f0bdd35b5b5489f",
           "narration": "The synthetic sales total is 35. Customer history has two rows for the same key. Key labels and cardinality assertions need validation against the intended grain."
         },
         {
@@ -708,6 +709,7 @@
             }
           ],
           "fingerprint": "7c9f7026ab42467f",
+          "referencedFingerprint": "21384c935473deca",
           "narration": "Each fact matches two dimension records. Four rows contribute 70, not 35. These values are calculated from this explicit synthetic fixture, not production metrics."
         },
         {
@@ -732,6 +734,7 @@
             }
           ],
           "fingerprint": "4e1fe4099325d357",
+          "referencedFingerprint": "6f72208caf880d21",
           "narration": "Choosing the applicable unique dimension record restores the intended contribution. DISTINCT over an amount is not a general correction: equal-valued legitimate sales can exist."
         }
       ],

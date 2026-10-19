@@ -703,6 +703,7 @@
             }
           ],
           "fingerprint": "5fd62e71e3dd458c",
+          "referencedFingerprint": "8d1ce1a853a22a6e",
           "narration": "Instructions, model configuration and execution capability are distinct. This conceptual fixture does not describe any currently running ChatGPT or Claude session."
         },
         {
@@ -735,6 +736,7 @@
             }
           ],
           "fingerprint": "786f8a302891d9dd",
+          "referencedFingerprint": "a6211db0a755966a",
           "narration": "A model can propose a tool call; the host validates available operations and scope. Displaying an MCP connection does not enable access or prove an installed integration."
         },
         {
@@ -763,6 +765,7 @@
             }
           ],
           "fingerprint": "6abb97946c759b92",
+          "referencedFingerprint": "9acc7e1b731fb5aa",
           "narration": "A task card can explain what is waiting. A visualization must not answer MFA, permissions or publication decisions on the owner's behalf."
         },
         {
@@ -787,6 +790,7 @@
             }
           ],
           "fingerprint": "ce084a49fea53c23",
+          "referencedFingerprint": "963044590def3e30",
           "narration": "The team or agents that built this system belong to a separate contributor lens. Hiding that lens must not remove the deployed product agent, its tools or trust boundaries."
         }
       ],
