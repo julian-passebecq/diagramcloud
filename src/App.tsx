@@ -399,13 +399,22 @@ const focus=useMemo(()=>basisFilter==='all'?null:new Set(doc.nodes.filter(n=>(n.
  // The tour position and the selected variant are semantic dimensions too: by stable ID, never a revision. Variants are author-only.
  const currentTourRef=()=>{if(!tourPlay)return null;const stop=doc.tours?.find(t=>t.id===tourPlay.tourId)?.stops[tourPlay.index],ref=stop&&stopRef(stop);return ref?{tourId:tourPlay.tourId,stopId:ref}:null;};
  const captureContext=()=>captureSemanticContext(doc,{path:effectivePath,view:activeView,selected,selectedEdge,sheet,environmentId,lesson:lessonFocus?{lessonId:lessonFocus.lessonId,depth:lessonFocus.depth}:null,
-  variantId:!publicMode&&variantSelection&&project.variants?.some(v=>v.id===variantSelection)?variantSelection:null,tour:currentTourRef()});
+  variantId:!publicMode&&variantSelection&&project.variants?.some(v=>v.id===variantSelection)?variantSelection:null,tour:currentTourRef(),
+  linked:linked&&workspaceSurface?{leftViewId:linked.leftViewId,rightViewId:linked.rightViewId,anchorNodeId:linked.anchorNodeId,detailPlacement:linked.detailPlacement}:null});
  const restoreContext=(entry:SavedContext)=>{const out=resolveSemanticContext(doc,entry.context,id=>learningCatalogue.some(e=>e.id===id)),nav=out.navigation;
   setPath(nav.path);setActiveView(nav.view);setSelected(nav.selected);setSelectedEdge(nav.selectedEdge);setSheet(nav.sheet);setStep(-1);setTrace('none');
   if(nav.lesson){const lesson=learningCatalogue.find(e=>e.id===nav.lesson!.lessonId);if(lesson)setLessonFocus({lessonId:lesson.id,depth:nav.lesson.depth,contentRevision:lesson.editorial.contentRevision});}
   // Environment: restored by exact declared identity only; a lost one falls back to all components and says so.
   const savedEnvironment=entry.context.environmentId,environmentKept=out.dimensions.some(d=>d.dimension==='environment'&&d.state==='kept');chooseEnvironment(savedEnvironment&&environmentKept?savedEnvironment:null);
+  // Linked pair: reopened by exact view and anchor IDs on this permitted document, only in the V3 workspace; a context
+  // without the dimension leaves linked mode as it is (legacy contexts restore exactly as before).
+  let linkedLost:string|null=null;
+  if(out.linked){if(!workspaceSurface)linkedLost=`${SAVED_CONTEXT_UNAVAILABLE} Linked views open only in the V3 workspace.`;
+   else{const opened=openLinkedPerspective(doc,{binding:perspectiveBinding,leftViewId:out.linked.leftViewId,rightViewId:out.linked.rightViewId,anchorNodeId:out.linked.anchorNodeId,detailPlacement:out.linked.detailPlacement});
+    if(opened.ok){setLinkedState(opened.state);setComparison(null);setWorkbench(w=>selectWorkbenchPane(w,'primary'));}else linkedLost=SAVED_CONTEXT_UNAVAILABLE;}}
+  else if(out.linked===null)setLinkedState(null);
   const dimensions=out.dimensions.map((d):DimensionResult=>{
+   if((d.dimension==='linked'||d.dimension==='anchor')&&d.state==='kept'&&linkedLost)return {dimension:d.dimension,state:'fallback',explanation:linkedLost};
    if(d.dimension==='environment'&&d.state==='fallback')return {...d,explanation:`${SAVED_CONTEXT_UNAVAILABLE} No environment is selected; all components are shown.`};
    if(d.dimension==='variant'){const id=entry.context.variantId;if(!publicMode&&id&&project.variants?.some(v=>v.id===id)){setVariantSelection(id);return {dimension:'variant',state:'kept'};}return {dimension:'variant',state:'fallback',explanation:SAVED_CONTEXT_UNAVAILABLE};}
    if(d.dimension==='tour'&&entry.context.tour){const r=resolveTourResume(doc,{tourId:entry.context.tour.tourId,stopRef:entry.context.tour.stopId});
