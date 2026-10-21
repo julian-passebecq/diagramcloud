@@ -1,6 +1,12 @@
 import {canonical} from './learningMapping';
 import {errorMessage,parseDocument,type Project} from './model';
-const TAB_ID=crypto.randomUUID();let connection:Promise<IDBDatabase>|undefined;const known=new Map<string,number>();
+const TAB_ID=crypto.randomUUID();let connection:Promise<IDBDatabase>|undefined;
+// Keep the observed bytes and writer as well as the generation: corrupt or
+// externally restored rows may reuse a timestamp. Recovery must not rebind.
+type RowBasis={json:unknown;writer:unknown;savedAt:unknown};
+const known=new Map<string,RowBasis>(),quarantined=new Map<string,RowBasis>();
+const rowBasis=(row:Partial<Row>):RowBasis=>({json:row.json,writer:row.writer,savedAt:row.savedAt});
+const sameBasis=(a:RowBasis,b:RowBasis|undefined)=>!!b&&Object.is(a.savedAt,b.savedAt)&&a.writer===b.writer&&a.json===b.json;
 
 type Row={id:string;json:string;writer:string;savedAt:number};
 /** A stored row that could not be loaded. It stays untouched in IndexedDB until the user recovers or deletes it. */
@@ -22,7 +28,7 @@ function open():Promise<IDBDatabase>{
   const attempt=new Promise<IDBDatabase>((resolve,reject)=>{
    let r:IDBOpenDBRequest;try{r=indexedDB.open('diagramcloud-v1',1);}catch(error){reject(new Error(storageErrorMessage(error)));return;}let blocked=false;
    r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('projects'))r.result.createObjectStore('projects',{keyPath:'id'});};
-   r.onsuccess=()=>{if(blocked){r.result.close();return;}r.result.onversionchange=()=>{r.result.close();if(connection===attempt)connection=undefined;};resolve(r.result);};
+   r.onsuccess=()=>{if(blocked){r.result.close();return;}const db=r.result,forget=()=>{if(connection===attempt)connection=undefined;};db.onclose=forget;db.onversionchange=()=>{db.close();forget();};resolve(db);};
    r.onerror=()=>reject(r.error?new Error(storageErrorMessage(r.error)):new Error('Could not open local workspace'));
    r.onblocked=()=>{blocked=true;reject(new Error('Close older DiagramCloud tabs to open storage'));};
   });
@@ -57,8 +63,9 @@ export async function loadWorkspace():Promise<WorkspaceLoad>{
      if(typeof row.json!=='string'||typeof row.savedAt!=='number'||!Number.isFinite(row.savedAt)||typeof row.writer!=='string')throw new Error('Invalid local storage record');
      const project=parseDocument(row.json);
      if(project.id!==rowId)throw new Error(`Stored key ${rowId} does not match document ID ${project.id}`);
-     known.set(project.id,row.savedAt);projects.push(project);
+     known.set(project.id,rowBasis(row));quarantined.delete(project.id);projects.push(project);
     }catch(error){let bytes=0;try{bytes=typeof row.json==='string'?row.json.length:JSON.stringify(raw)?.length??0;}catch{/* unserializable envelope */}
+     quarantined.set(rowId,rowBasis(row));
      warnings.push({id:rowId,message:errorMessage(error),...(typeof row.savedAt==='number'&&Number.isFinite(row.savedAt)?{savedAt:row.savedAt}:{}),bytes,hasJsonText:typeof row.json==='string'});}
    }
    resolve({projects,warnings});
@@ -71,15 +78,18 @@ export async function loadProjects():Promise<Project[]>{return (await loadWorksp
 export async function saveProject(doc:Project):Promise<void>{
  const db=await open();
  return new Promise((resolve,reject)=>{
-  const tx=db.transaction('projects','readwrite'),store=tx.objectStore('projects');let problem:Error|null=null;let timestamp=0;
+  const tx=db.transaction('projects','readwrite'),store=tx.objectStore('projects');let problem:Error|null=null;let timestamp=0,json='';
   const r=store.get(doc.id);
-  r.onsuccess=()=>{const previous=r.result as Row|undefined,expected=known.get(doc.id);if(previous&&previous.writer!==TAB_ID&&(!known.has(doc.id)||previous.savedAt!==expected)){problem=new Error('Another tab changed this project. Export your JSON, then reload before editing.');tx.abort();return;}
+  r.onsuccess=()=>{const previous=r.result as Row|undefined;if(previous&&previous.writer!==TAB_ID&&!sameBasis(rowBasis(previous),known.get(doc.id))){problem=new Error('Another tab changed this project. Export your JSON, then reload before editing.');tx.abort();return;}
    // A disappeared, previously loaded row is an external deletion. Only the
    // explicit same-tab delete/adopt flow may establish a fresh creation basis.
-   if(!previous&&known.has(doc.id)){problem=new Error('Another tab removed this project. Export your JSON, then reload before restoring it.');tx.abort();return;}timestamp=Math.max(Date.now(),(previous?.savedAt??0)+1);
+   if(!previous&&known.has(doc.id)){problem=new Error('Another tab removed this project. Export your JSON, then reload before restoring it.');tx.abort();return;}
+   // Explicitly adopted malformed timestamps must not survive as NaN/Infinity,
+   // or stop advancing through numeric overflow. Normal generations still advance.
+   const prior=previous?.savedAt;timestamp=Math.max(Date.now(),typeof prior==='number'&&Number.isSafeInteger(prior)&&prior>=0&&prior<Number.MAX_SAFE_INTEGER?prior+1:0);
    // A throwing put (quota, serialization) would abort with no reason; keep the real one.
-   try{store.put({id:doc.id,json:JSON.stringify(doc),writer:TAB_ID,savedAt:timestamp} satisfies Row);}catch(error){problem=new Error(storageErrorMessage(error));tx.abort();}};
-  tx.oncomplete=()=>{known.set(doc.id,timestamp);resolve();};
+   try{json=JSON.stringify(doc);store.put({id:doc.id,json,writer:TAB_ID,savedAt:timestamp} satisfies Row);}catch(error){problem=new Error(storageErrorMessage(error));tx.abort();}};
+  tx.oncomplete=()=>{known.set(doc.id,{json,writer:TAB_ID,savedAt:timestamp});quarantined.delete(doc.id);resolve();};
   tx.onabort=tx.onerror=()=>reject(problem??(tx.error?new Error(storageErrorMessage(tx.error)):new Error('Local save failed. Export a JSON backup.')));
  });
 }
@@ -92,15 +102,16 @@ export async function readRawRow(id:string):Promise<unknown>{
 /** Permanently remove one stored row. The recovery screen only offers this after an explicit confirmation. */
 export async function deleteRow(id:string):Promise<void>{
  const db=await open();
- return new Promise((resolve,reject)=>{const tx=db.transaction('projects','readwrite');tx.objectStore('projects').delete(id);tx.oncomplete=()=>{known.delete(id);resolve();};tx.onabort=tx.onerror=()=>reject(tx.error?new Error(storageErrorMessage(tx.error)):new Error('Could not delete the stored row'));});
+ return new Promise((resolve,reject)=>{const tx=db.transaction('projects','readwrite');tx.objectStore('projects').delete(id);tx.oncomplete=()=>{known.delete(id);quarantined.delete(id);resolve();};tx.onabort=tx.onerror=()=>reject(tx.error?new Error(storageErrorMessage(tx.error)):new Error('Could not delete the stored row'));});
 }
 /**
- * Let a repaired document replace its quarantined row. That row was never loaded, so its generation is unknown and
- * the other-tab guard would refuse the save; adopting records the generation seen now. Another tab writing the row
- * after this point is still detected.
+ * Adopt only the exact quarantined row seen by loadWorkspace. Re-reading a newer
+ * row must not authorize the older JSON already displayed by the repair editor.
+ * A change after this read is still detected in saveProject's write transaction.
  */
 export async function adoptRow(id:string):Promise<void>{
- const row=await readRawRow(id) as {savedAt?:unknown}|undefined;
- // Record the value as stored, even a broken one: saveProject compares it with the row it finds.
- if(row)known.set(id,row.savedAt as number);
+ const expected=quarantined.get(id),row=await readRawRow(id) as Partial<Row>|undefined;
+ if(!row)throw new Error('The stored recovery row was removed. Keep your backup, then reload before restoring it.');
+ if(!sameBasis(rowBasis(row),expected))throw new Error('The stored recovery row changed. Keep your backup, then reload and review the current copy.');
+ known.set(id,rowBasis(row));
 }

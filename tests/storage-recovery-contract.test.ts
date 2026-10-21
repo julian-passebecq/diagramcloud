@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {loadWorkspace,saveProject,deleteRow,adoptRow} from '../src/core/storage';
+import {loadWorkspace,saveProject,deleteRow,adoptRow,readRawRow} from '../src/core/storage';
 import {documentSchema,validateDocument} from '../src/core/model';
 
 /** Controlled IndexedDB request/transaction double, not a browser storage test.
@@ -53,5 +53,59 @@ test('explicit adoption permits repair of a malformed row without weakening late
 test('ordinary same-tab saves keep working with a monotonically later generation',async()=>{
  const s=eventStore();s.install();const d=document('storage-ordinary');
  try{await loadWorkspace();await saveProject(d);const first=(s.rows.get(d.id) as {savedAt:number}).savedAt;await saveProject({...d,revision:d.revision+1});assert.ok((s.rows.get(d.id) as {savedAt:number}).savedAt>first);}
+ finally{s.close();}
+});
+
+for(const [label,savedAt] of [
+ ['not-a-number',Number.NaN],['positive-infinity',Number.POSITIVE_INFINITY],
+ ['negative-infinity',Number.NEGATIVE_INFINITY],['text','corrupt'],
+ ['unsafe-number',Number.MAX_VALUE]
+] as const)test(`repair of ${label} generation survives reopen and advances on later saves`,async()=>{
+ const s=eventStore();s.install();const d=document(`repair-${label}`);
+ s.rows.set(d.id,{id:d.id,json:'broken',writer:'other',savedAt});
+ try{
+  assert.equal((await loadWorkspace()).warnings.length,1);
+  await adoptRow(d.id);await saveProject(d);
+  const first=(s.rows.get(d.id) as {savedAt:number}).savedAt;
+  assert.ok(Number.isSafeInteger(first),'Repaired save must have a safe finite generation');
+  const loaded=await loadWorkspace();assert.equal(loaded.warnings.length,0);assert.equal(loaded.projects[0]?.id,d.id);
+  await saveProject({...d,revision:d.revision+1});
+  assert.ok((s.rows.get(d.id) as {savedAt:number}).savedAt>first,'Every next save must advance the generation');
+ }finally{s.close();}
+});
+
+
+test('repair adoption refuses a row replaced after it was shown for recovery',async()=>{
+ const s=eventStore();s.install();const d=document('recovery-race');
+ const bad={id:d.id,json:'broken',writer:'first-tab',savedAt:1};s.rows.set(d.id,bad);
+ try{
+  await loadWorkspace();await readRawRow(d.id);
+  const replacement={id:d.id,json:JSON.stringify({...d,title:'Newer recovered copy'}),writer:'second-tab',savedAt:2};s.rows.set(d.id,replacement);
+  await assert.rejects(adoptRow(d.id),/changed|reload/i);
+  assert.deepEqual(s.rows.get(d.id),replacement);
+ }finally{s.close();}
+});
+
+test('repair adoption refuses a row removed after it was shown for recovery',async()=>{
+ const s=eventStore();s.install();const d=document('recovery-removed');s.rows.set(d.id,{id:d.id,json:'broken',writer:'other',savedAt:1});
+ try{await loadWorkspace();await readRawRow(d.id);s.rows.delete(d.id);await assert.rejects(adoptRow(d.id),/removed|reload/i);assert.equal(s.rows.has(d.id),false);}
+ finally{s.close();}
+});
+
+test('a changed corrupt row cannot be adopted just because its generation is unchanged',async()=>{
+ const s=eventStore();s.install();const d=document('recovery-same-generation');s.rows.set(d.id,{id:d.id,json:'broken one',writer:'other',savedAt:1});
+ try{await loadWorkspace();const replacement={id:d.id,json:'broken two',writer:'other',savedAt:1};s.rows.set(d.id,replacement);await assert.rejects(adoptRow(d.id),/changed|reload/i);assert.deepEqual(s.rows.get(d.id),replacement);}
+ finally{s.close();}
+});
+
+test('changing the writer or bytes at an adopted NaN generation remains a conflict',async()=>{
+ const s=eventStore();s.install();const d=document('recovery-nan-conflict');s.rows.set(d.id,{id:d.id,json:'broken one',writer:'first',savedAt:NaN});
+ try{await loadWorkspace();await adoptRow(d.id);const replacement={id:d.id,json:'broken two',writer:'second',savedAt:NaN};s.rows.set(d.id,replacement);await assert.rejects(saveProject(d),/Another tab changed/);assert.deepEqual(s.rows.get(d.id),replacement);}
+ finally{s.close();}
+});
+
+test('repeated finite generation with changed content does not authorize a stale save',async()=>{
+ const s=eventStore();s.install();const d=document('storage-same-generation');s.rows.set(d.id,{id:d.id,json:JSON.stringify(d),writer:'other',savedAt:1});
+ try{await loadWorkspace();const replacement={id:d.id,json:JSON.stringify({...d,title:'Newer copy'}),writer:'other',savedAt:1};s.rows.set(d.id,replacement);await assert.rejects(saveProject(d),/Another tab changed/);assert.deepEqual(s.rows.get(d.id),replacement);}
  finally{s.close();}
 });
