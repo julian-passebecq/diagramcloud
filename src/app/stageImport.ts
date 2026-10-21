@@ -1,3 +1,4 @@
+import {isIdeationBrief,compileIdeationBrief} from '../intelligence/ideation';
 import {isPmTaskDocument,compilePmTasks} from '../development/pmTasks';
 import {MAX_DOCUMENT_BYTES,validateDocument,type Project} from '../core/model';
 import {withoutUnknownModules} from '../core/moduleCompat';
@@ -68,6 +69,7 @@ export async function stageImportText(input:{project:Project;library:readonly Pr
   if([project,...library].some(d=>d.provenance==='PM task projection; source authenticity and authority are unverified.'&&d.sources.some(s=>s.id==='pm-task-source'&&s.location==='sha256:'+out.inputDigest)))throw new Error('This PM task snapshot is already loaded. Open the existing projection; no presentation edits were replaced.');
   return {staged:out.document,patched:null,report:null,importName:'PM task snapshot (private, not adopted)'};
  }
+ if(isIdeationBrief(obj)){const out=compileIdeationBrief(obj);if([project,...library].some(d=>d.id===out.document.id))throw new Error('This idea project ID already exists. Use a new snapshot ID or review edits in the existing project; no content was replaced.');return {staged:out.document,patched:null,report:null,importName:'Idea portfolio (supplied proposals, not adopted work)'};}
  if(isGraphSnapshot(obj)){const compiled=compileGraphSnapshot(obj),existing=library.find(d=>d.id===compiled.document.id),proposal=existing?previewGraphReimport(existing,obj,existing.revision):null;return {staged:proposal?.document??compiled.document,patched:proposal?{patch:proposal.patch,result:proposal.document}:null,report:null,importName:'GraphSnapshot (offline)'};}
  if(obj&&typeof obj==='object'&&(obj as {format?:string}).format==='diagramcloud.delivery-brief'){const out=previewDeliveryBrief(project,obj);return {staged:out.document,patched:{patch:out.patch,result:out.document},report:null};}
  if(isProviderRequest(obj))throw new Error(PROVIDER_LAUNCH_MESSAGE);

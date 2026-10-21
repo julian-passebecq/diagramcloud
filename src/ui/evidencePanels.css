@@ -22,3 +22,12 @@
 .dc-evidence-link:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .dc-evidence-flag { font-weight: 600; }
 @media (max-width: 600px) { .dc-evidence-identity { grid-template-columns: 1fr; } }
+
+/* Summary first, with no new theme or independent layout store. */
+.dc-delivery-overview { padding: 12px; border: 1px solid color-mix(in srgb, currentColor 20%, transparent); border-radius: 8px; min-width: 0; }
+.dc-delivery-overview h3 { margin: 0 0 10px; font-size: 1rem; }
+.dc-delivery-overview p { font-size: .85rem; margin: 10px 0 0; }
+.dc-delivery-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.dc-delivery-metrics dt { font-size: .8rem; opacity: .85; }
+.dc-delivery-metrics dd { margin: 5px 0 0; font-weight: 600; overflow-wrap: anywhere; }
+@media (max-width: 700px) { .dc-delivery-metrics { grid-template-columns: 1fr; } }

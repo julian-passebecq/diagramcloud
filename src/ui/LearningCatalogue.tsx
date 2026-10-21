@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';import {InterviewPractice} from './InterviewPractice';import {canonical,fnv64} from '../core/learningMapping';import {publicDocument} from '../core/operations';
 import type {Project} from '../core/model';
 import {download as downloadFile} from '../export/browser';
 import {lessonInstanceFacts,mappingCandidates,suggestMapping,reviewMapping,rejectMapping,savedExplanation,MAPPING_STATE_LABELS,CANDIDATE_LABEL,type LessonContext,type MappingRow} from '../intelligence/learning/mappings';
@@ -99,6 +99,7 @@ export function lessonContextFor(lessons:readonly LearningEntry[],id:string|null
 }
 export function LearningCatalogue({entries,host={}}:{entries?:readonly unknown[];host?:LearningHost}){
  const rows=useMemo(()=>catalogueRows(entries??learningCatalogue),[entries]);
+ const practiceScope=useMemo(()=>`${host.publicMode?'public':'author'}:${host.project?fnv64(canonical(host.publicMode?publicDocument(host.project):host.project)):'projectless'}`,[host.project,host.publicMode]);
  const [initial,setInitial]=useState(()=>host.initial??null);
  const [query,setQuery]=useState(''),[kind,setKind]=useState<CatalogueKindFilter>('all'),[domain,setDomain]=useState<LearningDomainFilter>('all'),[family,setFamily]=useState<CatalogueFamilyFilter>('all'),[open,setOpenState]=useState<string|null>(initial?.lessonId??null);
  const lessons=useMemo(()=>rows.flatMap(row=>row.state==='lesson'?[row.entry]:[]),[rows]);
@@ -107,6 +108,7 @@ export function LearningCatalogue({entries,host={}}:{entries?:readonly unknown[]
  const reset=()=>{setQuery('');setKind('all');setDomain('all');setFamily('all');};
  return <section aria-label="Learning catalogue" style={{minWidth:0}}><h3>Learning catalogue</h3>
   <p className="micro">Concepts, patterns, case studies and view recipes. Works without a project, Git, cloud or AI. Lessons are authored synthetic teaching content; opening one runs nothing and maps nothing to your project.</p>
+  <details className="catalogue-practice"><summary>Interview practice · four-question rounds and fictional company cases</summary><InterviewPractice scopeKey={practiceScope}/></details>
   <div className="pi-controls"><label style={{minWidth:0,flex:'1 1 200px'}}>Search lessons<input type="search" maxLength={200} aria-label="Search lessons" value={query} onChange={e=>setQuery(e.target.value)} style={{width:'100%',maxWidth:'100%',boxSizing:'border-box'}}/></label>
    <label style={{minWidth:0}}>Entry kind<select aria-label="Entry kind" value={kind} onChange={e=>setKind(e.target.value as CatalogueKindFilter)}><option value="all">All kinds</option>{CATALOGUE_ENTRY_KINDS.map(k=><option key={k} value={k}>{CATALOGUE_ENTRY_KIND_LABELS[k]}</option>)}</select></label>
    <label style={{minWidth:0}}>Learning domain<select aria-label="Learning domain" value={domain} onChange={e=>setDomain(e.target.value as LearningDomainFilter)}><option value="all">All domains</option>{LEARNING_DOMAINS.map(d=><option key={d} value={d}>{d}</option>)}<option value="not-supplied">Not supplied</option></select></label>

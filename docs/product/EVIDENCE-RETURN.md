@@ -1,3 +1,8 @@
+> Historical lane-B adoption report for 1.32.0. The mounted App now uses these modules. For the next source contribution's
+> corrected estimate/subtotal semantics, product relations, bounded conflict detection and explicit PM task links, read
+> [delivery-task-reading](../contracts/delivery-task-reading.md). Original tests and residual statements below record that
+> earlier source cut; they are not current package qualification.
+
 # Evidence return (lane B)
 
 Read-only evidence modules and panels for the 1.32 integration. Nothing here dispatches, launches, approves, schedules,

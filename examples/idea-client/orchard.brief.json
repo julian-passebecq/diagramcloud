@@ -1,0 +1,431 @@
+{
+  "schema": "diagramcloud.ideation-brief/1",
+  "id": "orchard-options",
+  "title": "Orchard Studio: options before commitments",
+  "question": "Which proposed improvements deserve further investigation, and what must we learn first?",
+  "visibility": "public",
+  "provenance": "authored-synthetic",
+  "sources": [
+    {
+      "id": "scenario",
+      "title": "Original fictional planning exercise",
+      "location": "Authored for DiagramCloud on 2026-10-20; no actual organization, running agents or measured effort."
+    }
+  ],
+  "groups": [
+    {
+      "id": "evidence",
+      "label": "Evidence Library",
+      "kind": "project",
+      "description": "Fictional full-stack document application."
+    },
+    {
+      "id": "learning",
+      "label": "Learning Centre",
+      "kind": "project",
+      "description": "Fictional explanation and practice application."
+    },
+    {
+      "id": "reliability",
+      "label": "Reliability",
+      "kind": "theme",
+      "description": "Failure handling and trustworthy data."
+    },
+    {
+      "id": "experience",
+      "label": "Reader experience",
+      "kind": "theme",
+      "description": "Help humans orient, inspect and return."
+    },
+    {
+      "id": "platform",
+      "label": "Platform and delivery",
+      "kind": "theme",
+      "description": "Source, runtime, deployment and release boundaries."
+    }
+  ],
+  "ideas": [
+    {
+      "id": "permitted-search",
+      "title": "Search only the permitted content",
+      "groupIds": [
+        "evidence",
+        "reliability"
+      ],
+      "problem": "Search must not reveal excluded client material.",
+      "proposal": "Use an explicitly access-filtered search projection and test denied cases.",
+      "benefits": [
+        "Makes a specific question easier to inspect."
+      ],
+      "risks": [
+        "The example is fictional; actual effort and applicability are not measured."
+      ],
+      "unknowns": [
+        "Which real user journey and acceptance evidence should define success?"
+      ],
+      "conditions": [
+        "An owner must select real work independently of viewing this proposal."
+      ],
+      "consideration": "exploring",
+      "assessments": [
+        {
+          "criterion": "feasibility",
+          "rating": "high",
+          "rationale": "Author opinion for this fictional teaching case, not measured delivery probability.",
+          "sourceIds": [
+            "scenario"
+          ]
+        },
+        {
+          "criterion": "difficulty",
+          "rating": "medium",
+          "rationale": "Author opinion; must be reassessed against the actual integration.",
+          "sourceIds": [
+            "scenario"
+          ]
+        }
+      ],
+      "estimate": null,
+      "sourceIds": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "return-context",
+      "title": "Remember the surrounding scope",
+      "groupIds": [
+        "evidence",
+        "experience"
+      ],
+      "problem": "A reader loses the question after drilling into detail.",
+      "proposal": "Offer an optional parent-context strip with an explicit return; do not confuse history and hierarchy.",
+      "benefits": [
+        "Makes a specific question easier to inspect."
+      ],
+      "risks": [
+        "The example is fictional; actual effort and applicability are not measured."
+      ],
+      "unknowns": [
+        "Which real user journey and acceptance evidence should define success?"
+      ],
+      "conditions": [
+        "An owner must select real work independently of viewing this proposal."
+      ],
+      "consideration": "candidate",
+      "assessments": [
+        {
+          "criterion": "feasibility",
+          "rating": "high",
+          "rationale": "Author opinion for this fictional teaching case, not measured delivery probability.",
+          "sourceIds": [
+            "scenario"
+          ]
+        },
+        {
+          "criterion": "difficulty",
+          "rating": "low",
+          "rationale": "Author opinion; must be reassessed against the actual integration.",
+          "sourceIds": [
+            "scenario"
+          ]
+        }
+      ],
+      "estimate": null,
+      "sourceIds": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "quiz",
+      "title": "Interview explanation rounds",
+      "groupIds": [
+        "learning",
+        "experience"
+      ],
+      "problem": "A learner needs to explain concepts rather than collect vendor names.",
+      "proposal": "Use four-question rounds and original reference answers with source and version scope.",
+      "benefits": [
+        "Makes a specific question easier to inspect."
+      ],
+      "risks": [
+        "The example is fictional; actual effort and applicability are not measured."
+      ],
+      "unknowns": [
+        "Which real user journey and acceptance evidence should define success?"
+      ],
+      "conditions": [
+        "An owner must select real work independently of viewing this proposal."
+      ],
+      "consideration": "candidate",
+      "assessments": [
+        {
+          "criterion": "feasibility",
+          "rating": "high",
+          "rationale": "Author opinion for this fictional teaching case, not measured delivery probability.",
+          "sourceIds": [
+            "scenario"
+          ]
+        },
+        {
+          "criterion": "difficulty",
+          "rating": "medium",
+          "rationale": "Author opinion; must be reassessed against the actual integration.",
+          "sourceIds": [
+            "scenario"
+          ]
+        }
+      ],
+      "estimate": null,
+      "sourceIds": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "trace-input",
+      "title": "Read supplied runtime traces",
+      "groupIds": [
+        "evidence",
+        "platform"
+      ],
+      "problem": "A static dependency diagram is not an observed request path.",
+      "proposal": "Import a bounded external trace after its producer contract and privacy projection are qualified.",
+      "benefits": [
+        "Makes a specific question easier to inspect."
+      ],
+      "risks": [
+        "The example is fictional; actual effort and applicability are not measured."
+      ],
+      "unknowns": [
+        "Which real user journey and acceptance evidence should define success?"
+      ],
+      "conditions": [
+        "An owner must select real work independently of viewing this proposal."
+      ],
+      "consideration": "deferred",
+      "assessments": [
+        {
+          "criterion": "feasibility",
+          "rating": "unknown",
+          "rationale": "Author opinion for this fictional teaching case, not measured delivery probability.",
+          "sourceIds": [
+            "scenario"
+          ]
+        },
+        {
+          "criterion": "difficulty",
+          "rating": "high",
+          "rationale": "Author opinion; must be reassessed against the actual integration.",
+          "sourceIds": [
+            "scenario"
+          ]
+        }
+      ],
+      "estimate": null,
+      "sourceIds": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "cloud-deploy",
+      "title": "Short-lived cloud staging proof",
+      "groupIds": [
+        "evidence",
+        "platform"
+      ],
+      "problem": "Source checks do not establish a deployed user journey.",
+      "proposal": "Prepare a reviewed deployment and teardown plan; execution requires its own grant.",
+      "benefits": [
+        "Makes a specific question easier to inspect."
+      ],
+      "risks": [
+        "The example is fictional; actual effort and applicability are not measured."
+      ],
+      "unknowns": [
+        "Which real user journey and acceptance evidence should define success?"
+      ],
+      "conditions": [
+        "An owner must select real work independently of viewing this proposal."
+      ],
+      "consideration": "deferred",
+      "assessments": [
+        {
+          "criterion": "feasibility",
+          "rating": "unknown",
+          "rationale": "Author opinion for this fictional teaching case, not measured delivery probability.",
+          "sourceIds": [
+            "scenario"
+          ]
+        },
+        {
+          "criterion": "difficulty",
+          "rating": "high",
+          "rationale": "Author opinion; must be reassessed against the actual integration.",
+          "sourceIds": [
+            "scenario"
+          ]
+        }
+      ],
+      "estimate": null,
+      "sourceIds": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "new-engine",
+      "title": "Replace the diagram engine",
+      "groupIds": [
+        "learning",
+        "platform"
+      ],
+      "problem": "A renderer change has been suggested without a measured defect.",
+      "proposal": "Measure a concrete geometry limitation before selecting a replacement.",
+      "benefits": [
+        "Makes a specific question easier to inspect."
+      ],
+      "risks": [
+        "The example is fictional; actual effort and applicability are not measured."
+      ],
+      "unknowns": [
+        "Which real user journey and acceptance evidence should define success?"
+      ],
+      "conditions": [
+        "An owner must select real work independently of viewing this proposal."
+      ],
+      "consideration": "rejected",
+      "assessments": [
+        {
+          "criterion": "feasibility",
+          "rating": "unknown",
+          "rationale": "Author opinion for this fictional teaching case, not measured delivery probability.",
+          "sourceIds": [
+            "scenario"
+          ]
+        },
+        {
+          "criterion": "difficulty",
+          "rating": "high",
+          "rationale": "Author opinion; must be reassessed against the actual integration.",
+          "sourceIds": [
+            "scenario"
+          ]
+        }
+      ],
+      "estimate": null,
+      "sourceIds": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "quality",
+      "title": "Expose join fanout and loss",
+      "groupIds": [
+        "evidence",
+        "reliability"
+      ],
+      "problem": "Matching row counts can hide duplication and disappearance.",
+      "proposal": "Inspect exact sample-row correspondences and the declared metric grain.",
+      "benefits": [
+        "Makes a specific question easier to inspect."
+      ],
+      "risks": [
+        "The example is fictional; actual effort and applicability are not measured."
+      ],
+      "unknowns": [
+        "Which real user journey and acceptance evidence should define success?"
+      ],
+      "conditions": [
+        "An owner must select real work independently of viewing this proposal."
+      ],
+      "consideration": "candidate",
+      "assessments": [
+        {
+          "criterion": "feasibility",
+          "rating": "high",
+          "rationale": "Author opinion for this fictional teaching case, not measured delivery probability.",
+          "sourceIds": [
+            "scenario"
+          ]
+        },
+        {
+          "criterion": "difficulty",
+          "rating": "medium",
+          "rationale": "Author opinion; must be reassessed against the actual integration.",
+          "sourceIds": [
+            "scenario"
+          ]
+        }
+      ],
+      "estimate": null,
+      "sourceIds": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "board",
+      "title": "Add a proposal comparison board",
+      "groupIds": [
+        "learning",
+        "experience"
+      ],
+      "problem": "A long idea discussion obscures alternatives and uncertainty.",
+      "proposal": "Provide grouped cards, a matrix and source-derived consideration columns without creating tasks.",
+      "benefits": [
+        "Makes a specific question easier to inspect."
+      ],
+      "risks": [
+        "The example is fictional; actual effort and applicability are not measured."
+      ],
+      "unknowns": [
+        "Which real user journey and acceptance evidence should define success?"
+      ],
+      "conditions": [
+        "An owner must select real work independently of viewing this proposal."
+      ],
+      "consideration": "exploring",
+      "assessments": [
+        {
+          "criterion": "feasibility",
+          "rating": "high",
+          "rationale": "Author opinion for this fictional teaching case, not measured delivery probability.",
+          "sourceIds": [
+            "scenario"
+          ]
+        },
+        {
+          "criterion": "difficulty",
+          "rating": "medium",
+          "rationale": "Author opinion; must be reassessed against the actual integration.",
+          "sourceIds": [
+            "scenario"
+          ]
+        }
+      ],
+      "estimate": null,
+      "sourceIds": [
+        "scenario"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "trace-access",
+      "from": "trace-input",
+      "to": "permitted-search",
+      "kind": "depends-on",
+      "reason": "A proposed trace import needs a qualified access boundary.",
+      "sourceIds": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "context-board",
+      "from": "board",
+      "to": "return-context",
+      "kind": "related",
+      "reason": "Both help retain a human question while changing detail.",
+      "sourceIds": [
+        "scenario"
+      ]
+    }
+  ]
+}

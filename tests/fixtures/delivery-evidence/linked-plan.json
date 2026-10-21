@@ -1,0 +1,345 @@
+{
+  "schema": "delivery-view/1",
+  "title": "Example Service - explicit plan and task correspondence",
+  "captured_at": "2026-09-30T08:00:00.000000Z",
+  "visibility": "private",
+  "scope_note": "Synthetic test fixture. Invented product, owners and paths; no real plan, client or repository.",
+  "x_extension_note": "An unknown top-level field that must be listed, never interpreted.",
+  "sources": [
+    {
+      "id": "src.board",
+      "title": "Synthetic planning board",
+      "url": null,
+      "basis": "DECLARED",
+      "checked_at": "2026-09-30T07:55:00Z",
+      "summary": "Invented source.",
+      "event_at": "2026-09-01T08:00:00Z"
+    },
+    {
+      "id": "src.ci",
+      "title": "Synthetic CI log",
+      "url": "https://example.invalid/ci/1",
+      "basis": "OBSERVED",
+      "checked_at": "2026-09-30T07:58:00Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "example-service",
+      "title": "Example Service",
+      "repository": "example/service",
+      "state": "in progress",
+      "source_ids": [
+        "src.board"
+      ],
+      "source_revision": "rev-0001",
+      "candidate_version": "0.4.0"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "svc.schema",
+      "title": "Define the request schema",
+      "product_id": "example-service",
+      "state": "done",
+      "depends_on": [],
+      "acceptance": "Schema validates the three example requests.",
+      "source_ids": [
+        "src.board"
+      ],
+      "estimate": {
+        "min_minutes": 30,
+        "max_minutes": 60,
+        "basis": "Synthetic author allowance",
+        "estimated_at": "2026-09-01T08:00:00Z"
+      },
+      "priority": "high",
+      "interval": {
+        "start": "2026-09-01T09:00:00+02:00",
+        "end": "2026-09-01T10:30:00+02:00",
+        "timezone": "Europe/Paris",
+        "basis": "DECLARED",
+        "source_ids": [
+          "src.board"
+        ]
+      },
+      "results": [
+        {
+          "kind": "commit",
+          "ref": "abc1234",
+          "url": null,
+          "basis": "DECLARED",
+          "source_ids": [
+            "src.board"
+          ]
+        },
+        {
+          "kind": "check",
+          "ref": "unit-tests #12",
+          "url": "https://example.invalid/ci/1",
+          "basis": "OBSERVED",
+          "source_ids": [
+            "src.ci"
+          ]
+        }
+      ],
+      "prompt_ref": "prompts/schema.md"
+    },
+    {
+      "id": "svc.api",
+      "title": "Serve the request endpoint",
+      "product_id": "example-service",
+      "state": "blocked",
+      "depends_on": [
+        "svc.schema"
+      ],
+      "acceptance": "Endpoint answers the example requests.",
+      "source_ids": [
+        "src.board"
+      ],
+      "estimate": {
+        "min_minutes": 60,
+        "max_minutes": 120,
+        "basis": "Synthetic author allowance",
+        "estimated_at": "2026-09-01T08:00:00Z"
+      },
+      "blocker": "An independent installed-environment check is still required."
+    },
+    {
+      "id": "svc.docs",
+      "title": "Write the usage guide",
+      "product_id": "example-service",
+      "state": "ready",
+      "depends_on": [],
+      "acceptance": "",
+      "source_ids": [
+        "src.board"
+      ]
+    },
+    {
+      "id": "svc.ui",
+      "title": "Add the request form",
+      "product_id": "example-service",
+      "state": "in progress",
+      "depends_on": [
+        "svc.api"
+      ],
+      "acceptance": "Form submits a request.",
+      "source_ids": [
+        "src.board"
+      ],
+      "estimate": {
+        "min_minutes": 90,
+        "max_minutes": 180,
+        "basis": "Synthetic author allowance",
+        "estimated_at": null
+      }
+    },
+    {
+      "id": "svc.release",
+      "title": "Prepare the candidate",
+      "product_id": "example-service",
+      "state": "ready",
+      "depends_on": [
+        "svc.docs"
+      ],
+      "acceptance": "",
+      "source_ids": [],
+      "estimate": {
+        "min_minutes": 15,
+        "max_minutes": 30,
+        "basis": "Synthetic author allowance",
+        "estimated_at": null
+      }
+    }
+  ],
+  "dependencies": [],
+  "handoff": {
+    "revision": 1,
+    "outcome": "Synthetic outcome text.",
+    "non_goals": [
+      "No deployment"
+    ],
+    "owners": [
+      {
+        "id": "own.alpha",
+        "title": "Owner Alpha",
+        "role": "builder"
+      },
+      {
+        "id": "own.beta",
+        "title": "Owner Beta",
+        "role": "builder"
+      }
+    ],
+    "source_vector": [
+      {
+        "repository": "example/service",
+        "ref": "main",
+        "commit": "0000000000000000000000000000000000000001",
+        "purpose": "Synthetic source cut"
+      }
+    ],
+    "block_details": [
+      {
+        "block_id": "svc.schema",
+        "owner_id": "own.alpha",
+        "phase": 1,
+        "acceptance_ids": [
+          "AC1"
+        ],
+        "filesets": [
+          {
+            "repository": "example/service",
+            "path": "src/api",
+            "access": "write"
+          }
+        ],
+        "checkpoint": "docs/checkpoint.md",
+        "tokens": {
+          "input": [
+            1000,
+            3000
+          ],
+          "output": [
+            200,
+            500
+          ],
+          "basis": "Synthetic uncalibrated allowance, not measured usage",
+          "estimated_at": "2026-09-30T08:00:00Z"
+        }
+      },
+      {
+        "block_id": "svc.api",
+        "owner_id": "own.beta",
+        "phase": 2,
+        "acceptance_ids": [
+          "AC2"
+        ],
+        "filesets": [
+          {
+            "repository": "example/service",
+            "path": "src/api/routes.ts",
+            "access": "write"
+          },
+          {
+            "repository": "example/service",
+            "path": "docs/guide.md",
+            "access": "read"
+          }
+        ],
+        "tokens": {
+          "input": [
+            1000,
+            3000
+          ],
+          "output": [
+            200,
+            500
+          ],
+          "basis": "Synthetic uncalibrated allowance, not measured usage",
+          "estimated_at": "2026-09-30T08:00:00Z"
+        },
+        "pm_task_refs": [
+          {
+            "task_id": "task.api",
+            "input_sha256": "fb6c18de77946f4f56fff46f222db3600c912f0e7f84a3023345111b5be69b1d",
+            "revision": 4,
+            "scope": {
+              "organizationId": "example-org",
+              "privacyDomainId": "private",
+              "projectId": "example-service",
+              "repoId": "example.service"
+            }
+          }
+        ]
+      },
+      {
+        "block_id": "svc.docs",
+        "owner_id": "own.alpha",
+        "phase": 2,
+        "acceptance_ids": [],
+        "filesets": [
+          {
+            "repository": "example/service",
+            "path": "docs/guide.md",
+            "access": "write"
+          }
+        ],
+        "resources": [
+          "test.desktop"
+        ],
+        "tokens": {
+          "input": [
+            1000,
+            3000
+          ],
+          "output": [
+            200,
+            500
+          ],
+          "basis": "Synthetic uncalibrated allowance, not measured usage",
+          "estimated_at": "2026-09-30T08:00:00Z"
+        }
+      },
+      {
+        "block_id": "svc.ui",
+        "owner_id": "own.beta",
+        "phase": 3,
+        "acceptance_ids": [
+          "AC3"
+        ],
+        "filesets": [
+          {
+            "repository": "example/service",
+            "path": "docs",
+            "access": "write"
+          },
+          {
+            "repository": "example/web",
+            "path": "src/api",
+            "access": "write"
+          }
+        ],
+        "resources": [
+          "test.desktop"
+        ],
+        "tokens": {
+          "input": [
+            1000,
+            3000
+          ],
+          "output": [
+            200,
+            500
+          ],
+          "basis": "Synthetic uncalibrated allowance, not measured usage",
+          "estimated_at": "2026-09-30T08:00:00Z"
+        }
+      },
+      {
+        "block_id": "svc.release",
+        "phase": 3,
+        "filesets": [
+          {
+            "repository": "example/service",
+            "path": "src/apis",
+            "access": "write"
+          }
+        ],
+        "tokens": {
+          "input": [
+            1000,
+            3000
+          ],
+          "output": [
+            200,
+            500
+          ],
+          "basis": "Synthetic uncalibrated allowance, not measured usage",
+          "estimated_at": "2026-09-30T08:00:00Z"
+        }
+      }
+    ]
+  }
+}

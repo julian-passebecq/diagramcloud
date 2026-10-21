@@ -1,0 +1,1366 @@
+{
+  "schemaVersion": 1,
+  "id": "beacon-evidence-library",
+  "revision": 0,
+  "title": "Beacon Evidence Library — fictional full-stack case",
+  "summary": "An original teaching case: explain the business, application, request, data and delivery without confusing their identities. No runtime, customer or deployment claims.",
+  "author": "",
+  "category": "Reference",
+  "tags": [],
+  "rootViewId": "overview",
+  "provenance": "",
+  "nodes": [
+    {
+      "id": "business",
+      "label": "Business question",
+      "kind": "source",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Help a reviewer find permitted source material and understand why it matters. A public site sees only deliberately published excerpts, not the private originals.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.business"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "application",
+      "label": "Application capability",
+      "kind": "app",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Browse, search and inspect source-backed entries. A feature is not identical to a route, package or UI control.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "childViewId": "architecture",
+      "blockIds": [
+        "b.application"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "domain",
+      "label": "Business objects and data",
+      "kind": "model",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Entry, asset version, permission label and editorial claim have distinct identities and grains.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "childViewId": "data",
+      "blockIds": [
+        "b.domain"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "delivery",
+      "label": "Delivery and infrastructure",
+      "kind": "control",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Repository, build, artifact, environment and release receipt are separate. A preview is not production.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "childViewId": "operations",
+      "blockIds": [
+        "b.delivery"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "decision",
+      "label": "Review and publication",
+      "kind": "report",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "An editor explicitly chooses material for an audience. Search must operate on that permitted cut; hiding a card after searching private content is insufficient.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.decision"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "browser",
+      "label": "Browser UI",
+      "kind": "app",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Displays permitted entries and an inspector. Keeps reading state separate from editable content and never stores service credentials.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.browser"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "api",
+      "label": "API boundary",
+      "kind": "app",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Validates the caller and request, checks resource-level permissions, and returns an explicit result. A browser button is not server authorization.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.api",
+        "request-contract"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "identity",
+      "label": "Identity and authorization",
+      "kind": "control",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Authenticates the caller and enforces requested resource/action scope. A role display in the UI does not establish a server-side check.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.identity"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "metadata",
+      "label": "Metadata database",
+      "kind": "storage",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Stores stable entry IDs, asset-version references and editorial state. One row has a defined grain; do not turn every rendered occurrence into another entity.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.metadata",
+        "data-grains"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "objects",
+      "label": "Original asset store",
+      "kind": "storage",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Contains approved example bytes. A locator does not grant access. Public derivatives are separate from private originals.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.objects"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "index",
+      "label": "Permitted search projection",
+      "kind": "model",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Search returns only the allowed audience/scope. Derived index text is not an additional source of truth.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.index"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "worker",
+      "label": "Bounded processing worker",
+      "kind": "process",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Produces derived metadata/thumbnails for selected bytes. A reported success must bind to the exact input and output identities.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.worker"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "telemetry",
+      "label": "Diagnostic evidence",
+      "kind": "report",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Records sanitized outcomes and correlation IDs. It must not leak raw answers, credentials or private document contents.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.telemetry"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "entry",
+      "label": "Entry",
+      "kind": "model",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "One catalogued item with an ID, title, subject and publication state.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.entry"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "asset-version",
+      "label": "Asset version",
+      "kind": "storage",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "One exact immutable file version, digest and source locator. An edited file is a new version.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.asset-version"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "claim",
+      "label": "Editorial claim",
+      "kind": "model",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "One authored statement with supporting source references. A citation is inspectable support, not automatic truth.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.claim"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "mapping",
+      "label": "Explicit correspondence",
+      "kind": "process",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Connects an entry, business subject and source version. Name similarity does not establish identity.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.mapping"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "request-input",
+      "label": "Permitted request",
+      "kind": "source",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Example: fetch one entry by stable ID. Input is checked by the API; displayed snippets never run here.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.request-input"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "response",
+      "label": "Response or refusal",
+      "kind": "report",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "A response is scoped and schema-checked. Missing and unauthorized resources should not leak private existence through rich diagnostics.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.response"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "repo",
+      "label": "Source repository",
+      "kind": "storage",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Owns application code and reviewed changes. Company membership and repository ownership are not the same relation.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.repo"
+      ],
+      "sourceIds": [
+        "ci",
+        "iac"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "ci-job",
+      "label": "Build and tests",
+      "kind": "process",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Runs selected checks on a specified source revision with an explicit environment. A workflow definition is not a passing run.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.ci-job"
+      ],
+      "sourceIds": [
+        "ci",
+        "iac"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "artifact",
+      "label": "Versioned artifact",
+      "kind": "storage",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Produced files have an identity separate from the source commit and their eventual installed location.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.artifact"
+      ],
+      "sourceIds": [
+        "ci",
+        "iac"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "environment",
+      "label": "Target environment",
+      "kind": "app",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "An environment may be local, test or production only when supplied. This example defines no real target and grants no deployment.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.environment"
+      ],
+      "sourceIds": [
+        "ci",
+        "iac"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "iac-plan",
+      "label": "IaC plan review",
+      "kind": "control",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "The candidate infrastructure change is reviewed separately from executing it. Secret-bearing plan/state data does not belong in the public explanation.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.iac-plan"
+      ],
+      "sourceIds": [
+        "ci",
+        "iac"
+      ],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "receipt",
+      "label": "Qualification and release evidence",
+      "kind": "report",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Bindings distinguish built, installed, qualified and delivered. An unresolved gate remains unknown or open; no elapsed time is inferred.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "blockIds": [
+        "b.receipt"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "open-request",
+      "label": "Inspect a request",
+      "kind": "control",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Navigation to one request path; not another API service.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "childViewId": "request",
+      "blockIds": [
+        "b.open-request"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "open-data",
+      "label": "Inspect the data representation",
+      "kind": "control",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Navigation to data meaning; it does not create or execute a query.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "childViewId": "data",
+      "blockIds": [
+        "b.open-data"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "open-ops",
+      "label": "Inspect delivery and boundaries",
+      "kind": "control",
+      "provider": "Fictional reference",
+      "icon": "generic",
+      "summary": "Navigation to delivery design; it does not create an infrastructure resource.",
+      "role": "Authored design; not observed runtime.",
+      "status": "idle",
+      "childViewId": "operations",
+      "blockIds": [
+        "b.open-ops"
+      ],
+      "sourceIds": [],
+      "tags": [],
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e01",
+      "source": "business",
+      "target": "application",
+      "label": "requires capability",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e02",
+      "source": "application",
+      "target": "domain",
+      "label": "uses business data",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e03",
+      "source": "application",
+      "target": "delivery",
+      "label": "is delivered through",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e04",
+      "source": "decision",
+      "target": "application",
+      "label": "publishes permitted cut",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e10",
+      "source": "browser",
+      "target": "api",
+      "label": "request",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e11",
+      "source": "api",
+      "target": "identity",
+      "label": "authorization check",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e12",
+      "source": "api",
+      "target": "metadata",
+      "label": "read/write within scope",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e13",
+      "source": "metadata",
+      "target": "objects",
+      "label": "exact version locator",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e14",
+      "source": "worker",
+      "target": "objects",
+      "label": "selected input",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e15",
+      "source": "worker",
+      "target": "index",
+      "label": "derived projection",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e16",
+      "source": "api",
+      "target": "index",
+      "label": "permitted query",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e17",
+      "source": "api",
+      "target": "telemetry",
+      "label": "sanitized result",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e20",
+      "source": "entry",
+      "target": "asset-version",
+      "label": "references exact version",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e21",
+      "source": "claim",
+      "target": "asset-version",
+      "label": "cites",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e22",
+      "source": "entry",
+      "target": "mapping",
+      "label": "declares correspondence",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e30",
+      "source": "request-input",
+      "target": "api",
+      "label": "validated request",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e31",
+      "source": "api",
+      "target": "response",
+      "label": "scoped result or refusal",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e40",
+      "source": "repo",
+      "target": "ci-job",
+      "label": "source cut",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e41",
+      "source": "ci-job",
+      "target": "artifact",
+      "label": "build output",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e42",
+      "source": "artifact",
+      "target": "environment",
+      "label": "candidate installation",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e43",
+      "source": "iac-plan",
+      "target": "environment",
+      "label": "proposed infrastructure",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "e44",
+      "source": "environment",
+      "target": "receipt",
+      "label": "requires evidence",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "title": "Business and capability overview",
+      "description": "Fictional architecture, not an observed deployment or runtime trace.",
+      "nodeIds": [
+        "business",
+        "application",
+        "domain",
+        "delivery",
+        "decision"
+      ],
+      "edgeIds": [
+        "e01",
+        "e02",
+        "e03",
+        "e04"
+      ],
+      "positions": {
+        "business": {
+          "x": 0,
+          "y": 0
+        },
+        "application": {
+          "x": 300,
+          "y": 0
+        },
+        "domain": {
+          "x": 600,
+          "y": 0
+        },
+        "delivery": {
+          "x": 0,
+          "y": 170
+        },
+        "decision": {
+          "x": 300,
+          "y": 170
+        }
+      },
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "architecture",
+      "title": "Full-stack responsibilities",
+      "description": "Fictional architecture, not an observed deployment or runtime trace.",
+      "nodeIds": [
+        "browser",
+        "api",
+        "identity",
+        "metadata",
+        "objects",
+        "index",
+        "worker",
+        "telemetry",
+        "open-request",
+        "open-data",
+        "open-ops"
+      ],
+      "edgeIds": [
+        "e10",
+        "e11",
+        "e12",
+        "e13",
+        "e14",
+        "e15",
+        "e16",
+        "e17"
+      ],
+      "positions": {
+        "browser": {
+          "x": 0,
+          "y": 0
+        },
+        "api": {
+          "x": 300,
+          "y": 0
+        },
+        "identity": {
+          "x": 600,
+          "y": 0
+        },
+        "metadata": {
+          "x": 0,
+          "y": 170
+        },
+        "objects": {
+          "x": 300,
+          "y": 170
+        },
+        "index": {
+          "x": 600,
+          "y": 170
+        },
+        "worker": {
+          "x": 0,
+          "y": 340
+        },
+        "telemetry": {
+          "x": 300,
+          "y": 340
+        },
+        "open-request": {
+          "x": 600,
+          "y": 340
+        },
+        "open-data": {
+          "x": 0,
+          "y": 510
+        },
+        "open-ops": {
+          "x": 300,
+          "y": 510
+        }
+      },
+      "design": {
+        "type": "layers",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "request",
+      "title": "One request and its trust boundaries",
+      "description": "Fictional architecture, not an observed deployment or runtime trace.",
+      "nodeIds": [
+        "request-input",
+        "browser",
+        "api",
+        "identity",
+        "metadata",
+        "response",
+        "telemetry"
+      ],
+      "edgeIds": [
+        "e10",
+        "e11",
+        "e12",
+        "e17",
+        "e30",
+        "e31"
+      ],
+      "positions": {
+        "request-input": {
+          "x": 0,
+          "y": 0
+        },
+        "browser": {
+          "x": 300,
+          "y": 0
+        },
+        "api": {
+          "x": 600,
+          "y": 0
+        },
+        "identity": {
+          "x": 0,
+          "y": 170
+        },
+        "metadata": {
+          "x": 300,
+          "y": 170
+        },
+        "response": {
+          "x": 600,
+          "y": 170
+        },
+        "telemetry": {
+          "x": 0,
+          "y": 340
+        }
+      },
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "data",
+      "title": "Data grain and provenance",
+      "description": "Fictional architecture, not an observed deployment or runtime trace.",
+      "nodeIds": [
+        "entry",
+        "asset-version",
+        "claim",
+        "mapping",
+        "metadata",
+        "objects",
+        "index"
+      ],
+      "edgeIds": [
+        "e13",
+        "e20",
+        "e21",
+        "e22"
+      ],
+      "positions": {
+        "entry": {
+          "x": 0,
+          "y": 0
+        },
+        "asset-version": {
+          "x": 300,
+          "y": 0
+        },
+        "claim": {
+          "x": 600,
+          "y": 0
+        },
+        "mapping": {
+          "x": 0,
+          "y": 170
+        },
+        "metadata": {
+          "x": 300,
+          "y": 170
+        },
+        "objects": {
+          "x": 600,
+          "y": 170
+        },
+        "index": {
+          "x": 0,
+          "y": 340
+        }
+      },
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    },
+    {
+      "id": "operations",
+      "title": "Source, infrastructure and delivery",
+      "description": "Fictional architecture, not an observed deployment or runtime trace.",
+      "nodeIds": [
+        "repo",
+        "ci-job",
+        "artifact",
+        "iac-plan",
+        "environment",
+        "receipt"
+      ],
+      "edgeIds": [
+        "e40",
+        "e41",
+        "e42",
+        "e43",
+        "e44"
+      ],
+      "positions": {
+        "repo": {
+          "x": 0,
+          "y": 0
+        },
+        "ci-job": {
+          "x": 300,
+          "y": 0
+        },
+        "artifact": {
+          "x": 600,
+          "y": 0
+        },
+        "iac-plan": {
+          "x": 0,
+          "y": 170
+        },
+        "environment": {
+          "x": 300,
+          "y": 170
+        },
+        "receipt": {
+          "x": 600,
+          "y": 170
+        }
+      },
+      "design": {
+        "type": "architecture",
+        "focal": []
+      },
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "b.business",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Help a reviewer find permitted source material and understand why it matters. A public site sees only deliberately published excerpts, not the private originals."
+    },
+    {
+      "id": "b.application",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Browse, search and inspect source-backed entries. A feature is not identical to a route, package or UI control."
+    },
+    {
+      "id": "b.domain",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Entry, asset version, permission label and editorial claim have distinct identities and grains."
+    },
+    {
+      "id": "b.delivery",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Repository, build, artifact, environment and release receipt are separate. A preview is not production."
+    },
+    {
+      "id": "b.decision",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "An editor explicitly chooses material for an audience. Search must operate on that permitted cut; hiding a card after searching private content is insufficient."
+    },
+    {
+      "id": "b.browser",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Displays permitted entries and an inspector. Keeps reading state separate from editable content and never stores service credentials."
+    },
+    {
+      "id": "b.api",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Validates the caller and request, checks resource-level permissions, and returns an explicit result. A browser button is not server authorization."
+    },
+    {
+      "id": "b.identity",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Authenticates the caller and enforces requested resource/action scope. A role display in the UI does not establish a server-side check."
+    },
+    {
+      "id": "b.metadata",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Stores stable entry IDs, asset-version references and editorial state. One row has a defined grain; do not turn every rendered occurrence into another entity."
+    },
+    {
+      "id": "b.objects",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Contains approved example bytes. A locator does not grant access. Public derivatives are separate from private originals."
+    },
+    {
+      "id": "b.index",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Search returns only the allowed audience/scope. Derived index text is not an additional source of truth."
+    },
+    {
+      "id": "b.worker",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Produces derived metadata/thumbnails for selected bytes. A reported success must bind to the exact input and output identities."
+    },
+    {
+      "id": "b.telemetry",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Records sanitized outcomes and correlation IDs. It must not leak raw answers, credentials or private document contents."
+    },
+    {
+      "id": "b.entry",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "One catalogued item with an ID, title, subject and publication state."
+    },
+    {
+      "id": "b.asset-version",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "One exact immutable file version, digest and source locator. An edited file is a new version."
+    },
+    {
+      "id": "b.claim",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "One authored statement with supporting source references. A citation is inspectable support, not automatic truth."
+    },
+    {
+      "id": "b.mapping",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Connects an entry, business subject and source version. Name similarity does not establish identity."
+    },
+    {
+      "id": "b.request-input",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Example: fetch one entry by stable ID. Input is checked by the API; displayed snippets never run here."
+    },
+    {
+      "id": "b.response",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "A response is scoped and schema-checked. Missing and unauthorized resources should not leak private existence through rich diagnostics."
+    },
+    {
+      "id": "b.repo",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Owns application code and reviewed changes. Company membership and repository ownership are not the same relation."
+    },
+    {
+      "id": "b.ci-job",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Runs selected checks on a specified source revision with an explicit environment. A workflow definition is not a passing run."
+    },
+    {
+      "id": "b.artifact",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Produced files have an identity separate from the source commit and their eventual installed location."
+    },
+    {
+      "id": "b.environment",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "An environment may be local, test or production only when supplied. This example defines no real target and grants no deployment."
+    },
+    {
+      "id": "b.iac-plan",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "The candidate infrastructure change is reviewed separately from executing it. Secret-bearing plan/state data does not belong in the public explanation."
+    },
+    {
+      "id": "b.receipt",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Bindings distinguish built, installed, qualified and delivered. An unresolved gate remains unknown or open; no elapsed time is inferred."
+    },
+    {
+      "id": "b.open-request",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Navigation to one request path; not another API service."
+    },
+    {
+      "id": "b.open-data",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Navigation to data meaning; it does not create or execute a query."
+    },
+    {
+      "id": "b.open-ops",
+      "title": "Meaning, assumptions and next question",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "text",
+      "text": "Navigation to delivery design; it does not create an infrastructure resource."
+    },
+    {
+      "id": "request-contract",
+      "title": "Display-only request contract",
+      "visibility": "public",
+      "sourceIds": [
+        "http"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\n  \"method\": \"GET\",\n  \"path\": \"/entries/{entry_id}\",\n  \"required\": \"authenticated caller and entry read scope\",\n  \"outcome\": \"permitted representation or generic refusal\"\n}"
+    },
+    {
+      "id": "data-grains",
+      "title": "Data-model reading",
+      "visibility": "public",
+      "sourceIds": [
+        "sql"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Entity",
+        "Row grain",
+        "Key",
+        "Limit"
+      ],
+      "rows": [
+        [
+          "Entry",
+          "One catalogued item",
+          "entry_id",
+          "Does not prove an asset is public"
+        ],
+        [
+          "AssetVersion",
+          "One exact version",
+          "asset_version_id",
+          "Digest equality is not permission"
+        ],
+        [
+          "Claim",
+          "One authored statement",
+          "claim_id",
+          "Evidence must be reviewed"
+        ],
+        [
+          "Mapping",
+          "One declared relationship",
+          "mapping_id",
+          "No name-based identity inference"
+        ]
+      ]
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "http",
+      "title": "HTTP method semantics",
+      "location": "RFC 9110; reference, not an implementation guarantee.",
+      "url": "https://datatracker.ietf.org/doc/html/rfc9110",
+      "visibility": "public"
+    },
+    {
+      "id": "sql",
+      "title": "PostgreSQL table expressions",
+      "location": "PostgreSQL 18 SQL semantics; no database is connected.",
+      "url": "https://www.postgresql.org/docs/18/queries-table-expressions.html",
+      "visibility": "public"
+    },
+    {
+      "id": "ci",
+      "title": "GitHub Actions secure use",
+      "location": "Retrieved 2026-10-20; no CI job is executed.",
+      "url": "https://docs.github.com/en/actions/reference/security/secure-use",
+      "visibility": "public"
+    },
+    {
+      "id": "iac",
+      "title": "Terraform plan",
+      "location": "Plan is a proposed change, not apply or release evidence.",
+      "url": "https://developer.hashicorp.com/terraform/cli/commands/plan",
+      "visibility": "public"
+    }
+  ],
+  "story": [],
+  "observations": [],
+  "tours": []
+}
