@@ -80,7 +80,7 @@ export async function saveProject(doc:Project):Promise<void>{
  return new Promise((resolve,reject)=>{
   const tx=db.transaction('projects','readwrite'),store=tx.objectStore('projects');let problem:Error|null=null;let timestamp=0,json='';
   const r=store.get(doc.id);
-  r.onsuccess=()=>{const previous=r.result as Row|undefined;if(previous&&previous.writer!==TAB_ID&&!sameBasis(rowBasis(previous),known.get(doc.id))){problem=new Error('Another tab changed this project. Export your JSON, then reload before editing.');tx.abort();return;}
+  r.onsuccess=()=>{const previous=r.result as Row|undefined;if(previous&&!sameBasis(rowBasis(previous),known.get(doc.id))){problem=new Error('Another tab changed this project. Export your JSON, then reload before editing.');tx.abort();return;}
    // A disappeared, previously loaded row is an external deletion. Only the
    // explicit same-tab delete/adopt flow may establish a fresh creation basis.
    if(!previous&&known.has(doc.id)){problem=new Error('Another tab removed this project. Export your JSON, then reload before restoring it.');tx.abort();return;}
@@ -99,10 +99,24 @@ export async function readRawRow(id:string):Promise<unknown>{
  const db=await open();
  return new Promise((resolve,reject)=>{const r=db.transaction('projects','readonly').objectStore('projects').get(id);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error??new Error('Could not read the stored row'));});
 }
-/** Permanently remove one stored row. The recovery screen only offers this after an explicit confirmation. */
+/** Delete only the exact observed row, after explicit confirmation in the UI.
+ * The comparison and deletion share one transaction: another tab cannot replace
+ * the row between the guard and the delete. A stale warning grants no authority.
+ */
 export async function deleteRow(id:string):Promise<void>{
- const db=await open();
- return new Promise((resolve,reject)=>{const tx=db.transaction('projects','readwrite');tx.objectStore('projects').delete(id);tx.oncomplete=()=>{known.delete(id);quarantined.delete(id);resolve();};tx.onabort=tx.onerror=()=>reject(tx.error?new Error(storageErrorMessage(tx.error)):new Error('Could not delete the stored row'));});
+ const expected=quarantined.get(id)??known.get(id),db=await open();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('projects','readwrite'),store=tx.objectStore('projects');let problem:Error|null=null;
+  const r=store.get(id);
+  r.onsuccess=()=>{
+   const row=r.result as Partial<Row>|undefined;
+   if(!row){problem=new Error('The stored project was removed. Keep your backup, then reload before restoring it.');tx.abort();return;}
+   if(!sameBasis(rowBasis(row),expected)){problem=new Error('The stored project changed. Keep your backup, then reload and review the current copy.');tx.abort();return;}
+   try{store.delete(id);}catch(error){problem=new Error(storageErrorMessage(error));tx.abort();}
+  };
+  tx.oncomplete=()=>{known.delete(id);quarantined.delete(id);resolve();};
+  tx.onabort=tx.onerror=()=>reject(problem??(tx.error?new Error(storageErrorMessage(tx.error)):new Error('Could not delete the stored row')));
+ });
 }
 /**
  * Adopt only the exact quarantined row seen by loadWorkspace. Re-reading a newer
