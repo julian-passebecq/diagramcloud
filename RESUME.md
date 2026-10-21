@@ -1,6 +1,6 @@
-# Now: 1.33.0 on branch claude/diagramcloud-release-1.33; private candidate after merge
+# Now: 1.33.0 merged and packaged privately
 
-Source, storage-recovery hardening and the six recovery cases are integrated; gates and counts are recorded in the PR. Older checkpoints below are history.
+**State (2026-10-21).** 1.33.0 is merged (PR #116, `3e907db997783601a43f9e86084ad50196407590`, main CI run 39607764586 success) and its package is published privately in juliandatapass-group/galaxy-release-vault as generic package diagramcloud/1.33.0-3e907db (14 files; authenticated re-download matched every sha256; anonymous access refused). Receipt in `outcome.json` `privatePackages` (1.33.0 entry); UX46 implemented. No tag, public release, Marketplace entry or separate deploy check; `ownerVerified` stays false; pptx-visual was viewed by the release agent, not the owner. Older checkpoints below are history.
 
 ---
 
