@@ -1,4 +1,4 @@
-import {validateDocument,type Project} from '../core/model';
+import {validateDocument,MAX_DOCUMENT_BYTES,type Project} from '../core/model';
 
 /**
  * DataPass ↔ DiagramCloud Bridge V1 (contract pinned in docs/contracts/datapass-diagramcloud-bridge.lock.json).
@@ -32,6 +32,8 @@ export class SidecarUncertainWriteError extends Error{constructor(message:string
  * the hash check against the last read still refuses a blind overwrite. The next save re-reads the file first.
  */
 const receipts=new WeakMap<SidecarFolder,SidecarAttempt>();
+// Same handle only: this is not an OS lock against external editors or aliased handles.
+const writes=new WeakMap<SidecarFolder,Promise<SidecarLink>>();
 export const sidecarReceipt=(folder:SidecarFolder):SidecarAttempt|undefined=>receipts.get(folder);
 const shortHash=(hash:string)=>hash.slice(0,12);
 export const describeAttempt=(a:SidecarAttempt)=>`revision ${a.revision} (sha256 ${shortHash(a.hash)}…, ${a.bytes} bytes)`;
@@ -40,7 +42,17 @@ export async function contentHash(text:string):Promise<string>{const digest=awai
 const notFound=(error:unknown)=>error instanceof Error&&(error.name==='NotFoundError'||error.name==='TypeMismatchError');
 
 /** Stable, reviewable text: full authoring document (the repository is private project storage), two-space JSON, trailing newline. */
-export function serializeSidecar(project:Project):string{return JSON.stringify(validateDocument(project),null,2)+'\n';}
+const sidecarText=(project:Project)=>JSON.stringify(validateDocument(project),null,2)+'\n';
+function requireDocumentSize(bytes:number):void{
+ if(bytes>MAX_DOCUMENT_BYTES)throw new Error('Repository document exceeds the 12 MiB limit. Keep an authoring backup and reduce embedded images or evidence before saving or importing.');
+}
+export function serializeSidecar(project:Project):string{
+ const text=sidecarText(project);requireDocumentSize(new TextEncoder().encode(text).byteLength);return text;
+}
+async function readBoundedText(handle:SidecarFile):Promise<string>{
+ const file=await handle.getFile();requireDocumentSize(file.size);
+ const text=await file.text();requireDocumentSize(new TextEncoder().encode(text).byteLength);return text;
+}
 
 async function sidecarHandle(folder:SidecarFolder,create:boolean):Promise<SidecarFile|null>{
  try{const dir=await folder.getDirectoryHandle(SIDECAR_DIR,{create});return await dir.getFileHandle(SIDECAR_FILE,{create});}
@@ -49,11 +61,15 @@ async function sidecarHandle(folder:SidecarFolder,create:boolean):Promise<Sideca
 
 /** Reads raw text only. Callers must still parseDocument + preview before anything reaches the open project. */
 export async function readSidecar(folder:SidecarFolder):Promise<SidecarRead>{
- // Re-reading the file for review is how the author resolves an uncertain save: the receipt has done its job.
- receipts.delete(folder);
- const handle=await sidecarHandle(folder,false);if(!handle)return{status:'missing'};
- const text=await (await handle.getFile()).text();if(!text.trim())return{status:'missing'};
- return{status:'found',text,hash:await contentHash(text),bytes:new TextEncoder().encode(text).byteLength};
+ const observed=receipts.get(folder),resolveReceipt=()=>{if(receipts.get(folder)===observed)receipts.delete(folder);};
+ const handle=await sidecarHandle(folder,false);
+ if(!handle){resolveReceipt();return{status:'missing'};}
+ const text=await readBoundedText(handle);
+ if(!text.trim()){resolveReceipt();return{status:'missing'};}
+ const hash=await contentHash(text);
+ // A successful re-read enables review. A failed read cannot resolve an unknown write.
+ resolveReceipt();
+ return{status:'found',text,hash,bytes:new TextEncoder().encode(text).byteLength};
 }
 
 /** Only the DataPass project id/title are read from .datapass/project.json, to confirm the right folder was chosen. */
@@ -72,10 +88,19 @@ export async function readManifestIdentity(folder:SidecarFolder):Promise<Manifes
  * becomes the base; anything else is a conflict naming the attempt. A failed write is never retried blindly.
  */
 export async function writeSidecar(link:SidecarLink,project:Project):Promise<SidecarLink>{
+ // Freeze both the requested text and its base before permission prompts or queue waits.
+ // A queued stale base is refused, never silently rebased to the preceding save.
+ const selected={...link},snapshot={id:project.id,revision:project.revision},text=serializeSidecar(project);
+ const previous=writes.get(selected.folder);
+ const attempt=(previous??Promise.resolve()).catch(()=>{}).then(()=>writeSidecarNow(selected,snapshot,text));
+ writes.set(selected.folder,attempt);
+ try{return await attempt;}finally{if(writes.get(selected.folder)===attempt)writes.delete(selected.folder);}
+}
+async function writeSidecarNow(link:SidecarLink,project:{id:string;revision:number},text:string):Promise<SidecarLink>{
  if(project.id!==link.projectId)throw new Error(`The open project (${project.id}) is not the one linked to ${link.folder.name}/${SIDECAR_PATH} (${link.projectId}).`);
  if(link.folder.requestPermission&&await link.folder.requestPermission({mode:'readwrite'})!=='granted')throw new Error(`Write access to ${link.folder.name} was not granted. Nothing was written.`);
- const text=serializeSidecar(project),handle=(await sidecarHandle(link.folder,true))!;
- const onDisk=await (await handle.getFile()).text(),diskHash=onDisk.trim()?await contentHash(onDisk):null,where=`${link.folder.name}/${SIDECAR_PATH}`;
+ const handle=await sidecarHandle(link.folder,false);
+ const onDisk=handle?await readBoundedText(handle):'',diskHash=onDisk.trim()?await contentHash(onDisk):null,where=`${link.folder.name}/${SIDECAR_PATH}`;
  const receipt=receipts.get(link.folder);let base=link.baseHash,landed:SidecarAttempt|undefined;
  if(receipt){
   if(diskHash!==receipt.hash)throw new SidecarConflictError(`The last save of ${where} did not confirm: ${describeAttempt(receipt)} may not have been written, and the file now holds different content. Nothing was written. Download a backup, then reopen the repository file to review what is on disk.`);
@@ -83,7 +108,10 @@ export async function writeSidecar(link:SidecarLink,project:Project):Promise<Sid
   if(receipt.revision===project.revision&&receipt.projectId===project.id&&receipt.hash===await contentHash(text))return{folder:link.folder,projectId:link.projectId,baseRevision:project.revision,baseHash:receipt.hash,landed};
  }
  if(diskHash!==base)throw new SidecarConflictError(`${link.folder.name}/${SIDECAR_PATH} changed after DiagramCloud last read it. Nothing was written. Download a backup, then reopen the repository file to review the newer version.`);
- const writable=await handle.createWritable(),hash=await contentHash(text);
+ const hash=await contentHash(text),target=handle??(await sidecarHandle(link.folder,true))!;
+ // getFileHandle(create:true) can return a file that appeared since the missing read.
+ if(!handle&&(await readBoundedText(target)).trim())throw new SidecarConflictError(`${where} appeared before DiagramCloud could create it. Nothing was written. Reopen the repository file to review it.`);
+ const writable=await target.createWritable();
  try{await writable.write(text);await writable.close();}
  catch(error){
   const attempt:SidecarAttempt={projectId:project.id,revision:project.revision,hash,bytes:new TextEncoder().encode(text).byteLength,baseHash:base,at:new Date().toISOString()};receipts.set(link.folder,attempt);
@@ -93,11 +121,12 @@ export async function writeSidecar(link:SidecarLink,project:Project):Promise<Sid
 }
 
 /** Review notes shown before a sidecar is written into a Git repository. */
-export function sidecarNotes(project:Project,bytes=new TextEncoder().encode(serializeSidecar(project)).byteLength):string[]{
+export function sidecarNotes(project:Project,bytes=new TextEncoder().encode(sidecarText(project)).byteLength):string[]{
  const privateCount=[project.nodes,project.edges,project.views,project.blocks,project.assets,project.sources].reduce((sum,items)=>sum+items.filter(item=>item.visibility==='private').length,0)+(project.privateNotes?1:0);
  const notes:string[]=[];
  if(privateCount)notes.push(`${privateCount} private object${privateCount===1?'':'s'} will be stored in the repository file. Commit it only where the repository visibility allows that.`);
- if(bytes>SIDECAR_WARN_BYTES)notes.push(`The file is ${(bytes/1024/1024).toFixed(1)} MiB, mostly embedded images. Large sidecars are hard to review in Git.`);
+ if(bytes>MAX_DOCUMENT_BYTES)notes.push('This repository document exceeds the 12 MiB limit and cannot be saved or imported. Keep an authoring backup and reduce embedded images or evidence.');
+ else if(bytes>SIDECAR_WARN_BYTES)notes.push(`The file is ${(bytes/1024/1024).toFixed(1)} MiB. Large sidecars are hard to review in Git.`);
  return notes;
 }
 
