@@ -109,3 +109,39 @@ test('repeated finite generation with changed content does not authorize a stale
  try{await loadWorkspace();const replacement={id:d.id,json:JSON.stringify({...d,title:'Newer copy'}),writer:'other',savedAt:1};s.rows.set(d.id,replacement);await assert.rejects(saveProject(d),/Another tab changed/);assert.deepEqual(s.rows.get(d.id),replacement);}
  finally{s.close();}
 });
+
+test('a stale recovery deletion refuses a replacement even when its timestamp is reused',async()=>{
+ const s=eventStore();s.install();const d=document('delete-replaced');s.rows.set(d.id,{id:d.id,json:'broken',writer:'other',savedAt:1});
+ try{await loadWorkspace();const replacement={id:d.id,json:JSON.stringify(d),writer:'other',savedAt:1};s.rows.set(d.id,replacement);await assert.rejects(deleteRow(d.id),/changed|reload/i);assert.deepEqual(s.rows.get(d.id),replacement);}
+ finally{s.close();}
+});
+
+test('a stale deletion of an already removed row keeps the external-deletion guard',async()=>{
+ const s=eventStore();s.install();const d=document('delete-disappeared');s.rows.set(d.id,{id:d.id,json:JSON.stringify(d),writer:'other',savedAt:1});
+ try{await loadWorkspace();s.rows.delete(d.id);await assert.rejects(deleteRow(d.id),/removed|reload/i);await assert.rejects(saveProject(d),/Another tab removed/);assert.equal(s.rows.has(d.id),false);}
+ finally{s.close();}
+});
+
+test('deletion cannot authorize removing a project this tab never observed',async()=>{
+ const s=eventStore();s.install();const d=document('delete-unobserved'),row={id:d.id,json:JSON.stringify(d),writer:'other',savedAt:1};s.rows.set(d.id,row);
+ try{await assert.rejects(deleteRow(d.id),/changed|reload/i);assert.deepEqual(s.rows.get(d.id),row);}
+ finally{s.close();}
+});
+
+test('an unchanged quarantined NaN generation can still be explicitly deleted',async()=>{
+ const s=eventStore();s.install();const d=document('delete-nan');s.rows.set(d.id,{id:d.id,json:'broken',writer:'other',savedAt:NaN});
+ try{await loadWorkspace();await deleteRow(d.id);assert.equal(s.rows.has(d.id),false);await saveProject(d);assert.equal((await loadWorkspace()).projects[0]?.id,d.id);}
+ finally{s.close();}
+});
+
+test('a restored row reusing this tab writer cannot overwrite a changed copy',async()=>{
+ const s=eventStore();s.install();const d=document('same-writer-content');
+ try{await saveProject(d);const replacement={...(s.rows.get(d.id) as object),json:JSON.stringify({...d,title:'Newer restored synthetic copy'})};s.rows.set(d.id,replacement);await assert.rejects(saveProject({...d,revision:d.revision+1}),/Another tab changed/);assert.deepEqual(s.rows.get(d.id),replacement);}
+ finally{s.close();}
+});
+
+test('a restored row reusing this tab writer cannot bypass generation conflicts',async()=>{
+ const s=eventStore();s.install();const d=document('same-writer-generation');
+ try{await saveProject(d);const row=s.rows.get(d.id) as {savedAt:number},replacement={...row,savedAt:row.savedAt+1};s.rows.set(d.id,replacement);await assert.rejects(saveProject(d),/Another tab changed/);assert.deepEqual(s.rows.get(d.id),replacement);}
+ finally{s.close();}
+});
