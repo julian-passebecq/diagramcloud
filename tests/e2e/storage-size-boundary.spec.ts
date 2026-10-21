@@ -26,7 +26,9 @@ for(const width of [1440,390])test.describe(`UTF-8 save boundary ${width}`,()=>{
   await page.getByRole('button',{name:'JSON / AI',exact:true}).click();await page.getByLabel('Project JSON',{exact:true}).fill(text);
   await page.getByRole('button',{name:'Validate JSON',exact:true}).click();await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
   await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();const before=await stored(page);
-  await page.getByRole('tab',{name:'Edit',exact:true}).click();await page.getByRole('button',{name:'Inspector',exact:true}).click();
+  await page.getByRole('tab',{name:'Edit',exact:true}).click();
+  if(width===390)await page.getByRole('button',{name:'Detail',exact:true}).click();
+  await page.getByRole('button',{name:'Inspector',exact:true}).click();
   await page.getByLabel('Summary',{exact:true}).fill('界'.repeat(1000));await page.getByRole('button',{name:'Apply project',exact:true}).click();
   const alert=page.getByRole('alert').filter({hasText:'Local save needs attention'});await expect(alert).toContainText('12 MiB');expect(await stored(page)).toBe(before);
   const pending=page.waitForEvent('download');await alert.getByRole('button',{name:'Download backup',exact:true}).click();const file=await pending;
