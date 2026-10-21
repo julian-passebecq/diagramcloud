@@ -48,6 +48,26 @@
         "checksRun": "8 gates run locally on 5dbcd67 by the release agent (typecheck clean; unit 1649 tests, 1646 pass, 3 skipped; build ok; Playwright Chromium 298 tests, 293 pass, 5 skipped; real-atlas quality 26/26; pptx-zip 3 decks, 22 slides; pptx-visual 2 slides viewed by the release agent, not the owner; bundled CLI 21/21) plus GitHub Actions main run 39336345397 success; dry run DRY-RUN.json before the candidate",
         "productionJourney": "not run for this package"
       }
+    },
+    {
+      "version": "1.33.0",
+      "recordedAt": "2026-10-21",
+      "pullRequest": "https://github.com/julian-passebecq/diagramcloud/pull/116",
+      "mergeCommit": "3e907db997783601a43f9e86084ad50196407590",
+      "ci": "https://github.com/julian-passebecq/diagramcloud/actions/runs/39607764586",
+      "tag": "none",
+      "package": "PUBLISHED privately 2026-10-21: juliandatapass-group/galaxy-release-vault generic package diagramcloud/1.33.0-3e907db (14 files, READY.json sha256 78407a6b8ea90b65d3f904761f1dd1d2b5d3167e4b7c4c31bca2f0f8cac6c24b, SHA256SUMS.txt sha256 dc724eb3774fafa3c325d3b1902375910cad2a7a7684aac1fdfbc1c6c9037a1a); authenticated re-download matched every sha256; anonymous access refused (401 files, 404 project)",
+      "packageUrl": "https://gitlab.com/juliandatapass-group/galaxy-release-vault/-/packages/73288601",
+      "packageReceipt": {
+        "sourceSha": "3e907db997783601a43f9e86084ad50196407590",
+        "destination": "https://gitlab.com/api/v4/projects/87564954/packages/generic/diagramcloud/1.33.0-3e907db/",
+        "newImmutablePath": true,
+        "confidentialityScan": "PASS: all four archives extracted and every report file scanned (1317 files); no private paths beyond the same two tracked public mentions as 1.32.0 (a generic docs note and a synthetic redaction fixture), no real secrets (only SYNTHETIC fixtures already public in the repo), no transcripts, no .local, node_modules, fonts or Git internals; source archive equals git tree 3e907db (888 files, identical after line-ending normalisation) plus dist/ and generated public/ files",
+        "authenticatedRedownload": "PASS: 14/14 sha256 match",
+        "anonymousAccess": "refused: 401 on package files, 404 on project and package list",
+        "checksRun": "8 gates run locally on 3e907db by the release agent (typecheck clean; unit 1874 tests, 1871 pass, 3 skipped; build ok; Playwright Chromium 329 tests, 324 pass, 5 skipped; real-atlas quality 3/3 on a local Galaxy atlas, not committed; pptx-zip 3 decks, 52 slides; pptx-visual 2 slides viewed by the release agent, not the owner; bundled CLI 5/5 outputs identical across two runs, invalid input exit 1) plus GitHub Actions main run 39607764586 success; dry run DRY-RUN.json before the candidate",
+        "productionJourney": "not run for this package"
+      }
     }
   ],
   "scopeRule": "Statuses describe code against original feature scope, not release certification. Horizons guide the sole roadmap in docs/ROADMAP.md. Exact packaged source SHA/checks are generated in delivery-receipt.json and READY.json.",
