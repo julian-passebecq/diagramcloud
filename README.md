@@ -65,6 +65,18 @@ Use the visual editors for project metadata, components, connections, child view
 
 The catalogue distinguishes concepts, patterns, procedures, technologies, case studies and view recipes. Examples and practice references are authored learning content, not certifications or deployed-system evidence. [R4 acceptance](docs/product/R4_CROSSWALK.md) records the implemented slices and tests; [the earlier catalogue guide](README_HISTORY_20261021.md#learning-milestone-1260) preserves the original walkthrough.
 
+## Teach an authored explanation
+
+An explanation walkthrough is an **author-written narrative**, not a live trace, an executed simulation or automatic semantic zoom. The author supplies the question, explicit view/component IDs, step order, narration and any before/after tables or frozen code excerpts. These describe an authored case; they do not prove that a system ran or that a result was measured.
+
+The offline compiler produces a private, revision-guarded `diagramcloud.patch`, a preview and an explanation map. It changes neither input and never applies the patch or publishes the result. For example, from a clean checkout:
+
+```sh
+npm run explain -- --project examples/pro-expressiveness/retry-metadata.base.json --request examples/pro-expressiveness/retry-metadata.walkthrough.json --out explanation-output
+```
+
+The output directory must not already exist; each input is limited to 4 MiB of exact UTF-8. Review the generated patch through the ordinary JSON / AI import before applying it. The six teaching projects in [the expressiveness guide](docs/product/EXPRESSIVENESS.md) are labelled synthetic examples, not observed runs. The companion pane follows explicit related-context connections; similarly named subjects are not inferred correspondence. **Focused explanation HTML** exports the selected public story for offline reading, with its code/state evidence. An in-App walkthrough request editor and the companion’s Contract and Questions tabs remain unfinished.
+
 ## Project Intelligence (1.24.0)
 
 Repository, Guided and Hybrid analysis feed the same reviewed document path. Static declarations and inferred candidates remain distinct from runtime facts. [The earlier analysis guide](README_HISTORY_20261021.md#project-intelligence-1240) describes the entry points; [the AI guide](docs/AI_GUIDE.md) records the current commands.
