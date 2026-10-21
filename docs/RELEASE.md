@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.32.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.33.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -35,6 +35,7 @@ CI (`.github/workflows/ci.yml`) runs typecheck, unit tests, build and Chromium t
 - **Unit/contract** (`tests/*.test.ts`): document validation, public projection, patches and revision guards, change preview, save queue, storage recovery, story, realization lifecycle and export parity, Galaxy contracts and the receipt, Mongoku projection contract, export scene geometry (no route through a box on any sample), icons and their blobs, PPTX/deck structure and links, table and transformation authoring.
 - **Browser** (`tests/e2e/*.spec.ts`, Chromium): gallery and drilldown, task workspaces, editing with undo/redo and reload, visual table/transformation/source editors, Inspector grammar, observation review and portfolio index, Galaxy snapshot → review → SVG/HTML/PPTX/PNG, deep links, public projection and escaping, two-tab conflicts, storage open/quota failures, corrupt rows, stale JSON/patch imports, offline standalone HTML, reduced motion, dark mode, laptop and phone layouts.
 - **1.32.0 gate additions** (all in the full `npm run test:e2e`): `tests/e2e/v3-linked.spec.ts` (linked views at 1440 and 390, default surface), `tests/e2e/meeting-summary.spec.ts`, `tests/e2e/review-workspace.spec.ts`, `tests/e2e/domain-data-export.spec.ts`, `tests/e2e/linked-reading-export.spec.ts` and the three new journeys in `tests/e2e/v3-release.spec.ts` (Galaxy-style plan, synthetic commerce join and meeting summary, world/data correspondence with a catalogue pattern).
+- **1.33.0 gate additions** (all in the full `npm run test:e2e`): `tests/e2e/learning-release-recovery.spec.ts` (Beacon save/reload/reopen, brainstorm focus, private pins versus public export, at 1440 and 390), `tests/e2e/storage-multi-project.spec.ts`, `tests/e2e/brainstorming.spec.ts`, `tests/e2e/interview-practice.spec.ts`, `tests/e2e/reading-wayfinder.spec.ts` and `tests/e2e/delivery-task-links.spec.ts`.
 - **Screenshots** land in `test-results/` (release journey, viewports, editors, exports); review them, do not only read the pass count.
 
 ## Static deployment check

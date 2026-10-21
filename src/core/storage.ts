@@ -1,3 +1,4 @@
+import {canonical} from './learningMapping';
 import {errorMessage,parseDocument,type Project} from './model';
 const TAB_ID=crypto.randomUUID();let connection:Promise<IDBDatabase>|undefined;const known=new Map<string,number>();
 
@@ -15,15 +16,31 @@ export function storageErrorMessage(error:unknown):string{
 }
 
 function open():Promise<IDBDatabase>{
- if(!connection)connection=new Promise((resolve,reject)=>{
-  // indexedDB can be missing or throw synchronously (blocked site data); a later call may try again.
-  let r:IDBOpenDBRequest;try{r=indexedDB.open('diagramcloud-v1',1);}catch(error){connection=undefined;reject(new Error(storageErrorMessage(error)));return;}let blocked=false;
-  r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('projects'))r.result.createObjectStore('projects',{keyPath:'id'});};
-  r.onsuccess=()=>{if(blocked){r.result.close();return;}r.result.onversionchange=()=>{r.result.close();connection=undefined;};resolve(r.result);};
-  r.onerror=()=>{connection=undefined;reject(r.error?new Error(storageErrorMessage(r.error)):new Error('Could not open local workspace'));};
-  r.onblocked=()=>{blocked=true;connection=undefined;reject(new Error('Close older DiagramCloud tabs to open storage'));};
- });
+ if(!connection){
+  // Assign the attempt before clearing a rejected one. Clearing from inside a
+  // synchronous Promise executor would be overwritten by the assignment itself.
+  const attempt=new Promise<IDBDatabase>((resolve,reject)=>{
+   let r:IDBOpenDBRequest;try{r=indexedDB.open('diagramcloud-v1',1);}catch(error){reject(new Error(storageErrorMessage(error)));return;}let blocked=false;
+   r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('projects'))r.result.createObjectStore('projects',{keyPath:'id'});};
+   r.onsuccess=()=>{if(blocked){r.result.close();return;}r.result.onversionchange=()=>{r.result.close();if(connection===attempt)connection=undefined;};resolve(r.result);};
+   r.onerror=()=>reject(r.error?new Error(storageErrorMessage(r.error)):new Error('Could not open local workspace'));
+   r.onblocked=()=>{blocked=true;reject(new Error('Close older DiagramCloud tabs to open storage'));};
+  });
+  connection=attempt;
+  // A late failure from an older request must not clear a newer connection.
+  void attempt.catch(()=>{if(connection===attempt)connection=undefined;});
+ }
  return connection;
+}
+
+/** Resolve only whether startup drafts can be queued, never merge their contents.
+ * Revision equality is NOT document equality. Conflicting stored copies must stay
+ * untouched until the user backs up and reopens/reviews them.
+ */
+export function planWorkspaceDraftSaves(saved:readonly Project[],drafts:readonly Project[]):{pending:Project[];conflicts:string[]}{
+ const prior=new Map(saved.map(doc=>[doc.id,doc])),pending:Project[]=[],conflicts:string[]=[];
+ for(const doc of drafts){const stored=prior.get(doc.id);if(!stored)pending.push(doc);else if(canonical(stored)!==canonical(doc))conflicts.push(doc.id);}
+ return {pending,conflicts};
 }
 
 /** Load every healthy row independently. Corrupt rows remain untouched for recovery instead of disabling the whole workspace. */
@@ -56,7 +73,10 @@ export async function saveProject(doc:Project):Promise<void>{
  return new Promise((resolve,reject)=>{
   const tx=db.transaction('projects','readwrite'),store=tx.objectStore('projects');let problem:Error|null=null;let timestamp=0;
   const r=store.get(doc.id);
-  r.onsuccess=()=>{const previous=r.result as Row|undefined,expected=known.get(doc.id);if(previous&&previous.writer!==TAB_ID&&previous.savedAt!==expected){problem=new Error('Another tab changed this project. Export your JSON, then reload before editing.');tx.abort();return;}timestamp=Math.max(Date.now(),(previous?.savedAt??0)+1);
+  r.onsuccess=()=>{const previous=r.result as Row|undefined,expected=known.get(doc.id);if(previous&&previous.writer!==TAB_ID&&(!known.has(doc.id)||previous.savedAt!==expected)){problem=new Error('Another tab changed this project. Export your JSON, then reload before editing.');tx.abort();return;}
+   // A disappeared, previously loaded row is an external deletion. Only the
+   // explicit same-tab delete/adopt flow may establish a fresh creation basis.
+   if(!previous&&known.has(doc.id)){problem=new Error('Another tab removed this project. Export your JSON, then reload before restoring it.');tx.abort();return;}timestamp=Math.max(Date.now(),(previous?.savedAt??0)+1);
    // A throwing put (quota, serialization) would abort with no reason; keep the real one.
    try{store.put({id:doc.id,json:JSON.stringify(doc),writer:TAB_ID,savedAt:timestamp} satisfies Row);}catch(error){problem=new Error(storageErrorMessage(error));tx.abort();}};
   tx.oncomplete=()=>{known.set(doc.id,timestamp);resolve();};

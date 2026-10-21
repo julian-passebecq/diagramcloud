@@ -39,3 +39,15 @@ for(const width of [1440,390])test.describe(`catalogue interview ${width}`,()=>{
   await expect(page.getByLabel('Your practice answer')).toHaveValue('');
  });
 });
+
+for(const width of [1440,390])test.describe(`practice confirmation focus ${width}`,()=>{
+ test.use({viewport:{width,height:width===390?844:1000},reducedMotion:'reduce'});
+ test('clear confirmation, cancellation and confirmation keep a usable keyboard location',async({page})=>{
+  await page.goto('/?catalogue');await page.getByText('Interview practice \u00b7 four-question rounds and fictional company cases',{exact:true}).click();
+  const practice=page.getByRole('region',{name:'Interview practice',exact:true}),clear=practice.getByRole('button',{name:'Clear local practice',exact:true});
+  await practice.getByLabel('Your practice answer',{exact:true}).fill('Kept until explicit clear');await clear.focus();await page.keyboard.press('Enter');
+  await expect(practice.getByRole('button',{name:'Confirm clear',exact:true})).toBeFocused();
+  await practice.getByRole('button',{name:'Keep answers',exact:true}).focus();await page.keyboard.press('Enter');await expect(clear).toBeFocused();await expect(practice.getByLabel('Your practice answer',{exact:true})).toHaveValue('Kept until explicit clear');
+  await page.keyboard.press('Enter');await page.keyboard.press('Enter');await expect(clear).toBeFocused();await expect(practice.getByLabel('Your practice answer',{exact:true})).toHaveValue('');
+ });
+});

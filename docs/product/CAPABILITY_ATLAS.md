@@ -1,6 +1,10 @@
 # DiagramCloud capability atlas: a navigation index, not another backlog
 
-20 October 2026. Integrated baseline: 1.32.0; main 27916ed includes F/G/H and the later saved-linked-context fix. The private 1.32.0 package is pinned to 5dbcd67 and does not include that later fix. The new delivery/task reading contribution is prepared source, not a successor package. `docs/ROADMAP.md`, `R4_CROSSWALK.md`, `V3_WORKSPACE.md` and exact native receipts own acceptance. This index groups those responsibilities to keep broader vision visible during a narrow pass. Update links and boundaries, not a competing percent-complete column. CSV can be generated for analysis; there is no Pro-only secret feature authority.
+21 October 2026. PR115 is integrated at main `fa4ae5ac766a475aa77402729e391012498f22c1`; main CI39521754409 succeeded.
+The old private1.32.0-5dbcd67 package remains immutable and lacks PR113/PR115. Learning/ideas, task links and orientation
+are native source now, not unsent prototypes. This pass supplies exact-route/focus/representation repairs and six native recovery
+cases; they are not a successor release. See [release readiness](RELEASE-READINESS-20261021.md). ROADMAP/RESUME and
+V3_WORKSPACE own acceptance; this file is a hierarchical index, not another backlog.
 
 ## 1. Understand a client and its outcomes
 
@@ -22,7 +26,7 @@ Same source / different perspectives; version/variant differences; cross-project
 
 ## 5. Explain engineering activity, Git and release
 
-Five coordinated lenses: native source ancestry, feature/problem associations, attempts/run chronology, declared architecture impact, source-to-artifact/qualification lineage. Existing historyLens already models rich facets and uncertainty. Native 1.32 mounts the five history questions and a supplied-plan panel. UX26/27 are implemented for that bounded plan; UX29/30 remain partial. The current source contribution corrects subtotal/conflict/file identity and adds explicit byte/scope/revision-bound PM task links plus supplied token allowances; native qualification of those changes is pending. Complete result-chain verification and calendars are not established. No new scheduler or automatic agent authority.
+Five coordinated lenses: native source ancestry, feature/problem associations, attempts/run chronology, declared architecture impact, source-to-artifact/qualification lineage. Existing historyLens already models rich facets and uncertainty. Native 1.32 mounts the five history questions and a supplied-plan panel. UX26/27 are implemented for that bounded plan; UX29/30 remain partial. PR115 integrates subtotal/conflict/file identity repairs, explicit byte/scope/revision-bound PM task links and supplied token allowances. Preserve its native evidence; no successor package yet. Complete result-chain verification and calendars are not established. No new scheduler or automatic agent authority.
 
 ## 6. Teach through catalogue and examples
 
@@ -49,7 +53,7 @@ Retain UX01-UX34 as written in `V3_WORKSPACE.md`. Reconciled numbering, marked i
 
 ### Current continuation: trustworthy supplied work, not another work engine
 
-Use the existing roadmap: qualify the delivery/task reading fixes and explicit PM snapshot correspondence, then package a
+Use the current release-readiness section: preserve the adopted delivery/task reading and PM snapshot correspondence, close the selected recovery gates, then package a
 distinct source cut that also includes PR113. Keep the 1.32 package immutable. The new source advances UX29/30 without
 renumbering them or calling calendar/live-result coverage complete. App, integration and release stay with one native lead.
 
@@ -62,3 +66,31 @@ universal importers, live collectors and execution are optional separately selec
 [Selected continuation](LEARNING-IDEATION-CONTINUATION.md) preserves the prior delivery-reading fixes and adds original interview practice, full-stack teaching, a reading wayfinder, phase strip and idea portfolio. [Acceptance proposals](LEARNING-IDEATION-ACCEPTANCE.md) map into the existing native roadmap. This is not a new released version.
 
 Brainstorming reads proposals/alternatives/opinions; selected work and delivery evidence remain separate. The private FOIL sample is an attributed discussion, not authority to build AI/CAD/cloud tools. Parent context and history are different. Portfolio website implementation, universal live org dashboards and free docking remain later horizons. No separate Pro-only CSV truth or task system.
+
+
+## Current learning/idea reading and release gaps (21 October)
+
+Native UX39-44 cover64questions/16rounds, private local drafts and self-review, idea brief/import, candidate-only brainstorming,
+explicit hierarchy and supplied phases. New source repairs route-occurrence currentness and focus/view transitions; they add no
+new mode. UX45 still needs the supplied real saved-copy/reopen test; UX46 needs the actual successor package/qualification.
+The old prepared-source statements below/above are historical context, not a command to reapply PR115. Later company/public
+portfolio, source-refresh and selected cross-project work are proposals, not running tasks. Do not build the example FOIL tools.
+
+
+#### Direct release hardening - 21 October 2026
+
+The current source continuation protects unsaved multi-project drafts, rejects silent startup collisions,
+provides exact in-memory backups and preserves keyboard position. It does not expand the product into another
+storage engine, autosync service or learner database. Prior explanation, mapping, join, catalogue, ideas,
+comparison, meeting, Git/readiness and export capabilities remain selected. Wider onboarding/refresh,
+question-led cross-project views and a later portfolio/physical client stay successor proposals.
+The owner chose direct Pro continuation without a Claude handoff. Exact runtime and package qualification
+remain distinct from these source changes; see RELEASE-READINESS-20261021.md.
+
+
+### Direct recovery checkpoint, 21 October 2026
+
+Preserve the recovered direct-hardening implementation (including interview focus). The additional
+local-storage guards, per-project quarantine acknowledgement and failure-visible backups strengthen
+existing authoring/recovery; they introduce no new capability category. UX45/46 stay partial until
+actual App/installed/release gates pass. Continue Pro directly, not another native handoff.

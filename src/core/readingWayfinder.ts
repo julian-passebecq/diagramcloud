@@ -4,7 +4,7 @@ import {childLinks,isPermittedPath} from './hierarchy';
 import {canonical,fnv64} from './learningMapping';
 
 export type WayfinderPick={sourceKey:string;path:string[];viewId:string;nodeId?:string};
-export type WayfinderItem={label:string;pick:WayfinderPick;depth:number};
+export type WayfinderItem={label:string;pick:WayfinderPick;depth:number;current:boolean};
 export type ReadingWayfinderModel={
  projectId:string;title:string;revision:number;sourceKey:string;available:boolean;
  trail:WayfinderItem[];level:WayfinderItem[];children:WayfinderItem[];tree:WayfinderItem[];truncated:boolean;
@@ -17,7 +17,7 @@ export function prepareReadingWayfinder(input:Project,audience:'author'|'public'
  const empty={...base,available:false,trail:[],level:[],children:[],tree:[],truncated:false};
  if(!isPermittedPath(doc,prefix))return empty;
  const title=(id:string)=>doc.views.find(v=>v.id===id)!.title;
- const item=(p:string[],nodeId?:string):WayfinderItem=>({label:title(p[p.length-1]),depth:p.length-1,pick:{sourceKey,path:[...p],viewId:p[p.length-1],...(nodeId?{nodeId}:{})}});
+ const item=(p:string[],nodeId?:string):WayfinderItem=>({label:title(p[p.length-1]),depth:p.length-1,current:p.length===prefix.length&&p.every((id,i)=>id===prefix[i]),pick:{sourceKey,path:[...p],viewId:p[p.length-1],...(nodeId?{nodeId}:{})}});
  const childrenOf=(p:string[])=>{
   const seen=new Set<string>();
   return childLinks(doc,p[p.length-1]).filter(x=>!p.includes(x.viewId)&&!seen.has(x.viewId)&&!!seen.add(x.viewId)).map(x=>item([...p,x.viewId]));

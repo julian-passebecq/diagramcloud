@@ -1,3 +1,30 @@
+## Direct Pro recovery checkpoint - 21 October 2026 (source, not a release)
+
+The failed response did not erase the private direct-hardening source checkpoint. Its exact
+24-path differential was recovered and retained. The additional storage deletion/unadopted-row,
+project-specific recovery and backup-failure repairs are described in
+`docs/product/RELEASE-READINESS-20261021.md`. Continue here under Pro ownership; no Claude
+handoff or worker launch. Full App/installed acceptance and successor packaging remain pending.
+No previous delivered package or broader product scope is replaced by this source checkpoint.
+
+## Direct Pro release-hardening checkpoint - 21 October 2026
+
+The owner requested continuation here without a Claude handoff. This is an isolated source differential against
+`fa4ae5ac766a475aa77402729e391012498f22c1`, not an adopted product-main commit or successor application release.
+The prior release-readiness repairs are retained; do not reapply their separate patch over this consolidated tree.
+See [current readiness record](product/RELEASE-READINESS-20261021.md) for direct changes, evidence and remaining gates.
+Keep private `diagramcloud/1.32.0-5dbcd67` immutable. No native worker, cloud resource, CI job or deployment was launched.
+
+---
+
+## Current selected release continuation - 21 October 2026
+
+PR115/fa4ae5a is integrated and main CI39521754409 succeeded. Do not redispatch the old learning/ideas or delivery-reading
+source adoption. Follow [release readiness](product/RELEASE-READINESS-20261021.md): recover, reconcile the exact-route and
+brainstorm focus/view fixes, qualify the six actual-App recovery cases, then package one coherent authorized private successor.
+UX40/43 repairs extend existing acceptance; UX44 gets an explicit public-route/export test; UX45/46 remain partial pending
+native save/reopen and release evidence. No new feature IDs or parallel backlog. Existing lower sections retain wider horizons.
+
 # Roadmap
 
 Current state and verification live in [README.md](../README.md) and [RELEASE.md](RELEASE.md). This page lists what 1.0 contains, the honest post-V1 boundaries, and (below) the historical pass logs.
