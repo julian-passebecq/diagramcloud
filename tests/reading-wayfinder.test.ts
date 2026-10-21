@@ -28,3 +28,28 @@ test('changed content at same revision invalidates pick',()=>{const d=fixture(),
 test('public audience refuses author-cut pick',()=>{const d=fixture(),p=prepareReadingWayfinder(d,'author',['root'],'root').children[0].pick;assert.equal(resolveWayfinderPick(d,'public',p),null);});
 test('forged path and unknown selected entity refused',()=>{const d=fixture(),p=prepareReadingWayfinder(d,'author',['root'],'root').children[0].pick;assert.equal(resolveWayfinderPick(d,'author',{...p,path:['root','query'],viewId:'query'}),null);assert.equal(resolveWayfinderPick(d,'author',{...p,nodeId:'absent'}),null);});
 test('empty invalid path does not silently switch to root',()=>{assert.equal(prepareReadingWayfinder(fixture(),'author',[],'root').available,false);});
+
+// A shared view has several occurrences, but only the chosen path is current.
+test('exact current path is unique among shared-view occurrences',()=>{
+ const doc=fixture(),v=prepareReadingWayfinder(doc,'author',['root','data-view','query'],'query');
+ assert.deepEqual(v.tree.filter(x=>x.current).map(x=>x.pick.path),[['root','data-view','query']]);
+ assert.deepEqual(v.trail.filter(x=>x.current).map(x=>x.pick.viewId),['query']);
+ assert.equal(v.children.some(x=>x.current),false);
+});
+test('changing the chosen parent transfers the current occurrence, not every shared view',()=>{
+ const doc=fixture();
+ for(const parent of ['app-view','data-view']){
+  const v=prepareReadingWayfinder(doc,'author',['root',parent,'query'],'query');
+  assert.deepEqual(v.tree.filter(x=>x.current).map(x=>x.pick.path),[['root',parent,'query']]);
+  assert.equal(v.tree.filter(x=>x.pick.viewId==='query'&&!x.current).length,1);
+ }
+});
+test('root current marker does not mark its children',()=>{
+ const v=prepareReadingWayfinder(fixture(),'author',['root'],'root');
+ assert.equal(v.tree.filter(x=>x.current).length,1);assert.equal(v.tree[0].current,true);
+ assert.ok(v.children.every(x=>!x.current));assert.equal(v.level[0].current,true);
+});
+test('invalid path has no current occurrence or guessed parent',()=>{
+ const v=prepareReadingWayfinder(fixture(),'public',['root','private-view'],'private-view');
+ assert.equal(v.available,false);assert.equal(v.tree.filter(x=>x.current).length,0);
+});

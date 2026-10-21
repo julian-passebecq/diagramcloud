@@ -4,7 +4,7 @@ import {prepareReadingWayfinder,type WayfinderItem,type WayfinderPick} from '../
 export function ReadingWayfinder({document,audience,path,activeView,onNavigate}:{document:Project;audience:'author'|'public';path:readonly string[];activeView:string;onNavigate:(pick:WayfinderPick)=>void}){
  const model=useMemo(()=>prepareReadingWayfinder(document,audience,path,activeView),[document,audience,path,activeView]);
  const [style,setStyle]=useState<'levels'|'tree'>('levels');
- const button=(x:WayfinderItem)=> <button type="button" key={JSON.stringify(x.pick.path)} aria-current={x.pick.viewId===activeView?'location':undefined} onClick={()=>onNavigate(x.pick)}>{x.label}</button>;
+ const button=(x:WayfinderItem)=> <button type="button" key={JSON.stringify(x.pick.path)} aria-current={x.current?'location':undefined} onClick={()=>onNavigate(x.pick)}>{x.label}</button>;
  return <details className="dc-wayfinder"><summary>Where am I? · {model.title} · {model.trail.at(-1)?.label??'Route unavailable'}</summary>
   <p className="dc-wayfinder-note">Reading/navigation only · {audience} · document revision {model.revision}. These levels are not delivery stages, elapsed time or completion.</p>
   {!model.available?<p role="status">This route is no longer available in the permitted source. Use the existing explorer to choose a valid route.</p>:<>

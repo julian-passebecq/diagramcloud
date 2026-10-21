@@ -1,15 +1,48 @@
-# Prepared next source: delivery evidence and exact task reading (20 October 2026)
+# Now: 1.33.0 on branch claude/diagramcloud-release-1.33; private candidate after merge
 
-This Pro contribution is prepared against main 27916ed and is not yet a new qualified package. The completed unified
-1.32 handoff below remains delivered. Its private package source is 5dbcd67, so the later PR113 saved-linked-context fix
-is on main but not in that package. Keep both identities and all prior receipts.
-
-Next: follow the existing roadmap's delivery-readout continuation, run the new actual-App task-binding/race/privacy
-journeys and affected native gates, then package distinctly within recovered grants. Read
-`docs/contracts/delivery-task-reading.md`; preserve wider UX29/30/calendar/result-chain limits. Current native dirty
-state and adoption still need recovery; this text neither launches an agent nor updates a running session.
+Source, storage-recovery hardening and the six recovery cases are integrated; gates and counts are recorded in the PR. Older checkpoints below are history.
 
 ---
+
+## Direct Pro recovery checkpoint - 21 October 2026 (source, not a release)
+
+The failed response did not erase the private direct-hardening source checkpoint. Its exact
+24-path differential was recovered and retained. The additional storage deletion/unadopted-row,
+project-specific recovery and backup-failure repairs are described in
+`docs/product/RELEASE-READINESS-20261021.md`. Continue here under Pro ownership; no Claude
+handoff or worker launch. Full App/installed acceptance and successor packaging remain pending.
+No previous delivered package or broader product scope is replaced by this source checkpoint.
+
+## Direct Pro release-hardening checkpoint - 21 October 2026
+
+The owner requested continuation here without a Claude handoff. This is an isolated source differential against
+`fa4ae5ac766a475aa77402729e391012498f22c1`, not an adopted product-main commit or successor application release.
+The prior release-readiness repairs are retained; do not reapply their separate patch over this consolidated tree.
+See [current readiness record](docs/product/RELEASE-READINESS-20261021.md) for direct changes, evidence and remaining gates.
+Keep private `diagramcloud/1.32.0-5dbcd67` immutable. No native worker, cloud resource, CI job or deployment was launched.
+
+---
+
+# Now / Next - 21 October 2026: PR115 integrated; successor release pending
+
+**Verified source.** PR115 merged as `fa4ae5ac766a475aa77402729e391012498f22c1`; main CI39521754409 succeeded.
+Interview practice, brainstorming/import, the displayed reading wayfinder and exact task links are integrated. Preserve the
+native CSS-entrypoint, LF task fixture, citation-line, compact helper and type repairs. Do not reapply the earlier packets.
+
+**Package.** Private `diagramcloud/1.32.0-5dbcd67` remains delivered and immutable, but predates PR113/PR115.
+No new version/private candidate is established by this source contribution. Source main is not installed delivery.
+
+**Selected continuation.** Apply only nonduplicate exact-route/focus/representation fixes and run the six supplied actual-App
+recovery cases. See [release readiness](docs/product/RELEASE-READINESS-20261021.md). UX45 (Beacon saved copy reopen)
+and UX46 (coherent qualified private successor) remain partial until their actual gates pass. New pure/component tests are
+supporting evidence, not full pinned/App/installed qualification. One native lead owns integration and release identity.
+
+**Boundary.** Preserve all broader features. No FOIL implementation, portfolio website, new runner/service/permission or
+public/production release is selected here. Current laptop dirty state and processes are not observable from this source record.
+
+## Historical checkpoints below
+
+These preserve prior decisions and receipts. Their old Next/Left/forecast paragraphs are historical; use the current section above.
 
 # Now / Next (2026-10-19, 1.32.0 unified continuation)
 

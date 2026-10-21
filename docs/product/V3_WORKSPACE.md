@@ -128,7 +128,7 @@ Merged lanes A (linked views and default surface), B (delivery evidence, history
 Still open after 1.32.0: UX29 and UX30 are partial (above); no cross-project correspondence in linked views, no free docking, no link from delivery blocks to PM tasks, no token forecast, no live collector or dispatch, no capacityScenario App surface, no PDF/PPTX meeting output, no question or decision dock panels.
 
 
-## Prepared delivery/task reading contribution (20 October 2026; native qualification pending)
+## Prepared delivery/task reading contribution (20 October 2026; qualified natively in 1.33.0)
 
 The existing UX29/UX30 rows stay PARTIAL. Source tests now cover a complete-versus-known effort subtotal, explicit blockers,
 portfolio product relations distinct from work prerequisites, bounded case/root/resource conflicts, supplied input/output
@@ -136,7 +136,7 @@ token allowances and exact PM task correspondence. The mounted DeliveryEvidenceP
 entrypoint; no App route, authority, layout store or new acceptance ID is introduced.
 
 The task reference is consumer metadata, not a PM admission envelope. Read [the contract](../contracts/delivery-task-reading.md).
-New `tests/e2e/delivery-task-links.spec.ts` must pass in the native App before recording installed/integrated acceptance.
+New `tests/e2e/delivery-task-links.spec.ts` passes in the native App as part of the 1.33.0 gates.
 Invalid or late file completion must preserve the latest valid source, and public/audience changes must withhold task data.
 No live result collector, automatic calendar, usage bill or verified release chain is delivered by a matching task ID.
 
@@ -152,7 +152,32 @@ The consolidated learning/ideas contribution (packet SHA-256 `2fe593b7...0dd6`, 
 | UX42 | LC04 | A `diagramcloud.ideation-brief/1` file in JSON / AI validates, compiles to an ordinary Project and stages it in the ordinary import review (Apply is the normal Apply); it never overwrites an existing project; supplied discussions stay private; ideas keep candidate choices and zero observations. | implemented in the App dispatcher (`src/app/stageImport.ts`): `tests/ideation-import.test.ts`, `tests/ideation.test.ts`; `tests/e2e/brainstorming.spec.ts`. Not in the CLI or MCP. |
 | UX43 | LC05 | Brainstorm read mode (workspace toggle "Brainstorm", author audience only): group filter, cards, comparison matrix and consideration board over stable idea IDs; unknown feasibility is never low; Focus, Pin and the optional "Show parent context" reminder keep orientation; unsupported metadata is a visible gap. | implemented: `tests/ideation.test.ts` ("consideration is not delivery status or approval", "duplicate memberships refuse rather than inflate counts"); `tests/e2e/brainstorming.spec.ts` "ordinary import then read-only focus, parent reminder and comparison". |
 | UX44 | LC06 | Audience, privacy and source changes invalidate picks, pins and private search and counts; the private compiled root carries no client title or question; an export never raises a proposal or a source claim. | implemented: `tests/ideation.test.ts` ("supplied discussion defaults private and public export has no source, grouping or idea payload", "supplied discussion cannot auto-opt into public disclosure"); `tests/e2e/brainstorming.spec.ts` "private discussion retains author context without fabricating completion". |
-| UX45 | LC07 | The fictional Beacon full-stack Project imports and drills through request, data and IaC layers and back under the chosen parent. | partial: `tests/interview-client.test.ts`; `tests/e2e/reading-wayfinder.spec.ts` imports, saves locally and navigates it. A reload/reopen of the saved copy is not in that spec. |
-| UX46 | LC08 | Delivery-reading correction and saved-linked-context main delta integrated; full native gates; a distinct private candidate with a qualified receipt. | partial: delivery task links `tests/delivery-task-links.test.ts`, `tests/delivery-integrity.test.ts`, `tests/e2e/delivery-task-links.spec.ts` (1440 and 390); full unit, build and e2e suites run on this branch. No new version or private candidate is cut by this change; that is the next release step. |
+| UX45 | LC07 | The fictional Beacon full-stack Project imports and drills through request, data and IaC layers and back under the chosen parent. | implemented: `tests/interview-client.test.ts`; `tests/e2e/learning-release-recovery.spec.ts` "Beacon saved copy and its chosen shared parent survive real reload and reopen" (1440 and 390: local save, IndexedDB copy, reload, reopen by deep link, chosen-parent saved context restored); `tests/e2e/reading-wayfinder.spec.ts`. |
+| UX46 | LC08 | Delivery-reading correction and saved-linked-context main delta integrated; full native gates; a distinct private candidate with a qualified receipt. | partial: 1.33.0 source integrated with full native gates; private candidate recorded after merge in `outcome.json`. Delivery task links `tests/delivery-task-links.test.ts`, `tests/delivery-integrity.test.ts`, `tests/e2e/delivery-task-links.spec.ts` (1440 and 390). |
 
 The FOIL discussion in the packet is sample content only and is not in this repository; none of its tools, migrations or cloud proposals is implemented.
+
+
+### Release-readiness source differential (21 October 2026, after PR115)
+
+PR115/fa4ae5a and main CI39521754409 are independently verified. The next source fixes exact-current path display (UX40)
+and keyboard focus/representation switching (UX43), without renumbering acceptance. New pure/current-component checks pass.
+`tests/e2e/learning-release-recovery.spec.ts` supplies six real-App cases at1440/390: Beacon save/reload/reopen/shared-parent
+restoration (UX45), focus/view recovery (UX40/43), and private pin/search -> public export -> author return (UX44).
+These cases were NOT_RUN in the Pro environment (loopback navigation refused); they run in the native 1.33.0 gates and UX45 is implemented there.
+Follow [release readiness](RELEASE-READINESS-20261021.md); full native and coherent private successor gates remain required.
+
+
+### Direct Pro hardening, 21 October 2026 (source only)
+
+Keep UX39-46 and the prior recovery additions. UX45 now also includes multi-project save failure visibility,
+exact in-memory backup selection and same-revision/different-content startup collision preservation. A successful
+save of another project must not clear pending work or its tab-close guard. UX39 retains session-only practice
+answers and adds action-bound Clear/Keep/Confirm keyboard recovery; passive mounting cannot steal focus.
+Public recovery notices expose no private draft identity or authoring backup control. Compact recovery actions wrap.
+
+`tests/e2e/storage-multi-project.spec.ts` supplies four fault-injected real-App cases (two journeys at 1440/390).
+`tests/e2e/interview-practice.spec.ts` adds two clear/cancel/focus cases. Prior six
+`learning-release-recovery.spec.ts` cases remain required. These were NOT_RUN in the Pro environment, whose
+actual App navigation was refused; they run in the native 1.33.0 gates. The controlled IndexedDB-protocol double is not browser-persistence
+qualification. UX45 is implemented; UX46 stays partial until the private candidate is recorded.
