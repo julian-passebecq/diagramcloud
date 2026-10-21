@@ -17,30 +17,38 @@ export type DeliveryRange = {minMinutes: number; maxMinutes: number; basis: stri
 export type DeliveryInterval = {start: string; end: string; timezone: string | null; basis: DeliveryBasis; sourceIds: string[]};
 export type DeliveryResultRef = {kind: 'commit' | 'pull-request' | 'artifact' | 'check' | 'release' | 'document'; ref: string; url: string | null; basis: DeliveryBasis; sourceIds: string[]};
 export type DeliveryFileset = {repository: string; path: string; access: 'read' | 'write'};
+export type DeliveryProductRelation = {source: string; target: string; kind: string; label: string; sourceId: string | null};
+export type ResourceConflict = {resource: string; blockIds: [string, string]; ordered: boolean};
+export type DeliveryTaskRef = {taskId: string; inputSha256: string; revision: number;
+  scope: {organizationId: string; privacyDomainId: string; projectId: string; repoId: string}};
+export type DeliveryTokens = {input: [number, number] | null; output: [number, number] | null; basis: string; estimatedAt: string | null};
 export type DeliveryBlock = {
   id: string; title: string; productId: string; state: string; dependsOn: string[]; ownerId: string | null;
   acceptance: string; acceptanceIds: string[]; filesets: DeliveryFileset[]; estimate: DeliveryRange | null;
   interval: DeliveryInterval | null; results: DeliveryResultRef[]; sourceIds: string[];
   checkpoint: string | null; promptRef: string | null; phase: number | null;
+  blocker: string | null; boundary: string | null; resources: string[]; taskRefs: DeliveryTaskRef[]; tokens: DeliveryTokens | null;
 };
 export type DeliverySourceIdentity = {repository: string; ref: string; commit: string; purpose: string};
 export type DeliveryView = {
   schema: typeof DELIVERY_VIEW_SCHEMA; title: string; capturedAt: string; visibility: 'public' | 'private';
-  sources: {id: string; title: string; url: string | null; basis: DeliveryBasis; checkedAt: string | null}[];
+  sources: {id: string; title: string; url: string | null; basis: DeliveryBasis; checkedAt: string | null; eventAt: string | null}[];
   products: {id: string; title: string; sourceRevision: string | null; candidateVersion: string | null}[];
   owners: {id: string; title: string; role: string}[];
   blocks: DeliveryBlock[];
   sourceVector: DeliverySourceIdentity[];
+  productRelations: DeliveryProductRelation[];
   ignoredFields: string[];
   inputSha256: string;
 };
-export type OwnerConflict = {repository: string; path: string; blockIds: [string, string]; owners: [string | null, string | null]; ordered: boolean};
-export type NamedGapCode = 'NO_ESTIMATE' | 'NO_ACCEPTANCE' | 'NO_SOURCE' | 'NO_INTERVAL' | 'NO_RESULT' | 'NO_OWNER' | 'UNKNOWN_DEPENDENCY' | 'TOKENS_UNKNOWN' | 'CALENDAR_UNKNOWN';
+export type OwnerConflict = {repository: string; path: string; blockIds: [string, string]; owners: [string | null, string | null]; ordered: boolean; caseAlias?: true};
+export type NamedGapCode = 'NO_ESTIMATE' | 'NO_ACCEPTANCE' | 'NO_SOURCE' | 'NO_INTERVAL' | 'NO_RESULT' | 'NO_OWNER' | 'UNKNOWN_DEPENDENCY' | 'TOKENS_UNKNOWN' | 'CALENDAR_UNKNOWN' | 'SOURCE_BLOCKER' | 'NO_FILESET' | 'RESOURCE_CONFLICT';
 export type NamedGap = {code: NamedGapCode; blockId: string | null; message: string};
 export type DeliveryEvidence = {
   audience: 'author' | 'public'; withheld: boolean; view: DeliveryView | null;
-  conflicts: OwnerConflict[]; gaps: NamedGap[];
-  remaining: {sumMinutes: [number, number] | null; dependencyLowerBoundMinutes: [number, number] | null; unestimated: string[]; calendar: 'UNKNOWN'; notice: string};
+  conflicts: OwnerConflict[]; resourceConflicts: ResourceConflict[]; conflictLimitReached: boolean; gaps: NamedGap[];
+  remaining: {sumMinutes: [number, number] | null; knownSubtotalMinutes: [number, number] | null; dependencyLowerBoundMinutes: [number, number] | null; unestimated: string[]; partial: boolean; calendar: 'UNKNOWN'; notice: string};
+  tokens: {input: [number, number] | null; output: [number, number] | null; unknownInput: string[]; unknownOutput: string[]};
   intervals: {blockId: string; interval: DeliveryInterval}[];
   results: {blockId: string; ref: DeliveryResultRef}[];
 };
@@ -91,16 +99,31 @@ function known(o: Obj, path: string, keys: readonly string[], ignored: Set<strin
   for (const k of Object.keys(o)) if (!keys.includes(k)) ignored.add(path ? `${path}.${k}` : k);
 }
 const TOP = ['schema', 'title', 'captured_at', 'visibility', 'scope_note', 'sources', 'products', 'blocks', 'dependencies', 'handoff'];
-const SOURCE = ['id', 'title', 'url', 'basis', 'checked_at', 'summary'];
+const SOURCE = ['id', 'title', 'url', 'basis', 'checked_at', 'summary', 'event_at'];
 const PRODUCT = ['id', 'title', 'repository', 'mission', 'owner', 'target', 'delivered', 'next', 'launch', 'caveat', 'wave', 'state', 'source_ids', 'source_revision', 'candidate_version'];
-const DETAIL = ['owner_id', 'phase', 'acceptance_ids', 'filesets', 'checkpoint', 'prompt_ref', 'interval', 'results'];
+const DETAIL = ['owner_id', 'phase', 'acceptance_ids', 'filesets', 'checkpoint', 'prompt_ref', 'interval', 'results', 'resources', 'pm_task_refs', 'tokens'];
 const BLOCK = ['id', 'title', 'product_id', 'state', 'depends_on', 'boundary', 'acceptance', 'blocker', 'source_ids', 'estimate', ...DETAIL];
-const BLOCK_DETAIL = ['block_id', ...DETAIL, 'resources', 'deliverables', 'checks', 'model_class', 'model_reason', 'tokens'];
+const BLOCK_DETAIL = ['block_id', ...DETAIL, 'deliverables', 'checks', 'model_class', 'model_reason'];
 const HANDOFF = ['revision', 'outcome', 'non_goals', 'owners', 'source_vector', 'block_details', 'calendar'];
 const OWNER = ['id', 'title', 'role', 'provider_preference', 'activation', 'subagents_hint', 'reason'];
 
 type Detail = {ownerId?: string | null; phase?: number | null; acceptanceIds?: string[]; filesets?: DeliveryFileset[];
-  checkpoint?: string | null; promptRef?: string | null; interval?: DeliveryInterval | null; results?: DeliveryResultRef[]};
+  checkpoint?: string | null; promptRef?: string | null; interval?: DeliveryInterval | null; results?: DeliveryResultRef[];
+  resources?: string[]; taskRefs?: DeliveryTaskRef[]; tokens?: DeliveryTokens | null};
+
+/** Refuse byte-changing UTF-8 decoding (BOM removal or replacement characters from invalid bytes).
+ * Both browser File reads are bounded and immutable; no filename/path is resolved or executed.
+ * This keeps inputSha256 a digest of the selected file bytes rather than an accidental normalized alias.
+ */
+export async function readDeliveryJsonFile(file: {size: number; text(): Promise<string>; arrayBuffer(): Promise<ArrayBuffer>}): Promise<string> {
+  if (!Number.isSafeInteger(file.size) || file.size < 0 || file.size > DELIVERY_VIEW_LIMITS.bytes) return refuse();
+  const raw = await file.text();
+  const encoded = new TextEncoder().encode(raw);
+  if (encoded.byteLength > DELIVERY_VIEW_LIMITS.bytes) return refuse();
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  if (bytes.byteLength !== file.size || bytes.byteLength !== encoded.byteLength || bytes.some((b, i) => b !== encoded[i])) return refuse();
+  return raw;
+}
 
 /** Parses one supplied plan, or refuses it whole with DELIVERY_VIEW_REFUSAL (no partial data). */
 export function parseDeliveryView(raw: string): DeliveryView {
@@ -118,8 +141,8 @@ export function parseDeliveryView(raw: string): DeliveryView {
 
   const sources = array(input.sources, DELIVERY_VIEW_LIMITS.sources).map(s => {
     if (!isObj(s)) return refuse();
-    known(s, 'sources[]', SOURCE, ignored); descriptive(s.summary);
-    return {id: text(s.id, 300), title: text(s.title, 300), url: optText(s.url, 2000), basis: basis(s.basis), checkedAt: optInstant(s.checked_at)};
+    known(s, 'sources[]', SOURCE, ignored); descriptive(s.summary); optInstant(s.event_at);
+    return {id: text(s.id, 300), title: text(s.title, 300), url: optText(s.url, 2000), basis: basis(s.basis), checkedAt: optInstant(s.checked_at), eventAt: optInstant(s.event_at)};
   });
   unique(sources.map(s => s.id));
   const sourceIds = new Set(sources.map(s => s.id));
@@ -166,7 +189,8 @@ export function parseDeliveryView(raw: string): DeliveryView {
       known(f, path + '.filesets[]', ['repository', 'path', 'access'], ignored);
       if (++filesetCount > DELIVERY_VIEW_LIMITS.filesets) refuse();
       const access = f.access === 'read' || f.access === 'write' ? f.access : refuse();
-      return {repository: text(f.repository, 300), path: text(f.path, 1000), access};
+      const pathValue = text(f.path, 1000); normalisePath(pathValue);
+      return {repository: text(f.repository, 300), path: pathValue, access};
     });
     if ('interval' in o) {
       const i = o.interval;
@@ -186,6 +210,32 @@ export function parseDeliveryView(raw: string): DeliveryView {
       const kind = RESULT_KINDS.includes(r.kind as DeliveryResultRef['kind']) ? r.kind as DeliveryResultRef['kind'] : refuse();
       return {kind, ref: text(r.ref, 500), url: optText(r.url, 2000), basis: basis(r.basis), sourceIds: cited(r.source_ids)};
     });
+    if ('resources' in o) d.resources = idList(o.resources, 100);
+    if ('pm_task_refs' in o) d.taskRefs = array(o.pm_task_refs, 100).map(r => {
+      if (!isObj(r) || Object.keys(r).some(k => !['task_id', 'input_sha256', 'revision', 'scope'].includes(k))) return refuse();
+      const scope = r.scope;
+      const keys = ['organizationId', 'privacyDomainId', 'projectId', 'repoId'] as const;
+      if (!isObj(scope) || Object.keys(scope).length !== keys.length || !keys.every(k => typeof scope[k] === 'string' && /^[A-Za-z0-9_.:/-]{1,200}$/.test(scope[k] as string))) return refuse();
+      if (typeof r.input_sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(r.input_sha256) || !Number.isSafeInteger(r.revision) || (r.revision as number) < 0) return refuse();
+      const taskId = text(r.task_id, 200);
+      if (!/^[A-Za-z0-9_.:/-]+$/.test(taskId)) return refuse();
+      return {taskId, inputSha256: r.input_sha256, revision: r.revision as number,
+        scope: Object.fromEntries(keys.map(k => [k, scope[k]])) as DeliveryTaskRef['scope']};
+    });
+    if (d.taskRefs && new Set(d.taskRefs.map(r => JSON.stringify(r))).size !== d.taskRefs.length) refuse();
+    if ('tokens' in o) {
+      if (o.tokens == null || (isObj(o.tokens) && !Object.keys(o.tokens).length)) d.tokens = null;
+      else if (isObj(o.tokens) && ['input','output','basis'].every(k => k in (o.tokens as Obj))) {
+        const t = o.tokens;
+        if (Object.keys(t).some(k => !['input','output','basis','estimated_at'].includes(k))) refuse();
+        const range = (v: unknown): [number, number] | null => {
+          if (v === null) return null;
+          if (!Array.isArray(v) || v.length !== 2 || !v.every(n => Number.isSafeInteger(n) && n >= 0 && n <= 1e12) || v[0] > v[1]) return refuse();
+          return [v[0], v[1]];
+        };
+        d.tokens = {input: range(t.input), output: range(t.output), basis: text(t.basis, 2000), estimatedAt: optInstant(t.estimated_at)};
+      } else {descriptive(o.tokens); ignored.add(path + '.tokens'); d.tokens = null;}
+    }
     return d;
   };
 
@@ -197,6 +247,7 @@ export function parseDeliveryView(raw: string): DeliveryView {
     if (!isObj(b)) return refuse();
     known(b, 'blocks[]', BLOCK, ignored);
     descriptive(b.boundary); descriptive(b.blocker);
+    for (const k of ['boundary','blocker']) if (b[k] != null && typeof b[k] !== 'string') ignored.add('blocks[].' + k);
     const id = text(b.id, 300), productId = text(b.product_id, 300);
     if (!productIds.has(productId)) refuse();
     const dependsOn = idList(b.depends_on);
@@ -212,7 +263,8 @@ export function parseDeliveryView(raw: string): DeliveryView {
     local.set(id, detail(b, 'blocks[]'));
     blocks.push({id, title: text(b.title, 500), productId, state: text(b.state, 80), dependsOn, ownerId: null,
       acceptance: textOrEmpty(b.acceptance), acceptanceIds: [], filesets: [], estimate, interval: null, results: [],
-      sourceIds: cited(b.source_ids), checkpoint: null, promptRef: null, phase: null});
+      sourceIds: cited(b.source_ids), checkpoint: null, promptRef: null, phase: null,
+      blocker: typeof b.blocker === 'string' && b.blocker.trim() ? optText(b.blocker, 8000) : null, boundary: typeof b.boundary === 'string' && b.boundary.trim() ? optText(b.boundary, 8000) : null, resources: [], taskRefs: [], tokens: null});
   }
   unique(blocks.map(b => b.id));
   const byId = new Map(blocks.map(b => [b.id, b]));
@@ -222,9 +274,7 @@ export function parseDeliveryView(raw: string): DeliveryView {
   for (const d of array(handoff.block_details, DELIVERY_VIEW_LIMITS.blocks)) {
     if (!isObj(d)) return refuse();
     known(d, 'handoff.block_details[]', BLOCK_DETAIL, ignored);
-    for (const k of ['resources', 'deliverables', 'checks', 'model_class', 'model_reason']) descriptive(d[k]);
-    // Tokens are not modelled: a supplied tokens value is listed and never read (TOKENS_UNKNOWN stays).
-    if (d.tokens !== undefined && d.tokens !== null && !(isObj(d.tokens) && !Object.keys(d.tokens).length)) ignored.add('handoff.block_details[].tokens');
+    for (const k of ['deliverables', 'checks', 'model_class', 'model_reason']) descriptive(d[k]);
     const id = text(d.block_id, 300);
     if (!byId.has(id) || details.has(id)) refuse();
     details.set(id, detail(d, 'handoff.block_details[]'));
@@ -239,11 +289,21 @@ export function parseDeliveryView(raw: string): DeliveryView {
     b.ownerId = merged.ownerId ?? null; b.phase = merged.phase ?? null; b.acceptanceIds = merged.acceptanceIds ?? [];
     b.filesets = merged.filesets ?? []; b.checkpoint = merged.checkpoint ?? null; b.promptRef = merged.promptRef ?? null;
     b.interval = merged.interval ?? null; b.results = merged.results ?? [];
+    b.resources = merged.resources ?? []; b.taskRefs = merged.taskRefs ?? []; b.tokens = merged.tokens ?? null;
   }
 
-  // Top-level dependencies: {from, to} means `from` depends on `to`; merged into the block's dependsOn.
+  const productRelations: DeliveryProductRelation[] = [];
+  // Two existing producer shapes: block prerequisites and product associations never share edge meaning.
   for (const dep of array(input.dependencies, DELIVERY_VIEW_LIMITS.dependencies)) {
     if (!isObj(dep)) return refuse();
+    if ('source' in dep || 'target' in dep) {
+      if ('from' in dep || 'to' in dep) return refuse();
+      known(dep, 'dependencies[]', ['source', 'target', 'kind', 'label', 'source_id'], ignored);
+      const source = text(dep.source, 300), target = text(dep.target, 300), sourceId = optText(dep.source_id, 300);
+      if (!productIds.has(source) || !productIds.has(target) || (sourceId && !sourceIds.has(sourceId))) return refuse();
+      productRelations.push({source, target, kind: text(dep.kind, 100), label: textOrEmpty(dep.label, 2000), sourceId});
+      continue;
+    }
     known(dep, 'dependencies[]', ['from', 'to'], ignored);
     const from = byId.get(text(dep.from, 300)) ?? refuse(), to = text(dep.to, 300);
     if (!from.dependsOn.includes(to)) {from.dependsOn.push(to); dependencyCount++;}
@@ -260,14 +320,24 @@ export function parseDeliveryView(raw: string): DeliveryView {
   };
   for (const b of blocks) visit(b.id);
 
-  return {schema: DELIVERY_VIEW_SCHEMA, title, capturedAt, visibility, sources, products, owners, blocks, sourceVector,
+  return {schema: DELIVERY_VIEW_SCHEMA, title, capturedAt, visibility, sources, products, owners, blocks, sourceVector, productRelations,
     ignoredFields: [...ignored].sort(), inputSha256: sha256Hex(raw)};
 }
 
-const normalisePath = (p: string) => p.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '');
+/** Lexical repository-relative path. Does not read the filesystem or infer symlink targets. */
+function normalisePath(p: string): string {
+  const value = p.replace(/\\/g, '/');
+  if (value.startsWith('/') || /^[a-z]:/i.test(value) || /[?*\[\]\u0000-\u001f]/.test(value)) return refuse();
+  const parts: string[] = [];
+  for (const part of value.split('/')) {
+    if (!part || part === '.') continue;
+    if (part === '..') {if (!parts.length) return refuse(); parts.pop();} else parts.push(part);
+  }
+  return parts.join('/');
+}
 /** The overlapping path when one equals the other or is a directory prefix of it; otherwise null. */
 function overlap(a: string, b: string): string | null {
-  const x = normalisePath(a), y = normalisePath(b);
+  const x = normalisePath(a).toLowerCase(), y = normalisePath(b).toLowerCase();
   if (x === y) return x;
   if (!x || y.startsWith(x + '/')) return x;
   if (!y || x.startsWith(y + '/')) return y;
@@ -278,8 +348,9 @@ function overlap(a: string, b: string): string | null {
 export function deliveryEvidence(view: DeliveryView, audience: 'author' | 'public'): DeliveryEvidence {
   const notice = REMAINING_NOTICE;
   if (audience === 'public' && view.visibility !== 'public') {
-    return {audience, withheld: true, view: null, conflicts: [], gaps: [],
-      remaining: {sumMinutes: null, dependencyLowerBoundMinutes: null, unestimated: [], calendar: 'UNKNOWN', notice}, intervals: [], results: []};
+    return {audience, withheld: true, view: null, conflicts: [], resourceConflicts: [], conflictLimitReached: false, gaps: [],
+      remaining: {sumMinutes: null, knownSubtotalMinutes: null, dependencyLowerBoundMinutes: null, unestimated: [], partial: false, calendar: 'UNKNOWN', notice},
+      tokens: {input: null, output: null, unknownInput: [], unknownOutput: []}, intervals: [], results: []};
   }
   const blocks = view.blocks, byId = new Map(blocks.map(b => [b.id, b]));
   const ancestors = new Map<string, Set<string>>();
@@ -290,19 +361,31 @@ export function deliveryEvidence(view: DeliveryView, audience: 'author' | 'publi
     return out;
   };
 
+  const conflictLimit = 256; let conflictLimitReached = false;
   const conflicts: OwnerConflict[] = [], seen = new Set<string>();
   const writes = blocks.flatMap((b, i) => b.filesets.filter(f => f.access === 'write').map(f => ({b, i, f})));
   const byRepository = new Map<string, typeof writes>();
   for (const w of writes) byRepository.set(w.f.repository, [...(byRepository.get(w.f.repository) ?? []), w]);
-  for (const [repository, list] of byRepository) for (let x = 0; x < list.length; x++) for (let y = x + 1; y < list.length; y++) {
+  fileConflicts: for (const [repository, list] of byRepository) for (let x = 0; x < list.length; x++) for (let y = x + 1; y < list.length; y++) {
     const [p, q] = list[x].i <= list[y].i ? [list[x], list[y]] : [list[y], list[x]];
     if (p.b.id === q.b.id) continue;
     const path = overlap(p.f.path, q.f.path); if (path === null) continue;
     const key = JSON.stringify([repository, path, p.b.id, q.b.id]); if (seen.has(key)) continue; seen.add(key);
+    if (conflicts.length >= conflictLimit) {conflictLimitReached = true; break fileConflicts;}
+    const px = normalisePath(p.f.path), qx = normalisePath(q.f.path);
+    const exactOverlap = px === qx || !px || !qx || px.startsWith(qx + '/') || qx.startsWith(px + '/');
     conflicts.push({repository, path, blockIds: [p.b.id, q.b.id], owners: [p.b.ownerId, q.b.ownerId],
-      ordered: reach(p.b.id).has(q.b.id) || reach(q.b.id).has(p.b.id)});
+      ordered: reach(p.b.id).has(q.b.id) || reach(q.b.id).has(p.b.id),
+      ...(!exactOverlap ? {caseAlias: true as const} : {})});
   }
 
+  const resourceConflicts: ResourceConflict[] = [];
+  resources: for (let i=0; i<blocks.length; i++) for (let j=i+1; j<blocks.length; j++) {
+    for (const resource of blocks[i].resources) if (blocks[j].resources.includes(resource)) {
+      if (resourceConflicts.length >= conflictLimit) {conflictLimitReached = true; break resources;}
+      resourceConflicts.push({resource, blockIds:[blocks[i].id,blocks[j].id], ordered:reach(blocks[i].id).has(blocks[j].id)||reach(blocks[j].id).has(blocks[i].id)});
+    }
+  }
   const gaps: NamedGap[] = [];
   const gap = (code: NamedGapCode, blockId: string | null, message: string) => gaps.push({code, blockId, message});
   for (const b of blocks) {
@@ -312,16 +395,20 @@ export function deliveryEvidence(view: DeliveryView, audience: 'author' | 'publi
     if (!b.interval) gap('NO_INTERVAL', b.id, 'No dated interval supplied; when this work happened is unknown.');
     if (!b.results.length) gap('NO_RESULT', b.id, 'No result or artifact reference supplied.');
     if (!b.ownerId) gap('NO_OWNER', b.id, 'No owner supplied for this block.');
+    if (!b.filesets.length) gap('NO_FILESET', b.id, 'No fileset supplied; the absence of an overlap is not evidence of independent ownership.');
+    if (b.state.trim().toLowerCase() === 'blocked') gap('SOURCE_BLOCKER', b.id, b.blocker || 'The source declares this block blocked; no reason was supplied.');
     for (const d of b.dependsOn) if (!byId.has(d)) gap('UNKNOWN_DEPENDENCY', b.id, `Depends on “${d}”, which is not in this plan.`);
   }
-  gap('TOKENS_UNKNOWN', null, 'Token use is not supplied or not modelled; it stays UNKNOWN.');
+  if (blocks.some(b => !FINISHED_STATES.has(b.state.trim().toLowerCase()) && (!b.tokens?.input || !b.tokens?.output))) gap('TOKENS_UNKNOWN', null, 'Some unfinished blocks have no supplied token allowance. This is not recorded usage or a bill.');
   gap('CALENDAR_UNKNOWN', null, 'No calendar is modelled; no start or finish date is computed.');
 
   const unfinished = blocks.filter(b => !FINISHED_STATES.has(b.state.trim().toLowerCase()));
   const open = new Set(unfinished.map(b => b.id));
   const estimated = unfinished.filter(b => b.estimate);
-  const sumMinutes: [number, number] | null = estimated.length
+  const knownSubtotalMinutes: [number, number] | null = !unfinished.length ? [0, 0] : estimated.length
     ? [estimated.reduce((s, b) => s + b.estimate!.minMinutes, 0), estimated.reduce((s, b) => s + b.estimate!.maxMinutes, 0)] : null;
+  const unestimated = unfinished.filter(b => !b.estimate).map(b => b.id);
+  const sumMinutes = unestimated.length ? null : knownSubtotalMinutes;
   // Longest dependency chain over unfinished blocks; finished and unestimated blocks add zero, so this is a lower bound.
   const longest = new Map<string, [number, number]>();
   const chain = (id: string): [number, number] => {
@@ -332,10 +419,16 @@ export function deliveryEvidence(view: DeliveryView, audience: 'author' | 'publi
     const out: [number, number] = [own[0] + lo, own[1] + hi]; longest.set(id, out); return out;
   };
   let bound: [number, number] | null = null;
-  if (sumMinutes) {bound = [0, 0]; for (const b of blocks) {const [a, c] = chain(b.id); bound = [Math.max(bound[0], a), Math.max(bound[1], c)];}}
+  if (knownSubtotalMinutes) {bound = [0, 0]; for (const b of blocks) {const [a, c] = chain(b.id); bound = [Math.max(bound[0], a), Math.max(bound[1], c)];}}
 
-  return {audience, withheld: false, view, conflicts, gaps,
-    remaining: {sumMinutes, dependencyLowerBoundMinutes: bound, unestimated: unfinished.filter(b => !b.estimate).map(b => b.id), calendar: 'UNKNOWN', notice},
+  const tokenTotal = (key: 'input' | 'output'): [number, number] | null => {
+    if (unfinished.some(b => !b.tokens?.[key])) return null;
+    return unfinished.reduce<[number, number]>((s,b)=>[s[0]+b.tokens![key]![0],s[1]+b.tokens![key]![1]],[0,0]);
+  };
+  return {audience, withheld: false, view, conflicts, resourceConflicts, conflictLimitReached, gaps,
+    remaining: {sumMinutes, knownSubtotalMinutes, dependencyLowerBoundMinutes: bound, unestimated,
+      partial: !!unestimated.length || blocks.some(b => b.dependsOn.some(d => !byId.has(d))), calendar: 'UNKNOWN', notice},
+    tokens: {input: tokenTotal('input'), output: tokenTotal('output'), unknownInput: unfinished.filter(b=>!b.tokens?.input).map(b=>b.id), unknownOutput: unfinished.filter(b=>!b.tokens?.output).map(b=>b.id)},
     intervals: blocks.filter(b => b.interval).map(b => ({blockId: b.id, interval: b.interval!})),
     results: blocks.flatMap(b => b.results.map(ref => ({blockId: b.id, ref})))};
 }

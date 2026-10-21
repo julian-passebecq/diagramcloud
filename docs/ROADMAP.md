@@ -4,6 +4,22 @@ Current state and verification live in [README.md](../README.md) and [RELEASE.md
 
 The selected r3/r4 V2 scope is the complete standalone architectural Studio: general core, Studio UX, Galaxy/external projects, IT catalogue, source analyses/bridges, visualizations, integrations and publication. The [eight-workstream status and original acceptance crosswalk](product/V2_WORKSTREAM_STATUS.md) is a navigation/status view of those contracts, not a replacement roadmap or permission grant. Mosaic/T3 remains one integration; its owner-side limits do not block independent authorized DiagramCloud work. All unfinished criteria remain open.
 
+## Selected delivery-readout continuation (20 October 2026, prepared Pro source)
+
+Preserve 1.32.0 at private package source 5dbcd67 and current main 27916ed. PR113 is main-only relative to that package.
+This is the next finite continuation, not a restart of A-H or the three completed sentinel journeys.
+
+1. Reconcile and qualify the prepared deliveryEvidence / task-link / panel changes: accurate partial totals, source blockers,
+   product associations, file/resource overlap, exact UTF-8 identity and race-safe local file reads.
+2. Exercise explicit PM snapshot links and supplied token allowances in the actual App at desktop/compact sizes, author/public,
+   source replacement/clear and invalid data. Read-only and session-only; no PM writes or invented current activity.
+3. Build a distinctly identified candidate including the prior saved-context fix; reuse unchanged evidence appropriately,
+   run required new artifact/affected checks, then privately deliver only under the existing recovered grant.
+
+One native lead owns integration/manifests/release. A separate source/doc reviewer can inspect fixtures and input contracts;
+there is no need for competing App writers. UX29/30 stay partial where queue/calendar/actual result evidence is absent.
+[Capability atlas](product/CAPABILITY_ATLAS.md) preserves wider product direction and successor options.
+
 ## V3 workspace (integrated in 1.30.0, 2026-10-19)
 
 V3 is adopted into this roadmap, not tracked in a parallel backlog. The adoption report, patch hashes, block filesets and acceptance UX26-UX30 are in [V3_WORKSPACE](product/V3_WORKSPACE.md); the mission rows UX01-UX25 are in the [V3 handoff entrypoint](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/workstreams/diagramcloud-v3-handoff-20261018/START.md).
@@ -344,3 +360,7 @@ Remaining limits:
 - No automatic observation fetching; DiagramCloud never polls or connects to another app to pull facts.
 - DiagramCloud is not a runtime, a password/secret store, a MongoDB client, or a task authority: it refuses
   credential-shaped content, has no Mongo driver, and never applies a `datapass.ai-plan` itself.
+
+## Selected Pro source complement — learning, ideas and orientation (20 October)
+
+Recover the single attached consolidation, not the previously completed F/G/H package. Reconcile the unsent delivery-reading source and LC01-LC08 in [LEARNING-IDEATION-CONTINUATION](product/LEARNING-IDEATION-CONTINUATION.md). One native integrator adopts the exact source, filesets, tests and release. No portfolio-site or FOIL-tool implementation is selected.

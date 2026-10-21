@@ -1,0 +1,27 @@
+{
+  "schema": "datapass.owner-tasks/1",
+  "scope": {
+    "organizationId": "example-org",
+    "privacyDomainId": "private",
+    "projectId": "example-service",
+    "repoId": "example.service"
+  },
+  "revision": 4,
+  "tasks": [
+    {
+      "id": "task.api",
+      "title": "Implement the synthetic request reader",
+      "description": "Synthetic task. Source review marked complete; deployed behavior remains unqualified.",
+      "state": "DONE",
+      "desiredDate": null,
+      "dependencies": [],
+      "reviewStatus": "APPROVED",
+      "acceptanceIds": [
+        "AC2"
+      ],
+      "author": "Synthetic owner",
+      "createdAt": "2026-09-01T08:00:00Z",
+      "updatedAt": "2026-09-30T08:00:00Z"
+    }
+  ]
+}

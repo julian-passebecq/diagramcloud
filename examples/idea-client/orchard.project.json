@@ -1,0 +1,1490 @@
+{
+  "schemaVersion": 1,
+  "id": "ideas-orchard-options",
+  "revision": 0,
+  "title": "Orchard Studio: options before commitments",
+  "summary": "Which proposed improvements deserve further investigation, and what must we learn first?",
+  "author": "",
+  "category": "Reference",
+  "tags": [
+    "idea-portfolio"
+  ],
+  "rootViewId": "ideas-overview",
+  "provenance": "Authored idea portfolio. Proposal, consideration and opinion are not approval, runtime or delivery. Normalized validated input sha256:7f2c4f805d1865753e340fc44c02da4b1bbc7900c3d96b8a96f944403be9dcc4",
+  "nodes": [
+    {
+      "id": "group-evidence",
+      "label": "Evidence Library",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "Fictional full-stack document application.",
+      "role": "",
+      "status": "idle",
+      "childViewId": "group-view-evidence",
+      "blockIds": [
+        "group-profile-evidence",
+        "ideas-context"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "idea-group",
+        "project"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "group-learning",
+      "label": "Learning Centre",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "Fictional explanation and practice application.",
+      "role": "",
+      "status": "idle",
+      "childViewId": "group-view-learning",
+      "blockIds": [
+        "group-profile-learning"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "idea-group",
+        "project"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "group-reliability",
+      "label": "Reliability",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "Failure handling and trustworthy data.",
+      "role": "",
+      "status": "idle",
+      "childViewId": "group-view-reliability",
+      "blockIds": [
+        "group-profile-reliability"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "idea-group",
+        "theme"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "group-experience",
+      "label": "Reader experience",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "Help humans orient, inspect and return.",
+      "role": "",
+      "status": "idle",
+      "childViewId": "group-view-experience",
+      "blockIds": [
+        "group-profile-experience"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "idea-group",
+        "theme"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "group-platform",
+      "label": "Platform and delivery",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "Source, runtime, deployment and release boundaries.",
+      "role": "",
+      "status": "idle",
+      "childViewId": "group-view-platform",
+      "blockIds": [
+        "group-profile-platform"
+      ],
+      "sourceIds": [],
+      "tags": [
+        "idea-group",
+        "theme"
+      ],
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "idea-permitted-search",
+      "label": "Search only the permitted content",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "Search must not reveal excluded client material.",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "idea-summary-permitted-search",
+        "idea-profile-permitted-search",
+        "idea-relations-permitted-search"
+      ],
+      "sourceIds": [
+        "scenario"
+      ],
+      "tags": [
+        "brainstorm-idea"
+      ],
+      "basis": "planned",
+      "choices": [
+        {
+          "id": "choice-permitted-search",
+          "title": "Search only the permitted content",
+          "goal": "Search must not reveal excluded client material.",
+          "options": [
+            {
+              "id": "option-permitted-search",
+              "label": "Search only the permitted content",
+              "summary": "Use an explicitly access-filtered search projection and test denied cases."
+            }
+          ],
+          "reasons": [
+            "Makes a specific question easier to inspect."
+          ],
+          "tradeoffs": [
+            "The example is fictional; actual effort and applicability are not measured."
+          ],
+          "assumptions": [
+            "An owner must select real work independently of viewing this proposal."
+          ],
+          "status": "candidate",
+          "origin": "imported",
+          "sourceIds": [
+            "scenario"
+          ],
+          "visibility": "public"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "id": "idea-return-context",
+      "label": "Remember the surrounding scope",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "A reader loses the question after drilling into detail.",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "idea-summary-return-context",
+        "idea-profile-return-context",
+        "idea-relations-return-context"
+      ],
+      "sourceIds": [
+        "scenario"
+      ],
+      "tags": [
+        "brainstorm-idea"
+      ],
+      "basis": "planned",
+      "choices": [
+        {
+          "id": "choice-return-context",
+          "title": "Remember the surrounding scope",
+          "goal": "A reader loses the question after drilling into detail.",
+          "options": [
+            {
+              "id": "option-return-context",
+              "label": "Remember the surrounding scope",
+              "summary": "Offer an optional parent-context strip with an explicit return; do not confuse history and hierarchy."
+            }
+          ],
+          "reasons": [
+            "Makes a specific question easier to inspect."
+          ],
+          "tradeoffs": [
+            "The example is fictional; actual effort and applicability are not measured."
+          ],
+          "assumptions": [
+            "An owner must select real work independently of viewing this proposal."
+          ],
+          "status": "candidate",
+          "origin": "imported",
+          "sourceIds": [
+            "scenario"
+          ],
+          "visibility": "public"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "id": "idea-quiz",
+      "label": "Interview explanation rounds",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "A learner needs to explain concepts rather than collect vendor names.",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "idea-summary-quiz",
+        "idea-profile-quiz"
+      ],
+      "sourceIds": [
+        "scenario"
+      ],
+      "tags": [
+        "brainstorm-idea"
+      ],
+      "basis": "planned",
+      "choices": [
+        {
+          "id": "choice-quiz",
+          "title": "Interview explanation rounds",
+          "goal": "A learner needs to explain concepts rather than collect vendor names.",
+          "options": [
+            {
+              "id": "option-quiz",
+              "label": "Interview explanation rounds",
+              "summary": "Use four-question rounds and original reference answers with source and version scope."
+            }
+          ],
+          "reasons": [
+            "Makes a specific question easier to inspect."
+          ],
+          "tradeoffs": [
+            "The example is fictional; actual effort and applicability are not measured."
+          ],
+          "assumptions": [
+            "An owner must select real work independently of viewing this proposal."
+          ],
+          "status": "candidate",
+          "origin": "imported",
+          "sourceIds": [
+            "scenario"
+          ],
+          "visibility": "public"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "id": "idea-trace-input",
+      "label": "Read supplied runtime traces",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "A static dependency diagram is not an observed request path.",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "idea-summary-trace-input",
+        "idea-profile-trace-input",
+        "idea-relations-trace-input"
+      ],
+      "sourceIds": [
+        "scenario"
+      ],
+      "tags": [
+        "brainstorm-idea"
+      ],
+      "basis": "planned",
+      "choices": [
+        {
+          "id": "choice-trace-input",
+          "title": "Read supplied runtime traces",
+          "goal": "A static dependency diagram is not an observed request path.",
+          "options": [
+            {
+              "id": "option-trace-input",
+              "label": "Read supplied runtime traces",
+              "summary": "Import a bounded external trace after its producer contract and privacy projection are qualified."
+            }
+          ],
+          "reasons": [
+            "Makes a specific question easier to inspect."
+          ],
+          "tradeoffs": [
+            "The example is fictional; actual effort and applicability are not measured."
+          ],
+          "assumptions": [
+            "An owner must select real work independently of viewing this proposal."
+          ],
+          "status": "candidate",
+          "origin": "imported",
+          "sourceIds": [
+            "scenario"
+          ],
+          "visibility": "public"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "id": "idea-cloud-deploy",
+      "label": "Short-lived cloud staging proof",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "Source checks do not establish a deployed user journey.",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "idea-summary-cloud-deploy",
+        "idea-profile-cloud-deploy"
+      ],
+      "sourceIds": [
+        "scenario"
+      ],
+      "tags": [
+        "brainstorm-idea"
+      ],
+      "basis": "planned",
+      "choices": [
+        {
+          "id": "choice-cloud-deploy",
+          "title": "Short-lived cloud staging proof",
+          "goal": "Source checks do not establish a deployed user journey.",
+          "options": [
+            {
+              "id": "option-cloud-deploy",
+              "label": "Short-lived cloud staging proof",
+              "summary": "Prepare a reviewed deployment and teardown plan; execution requires its own grant."
+            }
+          ],
+          "reasons": [
+            "Makes a specific question easier to inspect."
+          ],
+          "tradeoffs": [
+            "The example is fictional; actual effort and applicability are not measured."
+          ],
+          "assumptions": [
+            "An owner must select real work independently of viewing this proposal."
+          ],
+          "status": "candidate",
+          "origin": "imported",
+          "sourceIds": [
+            "scenario"
+          ],
+          "visibility": "public"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "id": "idea-new-engine",
+      "label": "Replace the diagram engine",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "A renderer change has been suggested without a measured defect.",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "idea-summary-new-engine",
+        "idea-profile-new-engine"
+      ],
+      "sourceIds": [
+        "scenario"
+      ],
+      "tags": [
+        "brainstorm-idea"
+      ],
+      "basis": "planned",
+      "choices": [
+        {
+          "id": "choice-new-engine",
+          "title": "Replace the diagram engine",
+          "goal": "A renderer change has been suggested without a measured defect.",
+          "options": [
+            {
+              "id": "option-new-engine",
+              "label": "Replace the diagram engine",
+              "summary": "Measure a concrete geometry limitation before selecting a replacement."
+            }
+          ],
+          "reasons": [
+            "Makes a specific question easier to inspect."
+          ],
+          "tradeoffs": [
+            "The example is fictional; actual effort and applicability are not measured."
+          ],
+          "assumptions": [
+            "An owner must select real work independently of viewing this proposal."
+          ],
+          "status": "candidate",
+          "origin": "imported",
+          "sourceIds": [
+            "scenario"
+          ],
+          "visibility": "public"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "id": "idea-quality",
+      "label": "Expose join fanout and loss",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "Matching row counts can hide duplication and disappearance.",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "idea-summary-quality",
+        "idea-profile-quality"
+      ],
+      "sourceIds": [
+        "scenario"
+      ],
+      "tags": [
+        "brainstorm-idea"
+      ],
+      "basis": "planned",
+      "choices": [
+        {
+          "id": "choice-quality",
+          "title": "Expose join fanout and loss",
+          "goal": "Matching row counts can hide duplication and disappearance.",
+          "options": [
+            {
+              "id": "option-quality",
+              "label": "Expose join fanout and loss",
+              "summary": "Inspect exact sample-row correspondences and the declared metric grain."
+            }
+          ],
+          "reasons": [
+            "Makes a specific question easier to inspect."
+          ],
+          "tradeoffs": [
+            "The example is fictional; actual effort and applicability are not measured."
+          ],
+          "assumptions": [
+            "An owner must select real work independently of viewing this proposal."
+          ],
+          "status": "candidate",
+          "origin": "imported",
+          "sourceIds": [
+            "scenario"
+          ],
+          "visibility": "public"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "id": "idea-board",
+      "label": "Add a proposal comparison board",
+      "kind": "control",
+      "provider": "Generic",
+      "icon": "generic",
+      "summary": "A long idea discussion obscures alternatives and uncertainty.",
+      "role": "",
+      "status": "idle",
+      "blockIds": [
+        "idea-summary-board",
+        "idea-profile-board",
+        "idea-relations-board"
+      ],
+      "sourceIds": [
+        "scenario"
+      ],
+      "tags": [
+        "brainstorm-idea"
+      ],
+      "basis": "planned",
+      "choices": [
+        {
+          "id": "choice-board",
+          "title": "Add a proposal comparison board",
+          "goal": "A long idea discussion obscures alternatives and uncertainty.",
+          "options": [
+            {
+              "id": "option-board",
+              "label": "Add a proposal comparison board",
+              "summary": "Provide grouped cards, a matrix and source-derived consideration columns without creating tasks."
+            }
+          ],
+          "reasons": [
+            "Makes a specific question easier to inspect."
+          ],
+          "tradeoffs": [
+            "The example is fictional; actual effort and applicability are not measured."
+          ],
+          "assumptions": [
+            "An owner must select real work independently of viewing this proposal."
+          ],
+          "status": "candidate",
+          "origin": "imported",
+          "sourceIds": [
+            "scenario"
+          ],
+          "visibility": "public"
+        }
+      ],
+      "visibility": "public"
+    }
+  ],
+  "edges": [
+    {
+      "id": "relation-trace-access",
+      "source": "idea-trace-input",
+      "target": "idea-permitted-search",
+      "label": "depends-on: A proposed trace import needs a qualified access boundary.",
+      "kind": "dependency",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    },
+    {
+      "id": "relation-context-board",
+      "source": "idea-board",
+      "target": "idea-return-context",
+      "label": "related: Both help retain a human question while changing detail.",
+      "kind": "control",
+      "speed": "medium",
+      "basis": "planned",
+      "visibility": "public"
+    }
+  ],
+  "views": [
+    {
+      "id": "ideas-overview",
+      "title": "Orchard Studio: options before commitments",
+      "description": "Authored idea relations and consideration only. Not a work schedule or live status.",
+      "nodeIds": [
+        "group-evidence",
+        "group-learning",
+        "group-reliability",
+        "group-experience",
+        "group-platform"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "group-evidence": {
+          "x": 0,
+          "y": 0
+        },
+        "group-learning": {
+          "x": 300,
+          "y": 0
+        },
+        "group-reliability": {
+          "x": 600,
+          "y": 0
+        },
+        "group-experience": {
+          "x": 0,
+          "y": 180
+        },
+        "group-platform": {
+          "x": 300,
+          "y": 180
+        }
+      },
+      "perspective": "decisions",
+      "visibility": "public"
+    },
+    {
+      "id": "group-view-evidence",
+      "title": "Evidence Library",
+      "description": "Authored idea relations and consideration only. Not a work schedule or live status.",
+      "nodeIds": [
+        "idea-permitted-search",
+        "idea-return-context",
+        "idea-trace-input",
+        "idea-cloud-deploy",
+        "idea-quality"
+      ],
+      "edgeIds": [
+        "relation-trace-access"
+      ],
+      "positions": {
+        "idea-permitted-search": {
+          "x": 0,
+          "y": 0
+        },
+        "idea-return-context": {
+          "x": 300,
+          "y": 0
+        },
+        "idea-trace-input": {
+          "x": 600,
+          "y": 0
+        },
+        "idea-cloud-deploy": {
+          "x": 0,
+          "y": 180
+        },
+        "idea-quality": {
+          "x": 300,
+          "y": 180
+        }
+      },
+      "perspective": "decisions",
+      "visibility": "public"
+    },
+    {
+      "id": "group-view-learning",
+      "title": "Learning Centre",
+      "description": "Authored idea relations and consideration only. Not a work schedule or live status.",
+      "nodeIds": [
+        "idea-quiz",
+        "idea-new-engine",
+        "idea-board"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "idea-quiz": {
+          "x": 0,
+          "y": 0
+        },
+        "idea-new-engine": {
+          "x": 300,
+          "y": 0
+        },
+        "idea-board": {
+          "x": 600,
+          "y": 0
+        }
+      },
+      "perspective": "decisions",
+      "visibility": "public"
+    },
+    {
+      "id": "group-view-reliability",
+      "title": "Reliability",
+      "description": "Authored idea relations and consideration only. Not a work schedule or live status.",
+      "nodeIds": [
+        "idea-permitted-search",
+        "idea-quality"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "idea-permitted-search": {
+          "x": 0,
+          "y": 0
+        },
+        "idea-quality": {
+          "x": 300,
+          "y": 0
+        }
+      },
+      "perspective": "decisions",
+      "visibility": "public"
+    },
+    {
+      "id": "group-view-experience",
+      "title": "Reader experience",
+      "description": "Authored idea relations and consideration only. Not a work schedule or live status.",
+      "nodeIds": [
+        "idea-return-context",
+        "idea-quiz",
+        "idea-board"
+      ],
+      "edgeIds": [
+        "relation-context-board"
+      ],
+      "positions": {
+        "idea-return-context": {
+          "x": 0,
+          "y": 0
+        },
+        "idea-quiz": {
+          "x": 300,
+          "y": 0
+        },
+        "idea-board": {
+          "x": 600,
+          "y": 0
+        }
+      },
+      "perspective": "decisions",
+      "visibility": "public"
+    },
+    {
+      "id": "group-view-platform",
+      "title": "Platform and delivery",
+      "description": "Authored idea relations and consideration only. Not a work schedule or live status.",
+      "nodeIds": [
+        "idea-trace-input",
+        "idea-cloud-deploy",
+        "idea-new-engine"
+      ],
+      "edgeIds": [],
+      "positions": {
+        "idea-trace-input": {
+          "x": 0,
+          "y": 0
+        },
+        "idea-cloud-deploy": {
+          "x": 300,
+          "y": 0
+        },
+        "idea-new-engine": {
+          "x": 600,
+          "y": 0
+        }
+      },
+      "perspective": "decisions",
+      "visibility": "public"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "ideas-context",
+      "title": "Discussion scope",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Value"
+      ],
+      "rows": [
+        [
+          "Title",
+          "Orchard Studio: options before commitments"
+        ],
+        [
+          "Question",
+          "Which proposed improvements deserve further investigation, and what must we learn first?"
+        ]
+      ]
+    },
+    {
+      "id": "group-profile-evidence",
+      "title": "Idea grouping",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Kind",
+        "Value"
+      ],
+      "rows": [
+        [
+          "id",
+          "evidence"
+        ],
+        [
+          "kind",
+          "project"
+        ],
+        [
+          "description",
+          "Fictional full-stack document application."
+        ]
+      ]
+    },
+    {
+      "id": "group-profile-learning",
+      "title": "Idea grouping",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Kind",
+        "Value"
+      ],
+      "rows": [
+        [
+          "id",
+          "learning"
+        ],
+        [
+          "kind",
+          "project"
+        ],
+        [
+          "description",
+          "Fictional explanation and practice application."
+        ]
+      ]
+    },
+    {
+      "id": "group-profile-reliability",
+      "title": "Idea grouping",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Kind",
+        "Value"
+      ],
+      "rows": [
+        [
+          "id",
+          "reliability"
+        ],
+        [
+          "kind",
+          "theme"
+        ],
+        [
+          "description",
+          "Failure handling and trustworthy data."
+        ]
+      ]
+    },
+    {
+      "id": "group-profile-experience",
+      "title": "Idea grouping",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Kind",
+        "Value"
+      ],
+      "rows": [
+        [
+          "id",
+          "experience"
+        ],
+        [
+          "kind",
+          "theme"
+        ],
+        [
+          "description",
+          "Help humans orient, inspect and return."
+        ]
+      ]
+    },
+    {
+      "id": "group-profile-platform",
+      "title": "Idea grouping",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Kind",
+        "Value"
+      ],
+      "rows": [
+        [
+          "id",
+          "platform"
+        ],
+        [
+          "kind",
+          "theme"
+        ],
+        [
+          "description",
+          "Source, runtime, deployment and release boundaries."
+        ]
+      ]
+    },
+    {
+      "id": "idea-profile-permitted-search",
+      "title": "Idea profile (supplied, not adopted)",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\n  \"id\": \"permitted-search\",\n  \"title\": \"Search only the permitted content\",\n  \"groupIds\": [\n    \"evidence\",\n    \"reliability\"\n  ],\n  \"problem\": \"Search must not reveal excluded client material.\",\n  \"proposal\": \"Use an explicitly access-filtered search projection and test denied cases.\",\n  \"benefits\": [\n    \"Makes a specific question easier to inspect.\"\n  ],\n  \"risks\": [\n    \"The example is fictional; actual effort and applicability are not measured.\"\n  ],\n  \"unknowns\": [\n    \"Which real user journey and acceptance evidence should define success?\"\n  ],\n  \"conditions\": [\n    \"An owner must select real work independently of viewing this proposal.\"\n  ],\n  \"consideration\": \"exploring\",\n  \"assessments\": [\n    {\n      \"criterion\": \"feasibility\",\n      \"rating\": \"high\",\n      \"rationale\": \"Author opinion for this fictional teaching case, not measured delivery probability.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    },\n    {\n      \"criterion\": \"difficulty\",\n      \"rating\": \"medium\",\n      \"rationale\": \"Author opinion; must be reassessed against the actual integration.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    }\n  ],\n  \"estimate\": null,\n  \"sourceIds\": [\n    \"scenario\"\n  ]\n}"
+    },
+    {
+      "id": "idea-summary-permitted-search",
+      "title": "Problem, option and uncertainty",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Reading"
+      ],
+      "rows": [
+        [
+          "Problem",
+          "Search must not reveal excluded client material."
+        ],
+        [
+          "Proposal",
+          "Use an explicitly access-filtered search projection and test denied cases."
+        ],
+        [
+          "Consideration",
+          "exploring"
+        ],
+        [
+          "Benefit",
+          "Makes a specific question easier to inspect."
+        ],
+        [
+          "Risk",
+          "The example is fictional; actual effort and applicability are not measured."
+        ],
+        [
+          "Open question",
+          "Which real user journey and acceptance evidence should define success?"
+        ],
+        [
+          "Condition",
+          "An owner must select real work independently of viewing this proposal."
+        ],
+        [
+          "Effort allowance",
+          "UNKNOWN; not a scheduled task"
+        ]
+      ]
+    },
+    {
+      "id": "idea-relations-permitted-search",
+      "title": "Authored relationships, not execution order",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "From",
+        "Relation",
+        "To",
+        "Reason",
+        "Sources"
+      ],
+      "rows": [
+        [
+          "trace-input",
+          "depends-on",
+          "permitted-search",
+          "A proposed trace import needs a qualified access boundary.",
+          "scenario"
+        ]
+      ]
+    },
+    {
+      "id": "idea-profile-return-context",
+      "title": "Idea profile (supplied, not adopted)",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\n  \"id\": \"return-context\",\n  \"title\": \"Remember the surrounding scope\",\n  \"groupIds\": [\n    \"evidence\",\n    \"experience\"\n  ],\n  \"problem\": \"A reader loses the question after drilling into detail.\",\n  \"proposal\": \"Offer an optional parent-context strip with an explicit return; do not confuse history and hierarchy.\",\n  \"benefits\": [\n    \"Makes a specific question easier to inspect.\"\n  ],\n  \"risks\": [\n    \"The example is fictional; actual effort and applicability are not measured.\"\n  ],\n  \"unknowns\": [\n    \"Which real user journey and acceptance evidence should define success?\"\n  ],\n  \"conditions\": [\n    \"An owner must select real work independently of viewing this proposal.\"\n  ],\n  \"consideration\": \"candidate\",\n  \"assessments\": [\n    {\n      \"criterion\": \"feasibility\",\n      \"rating\": \"high\",\n      \"rationale\": \"Author opinion for this fictional teaching case, not measured delivery probability.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    },\n    {\n      \"criterion\": \"difficulty\",\n      \"rating\": \"low\",\n      \"rationale\": \"Author opinion; must be reassessed against the actual integration.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    }\n  ],\n  \"estimate\": null,\n  \"sourceIds\": [\n    \"scenario\"\n  ]\n}"
+    },
+    {
+      "id": "idea-summary-return-context",
+      "title": "Problem, option and uncertainty",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Reading"
+      ],
+      "rows": [
+        [
+          "Problem",
+          "A reader loses the question after drilling into detail."
+        ],
+        [
+          "Proposal",
+          "Offer an optional parent-context strip with an explicit return; do not confuse history and hierarchy."
+        ],
+        [
+          "Consideration",
+          "candidate"
+        ],
+        [
+          "Benefit",
+          "Makes a specific question easier to inspect."
+        ],
+        [
+          "Risk",
+          "The example is fictional; actual effort and applicability are not measured."
+        ],
+        [
+          "Open question",
+          "Which real user journey and acceptance evidence should define success?"
+        ],
+        [
+          "Condition",
+          "An owner must select real work independently of viewing this proposal."
+        ],
+        [
+          "Effort allowance",
+          "UNKNOWN; not a scheduled task"
+        ]
+      ]
+    },
+    {
+      "id": "idea-relations-return-context",
+      "title": "Authored relationships, not execution order",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "From",
+        "Relation",
+        "To",
+        "Reason",
+        "Sources"
+      ],
+      "rows": [
+        [
+          "board",
+          "related",
+          "return-context",
+          "Both help retain a human question while changing detail.",
+          "scenario"
+        ]
+      ]
+    },
+    {
+      "id": "idea-profile-quiz",
+      "title": "Idea profile (supplied, not adopted)",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\n  \"id\": \"quiz\",\n  \"title\": \"Interview explanation rounds\",\n  \"groupIds\": [\n    \"learning\",\n    \"experience\"\n  ],\n  \"problem\": \"A learner needs to explain concepts rather than collect vendor names.\",\n  \"proposal\": \"Use four-question rounds and original reference answers with source and version scope.\",\n  \"benefits\": [\n    \"Makes a specific question easier to inspect.\"\n  ],\n  \"risks\": [\n    \"The example is fictional; actual effort and applicability are not measured.\"\n  ],\n  \"unknowns\": [\n    \"Which real user journey and acceptance evidence should define success?\"\n  ],\n  \"conditions\": [\n    \"An owner must select real work independently of viewing this proposal.\"\n  ],\n  \"consideration\": \"candidate\",\n  \"assessments\": [\n    {\n      \"criterion\": \"feasibility\",\n      \"rating\": \"high\",\n      \"rationale\": \"Author opinion for this fictional teaching case, not measured delivery probability.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    },\n    {\n      \"criterion\": \"difficulty\",\n      \"rating\": \"medium\",\n      \"rationale\": \"Author opinion; must be reassessed against the actual integration.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    }\n  ],\n  \"estimate\": null,\n  \"sourceIds\": [\n    \"scenario\"\n  ]\n}"
+    },
+    {
+      "id": "idea-summary-quiz",
+      "title": "Problem, option and uncertainty",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Reading"
+      ],
+      "rows": [
+        [
+          "Problem",
+          "A learner needs to explain concepts rather than collect vendor names."
+        ],
+        [
+          "Proposal",
+          "Use four-question rounds and original reference answers with source and version scope."
+        ],
+        [
+          "Consideration",
+          "candidate"
+        ],
+        [
+          "Benefit",
+          "Makes a specific question easier to inspect."
+        ],
+        [
+          "Risk",
+          "The example is fictional; actual effort and applicability are not measured."
+        ],
+        [
+          "Open question",
+          "Which real user journey and acceptance evidence should define success?"
+        ],
+        [
+          "Condition",
+          "An owner must select real work independently of viewing this proposal."
+        ],
+        [
+          "Effort allowance",
+          "UNKNOWN; not a scheduled task"
+        ]
+      ]
+    },
+    {
+      "id": "idea-profile-trace-input",
+      "title": "Idea profile (supplied, not adopted)",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\n  \"id\": \"trace-input\",\n  \"title\": \"Read supplied runtime traces\",\n  \"groupIds\": [\n    \"evidence\",\n    \"platform\"\n  ],\n  \"problem\": \"A static dependency diagram is not an observed request path.\",\n  \"proposal\": \"Import a bounded external trace after its producer contract and privacy projection are qualified.\",\n  \"benefits\": [\n    \"Makes a specific question easier to inspect.\"\n  ],\n  \"risks\": [\n    \"The example is fictional; actual effort and applicability are not measured.\"\n  ],\n  \"unknowns\": [\n    \"Which real user journey and acceptance evidence should define success?\"\n  ],\n  \"conditions\": [\n    \"An owner must select real work independently of viewing this proposal.\"\n  ],\n  \"consideration\": \"deferred\",\n  \"assessments\": [\n    {\n      \"criterion\": \"feasibility\",\n      \"rating\": \"unknown\",\n      \"rationale\": \"Author opinion for this fictional teaching case, not measured delivery probability.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    },\n    {\n      \"criterion\": \"difficulty\",\n      \"rating\": \"high\",\n      \"rationale\": \"Author opinion; must be reassessed against the actual integration.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    }\n  ],\n  \"estimate\": null,\n  \"sourceIds\": [\n    \"scenario\"\n  ]\n}"
+    },
+    {
+      "id": "idea-summary-trace-input",
+      "title": "Problem, option and uncertainty",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Reading"
+      ],
+      "rows": [
+        [
+          "Problem",
+          "A static dependency diagram is not an observed request path."
+        ],
+        [
+          "Proposal",
+          "Import a bounded external trace after its producer contract and privacy projection are qualified."
+        ],
+        [
+          "Consideration",
+          "deferred"
+        ],
+        [
+          "Benefit",
+          "Makes a specific question easier to inspect."
+        ],
+        [
+          "Risk",
+          "The example is fictional; actual effort and applicability are not measured."
+        ],
+        [
+          "Open question",
+          "Which real user journey and acceptance evidence should define success?"
+        ],
+        [
+          "Condition",
+          "An owner must select real work independently of viewing this proposal."
+        ],
+        [
+          "Effort allowance",
+          "UNKNOWN; not a scheduled task"
+        ]
+      ]
+    },
+    {
+      "id": "idea-relations-trace-input",
+      "title": "Authored relationships, not execution order",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "From",
+        "Relation",
+        "To",
+        "Reason",
+        "Sources"
+      ],
+      "rows": [
+        [
+          "trace-input",
+          "depends-on",
+          "permitted-search",
+          "A proposed trace import needs a qualified access boundary.",
+          "scenario"
+        ]
+      ]
+    },
+    {
+      "id": "idea-profile-cloud-deploy",
+      "title": "Idea profile (supplied, not adopted)",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\n  \"id\": \"cloud-deploy\",\n  \"title\": \"Short-lived cloud staging proof\",\n  \"groupIds\": [\n    \"evidence\",\n    \"platform\"\n  ],\n  \"problem\": \"Source checks do not establish a deployed user journey.\",\n  \"proposal\": \"Prepare a reviewed deployment and teardown plan; execution requires its own grant.\",\n  \"benefits\": [\n    \"Makes a specific question easier to inspect.\"\n  ],\n  \"risks\": [\n    \"The example is fictional; actual effort and applicability are not measured.\"\n  ],\n  \"unknowns\": [\n    \"Which real user journey and acceptance evidence should define success?\"\n  ],\n  \"conditions\": [\n    \"An owner must select real work independently of viewing this proposal.\"\n  ],\n  \"consideration\": \"deferred\",\n  \"assessments\": [\n    {\n      \"criterion\": \"feasibility\",\n      \"rating\": \"unknown\",\n      \"rationale\": \"Author opinion for this fictional teaching case, not measured delivery probability.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    },\n    {\n      \"criterion\": \"difficulty\",\n      \"rating\": \"high\",\n      \"rationale\": \"Author opinion; must be reassessed against the actual integration.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    }\n  ],\n  \"estimate\": null,\n  \"sourceIds\": [\n    \"scenario\"\n  ]\n}"
+    },
+    {
+      "id": "idea-summary-cloud-deploy",
+      "title": "Problem, option and uncertainty",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Reading"
+      ],
+      "rows": [
+        [
+          "Problem",
+          "Source checks do not establish a deployed user journey."
+        ],
+        [
+          "Proposal",
+          "Prepare a reviewed deployment and teardown plan; execution requires its own grant."
+        ],
+        [
+          "Consideration",
+          "deferred"
+        ],
+        [
+          "Benefit",
+          "Makes a specific question easier to inspect."
+        ],
+        [
+          "Risk",
+          "The example is fictional; actual effort and applicability are not measured."
+        ],
+        [
+          "Open question",
+          "Which real user journey and acceptance evidence should define success?"
+        ],
+        [
+          "Condition",
+          "An owner must select real work independently of viewing this proposal."
+        ],
+        [
+          "Effort allowance",
+          "UNKNOWN; not a scheduled task"
+        ]
+      ]
+    },
+    {
+      "id": "idea-profile-new-engine",
+      "title": "Idea profile (supplied, not adopted)",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\n  \"id\": \"new-engine\",\n  \"title\": \"Replace the diagram engine\",\n  \"groupIds\": [\n    \"learning\",\n    \"platform\"\n  ],\n  \"problem\": \"A renderer change has been suggested without a measured defect.\",\n  \"proposal\": \"Measure a concrete geometry limitation before selecting a replacement.\",\n  \"benefits\": [\n    \"Makes a specific question easier to inspect.\"\n  ],\n  \"risks\": [\n    \"The example is fictional; actual effort and applicability are not measured.\"\n  ],\n  \"unknowns\": [\n    \"Which real user journey and acceptance evidence should define success?\"\n  ],\n  \"conditions\": [\n    \"An owner must select real work independently of viewing this proposal.\"\n  ],\n  \"consideration\": \"rejected\",\n  \"assessments\": [\n    {\n      \"criterion\": \"feasibility\",\n      \"rating\": \"unknown\",\n      \"rationale\": \"Author opinion for this fictional teaching case, not measured delivery probability.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    },\n    {\n      \"criterion\": \"difficulty\",\n      \"rating\": \"high\",\n      \"rationale\": \"Author opinion; must be reassessed against the actual integration.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    }\n  ],\n  \"estimate\": null,\n  \"sourceIds\": [\n    \"scenario\"\n  ]\n}"
+    },
+    {
+      "id": "idea-summary-new-engine",
+      "title": "Problem, option and uncertainty",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Reading"
+      ],
+      "rows": [
+        [
+          "Problem",
+          "A renderer change has been suggested without a measured defect."
+        ],
+        [
+          "Proposal",
+          "Measure a concrete geometry limitation before selecting a replacement."
+        ],
+        [
+          "Consideration",
+          "rejected"
+        ],
+        [
+          "Benefit",
+          "Makes a specific question easier to inspect."
+        ],
+        [
+          "Risk",
+          "The example is fictional; actual effort and applicability are not measured."
+        ],
+        [
+          "Open question",
+          "Which real user journey and acceptance evidence should define success?"
+        ],
+        [
+          "Condition",
+          "An owner must select real work independently of viewing this proposal."
+        ],
+        [
+          "Effort allowance",
+          "UNKNOWN; not a scheduled task"
+        ]
+      ]
+    },
+    {
+      "id": "idea-profile-quality",
+      "title": "Idea profile (supplied, not adopted)",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\n  \"id\": \"quality\",\n  \"title\": \"Expose join fanout and loss\",\n  \"groupIds\": [\n    \"evidence\",\n    \"reliability\"\n  ],\n  \"problem\": \"Matching row counts can hide duplication and disappearance.\",\n  \"proposal\": \"Inspect exact sample-row correspondences and the declared metric grain.\",\n  \"benefits\": [\n    \"Makes a specific question easier to inspect.\"\n  ],\n  \"risks\": [\n    \"The example is fictional; actual effort and applicability are not measured.\"\n  ],\n  \"unknowns\": [\n    \"Which real user journey and acceptance evidence should define success?\"\n  ],\n  \"conditions\": [\n    \"An owner must select real work independently of viewing this proposal.\"\n  ],\n  \"consideration\": \"candidate\",\n  \"assessments\": [\n    {\n      \"criterion\": \"feasibility\",\n      \"rating\": \"high\",\n      \"rationale\": \"Author opinion for this fictional teaching case, not measured delivery probability.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    },\n    {\n      \"criterion\": \"difficulty\",\n      \"rating\": \"medium\",\n      \"rationale\": \"Author opinion; must be reassessed against the actual integration.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    }\n  ],\n  \"estimate\": null,\n  \"sourceIds\": [\n    \"scenario\"\n  ]\n}"
+    },
+    {
+      "id": "idea-summary-quality",
+      "title": "Problem, option and uncertainty",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Reading"
+      ],
+      "rows": [
+        [
+          "Problem",
+          "Matching row counts can hide duplication and disappearance."
+        ],
+        [
+          "Proposal",
+          "Inspect exact sample-row correspondences and the declared metric grain."
+        ],
+        [
+          "Consideration",
+          "candidate"
+        ],
+        [
+          "Benefit",
+          "Makes a specific question easier to inspect."
+        ],
+        [
+          "Risk",
+          "The example is fictional; actual effort and applicability are not measured."
+        ],
+        [
+          "Open question",
+          "Which real user journey and acceptance evidence should define success?"
+        ],
+        [
+          "Condition",
+          "An owner must select real work independently of viewing this proposal."
+        ],
+        [
+          "Effort allowance",
+          "UNKNOWN; not a scheduled task"
+        ]
+      ]
+    },
+    {
+      "id": "idea-profile-board",
+      "title": "Idea profile (supplied, not adopted)",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "code",
+      "language": "json",
+      "code": "{\n  \"id\": \"board\",\n  \"title\": \"Add a proposal comparison board\",\n  \"groupIds\": [\n    \"learning\",\n    \"experience\"\n  ],\n  \"problem\": \"A long idea discussion obscures alternatives and uncertainty.\",\n  \"proposal\": \"Provide grouped cards, a matrix and source-derived consideration columns without creating tasks.\",\n  \"benefits\": [\n    \"Makes a specific question easier to inspect.\"\n  ],\n  \"risks\": [\n    \"The example is fictional; actual effort and applicability are not measured.\"\n  ],\n  \"unknowns\": [\n    \"Which real user journey and acceptance evidence should define success?\"\n  ],\n  \"conditions\": [\n    \"An owner must select real work independently of viewing this proposal.\"\n  ],\n  \"consideration\": \"exploring\",\n  \"assessments\": [\n    {\n      \"criterion\": \"feasibility\",\n      \"rating\": \"high\",\n      \"rationale\": \"Author opinion for this fictional teaching case, not measured delivery probability.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    },\n    {\n      \"criterion\": \"difficulty\",\n      \"rating\": \"medium\",\n      \"rationale\": \"Author opinion; must be reassessed against the actual integration.\",\n      \"sourceIds\": [\n        \"scenario\"\n      ]\n    }\n  ],\n  \"estimate\": null,\n  \"sourceIds\": [\n    \"scenario\"\n  ]\n}"
+    },
+    {
+      "id": "idea-summary-board",
+      "title": "Problem, option and uncertainty",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Field",
+        "Reading"
+      ],
+      "rows": [
+        [
+          "Problem",
+          "A long idea discussion obscures alternatives and uncertainty."
+        ],
+        [
+          "Proposal",
+          "Provide grouped cards, a matrix and source-derived consideration columns without creating tasks."
+        ],
+        [
+          "Consideration",
+          "exploring"
+        ],
+        [
+          "Benefit",
+          "Makes a specific question easier to inspect."
+        ],
+        [
+          "Risk",
+          "The example is fictional; actual effort and applicability are not measured."
+        ],
+        [
+          "Open question",
+          "Which real user journey and acceptance evidence should define success?"
+        ],
+        [
+          "Condition",
+          "An owner must select real work independently of viewing this proposal."
+        ],
+        [
+          "Effort allowance",
+          "UNKNOWN; not a scheduled task"
+        ]
+      ]
+    },
+    {
+      "id": "idea-relations-board",
+      "title": "Authored relationships, not execution order",
+      "visibility": "public",
+      "sourceIds": [
+        "scenario"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "From",
+        "Relation",
+        "To",
+        "Reason",
+        "Sources"
+      ],
+      "rows": [
+        [
+          "board",
+          "related",
+          "return-context",
+          "Both help retain a human question while changing detail.",
+          "scenario"
+        ]
+      ]
+    }
+  ],
+  "assets": [],
+  "sources": [
+    {
+      "id": "scenario",
+      "title": "Original fictional planning exercise",
+      "location": "Authored for DiagramCloud on 2026-10-20; no actual organization, running agents or measured effort.",
+      "visibility": "public"
+    }
+  ],
+  "story": [],
+  "observations": []
+}

@@ -25,7 +25,7 @@ test('delivery plan: unknown fields are listed, never interpreted', () => {
   const schema = v.blocks.find(b => b.id === 'svc.schema')!;
   assert.equal(schema.ownerId, 'own.alpha'); assert.equal(schema.checkpoint, 'docs/checkpoint.md'); assert.equal(schema.promptRef, 'prompts/schema.md');
   assert.deepEqual(v.sourceVector[0], {repository: 'example/service', ref: 'main', commit: '0000000000000000000000000000000000000001', purpose: 'Synthetic source cut'});
-  // A supplied tokens value or calendar is listed, never read.
+  // An unsupported legacy token shape or calendar is listed, never interpreted.
   const p = plan(); p.handoff.block_details[0].tokens = {estimate: 1000}; p.handoff.calendar = {workdays: 5};
   assert.ok(parseDeliveryView(raw(p)).ignoredFields.includes('handoff.block_details[].tokens'));
   assert.ok(parseDeliveryView(raw(p)).ignoredFields.includes('handoff.calendar'));
@@ -93,7 +93,9 @@ test('named gaps: missing estimate, interval and result are named, tokens and ca
 test('remaining effort: uncalibrated range sum and dependency lower bound, no date', () => {
   const e = deliveryEvidence(parseDeliveryView(RAW), 'author');
   // Unfinished: api 60-120, docs (none), ui 90-180, release 15-30. The done schema block is excluded.
-  assert.deepEqual(e.remaining.sumMinutes, [165, 330]);
+  assert.equal(e.remaining.sumMinutes, null, 'a partial subtotal is not the total remaining effort');
+  assert.deepEqual(e.remaining.knownSubtotalMinutes, [165, 330]);
+  assert.equal(e.remaining.partial, true);
   // Longest chain: api -> ui (schema is done and adds zero).
   assert.deepEqual(e.remaining.dependencyLowerBoundMinutes, [150, 300]);
   assert.deepEqual(e.remaining.unestimated, ['svc.docs']);

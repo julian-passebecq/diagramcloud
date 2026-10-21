@@ -9,6 +9,7 @@ export type WorkbenchFrameProps={
  navigationMap?:React.ReactNode;activity?:React.ReactNode;rail?:React.ReactNode;
  primaryTitle?:string;companionTitle?:string;activityTitle?:string;
  controls?:React.ReactNode;status?:React.ReactNode;
+  orientation?:React.ReactNode;
  /** Host choices shown inside the Layout details (for example the default surface); never layout state of this frame. */
  layoutExtras?:React.ReactNode;
 };
@@ -83,7 +84,7 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
    </header>
    <div className="wb-body" hidden={fit.compact&&fit.active==='dock'}>
     <aside {...region('explorer')} className="wb-explorer wb-region" aria-label="Explorer"><h2>Explorer</h2>{p.explorer}</aside>
-    <section {...region('primary')} className="wb-primary wb-region" aria-label={p.primaryTitle??'Architecture view'}><h2>{p.primaryTitle??'Architecture view'}</h2>{p.primary}</section>
+    <section {...region('primary')} className="wb-primary wb-region" aria-label={p.primaryTitle??'Architecture view'}><h2>{p.primaryTitle??'Architecture view'}</h2>{p.orientation}{p.primary}</section>
     <aside {...region('companion')} className="wb-companion wb-region" aria-label={p.companionTitle??'Context and explanation'}><h2>{p.companionTitle??'Context and explanation'}</h2>{p.companion}</aside>
     <nav id={id('rail')} className="wb-rail wb-region" hidden={!fit.rail} aria-label="Semantic navigation" data-wb-region="rail" tabIndex={-1}>{p.rail}</nav>
    </div>

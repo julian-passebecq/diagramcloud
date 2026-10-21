@@ -1,3 +1,16 @@
+# Prepared next source: delivery evidence and exact task reading (20 October 2026)
+
+This Pro contribution is prepared against main 27916ed and is not yet a new qualified package. The completed unified
+1.32 handoff below remains delivered. Its private package source is 5dbcd67, so the later PR113 saved-linked-context fix
+is on main but not in that package. Keep both identities and all prior receipts.
+
+Next: follow the existing roadmap's delivery-readout continuation, run the new actual-App task-binding/race/privacy
+journeys and affected native gates, then package distinctly within recovered grants. Read
+`docs/contracts/delivery-task-reading.md`; preserve wider UX29/30/calendar/result-chain limits. Current native dirty
+state and adoption still need recovery; this text neither launches an agent nor updates a running session.
+
+---
+
 # Now / Next (2026-10-19, 1.32.0 unified continuation)
 
 **Goal.** Land the unified continuation: the F/G/H source contribution (linked reading, domain correspondence, join inspection, meeting summary, review workspace) and three lanes on top of it, wired into the real App, as 1.32.0.
@@ -98,3 +111,7 @@ Genuinely separate remaining horizons are unchanged:
 Known supported-subset limits do not become facts: templates/MSBuild/compiler dispatch/DAX/dynamic infrastructure are not executed; YAML aliases/tags and remote references are not resolved; syntax call candidates are not runtime calls; Git subtree history is not inferred from selected file names. Quantitative conservation is UNKNOWN without a supplied closed-flow assumption. Unsupported/partial recipe availability and scoped omission receipts stay visible. Publications use generated detail pages and source tables rather than claiming a specialized dense figure retained every encoding. Legacy output digests are explicitly unbound. Chromium is the qualified browser; source folders/permissions are session-selected.
 
 Before proposing any later completed change run TypeScript, unit, production build and full Chromium. Renderer changes also require the unchanged real-local-atlas geometry gate and real PowerPoint PNG/ZIP visual inspection. Use a fresh evidence/package directory and exact source SHA; read final CI conclusion. Main merge, tag, deployment, production publication, external collector/executor and provider actions are not authorized by this campaign.
+
+## Pro source ready for native adoption — 20 October
+
+A single attached continuation now preserves delivery-reading fixes and adds interview practice, source-bound reading/phase navigation, a fictional full-stack client and idea portfolios. Read docs/product/LEARNING-IDEATION-CONTINUATION.md and docs/contracts/idea-portfolios.md. Native 1.32/private package facts above remain intact; these changes are not a new release or active native session.

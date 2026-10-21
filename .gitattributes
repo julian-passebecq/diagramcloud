@@ -4,3 +4,5 @@ public/icons/** -text
 examples/workflows/** -text
 # The committed join request fixture must equal the builder output byte for byte (tests/review-workspace.test.ts).
 examples/review-workspace/join.request.json -text
+# The linked delivery plan pins the PM task file by SHA-256 (tests/delivery-task-links.test.ts).
+tests/fixtures/delivery-evidence/linked-*.json -text

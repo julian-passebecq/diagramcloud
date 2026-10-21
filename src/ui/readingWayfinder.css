@@ -1,0 +1,13 @@
+.dc-wayfinder{width:100%;min-width:0;border-top:1px solid var(--border,#8885);padding:8px 4px;color:inherit}
+.dc-wayfinder summary{cursor:pointer;min-height:32px;font-weight:600;overflow-wrap:anywhere}
+.dc-wayfinder-note{font-size:.82em;line-height:1.45}
+.dc-wayfinder button,.dc-wayfinder select{font:inherit;color:inherit;background:var(--panel,#fff);border:1px solid var(--border,#8887);border-radius:7px;padding:7px;margin:3px;min-height:36px;max-width:100%;white-space:normal}
+.dc-wayfinder button[aria-current]{outline:2px solid currentColor}
+.dc-wayfinder-trail{display:flex;flex-wrap:wrap;align-items:center}
+.dc-wayfinder-trail button:not(:last-child)::after{content:' /';opacity:.6}
+.dc-wayfinder-levels{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dc-wayfinder-levels nav{min-width:0}.dc-wayfinder-levels strong{display:block}
+.dc-wayfinder-tree{max-height:220px;overflow:auto;list-style:none;padding:0}
+.dc-wayfinder button:focus-visible,.dc-wayfinder summary:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+@media(max-width:650px){.dc-wayfinder-levels{grid-template-columns:1fr}}
+@media print{.dc-wayfinder{display:none}}
