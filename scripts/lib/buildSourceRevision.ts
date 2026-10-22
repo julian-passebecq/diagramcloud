@@ -11,7 +11,8 @@ const missingGit=(error:unknown)=>(error as NodeJS.ErrnoException)?.code==='ENOE
  * An archive may lack Git metadata: only then use a full provider-supplied source SHA.
  * Dirty or unreadable local metadata stays unknown and is never hidden by an env fallback,
  * with two Vercel build exceptions: the platform clones exactly VERCEL_GIT_COMMIT_SHA, so
- * (1) a HEAD equal to it with only untracked files (build tooling output) keeps that SHA, and
+ * (1) a HEAD equal to it with only untracked files or its own edit of vercel.json (seen in the
+ *     22 Oct 2026 preview build log) keeps that SHA, and
  * (2) a build image without a git executable uses it like a source archive.
  */
 export function describeBuildSourceRevision(checkout=process.cwd(),env:SourceEnvironment=process.env):SourceIdentity{
@@ -30,8 +31,8 @@ export function describeBuildSourceRevision(checkout=process.cwd(),env:SourceEnv
    return {basis:head?'omitted: git status could not be read':'omitted: checkout metadata could not be read'};
   }
   if(!status)return {revision:head,basis:'clean Git checkout HEAD'};
-  const lines=status.split('\n'),untracked=lines.filter(line=>line.startsWith('?? ')).map(line=>line.slice(3));
-  if(vercel&&head===vercel&&untracked.length===lines.length)return {revision:head,basis:`Vercel commit SHA equals HEAD; untracked build files ignored: ${untracked.slice(0,5).join(', ')}${untracked.length>5?', ...':''}`};
+  const lines=status.split('\n'),platform=lines.filter(line=>line.startsWith('?? ')||line===' M vercel.json').map(line=>line.slice(3));
+  if(vercel&&head===vercel&&platform.length===lines.length)return {revision:head,basis:`Vercel commit SHA equals HEAD; build platform files ignored: ${platform.slice(0,5).join(', ')}${platform.length>5?', ...':''}`};
   return {basis:`omitted: checkout has ${lines.length} changed or untracked path(s), e.g. ${lines.slice(0,5).map(line=>line.slice(3)).join(', ')}`};
  }
  const archive=fullRevision(env.VERCEL_GIT_COMMIT_SHA)??fullRevision(env.GITHUB_SHA);
