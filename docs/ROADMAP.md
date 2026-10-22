@@ -10,6 +10,8 @@ Source version: `1.33.1` ([patch notes](release-1.33/RELEASE_NOTES-1.33.1.md): s
 
 ## Selected continuation: release reliability
 
+The [22 October closure contribution and Claude continuation](release-1.33/RELEASE_CLOSURE_20261022.md) adds bounded fixes for structured-cloned corrupt rows, near-limit authoring backups and Windows history bytes, plus the existing-runner deployed smoke scope. Its source tests are green locally; native/browser qualification and a distinctly identified successor remain separate. The existing production alias is verified at 1.33.1 / `8281539`, not upgraded by this proposed branch.
+
 Preserve the existing explanation/design/comparison/presentation workbench, including learning and interviews, ideas, linked views, join evidence, meeting summaries, history and delivery reading. Fix reproducible failures before expanding unrelated feature scope.
 
 The current continuation extends existing recovery and repository-save acceptance: exact observed-row checks for save/recovery/deletion; reconnect after database closure; requested-snapshot semantics; reopenable UTF-8 size boundaries; truthful uncertain-write receipts; and refusal of stale same-handle repository saves. Source and browser regressions must prove both refusal and the successful ordinary path. [The recovery audit](release-1.33/RECOVERY_CAS_20261022.md) and [persistence audit](release-1.33/PERSISTENCE_BOUNDARIES_20261022.md) retain their baseline failures and evidence limits. No new UX IDs or parallel acceptance system are created.

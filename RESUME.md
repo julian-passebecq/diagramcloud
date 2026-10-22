@@ -2,6 +2,12 @@
 
 Source version: `1.33.1` (patch release of #118, #119, #120 and #122; [notes](docs/release-1.33/RELEASE_NOTES-1.33.1.md)). Read [the roadmap](docs/ROADMAP.md) for selected scope and [release verification](docs/RELEASE.md) for release gates. This file is the resumable source checkpoint, not an installed-release claim.
 
+## Current proposed closure and Claude handoff
+
+[22 October release closure](docs/release-1.33/RELEASE_CLOSURE_20261022.md) is the current bounded continuation on `pro/diagramcloud-release-closure-20261022`, based on `8281539`. It repairs structured-cloned malformed-row recovery and near-limit authoring-backup round trips, preserves historical LF bytes on Windows, and adopts the earlier deployed-smoke contribution. Local check/build pass; unit 1,963 pass / three existing skips; bundled clients 21 pass. Eight new real-App regressions and four deployed smoke cases need their exact-source browser evidence; the local Chromium download was unavailable. Read the PR's current CI result before replaying checks.
+
+Provider and live HTTP/browser reads now confirm the existing production alias serves 1.33.1 from `828153990544bd05768a83248ac9542f7c115547`; read-only deep-link inspection is not isolated save/reload/export acceptance. The proposed branch is not a new package or production release. Claude is the requested receiving integrator, not an observed running session; preserve the existing native writer and package identity.
+
 ## Delivered package remains immutable
 
 The last recorded private package is `diagramcloud/1.33.1-1ee51db`, source `1ee51db6cd443afe2cd3126c46fd2f1c5644915d` (PR #123, main CI 39721881018), which contains #118, #119, #120 and #122. The 1.33.0 package `diagramcloud/1.33.0-3e907db` stays unchanged. Its publication receipt is in [outcome.json](outcome.json), `privatePackages`. Post-release source commits below are not inside that package. No successor tag, public release, Marketplace publication, owner acceptance or separately verified deployment is established by this continuation.
