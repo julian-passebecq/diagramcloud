@@ -4,7 +4,7 @@ Updated 22 October 2026. This is the canonical current roadmap, not a new backlo
 
 ## Current source and delivered package
 
-Source version: `1.33.1` ([patch notes](release-1.33/RELEASE_NOTES-1.33.1.md): storage recovery and persistence fixes #118-#120, entry documents #122). The last recorded private package is `diagramcloud/1.33.0-3e907db`; its immutable receipt remains in [outcome.json](../outcome.json), `privatePackages`. Post-release fixes must be identified by commit and qualified separately. They do not silently update that package or establish installation, a public release or deployment.
+Source version: `1.33.1` ([patch notes](release-1.33/RELEASE_NOTES-1.33.1.md): storage recovery and persistence fixes #118-#120, entry documents #122). The last recorded private package is `diagramcloud/1.33.1-1ee51db` (source `1ee51db`, PR #123); its immutable receipt remains in [outcome.json](../outcome.json), `privatePackages`. Post-release fixes must be identified by commit and qualified separately. They do not silently update that package or establish installation, a public release or deployment.
 
 [RESUME.md](../RESUME.md) records the current implementation/qualification checkpoint. [RELEASE.md](RELEASE.md) owns the release procedure and historical release receipts. The older direct-hardening document [RELEASE-READINESS-20261021.md](product/RELEASE-READINESS-20261021.md) is a recovered source checkpoint, not an instruction to reapply fixes already adopted in 1.33.0 and subsequent PRs.
 
