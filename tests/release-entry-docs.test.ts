@@ -5,6 +5,7 @@ import {dirname,resolve,sep} from 'node:path';
 import {createHash} from 'node:crypto';
 
 const read=(path:string)=>readFileSync(path,'utf8');
+const anchors=(text:string)=>new Set(text.split(/\r?\n/).filter(line=>/^#{1,6} /.test(line)).map(line=>line.replace(/^#+ /,'').toLowerCase().replace(/[^\p{L}\p{N}_\-\s]/gu,'').replaceAll(' ','-')));
 const entries=['README.md','docs/ROADMAP.md','RESUME.md'];
 const archives=[
  ['README_HISTORY_20261021.md','f1bd356605999ae8ed951d36501dabfaf749ed83'],
@@ -34,7 +35,7 @@ test('historical entry documents retain their original Git blob identity',()=>{
 });
 
 test('entry documentation local links resolve without breaking historical section anchors',()=>{
- const root=resolve('.'),anchors=(text:string)=>new Set(text.split('\n').filter(line=>/^#{1,6} /.test(line)).map(line=>line.replace(/^#+ /,'').toLowerCase().replace(/[^\p{L}\p{N}_\-\s]/gu,'').replaceAll(' ','-')));
+ const root=resolve('.');
  for(const path of entries)for(const match of read(path).matchAll(/\]\(([^)\s]+)\)/g)){
   const href=match[1];if(/^[a-z]+:/i.test(href))continue;
   const [target,anchor]=href.split('#'),absolute=target?resolve(dirname(path),decodeURIComponent(target)):resolve(path);
@@ -42,6 +43,13 @@ test('entry documentation local links resolve without breaking historical sectio
   assert.ok(existsSync(absolute),`${path}: ${href} exists`);
   if(anchor&&!/^L\d+(?:-L\d+)?$/.test(anchor))assert.ok(anchors(read(absolute)).has(decodeURIComponent(anchor)),`${path}: ${href} has a heading`);
  }
+});
+
+test('documentation heading anchors are identical for LF and Windows CRLF checkouts',()=>{
+ const text='# Current state\n\n## Authoring without raw JSON\n### Evidence / gaps\n';
+ const expected=new Set(['current-state','authoring-without-raw-json','evidence--gaps']);
+ assert.deepEqual(anchors(text),expected);
+ assert.deepEqual(anchors(text.replaceAll('\n','\r\n')),expected);
 });
 
 test('documented npm run commands name real package scripts',()=>{
