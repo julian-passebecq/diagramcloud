@@ -15,7 +15,7 @@ function eventStore(){
   })};
   return tx as unknown as IDBTransaction;
  }} as unknown as IDBDatabase;
- function request(value:()=>unknown){const r={result:undefined,onsuccess:null,onerror:null};queueMicrotask(()=>{r.result=value() as undefined;(r.onsuccess as (()=>void)|null)?.();});return r;}
+ function request(value:()=>unknown){const r={result:undefined,onsuccess:null,onerror:null};queueMicrotask(()=>{r.result=structuredClone(value()) as undefined;(r.onsuccess as (()=>void)|null)?.();});return r;}
  return {rows,db,get opens(){return opens;},set failOpen(value:boolean){failOpen=value;},install(){Object.defineProperty(globalThis,'indexedDB',{configurable:true,value:{open(){opens++;if(failOpen)throw new DOMException('blocked','SecurityError');const r={result:db,error:null,onsuccess:null,onerror:null,onupgradeneeded:null,onblocked:null};queueMicrotask(()=>{current=db;(r.onsuccess as (()=>void)|null)?.();});return r;}}});},close(){(current?.onversionchange as (()=>void)|null)?.();current=null;}};
 }
 const document=(id:string)=>validateDocument(documentSchema.parse({schemaVersion:1,id,title:'Synthetic '+id,rootViewId:'root',nodes:[],edges:[],views:[{id:'root',title:'Root',nodeIds:[],positions:{}}],blocks:[],sources:[]}));
@@ -143,5 +143,52 @@ test('a restored row reusing this tab writer cannot overwrite a changed copy',as
 test('a restored row reusing this tab writer cannot bypass generation conflicts',async()=>{
  const s=eventStore();s.install();const d=document('same-writer-generation');
  try{await saveProject(d);const row=s.rows.get(d.id) as {savedAt:number},replacement={...row,savedAt:row.savedAt+1};s.rows.set(d.id,replacement);await assert.rejects(saveProject(d),/Another tab changed/);assert.deepEqual(s.rows.get(d.id),replacement);}
+ finally{s.close();}
+});
+
+test('an unchanged non-text JSON row can be explicitly deleted after independent cloned reads',async()=>{
+ const s=eventStore();s.install();const id='delete-object-json';
+ s.rows.set(id,{id,json:{broken:['kept',null,{value:NaN}]},writer:'other',savedAt:1});
+ try{const loaded=await loadWorkspace();assert.equal(loaded.warnings[0]?.hasJsonText,false);await deleteRow(id);assert.equal(s.rows.has(id),false);}
+ finally{s.close();}
+});
+
+test('unchanged object-valued recovery metadata permits explicit adoption and a normal repaired save',async()=>{
+ const s=eventStore();s.install();const d=document('repair-object-metadata');
+ s.rows.set(d.id,{id:d.id,json:'broken',writer:{invalid:['writer']},savedAt:{invalid:'generation'}});
+ try{await loadWorkspace();await adoptRow(d.id);await saveProject(d);const result=await loadWorkspace();assert.equal(result.warnings.length,0);assert.equal(result.projects[0]?.id,d.id);}
+ finally{s.close();}
+});
+
+test('a nested change in non-text JSON is still a conflict at the same writer and generation',async()=>{
+ const s=eventStore();s.install();const id='delete-object-replaced';
+ const before={id,json:{broken:['old']},writer:'other',savedAt:1};s.rows.set(id,before);
+ try{await loadWorkspace();const replacement={...before,json:{broken:['new']}};s.rows.set(id,replacement);await assert.rejects(deleteRow(id),/changed|reload/i);await assert.rejects(adoptRow(id),/changed|reload/i);assert.deepEqual(s.rows.get(id),replacement);}
+ finally{s.close();}
+});
+
+for(const [label,before,after] of [
+ ['NaN versus null',{value:NaN},{value:null}],
+ ['undefined versus missing',{value:undefined},{}],
+ ['negative zero versus zero',{value:-0},{value:0}],
+ ['array hole versus undefined',Array(1),[undefined]]
+] as const)test(`recovery comparison preserves ${label}`,async()=>{
+ const s=eventStore();s.install();const id=`delete-object-${label.split(' ')[0]}`;
+ s.rows.set(id,{id,json:before,writer:'other',savedAt:1});
+ try{await loadWorkspace();const replacement={id,json:after,writer:'other',savedAt:1};s.rows.set(id,replacement);await assert.rejects(deleteRow(id),/changed|reload/i);assert.deepEqual(s.rows.get(id),replacement);}
+ finally{s.close();}
+});
+
+test('an unchanged cyclic plain-object row can be deleted without recursing or losing its basis',async()=>{
+ const s=eventStore();s.install();const id='delete-object-cycle',json:{value:string;self?:unknown}={value:'broken'};json.self=json;
+ s.rows.set(id,{id,json,writer:'other',savedAt:1});
+ try{await loadWorkspace();await deleteRow(id);assert.equal(s.rows.has(id),false);}
+ finally{s.close();}
+});
+
+test('changed shared-object references cannot pass as an unchanged recovery basis',async()=>{
+ const s=eventStore();s.install();const id='delete-object-sharing',child={value:'broken'};
+ s.rows.set(id,{id,json:{first:child,second:child},writer:'other',savedAt:1});
+ try{await loadWorkspace();const replacement={id,json:{first:{value:'broken'},second:{value:'broken'}},writer:'other',savedAt:1};s.rows.set(id,replacement);await assert.rejects(deleteRow(id),/changed|reload/i);assert.deepEqual(s.rows.get(id),replacement);}
  finally{s.close();}
 });

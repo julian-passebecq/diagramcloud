@@ -6,7 +6,28 @@ const TAB_ID=crypto.randomUUID();let connection:Promise<IDBDatabase>|undefined;
 type RowBasis={json:unknown;writer:unknown;savedAt:unknown};
 const known=new Map<string,RowBasis>(),quarantined=new Map<string,RowBasis>();
 const rowBasis=(row:Partial<Row>):RowBasis=>({json:row.json,writer:row.writer,savedAt:row.savedAt});
-const sameBasis=(a:RowBasis,b:RowBasis|undefined)=>!!b&&Object.is(a.savedAt,b.savedAt)&&a.writer===b.writer&&a.json===b.json;
+/** IndexedDB clones every read, including malformed object-valued fields. Compare
+ * plain records/arrays by exact values, not object identity or lossy JSON text.
+ * Preserve primitive distinctions and shared/cyclic references. Other structured
+ * clone types are conservatively refused rather than mistaken for empty records. */
+function sameStoredValue(a:unknown,b:unknown):boolean{
+ const pending:[unknown,unknown][]=[[a,b]],forward=new WeakMap<object,object>(),backward=new WeakMap<object,object>();
+ while(pending.length){
+  const [left,right]=pending.pop()!;
+  if(Object.is(left,right))continue;
+  if(!left||!right||typeof left!=='object'||typeof right!=='object')return false;
+  if(forward.has(left)||backward.has(right)){if(forward.get(left)!==right||backward.get(right)!==left)return false;continue;}
+  const leftArray=Array.isArray(left),rightArray=Array.isArray(right);
+  if(leftArray!==rightArray)return false;
+  if(leftArray){if(left.length!==(right as unknown[]).length)return false;}
+  else if(Object.getPrototypeOf(left)!==Object.prototype||Object.getPrototypeOf(right)!==Object.prototype)return false;
+  forward.set(left,right);backward.set(right,left);
+  const keys=Object.keys(left);if(keys.length!==Object.keys(right).length)return false;
+  for(const key of keys){if(!Object.prototype.hasOwnProperty.call(right,key))return false;pending.push([(left as Record<string,unknown>)[key],(right as Record<string,unknown>)[key]]);}
+ }
+ return true;
+}
+const sameBasis=(a:RowBasis,b:RowBasis|undefined)=>!!b&&sameStoredValue(a,b);
 
 type Row={id:string;json:string;writer:string;savedAt:number};
 /** A stored row that could not be loaded. It stays untouched in IndexedDB until the user recovers or deletes it. */

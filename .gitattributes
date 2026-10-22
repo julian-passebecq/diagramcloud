@@ -6,3 +6,7 @@ examples/workflows/** -text
 examples/review-workspace/join.request.json -text
 # The linked delivery plan pins the PM task file by SHA-256 (tests/delivery-task-links.test.ts).
 tests/fixtures/delivery-evidence/linked-*.json -text
+# Historical entry documents are pinned to their Git blob bytes; retain LF even on Windows checkouts.
+README_HISTORY_20261021.md text eol=lf
+docs/ROADMAP_HISTORY_20261021.md text eol=lf
+RESUME_HISTORY_20261021.md text eol=lf

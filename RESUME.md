@@ -2,6 +2,12 @@
 
 Source version: `1.33.1` (patch release of #118, #119, #120 and #122; [notes](docs/release-1.33/RELEASE_NOTES-1.33.1.md)). Read [the roadmap](docs/ROADMAP.md) for selected scope and [release verification](docs/RELEASE.md) for release gates. This file is the resumable source checkpoint, not an installed-release claim.
 
+## Current proposed closure and Claude handoff
+
+[22 October release closure](docs/release-1.33/RELEASE_CLOSURE_20261022.md) is the current bounded continuation on `pro/diagramcloud-release-closure-20261022`, based on `8281539`. It repairs structured-cloned malformed-row recovery, near-limit authoring-backup round trips and build-source identity on Vercel/GitHub; preserves historical LF bytes on Windows; and adopts the earlier deployed-smoke contribution. Local check/build pass; full unit suite 1,974 pass / three existing skips; bundled clients 21 pass. All eight new real-App regressions passed at 1440/390 using the exact pinned browser. Eleven source-identity cases pass. Read the PR for the final clean-build result and current CI before replaying checks.
+
+Provider metadata confirms the existing production alias serves source `828153990544bd05768a83248ac9542f7c115547`; its HTTP handshake reports 1.33.1/G0 but lacks `source_revision`. The strict deployed test correctly refused that missing identity before App interaction. Rebuild after the final clean source commit, verify the dist handshake matches HEAD, then qualify all four deployed cases on the authorized successor. Read-only deep-link inspection is not isolated save/reload/export acceptance. The proposed branch is not a new package or production release. Claude is the requested receiving integrator, not an observed running session; preserve the existing native writer and package identity.
+
 ## Delivered package remains immutable
 
 The last recorded private package is `diagramcloud/1.33.1-1ee51db`, source `1ee51db6cd443afe2cd3126c46fd2f1c5644915d` (PR #123, main CI 39721881018), which contains #118, #119, #120 and #122. The 1.33.0 package `diagramcloud/1.33.0-3e907db` stays unchanged. Its publication receipt is in [outcome.json](outcome.json), `privatePackages`. Post-release source commits below are not inside that package. No successor tag, public release, Marketplace publication, owner acceptance or separately verified deployment is established by this continuation.

@@ -12,6 +12,7 @@ import {portfolioHtml} from '../src/export/html';
 import {svgDiagram} from '../src/export/diagram';
 import {generateNotices} from './notices';
 import {checkIcons,fileIcons} from './icons';
+import {buildSourceRevision} from './lib/buildSourceRevision';
 import {patchSchema} from '../src/core/patch';
 import {projectBriefSchema} from '../src/intelligence/brief';
 import {packSchema} from '../src/experience/model';
@@ -60,10 +61,11 @@ for(const [file,zodSchema,name] of galaxySchemas){
  writeFileSync(`public/galaxy/${file}`,JSON.stringify(zodToJsonSchema(zodSchema,{name,target:'jsonSchema7'}),null,2)+'\n');
 }
 const generatedAt=process.env.SOURCE_DATE_EPOCH?new Date(Number(process.env.SOURCE_DATE_EPOCH)*1000):new Date();
+const sourceRevision=buildSourceRevision();
 writeFileSync('public/galaxy/version-handshake.json',JSON.stringify(versionHandshake({
  productVersion,
  generatedAt,
- ...(process.env.GITHUB_SHA?{sourceRevision:process.env.GITHUB_SHA}:{})
+ ...(sourceRevision?{sourceRevision}:{})
 }),null,2)+'\n');
 writeFileSync('public/galaxy/deep-link-route.json',JSON.stringify(DIAGRAMCLOUD_DEEP_LINK_ROUTE,null,2)+'\n');
 
