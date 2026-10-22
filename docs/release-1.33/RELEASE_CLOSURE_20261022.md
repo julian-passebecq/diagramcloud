@@ -2,6 +2,21 @@
 
 Current bounded Pro result and Claude continuation. This extends the existing release-reliability work in [ROADMAP](../ROADMAP.md); it does not replace the original Studio acceptance or authorize a production deployment. The branch is `pro/diagramcloud-release-closure-20261022`, based on `828153990544bd05768a83248ac9542f7c115547`. The pull request owns its exact proposed source and subsequent CI evidence.
 
+## Outcome — successor deployed and accepted (22 October 2026, 23:07 UTC)
+
+**Production now serves the reliability successor, accepted by the four deployed cases.** The sections below are the dated Pro-pass record that led here.
+
+| Step | Evidence |
+| --- | --- |
+| #125 merged | `b3bd161675b1d583a8b2f5dd153d62beba32fc9a`, exact-head PR CI [39859801595](https://github.com/julian-passebecq/diagramcloud/actions/runs/39859801595) success (all steps incl. browser tests and Linux packaging dry run); main CI 39863815028 success |
+| Defect found after merge | Vercel production build of `b3bd161` (22:17 UTC) still served no `source_revision`. The PR preview build log of #126 proved why: `Build source revision: none (omitted: checkout has 1 changed or untracked path(s), e.g. vercel.json)`. Vercel edits the tracked `vercel.json` during its build. |
+| #126 merged | `0892f9df2c29ab8313c2cb4f60c59061c57478cc`. On Vercel only (`VERCEL=1`), with HEAD equal to `VERCEL_GIT_COMMIT_SHA`, untracked files and that one `vercel.json` edit are ignored; any other tracked change still omits identity. `.vercel/` ignored. The generator prints the identity and its basis. Exact-head PR CI [39866568609](https://github.com/julian-passebecq/diagramcloud/actions/runs/39866568609) success; preview log: `Build source revision: 4686e80… (Vercel commit SHA equals HEAD; build platform files ignored: vercel.json)`. 15 source-identity tests pass. |
+| Production identity | `https://diagramcloud.vercel.app/galaxy/version-handshake.json`: `product_version` 1.33.1, `source_revision` `0892f9df2c29ab8313c2cb4f60c59061c57478cc`, `generated_at` 2026-10-22T23:05:55.987Z |
+| Four deployed cases | **4 PASS** (26 s, Windows, Playwright 1.63.0 Chromium): anonymous deep link with parent context and no page errors, and synthetic import → IndexedDB reload → public export withholding private text, each at 1440 and 390 px. Identity verified before and after each case. |
+| Version | Stays 1.33.1; the handshake `source_revision` identifies the build. |
+
+Left: a private package of this successor in `galaxy-release-vault` (`diagramcloud/1.33.1-0892f9d`, needs the full evidence file of `scripts/package-campaign.ts`, including PPTX visual and real-atlas quality checks). This receipt commit redeploys production at a docs-only SHA; the four cases were re-run against it (see the PR).
+
 ## Decision and current release
 
 **The standalone browser app is already privately packaged and deployed as 1.33.1.** Close the concrete reliability repairs and exact deployed-browser acceptance before declaring the successor accepted. The complete architectural Studio remains broader than this release increment.
