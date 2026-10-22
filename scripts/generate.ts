@@ -12,7 +12,7 @@ import {portfolioHtml} from '../src/export/html';
 import {svgDiagram} from '../src/export/diagram';
 import {generateNotices} from './notices';
 import {checkIcons,fileIcons} from './icons';
-import {buildSourceRevision} from './lib/buildSourceRevision';
+import {describeBuildSourceRevision} from './lib/buildSourceRevision';
 import {patchSchema} from '../src/core/patch';
 import {projectBriefSchema} from '../src/intelligence/brief';
 import {packSchema} from '../src/experience/model';
@@ -61,7 +61,8 @@ for(const [file,zodSchema,name] of galaxySchemas){
  writeFileSync(`public/galaxy/${file}`,JSON.stringify(zodToJsonSchema(zodSchema,{name,target:'jsonSchema7'}),null,2)+'\n');
 }
 const generatedAt=process.env.SOURCE_DATE_EPOCH?new Date(Number(process.env.SOURCE_DATE_EPOCH)*1000):new Date();
-const sourceRevision=buildSourceRevision();
+const sourceIdentity=describeBuildSourceRevision(),sourceRevision=sourceIdentity.revision;
+console.log(`Build source revision: ${sourceRevision??'none'} (${sourceIdentity.basis}).`);
 writeFileSync('public/galaxy/version-handshake.json',JSON.stringify(versionHandshake({
  productVersion,
  generatedAt,

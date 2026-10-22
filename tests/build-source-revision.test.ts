@@ -4,7 +4,7 @@ import {execFileSync} from 'node:child_process';
 import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {buildSourceRevision} from '../scripts/lib/buildSourceRevision';
+import {buildSourceRevision,describeBuildSourceRevision} from '../scripts/lib/buildSourceRevision';
 import {versionHandshake} from '../src/core/galaxy';
 
 const providerSha='a'.repeat(40),mergeSha='b'.repeat(40);
@@ -77,4 +77,38 @@ test('ignored generated output does not invalidate a clean source identity',t=>{
 test('an unreadable Git index does not fall back to a provider SHA',t=>{
  const path=directory(t);checkout(path);writeFileSync(join(path,'.git','index'),'invalid synthetic index');
  assert.equal(buildSourceRevision(path,{VERCEL_GIT_COMMIT_SHA:providerSha,GITHUB_SHA:mergeSha}),undefined);
+});
+
+test('a Vercel build keeps its own commit SHA when only untracked build files appear',t=>{
+ const path=directory(t),{head}=checkout(path);mkdirSync(join(path,'.vercel'));writeFileSync(join(path,'.vercel','project.json'),'{}\n');
+ const identity=describeBuildSourceRevision(path,{VERCEL:'1',VERCEL_GIT_COMMIT_SHA:head});
+ assert.equal(identity.revision,head);assert.match(identity.basis,/build platform files ignored: \.vercel\/project\.json/);
+ // Outside Vercel, or when Vercel names another commit, untracked files still omit identity.
+ assert.equal(buildSourceRevision(path,{VERCEL_GIT_COMMIT_SHA:head}),undefined);
+ assert.equal(buildSourceRevision(path,{VERCEL:'1',VERCEL_GIT_COMMIT_SHA:providerSha}),undefined);
+});
+
+test('a Vercel build never stamps a tracked source change',t=>{
+ const path=directory(t),{head}=checkout(path);writeFileSync(join(path,'source.ts'),'export const synthetic=2;\n');
+ const identity=describeBuildSourceRevision(path,{VERCEL:'1',VERCEL_GIT_COMMIT_SHA:head});
+ assert.equal(identity.revision,undefined);assert.match(identity.basis,/^omitted: checkout has 1 changed/);
+});
+
+test('the identity basis says why a clean checkout or archive was chosen',t=>{
+ const path=directory(t);checkout(path);
+ assert.equal(describeBuildSourceRevision(path,{}).basis,'clean Git checkout HEAD');
+ assert.equal(describeBuildSourceRevision(directory(t),{VERCEL_GIT_COMMIT_SHA:providerSha}).basis,'source archive provider SHA');
+ assert.equal(describeBuildSourceRevision(directory(t),{}).basis,'omitted: no Git metadata and no provider SHA');
+});
+
+test('a Vercel build tolerates its own vercel.json edit but no other tracked change',t=>{
+ const path=directory(t),{git}=checkout(path);
+ writeFileSync(join(path,'vercel.json'),'{"framework":"vite"}\n');git(['add','vercel.json']);
+ git(['-c','user.name=Synthetic build test','-c','user.email=build-test@example.invalid','-c','commit.gpgsign=false','commit','--quiet','-m','Add platform config']);
+ const head=git(['rev-parse','HEAD']);writeFileSync(join(path,'vercel.json'),'{"framework":"vite","rewritten":true}\n');
+ const identity=describeBuildSourceRevision(path,{VERCEL:'1',VERCEL_GIT_COMMIT_SHA:head});
+ assert.equal(identity.revision,head);assert.match(identity.basis,/build platform files ignored: vercel\.json/);
+ assert.equal(buildSourceRevision(path,{VERCEL_GIT_COMMIT_SHA:head}),undefined);
+ writeFileSync(join(path,'source.ts'),'export const synthetic=3;\n');
+ assert.equal(buildSourceRevision(path,{VERCEL:'1',VERCEL_GIT_COMMIT_SHA:head}),undefined);
 });
