@@ -41,7 +41,7 @@ CI (`.github/workflows/ci.yml`) runs typecheck, unit tests, build and Chromium t
 
 ## Static deployment check
 
-[Current closure evidence and Claude continuation](release-1.33/RELEASE_CLOSURE_20261022.md) records the live 1.33.1 provider/HTTP/read-only-browser observations, bounded source repairs and remaining isolated acceptance. The opt-in deployed suite requires `DIAGRAMCLOUD_DEPLOYMENT_URL`, `DIAGRAMCLOUD_EXPECTED_SHA` and `DIAGRAMCLOUD_EXPECTED_VERSION` together and runs only `deployed-smoke.spec.ts`; normal local mode excludes that spec. Re-read target identity before using it. This source contribution and a read-only page check do not by themselves establish a new production release.
+The reliability successor is live and accepted (#125, #126; production `0892f9d`, four deployed cases PASS on 22 Oct). [Current closure evidence](release-1.33/RELEASE_CLOSURE_20261022.md) records the live 1.33.1 provider/HTTP/read-only-browser observations, bounded source repairs and remaining isolated acceptance. The opt-in deployed suite requires `DIAGRAMCLOUD_DEPLOYMENT_URL`, `DIAGRAMCLOUD_EXPECTED_SHA` and `DIAGRAMCLOUD_EXPECTED_VERSION` together and runs only `deployed-smoke.spec.ts`; normal local mode excludes that spec. Re-read target identity before using it. This source contribution and a read-only page check do not by themselves establish a new production release.
 
 On the deployed URL for the exact commit: the gallery loads; TotalEnergies drills SQL quality checks → Required fields with the parent kept; Explore/Edit/Portfolio/Present open; `?project=total-project-controls&view=validation&node=mandatory` opens with the parent context; HTML/SVG/PNG/PPTX exports download; `galaxy/version-handshake.json` reports the expected `product_version` and `G0`.
 
