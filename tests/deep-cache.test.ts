@@ -7,11 +7,11 @@ import type {ScanFile} from '../src/core/scan/scanner';
 import {nodeDeepRuntime} from '../scripts/lib/deepRuntime';
 test('actual Deep client caches four exact validated generated inputs, clones results and clears on abort',async()=>{
  const runtime=await nodeDeepRuntime(),original=globalThis.Worker,profile=analysisProfile('deep'),identity={repositoryId:'synthetic',revision:'a'.repeat(40)};
- let created=0,hold=false,badIdentity=false;
+ let created=0,hold=false,badIdentity=false,heldWorker:WorkerMock|undefined,heldPost:(()=>void)|undefined;
  class WorkerMock{
   onmessage:((event:{data:unknown})=>void)|null=null;onerror:((event:{message:string})=>void)|null=null;terminated=false;
   constructor(){created++;}terminate(){this.terminated=true;}
-  postMessage(data:{files:ScanFile[];profile:AnalysisProfile;repositoryId:string;revision:string}){if(hold)return;void deepAnalyze(data.files,data.profile,runtime,data).then(result=>{if(badIdentity)result.parserVersion+='-mismatch';if(!this.terminated)this.onmessage?.({data:{result}});}).catch(error=>this.onerror?.({message:String(error)}));}
+  postMessage(data:{files:ScanFile[];profile:AnalysisProfile;repositoryId:string;revision:string}){if(hold){heldWorker=this;heldPost?.();return;}void deepAnalyze(data.files,data.profile,runtime,data).then(result=>{if(badIdentity)result.parserVersion+='-mismatch';if(!this.terminated)this.onmessage?.({data:{result}});}).catch(error=>this.onerror?.({message:String(error)}));}
  }
  Object.defineProperty(globalThis,'Worker',{value:WorkerMock,configurable:true,writable:true});
  try{
@@ -23,7 +23,10 @@ test('actual Deep client caches four exact validated generated inputs, clones re
   await deepAnalyzeWorker([{path:'other.ts',text:'export function other() {}'}],profile,identity);assert.equal(created,5);
   await deepAnalyzeWorker(files,profile,identity);assert.equal(created,6,'oldest fifth entry evicts the initial generated result');
   const stopped=new AbortController();stopped.abort();await assert.rejects(deepAnalyzeWorker(files,profile,identity,stopped.signal),/cancelled/);await deepAnalyzeWorker(files,profile,identity);assert.equal(created,7,'aborted request clears generated reuse');
-  hold=true;const controller=new AbortController(),pending=deepAnalyzeWorker(changed,profile,identity,controller.signal);await new Promise(r=>setTimeout(r,20));controller.abort();await assert.rejects(pending,/cancelled/);hold=false;
+  // Wait for actual worker dispatch: on a busy host hashing can take longer than a timer,
+  // in which case aborting earlier correctly creates no worker at all.
+  hold=true;const started=new Promise<void>(resolve=>{heldPost=resolve;}),controller=new AbortController(),pending=deepAnalyzeWorker(changed,profile,identity,controller.signal);
+  await started;controller.abort();await assert.rejects(pending,/cancelled/);assert.equal(heldWorker?.terminated,true,'the dispatched worker is terminated');hold=false;
   await deepAnalyzeWorker(files,profile,identity);assert.equal(created,9,'in-flight cancellation clears cache and terminates worker');
   badIdentity=true;await assert.rejects(deepAnalyzeWorker([{path:'mismatch.ts',text:'const mismatch = 1;'}],profile,identity),/identity differs/);badIdentity=false;
   const partial=[...files,{path:'unsupported.txt',text:'inert'}];await deepAnalyzeWorker(partial,profile,identity);await deepAnalyzeWorker(partial,profile,identity);assert.equal(created,12,'partial acquisition is not reused with another omission report');
