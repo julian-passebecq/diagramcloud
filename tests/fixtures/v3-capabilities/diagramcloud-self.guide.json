@@ -3,411 +3,411 @@
  "title": "DiagramCloud capabilities (self-description)",
  "summary": "What DiagramCloud does, how it is used (browser studio, CLI commands, stdio MCP tools, import and export formats), how it is built, where it comes from and where it stops. Every statement cites a file and line of the public repository at the recorded source cut. Static source only: nothing here was observed running, reviewed or certified; runtime and verification stay UNKNOWN unless a cited line says otherwise.",
  "visibility": "public",
- "capturedAt": "2026-10-19T00:00:00Z",
+ "capturedAt": "2026-10-22T00:00:00Z",
  "sourceCut": [
   {
    "repository": "github.com/julian-passebecq/diagramcloud",
-   "revision": "ecf4af6f45816a62c456a7ebd9aa8f108aae5452"
+   "revision": "d3363269999c7608d230c133c00cde938f23514a"
   }
  ],
  "sources": [
   {
    "id": "readme-what",
-   "title": "README: what it is",
-   "location": "README.md:47",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L47",
+   "title": "Historical README: what it is",
+   "location": "README_HISTORY_20261021.md:47",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L47",
    "visibility": "public"
   },
   {
    "id": "readme-not",
-   "title": "README: what it is not",
-   "location": "README.md:49",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L49",
+   "title": "Historical README: what it is not",
+   "location": "README_HISTORY_20261021.md:49",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L49",
    "visibility": "public"
   },
   {
    "id": "readme-modes",
-   "title": "README: Explore, Edit and Portfolio modes",
-   "location": "README.md:102",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L102",
+   "title": "Historical README: Explore, Edit and Portfolio modes",
+   "location": "README_HISTORY_20261021.md:102",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L102",
    "visibility": "public"
   },
   {
    "id": "readme-node",
-   "title": "README: start locally with Node.js 22",
-   "location": "README.md:87",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L87",
+   "title": "Historical README: start locally with Node.js 22",
+   "location": "README_HISTORY_20261021.md:87",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L87",
    "visibility": "public"
   },
   {
    "id": "readme-storage",
-   "title": "README: browser storage",
-   "location": "README.md:273",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L273",
+   "title": "Historical README: browser storage",
+   "location": "README_HISTORY_20261021.md:273",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L273",
    "visibility": "public"
   },
   {
    "id": "readme-secrets",
-   "title": "README: credential refusal is not DLP",
-   "location": "README.md:275",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L275",
+   "title": "Historical README: credential refusal is not DLP",
+   "location": "README_HISTORY_20261021.md:275",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L275",
    "visibility": "public"
   },
   {
    "id": "readme-public",
-   "title": "README: exports built from publicDocument",
-   "location": "README.md:261",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L261",
+   "title": "Historical README: exports built from publicDocument",
+   "location": "README_HISTORY_20261021.md:261",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L261",
    "visibility": "public"
   },
   {
    "id": "readme-scan-limit",
-   "title": "README: scanner reads declarations only",
-   "location": "README.md:202",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L202",
+   "title": "Historical README: scanner reads declarations only",
+   "location": "README_HISTORY_20261021.md:202",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L202",
    "visibility": "public"
   },
   {
    "id": "readme-lim-browser",
-   "title": "README limit: Chromium only",
-   "location": "README.md:281",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L281",
+   "title": "Historical README limit: Chromium only",
+   "location": "README_HISTORY_20261021.md:281",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L281",
    "visibility": "public"
   },
   {
    "id": "readme-lim-scan",
-   "title": "README limit: declaration-based scanner",
-   "location": "README.md:282",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L282",
+   "title": "Historical README limit: declaration-based scanner",
+   "location": "README_HISTORY_20261021.md:282",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L282",
    "visibility": "public"
   },
   {
    "id": "readme-lim-import",
-   "title": "README limit: import adapters with loss report",
-   "location": "README.md:283",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L283",
+   "title": "Historical README limit: import adapters with loss report",
+   "location": "README_HISTORY_20261021.md:283",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L283",
    "visibility": "public"
   },
   {
    "id": "readme-lim-layout",
-   "title": "README limit: grid and auto layout only",
-   "location": "README.md:284",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L284",
+   "title": "Historical README limit: grid and auto layout only",
+   "location": "README_HISTORY_20261021.md:284",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L284",
    "visibility": "public"
   },
   {
    "id": "readme-lim-runtime",
-   "title": "README limit: no execution or live discovery",
-   "location": "README.md:285",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L285",
+   "title": "Historical README limit: no execution or live discovery",
+   "location": "README_HISTORY_20261021.md:285",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L285",
    "visibility": "public"
   },
   {
    "id": "readme-lim-observe",
-   "title": "README limit: observations are reviewed imports",
-   "location": "README.md:286",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L286",
+   "title": "Historical README limit: observations are reviewed imports",
+   "location": "README_HISTORY_20261021.md:286",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L286",
    "visibility": "public"
   },
   {
    "id": "readme-lim-pptx",
-   "title": "README limit: PPTX is a reconstruction",
-   "location": "README.md:289",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/README.md#L289",
+   "title": "Historical README limit: PPTX is a reconstruction",
+   "location": "README_HISTORY_20261021.md:289",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/README_HISTORY_20261021.md#L289",
    "visibility": "public"
   },
   {
    "id": "guide-observed",
    "title": "AI guide: observed or verified meaning",
    "location": "docs/AI_GUIDE.md:18",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L18",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/docs/AI_GUIDE.md#L18",
    "visibility": "public"
   },
   {
    "id": "guide-synthetic",
    "title": "AI guide: a scan is never observed",
    "location": "docs/AI_GUIDE.md:20",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L20",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/docs/AI_GUIDE.md#L20",
    "visibility": "public"
   },
   {
    "id": "guide-cmd-scan",
    "title": "AI guide command: graph one repository",
    "location": "docs/AI_GUIDE.md:30",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L30",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/docs/AI_GUIDE.md#L30",
    "visibility": "public"
   },
   {
    "id": "guide-cmd-atlas",
    "title": "AI guide command: graph several repositories",
    "location": "docs/AI_GUIDE.md:31",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L31",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/docs/AI_GUIDE.md#L31",
    "visibility": "public"
   },
   {
    "id": "guide-cmd-design",
    "title": "AI guide command: draw every public view",
    "location": "docs/AI_GUIDE.md:34",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L34",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/docs/AI_GUIDE.md#L34",
    "visibility": "public"
   },
   {
    "id": "guide-cmd-check",
    "title": "AI guide command: check edits",
    "location": "docs/AI_GUIDE.md:41",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/docs/AI_GUIDE.md#L41",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/docs/AI_GUIDE.md#L41",
    "visibility": "public"
   },
   {
    "id": "model-validate",
    "title": "validateDocument",
    "location": "src/core/model.ts:214",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/model.ts#L214",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/core/model.ts#L214",
    "visibility": "public"
   },
   {
    "id": "model-provenances",
    "title": "Evidence provenance vocabulary",
    "location": "src/core/model.ts:19",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/model.ts#L19",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/core/model.ts#L19",
    "visibility": "public"
   },
   {
    "id": "ops-public",
    "title": "publicDocument",
    "location": "src/core/operations.ts:9",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/operations.ts#L9",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/core/operations.ts#L9",
    "visibility": "public"
   },
   {
    "id": "real-patch",
    "title": "observationPatch",
    "location": "src/core/realization.ts:52",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/realization.ts#L52",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/core/realization.ts#L52",
    "visibility": "public"
   },
   {
    "id": "proposal-validate",
    "title": "validateProposal",
    "location": "src/core/proposal.ts:101",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/proposal.ts#L101",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/core/proposal.ts#L101",
    "visibility": "public"
   },
   {
    "id": "cli-header",
    "title": "Intelligence CLI header",
    "location": "scripts/intelligence.ts:1",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence.ts#L1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/intelligence.ts#L1",
    "visibility": "public"
   },
   {
    "id": "cli-modes",
    "title": "Intelligence CLI modes",
    "location": "scripts/intelligence.ts:40",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence.ts#L40",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/intelligence.ts#L40",
    "visibility": "public"
   },
   {
    "id": "cli-newdir",
    "title": "Intelligence CLI writes a new directory",
    "location": "scripts/intelligence.ts:120",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence.ts#L120",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/intelligence.ts#L120",
    "visibility": "public"
   },
   {
    "id": "mcp-header",
    "title": "Stdio MCP header",
    "location": "scripts/intelligence-mcp.ts:1",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/intelligence-mcp.ts#L1",
    "visibility": "public"
   },
   {
    "id": "mcp-query",
    "title": "MCP tool diagramcloud_query",
    "location": "scripts/intelligence-mcp.ts:24",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L24",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/intelligence-mcp.ts#L24",
    "visibility": "public"
   },
   {
    "id": "mcp-render",
    "title": "MCP tool diagramcloud_render",
    "location": "scripts/intelligence-mcp.ts:25",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L25",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/intelligence-mcp.ts#L25",
    "visibility": "public"
   },
   {
    "id": "mcp-catalogue",
    "title": "MCP tool diagramcloud_catalogue",
    "location": "scripts/intelligence-mcp.ts:30",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L30",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/intelligence-mcp.ts#L30",
    "visibility": "public"
   },
   {
    "id": "mcp-validate",
    "title": "MCP tool diagramcloud_validate_proposal",
    "location": "scripts/intelligence-mcp.ts:32",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/intelligence-mcp.ts#L32",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/intelligence-mcp.ts#L32",
    "visibility": "public"
   },
   {
    "id": "scan-cli",
    "title": "Scanner CLI header",
    "location": "scripts/scan-repo.ts:2",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/scan-repo.ts#L2",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/scan-repo.ts#L2",
    "visibility": "public"
   },
   {
    "id": "scan-fn",
    "title": "scanRepository",
    "location": "src/core/scan/scanner.ts:71",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/scan/scanner.ts#L71",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/core/scan/scanner.ts#L71",
    "visibility": "public"
   },
   {
    "id": "atlas-cli",
    "title": "Atlas CLI header",
    "location": "scripts/atlas.ts:2",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/atlas.ts#L2",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/atlas.ts#L2",
    "visibility": "public"
   },
   {
    "id": "design-cli",
    "title": "Diagram Design CLI header",
    "location": "scripts/design.ts:2",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/scripts/design.ts#L2",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/scripts/design.ts#L2",
    "visibility": "public"
   },
   {
    "id": "design-recommend",
    "title": "recommendFigures",
    "location": "src/export/design/recommend.ts:26",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/design/recommend.ts#L26",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/export/design/recommend.ts#L26",
    "visibility": "public"
   },
   {
    "id": "import-accept",
    "title": "Accepted interchange file types",
    "location": "src/core/interchange/index.ts:10",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/interchange/index.ts#L10",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/core/interchange/index.ts#L10",
    "visibility": "public"
   },
   {
    "id": "import-fn",
    "title": "importDiagram",
    "location": "src/core/interchange/index.ts:21",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/interchange/index.ts#L21",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/core/interchange/index.ts#L21",
    "visibility": "public"
   },
   {
    "id": "export-drawio",
    "title": "drawioDiagram",
    "location": "src/export/drawio.ts:33",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/drawio.ts#L33",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/export/drawio.ts#L33",
    "visibility": "public"
   },
   {
    "id": "export-html",
    "title": "portfolioHtml",
    "location": "src/export/html.ts:10",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/html.ts#L10",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/export/html.ts#L10",
    "visibility": "public"
   },
   {
    "id": "export-svg",
    "title": "svgDiagram",
    "location": "src/export/diagram.ts:23",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/diagram.ts#L23",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/export/diagram.ts#L23",
    "visibility": "public"
   },
   {
    "id": "export-mermaid",
    "title": "mermaidDiagram",
    "location": "src/export/diagram.ts:54",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/diagram.ts#L54",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/export/diagram.ts#L54",
    "visibility": "public"
   },
   {
    "id": "export-pptx",
    "title": "exportPptx",
    "location": "src/export/pptx.ts:24",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/pptx.ts#L24",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/export/pptx.ts#L24",
    "visibility": "public"
   },
   {
    "id": "export-manual",
    "title": "technicalManualHtml",
    "location": "src/export/manual.ts:77",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/export/manual.ts#L77",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/export/manual.ts#L77",
    "visibility": "public"
   },
   {
    "id": "react-entry",
    "title": "React viewer entrypoint",
    "location": "src/react/index.ts:1",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/react/index.ts#L1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/react/index.ts#L1",
    "visibility": "public"
   },
   {
    "id": "host-negotiate",
    "title": "negotiateCapabilities",
    "location": "src/react/hostSession.ts:45",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/react/hostSession.ts#L45",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/react/hostSession.ts#L45",
    "visibility": "public"
   },
   {
    "id": "layout-fn",
    "title": "layeredLayout",
    "location": "src/core/layout.ts:56",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/core/layout.ts#L56",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/core/layout.ts#L56",
    "visibility": "public"
   },
   {
    "id": "capguide-doc",
    "title": "Capability guide contract comment",
    "location": "src/intelligence/capabilityGuide.ts:3",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/intelligence/capabilityGuide.ts#L3",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/intelligence/capabilityGuide.ts#L3",
    "visibility": "public"
   },
   {
    "id": "capguide-fn",
    "title": "compileCapabilityGuide",
    "location": "src/intelligence/capabilityGuide.ts:60",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/src/intelligence/capabilityGuide.ts#L60",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/src/intelligence/capabilityGuide.ts#L60",
    "visibility": "public"
   },
   {
    "id": "notices-deps",
    "title": "Third-party notices: runtime libraries",
    "location": "THIRD_PARTY_NOTICES.md:7",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/THIRD_PARTY_NOTICES.md#L7",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/THIRD_PARTY_NOTICES.md#L7",
    "visibility": "public"
   },
   {
    "id": "notices-design",
    "title": "Third-party notices: diagram-design grammar",
    "location": "THIRD_PARTY_NOTICES.md:69",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/THIRD_PARTY_NOTICES.md#L69",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/THIRD_PARTY_NOTICES.md#L69",
    "visibility": "public"
   },
   {
    "id": "notices-tree",
    "title": "Third-party notices: tree-sitter runtime",
    "location": "THIRD_PARTY_NOTICES.md:110",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/THIRD_PARTY_NOTICES.md#L110",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/THIRD_PARTY_NOTICES.md#L110",
    "visibility": "public"
   },
   {
    "id": "license",
    "title": "Project licence",
    "location": "LICENSE:1",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/LICENSE#L1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/LICENSE#L1",
    "visibility": "public"
   },
   {
    "id": "ci-workflow",
    "title": "CI workflow",
    "location": ".github/workflows/ci.yml:1",
-   "url": "https://github.com/julian-passebecq/diagramcloud/blob/ecf4af6f45816a62c456a7ebd9aa8f108aae5452/.github/workflows/ci.yml#L1",
+   "url": "https://github.com/julian-passebecq/diagramcloud/blob/d3363269999c7608d230c133c00cde938f23514a/.github/workflows/ci.yml#L1",
    "visibility": "public"
   }
  ],

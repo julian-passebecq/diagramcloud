@@ -6,7 +6,7 @@ For the integrator. This records what the two capability examples contain, which
 
 | Example | Source cut | Recorded in |
 |---|---|---|
-| DiagramCloud self-description | `github.com/julian-passebecq/diagramcloud` at `ecf4af6f45816a62c456a7ebd9aa8f108aae5452` (main, "V3 foundation (W0 + W5)") | guide `sourceCut`, `diagramcloud-self.anchors.json` `sourceCut`, and every source `url` (`blob/<sha>/<path>#L<line>`) |
+| DiagramCloud self-description | `github.com/julian-passebecq/diagramcloud` at the revision in `diagramcloud-self.anchors.json` `sourceCut` (first `ecf4af6f45816a62c456a7ebd9aa8f108aae5452`, main, "V3 foundation (W0 + W5)"; re-cut on 2026-10-22 when the README was rewritten and its cited lines moved verbatim to `README_HISTORY_20261021.md`) | guide `sourceCut`, `diagramcloud-self.anchors.json` `sourceCut`, and every source `url` (`blob/<sha>/<path>#L<line>`) |
 | Synthetic question-answering service | No product revision: the cited file is the synthetic specification added with this change | guide `sourceCut` says so in words |
 
 Every source `location` is `path:line`. The paired `*.anchors.json` gives the exact text expected on that line; `tests/v3-capabilities.test.ts` re-reads the file and refuses a citation whose line no longer holds it. The cited files were read at the source cut; this change adds files only and edits none of them.
