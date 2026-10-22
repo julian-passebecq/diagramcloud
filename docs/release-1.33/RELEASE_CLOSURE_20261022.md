@@ -50,6 +50,14 @@ The five files from the earlier production-closure dossier were recovered and ma
 
 This extends the existing Playwright runner. Ordinary mode retains local tests; explicit deployed mode selects only four synthetic smoke cases, starts no fixture servers and requires the exact HTTPS DiagramCloud origin, full source SHA and stable version. Handshake mismatches fail before App interaction. New contexts carry no saved authentication state; the synthetic edit case refuses remote HTTP mutations and foreign hosts. Vercel's repository install command becomes `npm ci --no-fund --no-audit`; Node settings, manifests, lockfile and workflow are unchanged.
 
+### Identify the actual build source on GitHub and Vercel
+
+Running the deployed check exposed a third release defect: the real 1.33.1 production handshake has no `source_revision`. The generator read only `GITHUB_SHA`, which Vercel does not supply. On GitHub pull requests that variable can identify a temporary merge commit even though this repository's workflow checks out the PR head.
+
+`scripts/lib/buildSourceRevision.ts` now uses the actual full HEAD of a clean checkout, including linked worktrees. Dirty tracked or untracked source, an unborn checkout or unreadable Git status leaves the optional identity absent; provider metadata cannot disguise those states. An archive without its own Git metadata uses a validated full `VERCEL_GIT_COMMIT_SHA`, then `GITHUB_SHA`, otherwise omits the field. It never borrows the HEAD of an enclosing repository. Eleven focused tests exercise these cases with real temporary Git repositories. The existing Galaxy schema already allows this field; no schema, product version or G0 change is introduced.
+
+The four deployed cases remain strict. The current production build cannot pass their exact-source guard until a separately qualified successor includes the corrected handshake. Its source is presently established by Vercel metadata, not a source field in its HTTP handshake. The failed attempt stopped in `beforeEach` before App interaction; it is not evidence of a broken save or export.
+
 ## Verification and limits
 
 The local verification environment was Linux / Node **24.19.0**, with `npm ci` from the existing lockfile. The existing CI uses Node 22. Counts below are local executions on the proposed working tree, not a claim that predecessor CI qualifies it.
@@ -57,38 +65,39 @@ The local verification environment was Linux / Node **24.19.0**, with `npm ci` f
 | Check | Result |
 | --- | --- |
 | TypeScript, `npm run check` | PASS |
-| Full `npm test` | **1,963 PASS / 0 FAIL / 3 existing SKIP**, 1,966 total; approximately 83 seconds |
+| Full `npm test` | **1,974 PASS / 0 FAIL / 3 existing SKIP**, 1,977 total; approximately 82 seconds |
 | Production build | PASS; existing large-bundle warning retained |
 | Standalone CLI/MCP qualification | **21 PASS**; actual bundled clients isolated from project node_modules, synthetic inputs |
 | Deployed-target helper | **42 PASS**; included in the full unit count |
 | Normal/deployed discovery | Existing local suite selected normally; deployed mode selects exactly four tests in one file |
-| New browser regressions | Eight prepared. Local attempt failed before assertions because the Chromium executable is absent; seven were not started after the first launch failure. |
-| Pinned Chromium installation | FAILED: the download endpoint returned a 195-byte HTML “Site Unavailable” page instead of its ZIP. No substitute browser version or bypass was used. |
+| New browser regressions | **8 PASS**, 59.4 seconds, at exact 1440/390 viewports on the clean `cec841a27ba1938956ab840531b05d81037bf920` build. The subsequent source-identity repair does not change App behavior. Earlier missing-executable and extracted-file permission failures are retained as setup failures. |
+| Build source identity | **11 focused PASS**, including actual checkout versus PR merge SHA, Vercel fallback, dirty/untracked source, worktrees, ignored generated output and a corrupt Git index. |
+| Pinned Chromium installation | The original CDN returned a 195-byte HTML page instead of a ZIP. The exact same Chrome Headless Shell **153.0.8010.12** was then obtained from Google's official per-version manifest URL; Google MD5, ZIP CRC and executable version verified. Archive SHA256: `a9da028861a0cf789ff25c2fed45f5f1aaf969ed9247835b6a7821a4f7af9d1d`. No browser version changed. |
 | Live connected Chrome inspection | Read-only deep link opened at the canonical alias; parent and child views plus Export & share visible; no captured error logs. Measured CSS widths were 433 and 1600 after viewport requests, so this is not the exact 390/1440 automated qualification. Viewport override reset afterward. |
-| Fresh deployed save/reload/export cases | NOT RUN here; the connected browser inspection does not substitute for isolated-context persistence/privacy tests. |
+| Four deployed cases | Initial direct connection failed DNS; the unchanged suite then reached production through the configured credential-free egress proxy. It correctly refused the missing `source_revision` before App interaction: one setup failure, three not run. Fresh deployed save/reload/export/privacy remain pending on the corrected successor. |
 | Installed Cursor/update/rollback/signing/Marketplace | No new qualification |
 
-The controlled IndexedDB unit tests are not real-browser proof. The existing full unit suite exercises export/public-redaction behavior; no export renderer changed, and no new native PowerPoint/human-readability acceptance is claimed. The local CLI receipt honestly identifies a dirty working tree based on the predecessor; use the PR's exact-head CI for release binding.
+The controlled IndexedDB unit tests and the eight real-browser regressions are distinct evidence. The existing full unit suite exercises export/public-redaction behavior; no export renderer changed, and no new native PowerPoint/human-readability acceptance is claimed. The local CLI receipt honestly identifies a dirty working tree based on the predecessor; use the PR's current exact-head CI for release binding. The PR records later complete-suite and clean-build/package results; do not inherit a superseded commit's CI.
 
 ## Claude continuation: one integrator, finite remaining blocks
 
 1. **Recover ownership and exact source.** Read Galaxy START/NOW, native AGENTS/README/RESUME/ROADMAP/RELEASE and this PR. Preserve any active native writer or dirty checkout. Compare the PR source; do not replay #115–#124 or copy the old five-file contribution again. The proposed fixes are already together on this branch. No Claude session was launched by publication.
-2. **Qualify the proposed source using the existing runner.** Read this PR's CI result and failed logs first. Require the full normal typecheck/unit/CLI/build/browser/package checks, including the eight new cases. When inputs match, reuse those receipts instead of repeating all tests. Resolve any real failure without forced clicks, weakened assertions, or another CI/harness.
-3. **Qualify the selected deployed build.** Re-read provider source/version before setting the three variables below. Run the four isolated deployed cases, retain their screenshots/downloads/errors and verify identity before and after. Do not claim the predecessor live-page inspection qualifies a newly built successor. Do not disable protection, clear owner storage, change origin or use bypass credentials.
+2. **Qualify and rebuild the final clean source using the existing runner.** Read this PR's current CI result and failed logs first. Require the full normal typecheck/unit/CLI/build/browser/package checks, including the eight new cases. When inputs match, reuse those receipts instead of repeating all tests. After the final source commit, rebuild and explicitly require `dist/galaxy/version-handshake.json.source_revision` to equal `git rev-parse HEAD` before packaging; an earlier dirty build deliberately lacks this exact identity. Resolve a real failure without forced clicks, weakened assertions, or another CI/harness.
+3. **Qualify the selected deployed successor.** Re-read provider source/version before setting the three variables below. The current predecessor is known to omit the source field, so it cannot pass this strict gate. After authorized successor deployment, run the four isolated deployed cases, retain their screenshots/downloads/errors and verify identity before and after. Do not claim the predecessor live-page inspection qualifies a newly built successor. Do not disable protection, clear owner storage, change origin or use bypass credentials.
 4. **Integrate and deliver under the native release grant.** The native lead owns semver, manifests, merge, final source/package identity and production action. Main auto-deploys; this PR is not merged by the Pro pass. Preserve `1.33.1-1ee51db` and earlier packages, recheck rollback eligibility, and bind final acceptance to exact source/deployment/assets/time. A receipt-only main commit may trigger another deployment: keep final observations in the PR receipt, or verify that new deployment explicitly.
 
-For the currently observed predecessor only (replace both identity values if the provider moves):
+After the corrected successor is selected, replace the placeholders with independently re-read provider and product identity:
 
 ```powershell
 $env:DIAGRAMCLOUD_DEPLOYMENT_URL = 'https://diagramcloud.vercel.app'
-$env:DIAGRAMCLOUD_EXPECTED_SHA = '828153990544bd05768a83248ac9542f7c115547'
-$env:DIAGRAMCLOUD_EXPECTED_VERSION = '1.33.1'
+$env:DIAGRAMCLOUD_EXPECTED_SHA = '<full source SHA of the selected deployed successor>'
+$env:DIAGRAMCLOUD_EXPECTED_VERSION = '<product version of the selected deployed successor>'
 npm run test:e2e -- --list
 npm run test:e2e
 Remove-Item Env:DIAGRAMCLOUD_DEPLOYMENT_URL, Env:DIAGRAMCLOUD_EXPECTED_SHA, Env:DIAGRAMCLOUD_EXPECTED_VERSION
 ```
 
-Source qualification and deployed-predecessor inspection can proceed independently. Final successor acceptance follows the final source and deployment. No Azure/Fabric credentials are needed for this bounded standalone-browser work. Actual MFA or new release authority remains the owner's action only if encountered; no secret or credential is transferred in this handoff.
+Source qualification and read-only deployed-predecessor inspection can proceed independently. Exact-source successor acceptance follows the final clean source, rebuild and authorized deployment. No Azure/Fabric credentials are needed for this bounded standalone-browser work. Actual MFA or new release authority remains the owner's action only if encountered; no secret or credential is transferred in this handoff.
 
 **Planning allowance:** 1–3 active engineer-hours for a clean native finish with an available browser, passing PR checks and existing release authority. CI/build queues, account/owner waits and repairs are additional and unknown. This is not a calendar promise. Reforecast on the first browser or CI defect.
 
@@ -102,4 +111,4 @@ After release, propose the existing onboarding/explicit-refresh wave first, then
 
 ## Stop boundary
 
-This Pro pass delivers reviewed source repairs, regression coverage, current deployment observations and a native continuation. It does not turn a missing browser executable into PASS, mutate the current production alias, transfer ownership, or mark the whole Studio complete. Consult the PR for newer exact-head CI evidence before acting on the local limitations above.
+This Pro pass delivers reviewed source repairs, eight passing new App regressions, a reproduced deployment-identity gap and its source repair, current deployment observations and a native continuation. It does not treat a refused deployed handshake as acceptance, mutate the current production alias, transfer ownership, or mark the whole Studio complete. Consult the PR for newer exact-head CI evidence before acting on the dated observations above.

@@ -10,7 +10,7 @@ Source version: `1.33.1` ([patch notes](release-1.33/RELEASE_NOTES-1.33.1.md): s
 
 ## Selected continuation: release reliability
 
-The [22 October closure contribution and Claude continuation](release-1.33/RELEASE_CLOSURE_20261022.md) adds bounded fixes for structured-cloned corrupt rows, near-limit authoring backups and Windows history bytes, plus the existing-runner deployed smoke scope. Its source tests are green locally; native/browser qualification and a distinctly identified successor remain separate. The existing production alias is verified at 1.33.1 / `8281539`, not upgraded by this proposed branch.
+The [22 October closure contribution and Claude continuation](release-1.33/RELEASE_CLOSURE_20261022.md) adds bounded fixes for structured-cloned corrupt rows, near-limit authoring backups, Windows history bytes and exact build-source identity on Vercel/GitHub, plus the existing-runner deployed smoke scope. Its source tests and eight new real-App cases are green locally. The actual deployed test exposed the current build's missing source field and correctly stopped before App interaction. Final clean-source CI/rebuild, four deployed successor cases and a distinctly identified release remain separate. The existing production alias is verified by provider metadata at 1.33.1 / `8281539`, not upgraded by this proposed branch.
 
 Preserve the existing explanation/design/comparison/presentation workbench, including learning and interviews, ideas, linked views, join evidence, meeting summaries, history and delivery reading. Fix reproducible failures before expanding unrelated feature scope.
 
