@@ -10,15 +10,15 @@ For contributors, start with [AGENTS.md](AGENTS.md). Agents using the applicatio
 
 | Dimension | State | Authority |
 |---|---|---|
-| Source version | `1.33.0` | [package.json](package.json) |
+| Source version | `1.33.1` | [package.json](package.json) |
 | Document schema | `1` | [canonical model](src/core/model.ts) |
 | Galaxy maturity | `G0` standalone | [release contract](docs/RELEASE.md) |
 | Last recorded private package | `diagramcloud/1.33.0-3e907db` | [outcome.json](outcome.json), `privatePackages` |
 | Post-release source and exact-head checks | Separate from the immutable package | [current continuation](RESUME.md) |
 
-The package above predates the recovery and persistence follow-ups. A matching version string does not mean two source commits or delivered packages are identical. Read the exact source, CI receipt and package identity before claiming a release is installed or verified.
+The package above is 1.33.0; it predates the 1.33.1 recovery and persistence fixes, whose own private package is recorded after the release merge. A matching version string does not mean two source commits or delivered packages are identical. Read the exact source, CI receipt and package identity before claiming a release is installed or verified.
 
-1.33.0 includes interview practice, idea portfolios, the reading wayfinder, exact delivery-task links, restored linked-view contexts and storage recovery. See [the release notes](docs/release-1.33/RELEASE_NOTES.md). V2/V3 are integrated in bounded slices, not complete products: [the roadmap](docs/ROADMAP.md), [R4 acceptance](docs/product/R4_CROSSWALK.md) and [V3 acceptance](docs/product/V3_WORKSPACE.md) retain the remaining work.
+1.33.1 is a patch of storage recovery and persistence fixes ([1.33.1 notes](docs/release-1.33/RELEASE_NOTES-1.33.1.md)). 1.33.0 includes interview practice, idea portfolios, the reading wayfinder, exact delivery-task links, restored linked-view contexts and storage recovery. See [the release notes](docs/release-1.33/RELEASE_NOTES.md). V2/V3 are integrated in bounded slices, not complete products: [the roadmap](docs/ROADMAP.md), [R4 acceptance](docs/product/R4_CROSSWALK.md) and [V3 acceptance](docs/product/V3_WORKSPACE.md) retain the remaining work.
 
 ## Start locally
 
