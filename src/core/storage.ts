@@ -1,5 +1,5 @@
 import {canonical} from './learningMapping';
-import {errorMessage,parseDocument,type Project} from './model';
+import {errorMessage,parseDocument,MAX_DOCUMENT_BYTES,type Project} from './model';
 const TAB_ID=crypto.randomUUID();let connection:Promise<IDBDatabase>|undefined;
 // Keep the observed bytes and writer as well as the generation: corrupt or
 // externally restored rows may reuse a timestamp. Recovery must not rebind.
@@ -76,20 +76,24 @@ export async function loadProjects():Promise<Project[]>{return (await loadWorksp
 
 /** Compare generation inside a single transaction; conflicting tabs never silently overwrite. */
 export async function saveProject(doc:Project):Promise<void>{
+ // Capture the requested bytes before yielding. A later edit must not change
+ // what this operation saves, and an unreopenable draft must not replace a backup.
+ const id=doc.id,json=JSON.stringify(doc);
+ if(new TextEncoder().encode(json).byteLength>MAX_DOCUMENT_BYTES)throw new Error('Project exceeds the 12 MiB local document limit. Download a backup, then reduce embedded images or evidence before saving. The stored copy was not changed.');
  const db=await open();
  return new Promise((resolve,reject)=>{
-  const tx=db.transaction('projects','readwrite'),store=tx.objectStore('projects');let problem:Error|null=null;let timestamp=0,json='';
-  const r=store.get(doc.id);
-  r.onsuccess=()=>{const previous=r.result as Row|undefined;if(previous&&!sameBasis(rowBasis(previous),known.get(doc.id))){problem=new Error('Another tab changed this project. Export your JSON, then reload before editing.');tx.abort();return;}
+  const tx=db.transaction('projects','readwrite'),store=tx.objectStore('projects');let problem:Error|null=null;let timestamp=0;
+  const r=store.get(id);
+  r.onsuccess=()=>{const previous=r.result as Row|undefined;if(previous&&!sameBasis(rowBasis(previous),known.get(id))){problem=new Error('Another tab changed this project. Export your JSON, then reload before editing.');tx.abort();return;}
    // A disappeared, previously loaded row is an external deletion. Only the
    // explicit same-tab delete/adopt flow may establish a fresh creation basis.
-   if(!previous&&known.has(doc.id)){problem=new Error('Another tab removed this project. Export your JSON, then reload before restoring it.');tx.abort();return;}
+   if(!previous&&known.has(id)){problem=new Error('Another tab removed this project. Export your JSON, then reload before restoring it.');tx.abort();return;}
    // Explicitly adopted malformed timestamps must not survive as NaN/Infinity,
    // or stop advancing through numeric overflow. Normal generations still advance.
    const prior=previous?.savedAt;timestamp=Math.max(Date.now(),typeof prior==='number'&&Number.isSafeInteger(prior)&&prior>=0&&prior<Number.MAX_SAFE_INTEGER?prior+1:0);
    // A throwing put (quota, serialization) would abort with no reason; keep the real one.
-   try{json=JSON.stringify(doc);store.put({id:doc.id,json,writer:TAB_ID,savedAt:timestamp} satisfies Row);}catch(error){problem=new Error(storageErrorMessage(error));tx.abort();}};
-  tx.oncomplete=()=>{known.set(doc.id,{json,writer:TAB_ID,savedAt:timestamp});quarantined.delete(doc.id);resolve();};
+   try{store.put({id,json,writer:TAB_ID,savedAt:timestamp} satisfies Row);}catch(error){problem=new Error(storageErrorMessage(error));tx.abort();}};
+  tx.oncomplete=()=>{known.set(id,{json,writer:TAB_ID,savedAt:timestamp});quarantined.delete(id);resolve();};
   tx.onabort=tx.onerror=()=>reject(problem??(tx.error?new Error(storageErrorMessage(tx.error)):new Error('Local save failed. Export a JSON backup.')));
  });
 }
