@@ -15,3 +15,5 @@ public/experience/
 public/third-party-licenses.txt
 public/galaxy/
 .local/
+# Vercel CLI and build tooling
+.vercel/
