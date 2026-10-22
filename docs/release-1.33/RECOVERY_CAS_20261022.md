@@ -7,8 +7,11 @@ schema, migration, dependency, release version, deployment or private package.
 
 PR #118 was integrated as `2aa6bc082fc2b772d4c4e79879d8690020ad3faa` after exact-head
 `d92b928bb9fea219322191823c5fc96b16c54d4d` passed CI `39674865347`. Its downloaded
-artifact `12382192590` matched SHA-256
-`805b424f2f12af76d77f9fc89e7d650c5e0d09eec15955e97c15b873eae74f26773`.
+artifact `12382192590` (67,702,374 bytes) matches SHA-256
+`235843550da51c831152bc17daa5737ea1158ecb83776f237e45d9289139a46c8ab`.
+This digest was recomputed from the downloaded ZIP and matched to GitHub metadata.
+It corrects the earlier incorrect `805b424f...` digest in this audit and prior
+qualification comments; historical commits and the delivered package are not rewritten.
 The browser report contains 332 passed, zero failed/flaky and five existing
 optional external-host skips. All eight recovery-generation cases passed.
 The receipt and SOURCE_COMMIT.txt name d92b928; the integrated tree is identical.
@@ -34,7 +37,7 @@ The guard compares the existing row basis (JSON, writer and generation), not
 an immutable audit log. It is conflict detection, not collaboration, a security
 boundary against other scripts on the origin, or universal corruption recovery.
 
-## Evidence and remaining qualification
+## Source evidence
 
 Six new source cases contain five failing baseline regressions and one passing
 control. The 23-case recovery-contract selection on the predecessor produced
@@ -47,10 +50,21 @@ doubles are not native IndexedDB; this is not a pinned npm build/typecheck.
 Eight new Playwright cases at 1440 and 390 pixels cover a replacement arriving
 in another real tab after confirmation opens, disappearance, unchanged-row
 deletion/reload and same-writer replacement with preservation of the author's
-backup. They require exact-head CI before adoption. No existing test, skip,
-assertion, timeout or CI rule is weakened.
+backup. No existing test, skip, assertion, timeout or CI rule was weakened.
 
-The predecessor's green CI does not qualify this differential. Record the new
-head's typecheck, full units, build, browser suite and packaging result before
-merging. Keep the existing 1.33.0 private package immutable; successor packaging,
+## Qualification and integration
+
+PR #119 exact head `e286afe6647893bb2215b8d05518abb633c2d6a2` passed complete CI
+`39690285115`: semantic typecheck, full units, CLI/MCP qualification, production
+build, Chromium browser tests and Linux packaging dry run. All eight new browser
+cases passed. The report totals 340 passed, zero failed/flaky and five existing
+optional external-host skips; these counts include the predecessor's cases.
+
+Downloaded artifact `12388134456` (67,691,779 bytes) matches SHA-256
+`1e65161042735456e0843257a85132dada3325f35f5b49afe5c0c10ab6de6ede`.
+The receipt and SOURCE_COMMIT.txt identify e286afe. PR #119 integrated as
+`f54550df414ddfc45b4a0552bbb81afe04187754` only after that qualification.
+
+These results qualify the named source, not a later documentation or persistence
+head. Keep the existing 1.33.0 private package immutable; successor packaging,
 installed hosts and any changed export visuals remain separately gated.
