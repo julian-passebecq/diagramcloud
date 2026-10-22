@@ -4,7 +4,7 @@ Source version: `1.33.1` (patch release of #118, #119, #120 and #122; [notes](do
 
 ## Delivered package remains immutable
 
-The last recorded private package is `diagramcloud/1.33.0-3e907db`, source `3e907db997783601a43f9e86084ad50196407590`. Its publication receipt is in [outcome.json](outcome.json), `privatePackages`. Post-release source commits below are not inside that package. No successor tag, public release, Marketplace publication, owner acceptance or separately verified deployment is established by this continuation.
+The last recorded private package is `diagramcloud/1.33.1-1ee51db`, source `1ee51db6cd443afe2cd3126c46fd2f1c5644915d` (PR #123, main CI 39721881018), which contains #118, #119, #120 and #122. The 1.33.0 package `diagramcloud/1.33.0-3e907db` stays unchanged. Its publication receipt is in [outcome.json](outcome.json), `privatePackages`. Post-release source commits below are not inside that package. No successor tag, public release, Marketplace publication, owner acceptance or separately verified deployment is established by this continuation.
 
 ## Integrated recovery fixes
 
