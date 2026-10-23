@@ -1,0 +1,11 @@
+.explanation-request { box-sizing: border-box; width: min(850px, calc(100vw - 24px)); }
+.explanation-request form, .explanation-request fieldset { min-width: 0; }
+.explanation-request fieldset { margin: 12px 0; padding: 12px; border: 1px solid var(--colorNeutralStroke1, #ccc); }
+.explanation-request label:not(.explanation-choice) { display: grid; gap: 4px; margin: 10px 0; }
+.explanation-request input:not([type=checkbox]), .explanation-request select, .explanation-request textarea { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; font: inherit; padding: 6px; }
+.explanation-request .explanation-choice { display: flex; align-items: flex-start; gap: 8px; margin: 6px 0; overflow-wrap: anywhere; }
+.explanation-request .explanation-choice input { flex: 0 0 auto; }
+.explanation-request .explanation-state { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; margin: 8px 0; align-items: center; }
+.explanation-request .toolbar, .explanation-request .modal-actions { flex-wrap: wrap; }
+.explanation-request pre, .explanation-request p, .explanation-request legend { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .explanation-request .explanation-state { grid-template-columns: minmax(0, 1fr); } }

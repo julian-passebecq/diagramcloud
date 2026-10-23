@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateDocument,type Project} from '../src/core/model';
+import {publicDocument,commitHistory,undo} from '../src/core/operations';
+import {applyDocumentPatch} from '../src/core/patch';
+import {prepareExplanationWalkthrough} from '../src/intelligence/explanationWalkthrough';
+import {explanationBasis,explanationRequest,explanationSourceMatches,explanationStepInView,newExplanationDraft,newExplanationStep,prepareExplanationDraft,applyPreparedExplanation,type ExplanationDraft} from '../src/intelligence/explanationRequestDraft';
+
+function project(){return validateDocument({schemaVersion:1,id:'compose-demo',revision:7,title:'Synthetic explanation',rootViewId:'root',tours:[],
+ nodes:[{id:'caller',label:'Caller',blockIds:['code']},{id:'api',label:'API'},{id:'hidden',label:'Private subject',visibility:'private'}],
+ edges:[{id:'request',source:'caller',target:'api',label:'Request',kind:'query'}],
+ views:[{id:'root',title:'Architecture',nodeIds:['caller','api','hidden'],edgeIds:['request']},{id:'detail',title:'Detail',nodeIds:['api'],edgeIds:[]}],
+ blocks:[{id:'code',title:'Synthetic request',type:'code',language:'text',code:'const request = 1;\nreturn request;',provenance:'synthetic'}],
+ sources:[{id:'source',title:'Authored fixture reference',location:'synthetic reference, not a measured run'}]});}
+function draft(p=project()):ExplanationDraft{const d=newExplanationDraft(p,'root','caller');d.title='Why a request needs a result';d.question='What is sent?';d.steps[0].title='Request';d.steps[0].narration='This is an authored request example.';return d;}
+
+test('opening captures immutable source identity without changing the source',()=>{const p=project(),before=structuredClone(p),basis=explanationBasis(p);assert.ok(Object.isFrozen(basis));assert.equal(basis.projectId,p.id);assert.equal(basis.revision,7);assert.deepEqual(p,before);});
+test('a new draft uses only a valid explicit selection, never a label-based match',()=>{const p=project();assert.deepEqual(newExplanationDraft(p,'root','caller').steps[0].nodeIds,['caller']);assert.deepEqual(newExplanationDraft(p,'detail','caller').steps[0].nodeIds,[]);assert.deepEqual(newExplanationDraft(p,'missing','Caller').steps[0].nodeIds,[]);});
+test('a new explanation avoids an existing entry instead of overwriting it',()=>{const p=project();p.nodes.push({...p.nodes[0],id:'walk-explanation'});assert.equal(newExplanationDraft(p,'root',null).id,'explanation-2');});
+test('new steps have distinct IDs, no inferred timing or causal prerequisite',()=>{const a=newExplanationStep([],'root'),b=newExplanationStep([a],'root');assert.notEqual(a.id,b.id);assert.deepEqual(b.dependsOn,[]);assert.deepEqual(b.before,[]);assert.equal(b.provenance,'synthetic');});
+test('view changes clear exact subject and code choices and preserve authored narration',()=>{const step=draft().steps[0];step.edgeIds=['request'];step.code={blockId:'code',fromLine:1,toLine:2};const before=structuredClone(step),changed=explanationStepInView(step,'detail');assert.deepEqual(changed.nodeIds,[]);assert.deepEqual(changed.edgeIds,[]);assert.equal(changed.code,undefined);assert.equal(changed.narration,step.narration);assert.deepEqual(step,before);});
+test('form preparation uses exactly the existing walkthrough compiler',()=>{const p=project(),basis=explanationBasis(p),d=draft(p);assert.deepEqual(prepareExplanationDraft(p,basis,d),prepareExplanationWalkthrough(p,explanationRequest(basis,d)));});
+test('review changes neither project nor request; ordinary history applies one revision and Undo',()=>{const p=project(),d=draft(p),before=structuredClone(p),beforeDraft=structuredClone(d),out=prepareExplanationDraft(p,explanationBasis(p),d);assert.deepEqual(p,before);assert.deepEqual(d,beforeDraft);const applied=applyDocumentPatch(p,out.patch).result,history=commitHistory({past:[],present:p,future:[]},applied);assert.equal(history.present.revision,8);assert.deepEqual(undo(history).present,before);});
+test('private authored additions do not change the public projection',()=>{const p=project(),out=prepareExplanationDraft(p,explanationBasis(p),draft(p));assert.deepEqual(publicDocument(out.preview),publicDocument(p));assert.equal(out.preview.observations.length,0);assert.equal(out.preview.tours?.[0].visibility,'private');});
+for(const [name,edit] of [
+ ['project identity',(p:Project)=>{p.id='other';}],['revision',(p:Project)=>{p.revision++;}],
+ ['same-revision code',(p:Project)=>{const b=p.blocks[0];if(b.type==='code')b.code='changed';}],
+ ['same-revision title',(p:Project)=>{p.title='Changed interpretation';}],
+ ['same-revision source',(p:Project)=>{p.sources[0].location='different';}]
+] as const)test(`changed ${name} refuses preparation without rebinding the request`,()=>{const p=project(),basis=explanationBasis(p),d=draft(p);edit(p);const before=structuredClone(p);assert.equal(explanationSourceMatches(p,basis),false);assert.throws(()=>prepareExplanationDraft(p,basis,d),/source changed/);assert.equal(explanationRequest(basis,d).projectId,'compose-demo');assert.equal(explanationRequest(basis,d).baseRevision,7);assert.deepEqual(p,before);});
+test('an incomplete or stale draft can be exported without claiming validated input',()=>{const p=project(),basis=explanationBasis(p),d=newExplanationDraft(p,'root',null);p.revision++;const backup=explanationRequest(basis,d);assert.equal(backup.title,'');assert.equal(backup.baseRevision,7);assert.doesNotThrow(()=>JSON.stringify(backup));assert.throws(()=>prepareExplanationDraft(p,basis,d));});
+test('missing Tours still requires the explicit existing initialization gate',()=>{const p=project();delete p.tours;const before=structuredClone(p);assert.throws(()=>prepareExplanationDraft(p,explanationBasis(p),draft(p)),/Tours collection/);assert.deepEqual(p,before);});
+test('nonsynthetic narration requires citations and is not promoted to an observation',()=>{const p=project(),d=draft(p);d.steps[0].provenance='source-derived';assert.throws(()=>prepareExplanationDraft(p,explanationBasis(p),d),/source reference/);d.sourceIds=['source'];const out=prepareExplanationDraft(p,explanationBasis(p),d);assert.equal(out.preview.observations.length,0);});
+test('optional declared state and exact code excerpt survive form preparation',()=>{const p=project(),d=draft(p);d.steps[0].before=[{name:'attempt',value:'one, synthetic'}];d.steps[0].after=[{name:'reply',value:'illustrative'}];d.steps[0].code={blockId:'code',fromLine:2,toLine:2};const out=prepareExplanationDraft(p,explanationBasis(p),d);assert.ok(out.preview.blocks.some(b=>b.type==='code'&&b.id.startsWith('walk-')&&b.code==='return request;'));assert.equal(out.preview.blocks.filter(b=>b.type==='table'&&b.id.startsWith('walk-')).length,2);});
+test('removing or changing a selected component cannot silently choose a similar name',()=>{const p=project(),d=draft(p);d.steps[0].nodeIds=['Caller'];assert.throws(()=>prepareExplanationDraft(p,explanationBasis(p),d),/stable|outside|Invalid/i);});
+test('the existing compiler retains limits and refuses repeated explanation IDs',()=>{const p=project(),basis=explanationBasis(p),d=draft(p);const out=prepareExplanationDraft(p,basis,d);assert.throws(()=>prepareExplanationDraft(out.preview,explanationBasis(out.preview),d),/already exists/);d.steps=Array.from({length:31},(_,i)=>({...d.steps[0],id:`step-${i+1}`}));assert.throws(()=>prepareExplanationDraft(p,basis,d));});
+
+for(const [name,edit] of [
+ ['revision',(p:Project)=>{p.revision++;}],['same-revision title',(p:Project)=>{p.title='Replacement';}],
+ ['same-revision source',(p:Project)=>{p.sources[0].location='New source';}],['project',(p:Project)=>{p.id='foreign';}]
+] as const)test(`Apply refuses ${name} drift after a valid preparation`,()=>{const p=project(),basis=explanationBasis(p),out=prepareExplanationDraft(p,basis,draft(p));edit(p);const before=structuredClone(p);assert.throws(()=>applyPreparedExplanation(p,basis,out.patch),/source changed/);assert.deepEqual(p,before);});
+test('Apply uses the native patch and a replay is refused after the host commits',()=>{const p=project(),basis=explanationBasis(p),out=prepareExplanationDraft(p,basis,draft(p));const next=applyPreparedExplanation(p,basis,out.patch);assert.deepEqual(next,applyDocumentPatch(p,out.patch).result);const committed=commitHistory({past:[],present:p,future:[]},next).present;assert.throws(()=>applyPreparedExplanation(committed,basis,out.patch),/source changed/);});
