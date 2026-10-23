@@ -1,0 +1,320 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\julia\\AppData\\Local\\npm-cache\\_npx\\52027bd8fc0022aa\\node_modules\\node\\bin\\node.exe",
+      "C:\\Users\\julia\\.codex\\worktrees\\b874\\diagramcloud\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/e2e/concept-host.spec.ts",
+      "tests/e2e/mosaic-workspace.spec.ts",
+      "tests/e2e/custom-icons.spec.ts",
+      "--grep",
+      "native owner concept viewer|native local host opens|malformed optional artwork",
+      "--output",
+      ".local/continuation/canonical-final-browser/results",
+      "--reporter=list,json"
+    ],
+    "configFile": "C:\\Users\\julia\\.codex\\worktrees\\b874\\diagramcloud\\playwright.config.ts",
+    "rootDir": "C:/Users/julia/.codex/worktrees/b874/diagramcloud/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/julia/.codex/worktrees/b874/diagramcloud/.local/continuation/canonical-final-browser/results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/julia/.codex/worktrees/b874/diagramcloud/tests/e2e",
+        "testIgnore": [
+          "**/deployed-smoke.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 45000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "concept-host.spec.ts",
+      "file": "concept-host.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "native owner concept viewer in isolated local host",
+          "file": "concept-host.spec.ts",
+          "line": 9,
+          "column": 6,
+          "specs": [
+            {
+              "title": "actual load/ready, both SVGs, exact-source messages and source mapping boundary",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1268,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-23T16:38:38.544Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "43bc9d02a147917213e6-cc201c7a1212373b403e",
+              "file": "concept-host.spec.ts",
+              "line": 18,
+              "column": 2
+            },
+            {
+              "title": "real WebGL scene, reduced motion, selection and disposal; context loss is explicitly limited",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3043,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-23T16:38:40.240Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "43bc9d02a147917213e6-65009cf89f02f6f0da3c",
+              "file": "concept-host.spec.ts",
+              "line": 29,
+              "column": 2
+            },
+            {
+              "title": "unavailable WebGL retains explicit useful SVG modes and accessible controls",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 843,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-23T16:38:43.299Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "43bc9d02a147917213e6-f4e57fb034e927a131f2",
+              "file": "concept-host.spec.ts",
+              "line": 41,
+              "column": 2
+            },
+            {
+              "title": "only the explicitly authorized opener receives hello and separate manual source mapping",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 45000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 911,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-23T16:38:44.159Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "43bc9d02a147917213e6-c2dabb33a4657bea9f66",
+              "file": "concept-host.spec.ts",
+              "line": 47,
+              "column": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "custom-icons.spec.ts",
+      "file": "custom-icons.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "malformed optional artwork falls back while valid PNG JPEG WebP retain 4:1 native deck aspect",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3612,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T16:38:45.255Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fbd6eec151858210045e-4e620bff54cce7457e6d",
+          "file": "custom-icons.spec.ts",
+          "line": 6,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "mosaic-workspace.spec.ts",
+      "file": "mosaic-workspace.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "native local host opens from the workspace and returns only the matching current mapping",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3460,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T16:38:48.911Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f38e685b8b9b1c313c43-bfeefd609aec1550f276",
+          "file": "mosaic-workspace.spec.ts",
+          "line": 29,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-23T16:38:09.876Z",
+    "duration": 46896.174000000006,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,33 @@
+[WebServer] (node:68188) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:71984) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:38792) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:34972) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:76656) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+Running 6 tests using 1 worker
+
+(node:44704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 tests\e2e\concept-host.spec.ts:18:2 › native owner concept viewer in isolated local host › actual load/ready, both SVGs, exact-source messages and source mapping boundary (1.3s)
+  ok 2 tests\e2e\concept-host.spec.ts:29:2 › native owner concept viewer in isolated local host › real WebGL scene, reduced motion, selection and disposal; context loss is explicitly limited (3.0s)
+  ok 3 tests\e2e\concept-host.spec.ts:41:2 › native owner concept viewer in isolated local host › unavailable WebGL retains explicit useful SVG modes and accessible controls (843ms)
+  ok 4 tests\e2e\concept-host.spec.ts:47:2 › native owner concept viewer in isolated local host › only the explicitly authorized opener receives hello and separate manual source mapping (911ms)
+  ok 5 tests\e2e\custom-icons.spec.ts:6:1 › malformed optional artwork falls back while valid PNG JPEG WebP retain 4:1 native deck aspect (3.6s)
+  ok 6 tests\e2e\mosaic-workspace.spec.ts:29:1 › native local host opens from the workspace and returns only the matching current mapping (3.5s)
+
+  6 passed (46.9s)

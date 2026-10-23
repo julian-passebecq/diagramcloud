@@ -1,0 +1,397 @@
+{
+  "format": "diagramcloud.release-evidence-scan/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "capturedAt": "2026-10-23T16:50:12.091Z",
+  "scannedFiles": 59,
+  "scannedTextFiles": 40,
+  "binaryFilesNotTextScanned": [
+    "docs/qualification/explanation-release-20261023/editor/1440-applied.png",
+    "docs/qualification/explanation-release-20261023/editor/1440-form-bottom.png",
+    "docs/qualification/explanation-release-20261023/editor/1440-form-middle.png",
+    "docs/qualification/explanation-release-20261023/editor/1440-form-top.png",
+    "docs/qualification/explanation-release-20261023/editor/1440-returned-form-optional.png",
+    "docs/qualification/explanation-release-20261023/editor/1440-returned-form-top.png",
+    "docs/qualification/explanation-release-20261023/editor/1440-review-actions.png",
+    "docs/qualification/explanation-release-20261023/editor/1440-review-top.png",
+    "docs/qualification/explanation-release-20261023/editor/390-applied.png",
+    "docs/qualification/explanation-release-20261023/editor/390-form-bottom.png",
+    "docs/qualification/explanation-release-20261023/editor/390-form-middle.png",
+    "docs/qualification/explanation-release-20261023/editor/390-form-top.png",
+    "docs/qualification/explanation-release-20261023/editor/390-returned-form-optional.png",
+    "docs/qualification/explanation-release-20261023/editor/390-returned-form-top.png",
+    "docs/qualification/explanation-release-20261023/editor/390-review-actions.png",
+    "docs/qualification/explanation-release-20261023/editor/390-review-top.png",
+    "docs/qualification/explanation-release-20261023/pptx/source.pptx",
+    "docs/qualification/explanation-release-20261023/pptx/Slide1.PNG",
+    "docs/qualification/explanation-release-20261023/pptx/Slide2.PNG"
+  ],
+  "privateAtlasInputSha256": "15e22675c342804735a57af2b812ebc1875355c082aeaa71ee1fc9cb7062d220",
+  "candidateTerms": 173,
+  "privateOnlyTermsChecked": 42,
+  "findings": [],
+  "missing": [],
+  "passed": true,
+  "limits": [
+    "Pattern and exact-term scan, not a proof that every possible secret is absent.",
+    "Private atlas names/URLs and matched text are never written to this report.",
+    "Public product names already present in tracked source are not treated as private atlas leakage.",
+    "Machine workspace/runtime paths are counted as informational references; browser profile contents remain excluded.",
+    "Synthetic deck and screenshot contents rely on the separately recorded visual reviews."
+  ],
+  "files": [
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/verify-artifact.py",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/artifact-verification.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 1
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/ARTIFACT-VERIFICATION.md",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/browser-summary.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/verification-receipt.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/bundled-client-receipt.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/built-handshake.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/artifact-metadata.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/job.log",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/ci/workflow-run.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/publisher/publish-private-package.py",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/publisher/PRIVATE-PACKAGE-PUBLISHER.md",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 2
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/publisher/private-publisher-self-check.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/publisher/private-publisher-transport-check.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/canonical-copychecks-130c707-attempt1.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/canonical-copychecks-130c707-canonical.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/canonicalize-checkout.mjs",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/build-130c707-canonical-final.log",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 4
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/qualification-130c707-canonical.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/qualified-cli-inventory-130c707-canonical.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/vsix-comparison-130c707-canonical.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical-attempt1.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical-attempt2.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/vscode-host-diagnosis-130c707-canonical.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/cursor-host-130c707-canonical.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/local/bundled-client-receipt.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/browser/canonical-browser-receipt.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/browser/report.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 6
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/browser/browser.log",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/deployed-smoke.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/editor-result.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/VISUAL-REVIEW.md",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-applied.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-form-bottom.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-form-middle.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-form-top.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-returned-form-optional.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-returned-form-top.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-review-actions.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-review-top.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/390-applied.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/390-form-bottom.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/390-form-middle.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/390-form-top.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/390-returned-form-optional.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/390-returned-form-top.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/390-review-actions.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/editor/390-review-top.png",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/pptx/source.pptx",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/pptx/render-receipt.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/pptx/zip-inventory.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/pptx/VISUAL-REVIEW.md",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/pptx/Slide1.PNG",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/pptx/Slide2.PNG",
+      "text": false,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/visual-manifest.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/RELEASE-SUMMARY.md",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/tools/publish-release-evidence.mjs",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/tools/release-evidence-files.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    }
+  ]
+}

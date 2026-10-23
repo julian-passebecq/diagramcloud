@@ -1,0 +1,48 @@
+
+> diagramcloud@1.33.1 build
+> tsx scripts/generate.ts && vite build
+
+Icon registry: 27 entries; every shipped icon matches its recorded source.
+Build source revision: 130c70744ec8fdeefebb784c56afb53c182f8dfa (clean Git checkout HEAD).
+Preserved available license notices for 239 installed package versions.
+Generated JSON Schema, Galaxy V1G contracts and 21 standalone example sets.
+vite v6.4.3 building for production...
+transforming...
+[plugin vite:resolve] Module "fs/promises" has been externalized for browser compatibility, imported by "C:/Users/julia/.codex/worktrees/b874/diagramcloud/node_modules/web-tree-sitter/tree-sitter.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "module" has been externalized for browser compatibility, imported by "C:/Users/julia/.codex/worktrees/b874/diagramcloud/node_modules/web-tree-sitter/tree-sitter.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "fs/promises" has been externalized for browser compatibility, imported by "C:/Users/julia/.codex/worktrees/b874/diagramcloud/node_modules/web-tree-sitter/tree-sitter.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "module" has been externalized for browser compatibility, imported by "C:/Users/julia/.codex/worktrees/b874/diagramcloud/node_modules/web-tree-sitter/tree-sitter.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+node_modules/web-tree-sitter/tree-sitter.js (2978:32): Use of eval in "node_modules/web-tree-sitter/tree-sitter.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+node_modules/web-tree-sitter/tree-sitter.js (3001:34): Use of eval in "node_modules/web-tree-sitter/tree-sitter.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+node_modules/web-tree-sitter/tree-sitter.js (2978:32): Use of eval in "node_modules/web-tree-sitter/tree-sitter.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+node_modules/web-tree-sitter/tree-sitter.js (3001:34): Use of eval in "node_modules/web-tree-sitter/tree-sitter.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+✓ 2747 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/assets/__vite-browser-external-9wXp6ZBx.js       0.09 kB
+dist/index.html                                       0.51 kB │ gzip:   0.34 kB
+dist/assets/browserDeepRuntime-BL8d0uLg.js           75.08 kB
+dist/assets/tree-sitter-qKYAACSa.wasm               205.49 kB │ gzip:  81.31 kB
+dist/assets/deepWorker-B-JdIsvc.js                  213.48 kB
+dist/assets/sourceBundleWorker-Bax9BwAs.js          255.07 kB
+dist/assets/analysisWorker-BKW55tdI.js              353.38 kB
+dist/assets/tree-sitter-javascript-BIQS8cIx.wasm    411.77 kB │ gzip:  51.29 kB
+dist/assets/tree-sitter-python-BlcJAWGl.wasm        457.88 kB │ gzip:  69.46 kB
+dist/assets/tree-sitter-typescript-BQpamM5l.wasm  1,413.85 kB │ gzip: 141.98 kB
+dist/assets/tree-sitter-tsx-DFihddBo.wasm         1,445.64 kB │ gzip: 144.93 kB
+dist/assets/tree-sitter-c-sharp-By7IL2zh.wasm     5,103.33 kB │ gzip: 317.27 kB
+dist/assets/index-aDvZp46b.css                       97.13 kB │ gzip:  18.14 kB
+dist/assets/__vite-browser-external-BIHI7g3E.js       0.09 kB │ gzip:   0.11 kB │ map:     0.21 kB
+dist/assets/slides-BkQiTjS6.js                        2.64 kB │ gzip:   1.44 kB │ map:     7.19 kB
+dist/assets/deepClient-19mQlVM6.js                    3.66 kB │ gzip:   1.69 kB │ map:    21.96 kB
+dist/assets/deck-ftscJHWr.js                          9.78 kB │ gzip:   3.96 kB │ map:    26.79 kB
+dist/assets/pptx-_MvCS6N5.js                         10.83 kB │ gzip:   4.95 kB │ map:    30.94 kB
+dist/assets/pptx-BvvAxfN7.js                         20.81 kB │ gzip:   8.22 kB │ map:    60.80 kB
+dist/assets/pptxgen.es-DYnR0eyb.js                  373.23 kB │ gzip: 126.82 kB │ map:   905.62 kB
+dist/assets/index-CFCh8jDZ.js                     2,718.41 kB │ gzip: 846.95 kB │ map: 7,647.32 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 16.35s

@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "sourceSha256": "79a4e892c70131ebb8d573ea545cc666e1ede3f1d8332990543c60f4ee0b826a",
+  "renderer": "Microsoft PowerPoint COM read-only open, WithWindow=false, PNG export",
+  "rendererVersion": "16.0",
+  "slideCount": 2,
+  "exportedPngCount": 2,
+  "dimensions": "1600x900",
+  "sourceUnchanged": true,
+  "pngs": [
+    {
+      "name": "Slide1.PNG",
+      "bytes": 23139,
+      "sha256": "32c790731a41d8c1324205c70a0b7f7e40542430070bf544205582b39cae847a"
+    },
+    {
+      "name": "Slide2.PNG",
+      "bytes": 29157,
+      "sha256": "8a5929f2960210b69560748fe663c4a507c31eeb44fc365ff3e0e9558bbf1f4a"
+    }
+  ],
+  "limitation": "Synthetic export; agent visual inspection only, not human owner acceptance"
+}

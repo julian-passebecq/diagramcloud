@@ -1,0 +1,23 @@
+{
+  "mode": "read-only-existing-package-transport-check",
+  "package_id": 73509686,
+  "package_version": "1.33.1-0892f9d",
+  "glab_version": "1.119.0",
+  "writes_attempted": 0,
+  "files": [
+    {
+      "file": "READY.json",
+      "bytes": 5646,
+      "sha256": "d7790f096cd78947585fd87b48c5401fb3e10aee59ff049df307e3e02b5852b1",
+      "remote_size_match": true,
+      "remote_sha256_match": true
+    },
+    {
+      "file": "diagramcloud-synthetic-examples.tar.gz",
+      "bytes": 7814,
+      "sha256": "be2d3d51dda8028371da1eb9ab516964ca26126e70f0d49def3ab860471b2ee7",
+      "remote_size_match": true,
+      "remote_sha256_match": true
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "sourceCommit": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "runId": "39985734370",
+  "embeddedZipSha256": "ce4f955f4be0c66e16b52aac175987c4dd132137e66260cf4fa13ea1ffe4d028",
+  "embeddedZipCrcFailure": null,
+  "fileCount": 89,
+  "stats": {
+    "total": 367,
+    "expected": 362,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 5,
+    "ok": true
+  },
+  "independentOutcomeCounts": {
+    "expected": 362,
+    "skipped": 5
+  },
+  "detailStatusCounts": {
+    "passed": 362,
+    "skipped": 5
+  },
+  "testCount": 367,
+  "resultCount": 367,
+  "maxRetry": 0,
+  "resultsPerTest": {
+    "1": 367
+  },
+  "errors": [],
+  "actualWorkers": 1,
+  "gitCommit": {
+    "shortHash": "130c707",
+    "hash": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+    "subject": "Merge PR #131: explanation authoring and draft retention",
+    "body": "Merge PR #131: explanation authoring and draft retention\n\nAdopt the combined #129/#130 increment with reviewed draft-retention fixes. Exact-head qualification and independently verified artifact evidence are recorded in PR #131. Existing immutable packages remain preserved; the resulting main commit requires its own deployment and package receipts.",
+    "author": {
+      "name": "Julian Passebecq",
+      "email": "64646018+julian-passebecq@users.noreply.github.com",
+      "time": 1792772324000
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "time": 1792772324000
+    },
+    "branch": "HEAD"
+  },
+  "ciMetadata": {
+    "commitHref": "https://github.com/julian-passebecq/diagramcloud/commit/130c70744ec8fdeefebb784c56afb53c182f8dfa",
+    "commitHash": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+    "buildHref": "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370"
+  },
+  "gitDiffPresent": false,
+  "gitDiffSha256": null,
+  "skips": [
+    {
+      "file": "concept-host.spec.ts",
+      "title": "actual load/ready, both SVGs, exact-source messages and source mapping boundary",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Set DIAGRAMCLOUD_MOSAIC_VIEWER and DIAGRAMCLOUD_MOSAIC_VIEWER_SHA256 to explicitly select the owner artifact.",
+          "location": {
+            "file": "/home/runner/work/diagramcloud/diagramcloud/tests/e2e/concept-host.spec.ts",
+            "line": 10,
+            "column": 7
+          }
+        }
+      ]
+    },
+    {
+      "file": "concept-host.spec.ts",
+      "title": "real WebGL scene, reduced motion, selection and disposal; context loss is explicitly limited",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Set DIAGRAMCLOUD_MOSAIC_VIEWER and DIAGRAMCLOUD_MOSAIC_VIEWER_SHA256 to explicitly select the owner artifact.",
+          "location": {
+            "file": "/home/runner/work/diagramcloud/diagramcloud/tests/e2e/concept-host.spec.ts",
+            "line": 10,
+            "column": 7
+          }
+        }
+      ]
+    },
+    {
+      "file": "concept-host.spec.ts",
+      "title": "unavailable WebGL retains explicit useful SVG modes and accessible controls",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Set DIAGRAMCLOUD_MOSAIC_VIEWER and DIAGRAMCLOUD_MOSAIC_VIEWER_SHA256 to explicitly select the owner artifact.",
+          "location": {
+            "file": "/home/runner/work/diagramcloud/diagramcloud/tests/e2e/concept-host.spec.ts",
+            "line": 10,
+            "column": 7
+          }
+        }
+      ]
+    },
+    {
+      "file": "concept-host.spec.ts",
+      "title": "only the explicitly authorized opener receives hello and separate manual source mapping",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Set DIAGRAMCLOUD_MOSAIC_VIEWER and DIAGRAMCLOUD_MOSAIC_VIEWER_SHA256 to explicitly select the owner artifact.",
+          "location": {
+            "file": "/home/runner/work/diagramcloud/diagramcloud/tests/e2e/concept-host.spec.ts",
+            "line": 10,
+            "column": 7
+          }
+        }
+      ]
+    },
+    {
+      "file": "mosaic-workspace.spec.ts",
+      "title": "native local host opens from the workspace and returns only the matching current mapping",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Owner Mosaic standalone viewer was not selected for this host.",
+          "location": {
+            "file": "/home/runner/work/diagramcloud/diagramcloud/tests/e2e/mosaic-workspace.spec.ts",
+            "line": 30,
+            "column": 59
+          }
+        }
+      ]
+    }
+  ],
+  "explanationCases": [
+    {
+      "title": "form prepares ordinary review, applies once, undoes, reloads and stays private",
+      "path": [
+        "explanation request form 1440"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "Escape keeps a dirty request until explicit discard; no overflow or project edit",
+      "path": [
+        "explanation request form 1440"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "Back to request retains every authored field and original source basis before review and Apply",
+      "path": [
+        "explanation request form 1440"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "unsupported code range is refused without discarding the author draft",
+      "path": [
+        "explanation request form 1440"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "missing Tours initialization is explicit and undoable, not a hidden preparation write",
+      "path": [
+        "explanation request form 1440"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "undoing Tours initialization retains the original request through source drift and Back from review",
+      "path": [
+        "explanation request form 1440"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "form prepares ordinary review, applies once, undoes, reloads and stays private",
+      "path": [
+        "explanation request form 390"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "Escape keeps a dirty request until explicit discard; no overflow or project edit",
+      "path": [
+        "explanation request form 390"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "Back to request retains every authored field and original source basis before review and Apply",
+      "path": [
+        "explanation request form 390"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "unsupported code range is refused without discarding the author draft",
+      "path": [
+        "explanation request form 390"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "missing Tours initialization is explicit and undoable, not a hidden preparation write",
+      "path": [
+        "explanation request form 390"
+      ],
+      "outcome": "expected"
+    },
+    {
+      "title": "undoing Tours initialization retains the original request through source drift and Back from review",
+      "path": [
+        "explanation request form 390"
+      ],
+      "outcome": "expected"
+    }
+  ]
+}

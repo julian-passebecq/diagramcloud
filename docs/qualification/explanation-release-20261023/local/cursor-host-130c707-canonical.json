@@ -1,0 +1,19 @@
+{
+  "existingSelectedHostExecutable": true,
+  "host": "Cursor",
+  "status": "NOT_RUN",
+  "hostDownloaded": false,
+  "normalProfileUsed": false,
+  "harnessLimitation": true,
+  "format": "diagramcloud.installed-host-qualification/1",
+  "checks": {
+    "fail": 0,
+    "tests": 0,
+    "skipped": 0,
+    "pass": 0
+  },
+  "productFailureClaimed": false,
+  "reason": "The existing Cursor harness unconditionally hides account onboarding with CSS, so the optional installed Cursor check was not started in this bounded release pass.",
+  "scope": "No Cursor installed viewer behavior or whole Studio acceptance claim.",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa"
+}

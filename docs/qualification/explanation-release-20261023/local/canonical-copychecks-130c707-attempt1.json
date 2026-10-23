@@ -1,0 +1,13 @@
+{
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "format": "diagramcloud.canonical-source-copy/1",
+  "sourceWorktreeDirty": false,
+  "qualificationStarted": false,
+  "lineEndingOnlyMismatches": 218,
+  "identicalRawGitBlobs": 705,
+  "checkedAt": "2026-10-23T16:34:38.0940436Z",
+  "mismatches": 218,
+  "method": "Single git ls-tree batch; raw working file bytes hashed as Git blob objects and compared against every pinned source blob ID. All mismatches matched after CRLF to LF normalization, but exact-byte guard correctly refused them.",
+  "trackedFiles": 923,
+  "status": "FAIL"
+}

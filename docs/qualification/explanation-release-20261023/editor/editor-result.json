@@ -1,0 +1,58 @@
+{
+  "target": "https://diagramcloud.vercel.app",
+  "expectedSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "version": "1.33.1",
+  "method": "AI visual inspection of automated Chromium screenshots with disposable contexts; local IndexedDB only; same-origin GET and HEAD only",
+  "results": [
+    {
+      "identityBefore": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+      "identityAfter": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+      "width": 1440,
+      "formGeometry": {
+        "scrollWidth": 928,
+        "clientWidth": 928,
+        "width": 930,
+        "viewport": 1440
+      },
+      "reviewGeometry": {
+        "scrollWidth": 928,
+        "clientWidth": 928,
+        "width": 930,
+        "viewport": 1440
+      },
+      "requestRetained": true,
+      "revisionBefore": 1,
+      "revisionAfter": 2,
+      "toursAdded": 1,
+      "pageErrors": [],
+      "blockedForeignOrMutatingRequests": []
+    },
+    {
+      "identityBefore": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+      "identityAfter": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+      "width": 390,
+      "formGeometry": {
+        "scrollWidth": 354,
+        "clientWidth": 354,
+        "width": 356,
+        "viewport": 390
+      },
+      "reviewGeometry": {
+        "scrollWidth": 354,
+        "clientWidth": 354,
+        "width": 356,
+        "viewport": 390
+      },
+      "requestRetained": true,
+      "revisionBefore": 1,
+      "revisionAfter": 2,
+      "toursAdded": 1,
+      "pageErrors": [],
+      "blockedForeignOrMutatingRequests": []
+    }
+  ],
+  "format": "diagramcloud.deployed-editor-public-receipt/1",
+  "screenshotsVisuallyInspected": 16,
+  "observedDefects": [],
+  "rawResultSha256": "c9beea50a5c7cf7efcd0bba5fd0e674843b174e985c9133db83f1a797d159bfb"
+}

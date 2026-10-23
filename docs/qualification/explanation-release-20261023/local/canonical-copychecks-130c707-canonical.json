@@ -1,0 +1,12 @@
+{
+  "format": "diagramcloud.canonical-source-copy/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "sourceWorktreeDirty": false,
+  "checkedAt": "2026-10-23T16:37:23.796Z",
+  "status": "PASS",
+  "method": "Single git ls-tree batch; raw working file bytes hashed as Git blob objects and compared against every pinned source blob ID.",
+  "trackedFiles": 923,
+  "identicalRawGitBlobs": 923,
+  "mismatches": 0,
+  "inventorySha256": "fcfb05d5113188611422f9f5b8cdf239eb00ea30410a6a6f4cfb5bb4ac0d94d4"
+}

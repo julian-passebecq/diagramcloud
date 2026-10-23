@@ -1,0 +1,17 @@
+{
+  "format": "diagramcloud.vsix-canonical-comparison/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "previousVsixSha256": "74424c117e8ecfb8716cce22dbb4bc9125d4868bd33457135aff70a4a5083f3e",
+  "canonicalVsixSha256": "ce4f5ce7e3b0627b81cc0c1f8dc55a1a497f65efc428fda7faf1f14a0d6ddc1a",
+  "byteIdentical": false,
+  "membersChecked": 10,
+  "changedMembers": [
+    {
+      "name": "extension/LICENSE.txt",
+      "beforeBytes": 1094,
+      "afterBytes": 1073,
+      "lineEndingOnly": true
+    }
+  ],
+  "action": "Fresh isolated installed VS Code qualification required because artifact bytes changed; prior host receipt is not transferred."
+}

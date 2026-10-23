@@ -1,0 +1,244 @@
+{
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "parent": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "ref": "refs/heads/codex/diagramcloud-release-evidence-20261023",
+  "prefix": "docs/qualification/explanation-release-20261023/",
+  "files": [
+    {
+      "source": ".local/continuation/ci-39985734370/verify-artifact.py",
+      "target": "docs/qualification/explanation-release-20261023/ci/verify-artifact.py"
+    },
+    {
+      "source": ".local/continuation/ci-39985734370/artifact-verification.json",
+      "target": "docs/qualification/explanation-release-20261023/ci/artifact-verification.json"
+    },
+    {
+      "source": ".local/continuation/ci-39985734370/ARTIFACT-VERIFICATION.md",
+      "target": "docs/qualification/explanation-release-20261023/ci/ARTIFACT-VERIFICATION.md"
+    },
+    {
+      "source": ".local/continuation/ci-39985734370/browser-summary.json",
+      "target": "docs/qualification/explanation-release-20261023/ci/browser-summary.json"
+    },
+    {
+      "source": ".local/continuation/ci-39985734370/verification-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/ci/verification-receipt.json"
+    },
+    {
+      "source": ".local/continuation/ci-39985734370/bundled-client-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/ci/bundled-client-receipt.json"
+    },
+    {
+      "source": ".local/continuation/ci-39985734370/built-handshake.json",
+      "target": "docs/qualification/explanation-release-20261023/ci/built-handshake.json"
+    },
+    {
+      "source": ".local/continuation/ci-39985734370/artifact-metadata.json",
+      "target": "docs/qualification/explanation-release-20261023/ci/artifact-metadata.json"
+    },
+    {
+      "source": ".local/continuation/ci-39985734370/job.log",
+      "target": "docs/qualification/explanation-release-20261023/ci/job.log"
+    },
+    {
+      "source": ".local/continuation/ci-39985734370/workflow-run.json",
+      "target": "docs/qualification/explanation-release-20261023/ci/workflow-run.json"
+    },
+    {
+      "source": ".local/continuation/publish-private-package.py",
+      "target": "docs/qualification/explanation-release-20261023/publisher/publish-private-package.py"
+    },
+    {
+      "source": ".local/continuation/PRIVATE-PACKAGE-PUBLISHER.md",
+      "target": "docs/qualification/explanation-release-20261023/publisher/PRIVATE-PACKAGE-PUBLISHER.md"
+    },
+    {
+      "source": ".local/continuation/private-publisher-self-check.json",
+      "target": "docs/qualification/explanation-release-20261023/publisher/private-publisher-self-check.json"
+    },
+    {
+      "source": ".local/continuation/private-publisher-transport-check.json",
+      "target": "docs/qualification/explanation-release-20261023/publisher/private-publisher-transport-check.json"
+    },
+    {
+      "source": ".local/continuation/canonical-copychecks-130c707-attempt1.json",
+      "target": "docs/qualification/explanation-release-20261023/local/canonical-copychecks-130c707-attempt1.json"
+    },
+    {
+      "source": ".local/continuation/canonical-copychecks-130c707-canonical.json",
+      "target": "docs/qualification/explanation-release-20261023/local/canonical-copychecks-130c707-canonical.json"
+    },
+    {
+      "source": ".local/continuation/canonicalize-checkout.mjs",
+      "target": "docs/qualification/explanation-release-20261023/local/canonicalize-checkout.mjs"
+    },
+    {
+      "source": ".local/continuation/build-130c707-canonical-final.log",
+      "target": "docs/qualification/explanation-release-20261023/local/build-130c707-canonical-final.log"
+    },
+    {
+      "source": ".local/continuation/qualification-130c707-canonical.json",
+      "target": "docs/qualification/explanation-release-20261023/local/qualification-130c707-canonical.json"
+    },
+    {
+      "source": ".local/continuation/qualified-cli-inventory-130c707-canonical.json",
+      "target": "docs/qualification/explanation-release-20261023/local/qualified-cli-inventory-130c707-canonical.json"
+    },
+    {
+      "source": ".local/continuation/vsix-comparison-130c707-canonical.json",
+      "target": "docs/qualification/explanation-release-20261023/local/vsix-comparison-130c707-canonical.json"
+    },
+    {
+      "source": ".local/continuation/vscode-host-130c707-canonical-attempt1.json",
+      "target": "docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical-attempt1.json"
+    },
+    {
+      "source": ".local/continuation/vscode-host-130c707-canonical-attempt2.json",
+      "target": "docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical-attempt2.json"
+    },
+    {
+      "source": ".local/continuation/vscode-host-130c707-canonical.json",
+      "target": "docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical.json"
+    },
+    {
+      "source": ".local/continuation/vscode-host-diagnosis-130c707-canonical.json",
+      "target": "docs/qualification/explanation-release-20261023/local/vscode-host-diagnosis-130c707-canonical.json"
+    },
+    {
+      "source": ".local/continuation/cursor-host-130c707-canonical.json",
+      "target": "docs/qualification/explanation-release-20261023/local/cursor-host-130c707-canonical.json"
+    },
+    {
+      "source": ".local/continuation/clients-130c707-canonical/receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/local/bundled-client-receipt.json"
+    },
+    {
+      "source": ".local/continuation/canonical-browser-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/browser/canonical-browser-receipt.json"
+    },
+    {
+      "source": ".local/continuation/canonical-final-browser/report.json",
+      "target": "docs/qualification/explanation-release-20261023/browser/report.json"
+    },
+    {
+      "source": ".local/continuation/canonical-final-browser/browser.log",
+      "target": "docs/qualification/explanation-release-20261023/browser/browser.log"
+    },
+    {
+      "source": ".local/continuation/deployed-editor-public/deployed-smoke.json",
+      "target": "docs/qualification/explanation-release-20261023/editor/deployed-smoke.json"
+    },
+    {
+      "source": ".local/continuation/deployed-editor-public/editor-result.json",
+      "target": "docs/qualification/explanation-release-20261023/editor/editor-result.json"
+    },
+    {
+      "source": ".local/continuation/deployed-editor-public/VISUAL-REVIEW.md",
+      "target": "docs/qualification/explanation-release-20261023/editor/VISUAL-REVIEW.md"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/1440-applied.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-applied.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/1440-form-bottom.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-form-bottom.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/1440-form-middle.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-form-middle.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/1440-form-top.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-form-top.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/1440-returned-form-optional.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-returned-form-optional.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/1440-returned-form-top.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-returned-form-top.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/1440-review-actions.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-review-actions.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/1440-review-top.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/1440-review-top.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/390-applied.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/390-applied.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/390-form-bottom.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/390-form-bottom.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/390-form-middle.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/390-form-middle.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/390-form-top.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/390-form-top.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/390-returned-form-optional.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/390-returned-form-optional.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/390-returned-form-top.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/390-returned-form-top.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/390-review-actions.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/390-review-actions.png"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707-20261023/390-review-top.png",
+      "target": "docs/qualification/explanation-release-20261023/editor/390-review-top.png"
+    },
+    {
+      "source": ".local/continuation/pptx-final/source.pptx",
+      "target": "docs/qualification/explanation-release-20261023/pptx/source.pptx"
+    },
+    {
+      "source": ".local/continuation/pptx-final/render-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/pptx/render-receipt.json"
+    },
+    {
+      "source": ".local/continuation/pptx-final/zip-inventory.json",
+      "target": "docs/qualification/explanation-release-20261023/pptx/zip-inventory.json"
+    },
+    {
+      "source": ".local/continuation/pptx-final/VISUAL-REVIEW.md",
+      "target": "docs/qualification/explanation-release-20261023/pptx/VISUAL-REVIEW.md"
+    },
+    {
+      "source": ".local/continuation/pptx-final/slides/Slide1.PNG",
+      "target": "docs/qualification/explanation-release-20261023/pptx/Slide1.PNG"
+    },
+    {
+      "source": ".local/continuation/pptx-final/slides/Slide2.PNG",
+      "target": "docs/qualification/explanation-release-20261023/pptx/Slide2.PNG"
+    },
+    {
+      "source": ".local/continuation/deployed-editor-public/MANIFEST.json",
+      "target": "docs/qualification/explanation-release-20261023/visual-manifest.json"
+    },
+    {
+      "source": ".local/continuation/RELEASE-SUMMARY.md",
+      "target": "docs/qualification/explanation-release-20261023/RELEASE-SUMMARY.md"
+    },
+    {
+      "source": ".local/continuation/publish-release-evidence.mjs",
+      "target": "docs/qualification/explanation-release-20261023/tools/publish-release-evidence.mjs"
+    },
+    {
+      "source": ".local/continuation/release-evidence-files.json",
+      "target": "docs/qualification/explanation-release-20261023/tools/release-evidence-files.json"
+    }
+  ]
+}

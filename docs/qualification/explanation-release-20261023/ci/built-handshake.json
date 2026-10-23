@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "app_id": "diagramcloud",
+  "product_version": "1.33.1",
+  "galaxy_level": "G0",
+  "standalone": true,
+  "contracts": [
+    {
+      "contract_id": "galaxy.entity/1",
+      "role": "both",
+      "required": true
+    },
+    {
+      "contract_id": "galaxy.evidence-ref/1",
+      "role": "both",
+      "required": true
+    },
+    {
+      "contract_id": "galaxy.version-handshake/1",
+      "role": "produce",
+      "required": true
+    },
+    {
+      "contract_id": "galaxy.publication-snapshot/1",
+      "role": "both",
+      "required": true
+    },
+    {
+      "contract_id": "galaxy.deep-link/1",
+      "role": "produce",
+      "required": true
+    },
+    {
+      "contract_id": "galaxy.verification-receipt/1",
+      "role": "produce",
+      "required": false
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_id": "graph",
+      "status": "available"
+    },
+    {
+      "capability_id": "publish",
+      "status": "available"
+    },
+    {
+      "capability_id": "workbench",
+      "status": "available"
+    },
+    {
+      "capability_id": "verify",
+      "status": "partial"
+    }
+  ],
+  "deep_link_routes": [
+    "diagramcloud.project-view-node/1"
+  ],
+  "generated_at": "2026-10-23T16:21:07.562Z",
+  "source_revision": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "degradation": [
+    "DiagramCloud remains fully usable when Galaxy, Hub, DataPass, Verify or Mongoku are absent.",
+    "Unsupported optional contracts disable only that integration, never the local editor or exports."
+  ]
+}

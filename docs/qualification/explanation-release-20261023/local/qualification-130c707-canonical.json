@@ -1,0 +1,162 @@
+{
+  "format": "diagramcloud.local-release-qualification/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "sourceWorktreeDirty": false,
+  "hostRuntime": "v22.23.4",
+  "canonicalSourceCopy": {
+    "format": "diagramcloud.canonical-source-copy/1",
+    "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+    "sourceWorktreeDirty": false,
+    "checkedAt": "2026-10-23T16:37:23.796Z",
+    "status": "PASS",
+    "method": "Single git ls-tree batch; raw working file bytes hashed as Git blob objects and compared against every pinned source blob ID.",
+    "trackedFiles": 923,
+    "identicalRawGitBlobs": 923,
+    "mismatches": 0,
+    "inventorySha256": "fcfb05d5113188611422f9f5b8cdf239eb00ea30410a6a6f4cfb5bb4ac0d94d4",
+    "postQualificationRawGitBlobsChecked": 923,
+    "postQualificationMismatches": 0
+  },
+  "realAtlasGeometry": {
+    "status": "PASS",
+    "startedAt": "2026-10-23T16:38:17.6748872Z",
+    "completedAt": "2026-10-23T16:39:36.6490271Z",
+    "checks": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "inputSha256": "15e22675c342804735a57af2b812ebc1875355c082aeaa71ee1fc9cb7062d220",
+    "inputUnchanged": true,
+    "privateLogSha256": "c4e841c2f09134727a96823e944ea229c15dc4b791e32f8dda7181f5eabfe673",
+    "scope": "Existing selected real local atlas plus bundled samples, public projections and figure geometry only; no runtime, provider, observation or owner acceptance claim.",
+    "privateInputPublished": false,
+    "privateMaterialExcluded": [
+      "input bytes",
+      "input paths and names",
+      "raw geometry log"
+    ]
+  },
+  "bundledClients": {
+    "status": "PASS",
+    "checks": 21,
+    "failed": 0,
+    "skipped": 0,
+    "syntheticInputs": true,
+    "bundleOutsideRepository": true,
+    "isolatedFromProjectNodeModules": true,
+    "withoutNodePath": true,
+    "receiptSha256": "6719f151c81dcc0ce6f5d4eb0dd4b1bf781add0395a9430206eacd4c679dc070",
+    "qualifiedBundleInventorySha256": "d884200143cdf8752584fefc1696acf0feb982ab9504d28911880243c7f1b97b",
+    "scope": "Isolated CLI/MCP behavior over labelled synthetic protocol inputs; no real external facts or executed-provider claim."
+  },
+  "canonicalVsix": {
+    "sha256": "ce4f5ce7e3b0627b81cc0c1f8dc55a1a497f65efc428fda7faf1f14a0d6ddc1a",
+    "bytes": 253480,
+    "members": 10,
+    "sourceCommit": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+    "sourceDirty": false,
+    "comparisonReceiptSha256": "b88ad28d4ecca26cb03f3dda099234878bfa5db590a39d89a0fba861ef231b50",
+    "installedArtifactsMatch": true
+  },
+  "installedVsCode": {
+    "format": "diagramcloud.installed-host-qualification/1",
+    "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+    "sourceWorktreeDirty": false,
+    "hostRuntime": "v22.23.4",
+    "host": "VS Code",
+    "hostVersion": "1.142.0 6d62b1d5dace93a33b3a6d3eca1317bd5e15bcb1",
+    "existingSelectedHostExecutable": true,
+    "hostDownloaded": false,
+    "vsix": "diagramcloud-viewer-0.1.0.vsix",
+    "vsixSha256": "ce4f5ce7e3b0627b81cc0c1f8dc55a1a497f65efc428fda7faf1f14a0d6ddc1a",
+    "status": "FAIL",
+    "checks": {
+      "tests": 7,
+      "pass": 4,
+      "fail": 3,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "failure": "The unchanged rerun with the desktop lane clear reproduced the hidden quick-input timeout before the stale file was selected; the dependent retained-refusal alert was absent. Two nested tests and their parent failed.",
+    "passedScope": [
+      "activation and read-only default",
+      "host-guarded selection and live context return",
+      "dispose and reopen",
+      "render grant and apply refusal"
+    ],
+    "isolatedUserDataAndExtensions": true,
+    "normalProfileUsed": false,
+    "uninstallVerified": true,
+    "syntheticInputs": true,
+    "rawReceiptSha256": "2ea10634f3d2ac43e337e204c5344bf29bbf5cd4d3d3a0760c725d13bbdd4ea2",
+    "logSha256": "76351282d7801616e5af9fb290b732ce8652f84dad845b1eca7b25305682c5ba",
+    "notClaimed": [
+      "passing canonical installed host qualification",
+      "Cursor",
+      "Marketplace or signing",
+      "update and rollback",
+      "real provider results or human owner acceptance"
+    ],
+    "desktopLaneClear": true,
+    "attempts": [
+      {
+        "attempt": 1,
+        "status": "FAIL",
+        "checks": {
+          "tests": 7,
+          "pass": 4,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "overlappedOtherNativeAutomation": true,
+        "receiptSha256": "b5e360156d23ba3b8bc86980ef85d5f81d7a55b407fd120e1ccfd20561e71f3e",
+        "logSha256": "851ee772ade1536e7f5509cfa1e4c1eb7a2216d147b1798d41222123c58e60e4"
+      },
+      {
+        "attempt": 2,
+        "status": "FAIL",
+        "checks": {
+          "tests": 7,
+          "pass": 4,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "desktopLaneClear": true,
+        "receiptSha256": "4fa21b2a7f0d6ab8722d0aad6abec6c99657548a5bfadd5599a651a822b90ddf",
+        "logSha256": "76351282d7801616e5af9fb290b732ce8652f84dad845b1eca7b25305682c5ba"
+      }
+    ],
+    "diagnosis": "Both attempts stopped at the existing host test quick-input interaction before dispatching the stale file; the extension logs contain accepted/replay responses but no stale-file response. Exact cause remains unresolved: no failure screenshot or trace is captured for this helper. The desktop-clear reproduction does not establish earlier concurrent native automation as the cause.",
+    "sourceOrHarnessChangedBetweenAttempts": false,
+    "priorDifferentArtifactPassReused": false,
+    "moreRetriesRun": false
+  },
+  "installedCursor": {
+    "existingSelectedHostExecutable": true,
+    "host": "Cursor",
+    "status": "NOT_RUN",
+    "hostDownloaded": false,
+    "normalProfileUsed": false,
+    "harnessLimitation": true,
+    "format": "diagramcloud.installed-host-qualification/1",
+    "checks": {
+      "fail": 0,
+      "tests": 0,
+      "skipped": 0,
+      "pass": 0
+    },
+    "productFailureClaimed": false,
+    "reason": "The existing Cursor harness unconditionally hides account onboarding with CSS, so the optional installed Cursor check was not started in this bounded release pass.",
+    "scope": "No Cursor installed viewer behavior or whole Studio acceptance claim.",
+    "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa"
+  }
+}

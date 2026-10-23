@@ -1,0 +1,77 @@
+{
+  "format": "diagramcloud.canonical-browser-supplement/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "status": "PASS",
+  "sourceRawGitBlobsIdentical": 923,
+  "stats": {
+    "startTime": "2026-10-23T16:38:09.876Z",
+    "duration": 46896.174000000006,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "actualWorkers": 1,
+  "reportSha256": "c59be3702fb00e6bb9144451eb7b11d8e74b3bdd769ca50b3efd8440304f9e29",
+  "ownerViewer": {
+    "sourceDeclared": "70c55bf784d5fc1fee6cf939c679c3107902d9da",
+    "sha256": "382381cd7728b1af8c62bc25e094aa904d16a45a0d54eea156f3e0f7c80658b5",
+    "privateArtifactPublished": false
+  },
+  "cases": [
+    {
+      "title": "actual load/ready, both SVGs, exact-source messages and source mapping boundary",
+      "outcomes": [
+        "expected"
+      ],
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "real WebGL scene, reduced motion, selection and disposal; context loss is explicitly limited",
+      "outcomes": [
+        "expected"
+      ],
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "unavailable WebGL retains explicit useful SVG modes and accessible controls",
+      "outcomes": [
+        "expected"
+      ],
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "only the explicitly authorized opener receives hello and separate manual source mapping",
+      "outcomes": [
+        "expected"
+      ],
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "malformed optional artwork falls back while valid PNG JPEG WebP retain 4:1 native deck aspect",
+      "outcomes": [
+        "expected"
+      ],
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "native local host opens from the workspace and returns only the matching current mapping",
+      "outcomes": [
+        "expected"
+      ],
+      "results": [
+        "passed"
+      ]
+    }
+  ]
+}

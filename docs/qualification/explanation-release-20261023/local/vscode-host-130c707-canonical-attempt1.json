@@ -1,0 +1,41 @@
+{
+  "format": "diagramcloud.installed-host-qualification/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "sourceWorktreeDirty": false,
+  "hostRuntime": "v22.23.4",
+  "host": "VS Code",
+  "hostVersion": "1.142.0 6d62b1d5dace93a33b3a6d3eca1317bd5e15bcb1",
+  "existingSelectedHostExecutable": true,
+  "hostDownloaded": false,
+  "vsix": "diagramcloud-viewer-0.1.0.vsix",
+  "vsixSha256": "ce4f5ce7e3b0627b81cc0c1f8dc55a1a497f65efc428fda7faf1f14a0d6ddc1a",
+  "status": "FAIL",
+  "checks": {
+    "tests": 7,
+    "pass": 4,
+    "fail": 3,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "failure": "First failure: existing Load return file command did not expose its quick-input dialog for the stale file; subsequent retained-refusal alert was absent. The parent test also failed. No stale file dispatch appears in the extension log.",
+  "passedScope": [
+    "activation and read-only default",
+    "host-guarded selection and live context return",
+    "dispose and reopen",
+    "render grant and apply refusal"
+  ],
+  "isolatedUserDataAndExtensions": true,
+  "normalProfileUsed": false,
+  "uninstallVerified": true,
+  "syntheticInputs": true,
+  "rawReceiptSha256": "4e13623e3eca7112a1c94d05eed12f47065aa49c7892a289b5662903068b215f",
+  "logSha256": "851ee772ade1536e7f5509cfa1e4c1eb7a2216d147b1798d41222123c58e60e4",
+  "notClaimed": [
+    "passing canonical installed host qualification",
+    "Cursor",
+    "Marketplace or signing",
+    "update and rollback",
+    "real provider results or human owner acceptance"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "diagramcloud.private-publication/1",
+  "captured_at": "2026-10-23T16:31:44.645292+00:00",
+  "mode": "self-check",
+  "source_sha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "package_name": "diagramcloud",
+  "package_version": "1.33.1-130c707",
+  "project": {
+    "id": 87564954,
+    "path_with_namespace": "juliandatapass-group/galaxy-release-vault",
+    "visibility": "private",
+    "archived": false,
+    "packages_enabled": true,
+    "access_level": 50
+  },
+  "version_absent_at_start": true,
+  "checked_package_statuses": [
+    "default",
+    "deprecated",
+    "error",
+    "hidden",
+    "processing",
+    "pending_destruction"
+  ],
+  "publisher_sha256": "36242068a438bd0c0e015591bba67eec56ff43d6dc3cc4bdefc39a5512612b99",
+  "writes_attempted": 0,
+  "uploads": [],
+  "readbacks": [],
+  "status": "PASS"
+}

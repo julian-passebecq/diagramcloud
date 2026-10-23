@@ -1,0 +1,49 @@
+{
+  "format": "diagramcloud.installed-host-diagnosis/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "canonicalVsixSha256": "ce4f5ce7e3b0627b81cc0c1f8dc55a1a497f65efc428fda7faf1f14a0d6ddc1a",
+  "status": "UNRESOLVED",
+  "attempts": [
+    {
+      "attempt": 1,
+      "acceptedReturnFile": true,
+      "replayRefusal": true,
+      "staleFileResponseObserved": false,
+      "refusedFileDownloadObserved": false,
+      "failureScreenshotOrTraceAvailable": false
+    },
+    {
+      "attempt": 2,
+      "acceptedReturnFile": true,
+      "replayRefusal": true,
+      "staleFileResponseObserved": false,
+      "refusedFileDownloadObserved": false,
+      "failureScreenshotOrTraceAvailable": false
+    }
+  ],
+  "firstFailureBoundary": {
+    "file": "tests/host/vscode-host.test.ts",
+    "line": 112,
+    "calledFromLine": 177,
+    "observation": "After the command helper returned, the generic quick-input locator remained hidden for 30 seconds before the stale file path could be filled."
+  },
+  "dependentFailure": {
+    "file": "tests/host/vscode-host.test.ts",
+    "line": 183,
+    "observation": "The stale-refusal alert never appeared because the preceding stale-file interaction was not completed."
+  },
+  "relevantSynchronization": {
+    "file": "hosts/vscode/src/extension.ts",
+    "line": 16,
+    "observation": "The extension appends its action log before showing the warning and posting the webview reply. The host test waits on this log before issuing its next command; that log is not an acknowledgement that host UI work has settled."
+  },
+  "limitations": [
+    "No failure screenshot or trace is captured for the quick-input helper.",
+    "The logs do not distinguish an undelivered palette command from a file dialog that opened then closed.",
+    "The desktop-clear rerun reproduced the failure, so concurrent PowerPoint is not established as the cause.",
+    "Only LICENSE line-ending bytes changed between the previously passing and canonical VSIX; executable members are identical, but the earlier passing installed receipt is not transferred."
+  ],
+  "suggestedFollowup": "Capture command-palette selection and file-picker acknowledgement at the failure, then synchronize the unchanged stale/refusal journey with the exact file-picker UI. Determine the cause before proposing a code fix; do not weaken assertions or merely raise timeouts.",
+  "sourceOrHarnessEdited": false,
+  "additionalHostRetriesRun": false
+}
