@@ -4,7 +4,7 @@ Source version: `1.33.1` (patch release of #118, #119, #120 and #122; [notes](do
 
 ## Current proposed closure and Claude handoff
 
-**Done 22 Oct 23:07 UTC:** #125 (`b3bd161`) and #126 (`0892f9d`, Vercel source identity) merged on green; production serves 1.33.1 with `source_revision` `0892f9d`, and the four deployed cases pass at 1440/390. Remaining: private package `diagramcloud/1.33.1-0892f9d`. Outcome table in the [closure record](docs/release-1.33/RELEASE_CLOSURE_20261022.md). The paragraphs below are the pre-merge Pro-pass record.
+**Done 22 Oct 23:07 UTC:** #125 (`b3bd161`) and #126 (`0892f9d`, Vercel source identity) merged on green; production serves 1.33.1 with `source_revision` `0892f9d`, and the four deployed cases pass at 1440/390. Private package `diagramcloud/1.33.1-0892f9d` published 23 Oct ([package 73509686](https://gitlab.com/juliandatapass-group/galaxy-release-vault/-/packages/73509686); 14/14 authenticated re-download hashes match, anonymous access refused; receipt in `outcome.json` `privatePackages`). Outcome table in the [closure record](docs/release-1.33/RELEASE_CLOSURE_20261022.md). The paragraphs below are the pre-merge Pro-pass record.
 
 [22 October release closure](docs/release-1.33/RELEASE_CLOSURE_20261022.md) is the current bounded continuation on `pro/diagramcloud-release-closure-20261022`, based on `8281539`. It repairs structured-cloned malformed-row recovery, near-limit authoring-backup round trips and build-source identity on Vercel/GitHub; preserves historical LF bytes on Windows; and adopts the earlier deployed-smoke contribution. Local check/build pass; full unit suite 1,974 pass / three existing skips; bundled clients 21 pass. All eight new real-App regressions passed at 1440/390 using the exact pinned browser. Eleven source-identity cases pass. Read the PR for the final clean-build result and current CI before replaying checks.
 
@@ -12,7 +12,7 @@ Provider metadata confirms the existing production alias serves source `82815399
 
 ## Delivered package remains immutable
 
-The last recorded private package is `diagramcloud/1.33.1-1ee51db`, source `1ee51db6cd443afe2cd3126c46fd2f1c5644915d` (PR #123, main CI 39721881018), which contains #118, #119, #120 and #122. The 1.33.0 package `diagramcloud/1.33.0-3e907db` stays unchanged. Its publication receipt is in [outcome.json](outcome.json), `privatePackages`. Post-release source commits below are not inside that package. No successor tag, public release, Marketplace publication, owner acceptance or separately verified deployment is established by this continuation.
+The last recorded private package is `diagramcloud/1.33.1-0892f9d`, source `0892f9df2c29ab8313c2cb4f60c59061c57478cc` (PR #126, main CI 39869462768), which adds #125 and #126 to the earlier `diagramcloud/1.33.1-1ee51db` (source `1ee51db`, PR #123: #118, #119, #120 and #122); both stay unchanged, as does the 1.33.0 package `diagramcloud/1.33.0-3e907db` stays unchanged. Its publication receipt is in [outcome.json](outcome.json), `privatePackages`. Post-release source commits below are not inside that package. No successor tag, public release, Marketplace publication, owner acceptance or separately verified deployment is established by this continuation.
 
 ## Integrated recovery fixes
 

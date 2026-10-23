@@ -15,7 +15,7 @@ Current bounded Pro result and Claude continuation. This extends the existing re
 | Four deployed cases | **4 PASS** (26 s, Windows, Playwright 1.63.0 Chromium): anonymous deep link with parent context and no page errors, and synthetic import → IndexedDB reload → public export withholding private text, each at 1440 and 390 px. Identity verified before and after each case. |
 | Version | Stays 1.33.1; the handshake `source_revision` identifies the build. |
 
-Left: a private package of this successor in `galaxy-release-vault` (`diagramcloud/1.33.1-0892f9d`, needs the full evidence file of `scripts/package-campaign.ts`, including PPTX visual and real-atlas quality checks). This receipt commit redeploys production at a docs-only SHA; the four cases were re-run against it (see the PR).
+Private package: `diagramcloud/1.33.1-0892f9d` published 23 Oct to `galaxy-release-vault` ([package 73509686](https://gitlab.com/juliandatapass-group/galaxy-release-vault/-/packages/73509686)) from the full evidence file of `scripts/package-campaign.ts` (exact-head main CI 39869462768, local gates, real-atlas quality 3/3, PPTX visual by the release agent); 14/14 authenticated re-download hashes match, anonymous access refused; receipt in `outcome.json` `privatePackages`. Left: nothing for this successor. This receipt commit redeploys production at a docs-only SHA; the four cases were re-run against it (see the PR).
 
 ## Decision and current release
 

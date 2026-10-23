@@ -88,6 +88,26 @@
         "checksRun": "gates run locally by the release agent on 6352aaa, whose tree equals 1ee51db (typecheck clean; unit 1911 tests, 1906 pass, 3 skipped, 2 fail in release-entry-docs from the Windows CRLF working copy only, passing in CI; build ok; Playwright Chromium 347 tests, 342 pass, 5 skipped; installed VSIX host test 7/7 in VS Code 1.143.0; real-atlas quality 3/3 on a local Galaxy atlas, not committed; pptx-zip 3 decks, 22 slides; pptx-visual 2 of 22 slides viewed by the release agent, not the owner; bundled CLI 21/21) plus GitHub Actions PR run 39719550702 and main run 39721881018 success; dry run DRY-RUN.json before the candidate",
         "productionJourney": "not run for this package"
       }
+    },
+    {
+      "version": "1.33.1",
+      "recordedAt": "2026-10-23",
+      "pullRequest": "https://github.com/julian-passebecq/diagramcloud/pull/126",
+      "mergeCommit": "0892f9df2c29ab8313c2cb4f60c59061c57478cc",
+      "ci": "https://github.com/julian-passebecq/diagramcloud/actions/runs/39869462768",
+      "tag": "none",
+      "package": "PUBLISHED privately 2026-10-23: juliandatapass-group/galaxy-release-vault generic package diagramcloud/1.33.1-0892f9d (14 files, READY.json sha256 d7790f096cd78947585fd87b48c5401fb3e10aee59ff049df307e3e02b5852b1, SHA256SUMS.txt sha256 268e9310a30c2abc2c655ae38ea75f385ccd02b7837a29923f66e56e9c6ea37d); reliability successor of 1.33.1-1ee51db (contains #125 and #126), same version string, different source and package identity; authenticated re-download matched every sha256; anonymous access refused (401 files, 404 project)",
+      "packageUrl": "https://gitlab.com/juliandatapass-group/galaxy-release-vault/-/packages/73509686",
+      "packageReceipt": {
+        "sourceSha": "0892f9df2c29ab8313c2cb4f60c59061c57478cc",
+        "destination": "https://gitlab.com/api/v4/projects/87564954/packages/generic/diagramcloud/1.33.1-0892f9d/",
+        "newImmutablePath": true,
+        "confidentialityScan": "PASS: all four archives extracted and every report file scanned (1341 files); private-path matches are only tracked public content (a generic docs note, a synthetic worktree-path fixture, the %LOCALAPPDATA% Cursor default and parser regexes), no real secrets (only detection regexes and SYNTHETIC fixtures already public in the repo), no transcripts or owner e-mail address (only npm dependency authors in licence files), no .local, node_modules, fonts or Git internals",
+        "authenticatedRedownload": "PASS: 14/14 sha256 match (also SHA256SUMS.txt 12/12 OK and READY.json 11/11 artifacts)",
+        "anonymousAccess": "refused: 401 on package files, 404 on project and package list",
+        "checksRun": "gates run locally by the release agent on 0892f9d with a clean tree (typecheck clean; unit 1981 tests, 1978 pass, 3 skipped; build ok, dist/galaxy/version-handshake.json source_revision equals 0892f9d; Playwright Chromium 355 tests, 350 pass, 5 skipped; real-atlas quality 3/3 on a local Galaxy atlas, not committed; pptx-zip 3 decks, 52 slides; pptx-visual 2 of 32 exported slides viewed by the release agent, not the owner; bundled CLI 5/5 outputs identical across two runs, invalid input exit 1) plus GitHub Actions main run 39869462768 success (attempt 2; attempt 1 was cancelled by the #127 push); installed VSIX host test not re-run",
+        "productionJourney": "not run for this package; production at 0892f9d passed the four deployed cases at 1440/390 px (PR #127)"
+      }
     }
   ],
   "scopeRule": "Statuses describe code against original feature scope, not release certification. Horizons guide the sole roadmap in docs/ROADMAP.md. Exact packaged source SHA/checks are generated in delivery-receipt.json and READY.json.",
