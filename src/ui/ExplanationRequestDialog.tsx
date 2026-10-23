@@ -12,11 +12,15 @@ const toggled=(ids:string[],id:string)=>ids.includes(id)?ids.filter(x=>x!==id):[
 /** Author-only, session-local form. The host owns review/Apply, persistence and audience checks. */
 export function ExplanationRequestDialog(props:Props){
  const dialog=useRef<HTMLDialogElement>(null);
+ // Tours gates initial capture only. Once opened (or restored from review), keep
+ // the form and its original source cut even if Undo removes the live collection.
+ const initialized=useRef(!!props.initial||Array.isArray(props.project.tours));
+ if(props.initial||Array.isArray(props.project.tours))initialized.current=true;
  useEffect(()=>{const node=dialog.current;node?.showModal();return()=>node?.close();},[]);
  // Keep native Escape inside the form's explicit discard flow.
  const close=useRef<()=>void>(props.onClose);close.current=props.onClose;
  return <dialog ref={dialog} className="modal explanation-request" aria-label="Author an explanation" onCancel={event=>{event.preventDefault();close.current();}}>
-  {Array.isArray(props.project.tours)?<ExplanationForm {...props} setClose={handler=>{close.current=handler;}}/>:
+  {initialized.current?<ExplanationForm {...props} setClose={handler=>{close.current=handler;}}/>:
    <section><h2>Prepare explanation authoring</h2><p>This project has no Tours collection yet. Initialize an empty collection as one explicit, undoable edit before writing a request. Existing content is preserved; this does not create an explanation or prove a save.</p>
     {props.initializationError&&<p role="alert">{props.initializationError}</p>}<div className="toolbar"><button type="button" onClick={props.onInitialize}>Initialize Tours for explanations</button><button type="button" onClick={props.onClose}>Cancel</button></div></section>}
  </dialog>;

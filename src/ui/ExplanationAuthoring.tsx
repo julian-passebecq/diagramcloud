@@ -19,6 +19,7 @@ export function ExplanationAuthoring({doc,edit,viewId,selectedNodeId,live,onComm
  useEffect(()=>{if(!review)return;const guard=(e:BeforeUnloadEvent)=>{e.preventDefault();e.returnValue='';};window.addEventListener('beforeunload',guard);return()=>window.removeEventListener('beforeunload',guard);},[review]);
  const context=useRef({doc,edit,live,onCommit});context.current={doc,edit,live,onCommit};
  const close=()=>{setEditing(false);setReview(null);setSession(undefined);setError('');requestAnimationFrame(()=>opener.current?.focus());};
+ const back=()=>{setReview(null);setEditing(true);setError('');};
  const authorSource=()=>{const current=context.current;if(!current.edit)throw new Error('Explanation authoring is no longer available. Nothing was applied.');return current.live();};
  const apply=()=>{try{if(!review||!session)throw new Error('Prepare an explanation first.');const before=authorSource();
    const next=applyPreparedExplanation(before,session.basis,review.patch);
@@ -30,11 +31,11 @@ export function ExplanationAuthoring({doc,edit,viewId,selectedNodeId,live,onComm
   {editing&&<ExplanationRequestDialog initial={session} initializationError={error} project={doc} viewId={viewId} selectedNodeId={selectedNodeId} onClose={close}
    onInitialize={()=>{try{const before=authorSource();if(before!==doc)throw new Error(EXPLANATION_SOURCE_CHANGED);if(!Array.isArray(before.tours)&&!context.current.onCommit(validateDocument({...before,tours:[]})))throw new Error('Tours initialization was refused.');}catch(e){setError(errorMessage(e));}}}
    onPrepare={(basis,draft)=>{const before=authorSource(),result=prepareExplanationDraft(before,basis,draft);setSession({basis,source:before,draft:structuredClone(draft)});setReview(result);setEditing(false);setError('');}}/>}
-  {review&&session&&<Modal title="Review authored explanation" onClose={close}>
+  {review&&session&&<Modal title="Review authored explanation" onClose={back}>
    <p>{review.notice}</p><p>These additions are private. Review changes nothing. Apply is one undoable project edit; a download is not a saved project.</p>
    <ChangePreview preview={previewDocumentChange(session.source,review.preview)}/><ChangeDetailView detail={describeChanges(session.source,review.preview)}/>
    {changed&&<p role="alert">{EXPLANATION_SOURCE_CHANGED}</p>}{error&&<p role="alert">{error}</p>}
-   <form onSubmit={e=>{e.preventDefault();apply();}}><div className="modal-actions"><button type="button" onClick={()=>{setReview(null);setEditing(true);setError('');}}>Back to request</button><button type="button" onClick={()=>{try{download(JSON.stringify(review.patch,null,2),`${session.basis.projectId}.explanation.patch.json`,'application/json');}catch(e){setError(errorMessage(e));}}}>Download proposed patch</button><button type="submit" disabled={changed}>Apply explanation</button></div></form>
+   <form onSubmit={e=>{e.preventDefault();apply();}}><div className="modal-actions"><button type="button" onClick={back}>Back to request</button><button type="button" onClick={()=>{try{download(JSON.stringify(review.patch,null,2),`${session.basis.projectId}.explanation.patch.json`,'application/json');}catch(e){setError(errorMessage(e));}}}>Download proposed patch</button><button type="submit" disabled={changed}>Apply explanation</button></div></form>
   </Modal>}
   {error&&!review&&<p role="alert">{error}</p>}
  </>;
