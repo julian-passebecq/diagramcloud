@@ -1,0 +1,220 @@
+{
+  "stats": {
+    "startTime": "2026-10-23T15:21:41.861Z",
+    "duration": 537841.3150000001,
+    "expected": 362,
+    "skipped": 5,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "total": 367,
+  "failures": [],
+  "explanation": [
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "form prepares ordinary review, applies once, undoes, reloads and stays private",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "Escape keeps a dirty request until explicit discard; no overflow or project edit",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "Back to request retains every authored field and original source basis before review and Apply",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "unsupported code range is refused without discarding the author draft",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "missing Tours initialization is explicit and undoable, not a hidden preparation write",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "undoing Tours initialization retains the original request through source drift and Back from review",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "form prepares ordinary review, applies once, undoes, reloads and stays private",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "Escape keeps a dirty request until explicit discard; no overflow or project edit",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "Back to request retains every authored field and original source basis before review and Apply",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "unsupported code range is refused without discarding the author draft",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "missing Tours initialization is explicit and undoable, not a hidden preparation write",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "explanation-request.spec.ts",
+      "title": "undoing Tours initialization retains the original request through source drift and Back from review",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "results": [
+        {
+          "status": "passed",
+          "retry": 0
+        }
+      ]
+    }
+  ],
+  "skips": [
+    {
+      "file": "concept-host.spec.ts",
+      "title": "actual load/ready, both SVGs, exact-source messages and source mapping boundary",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "results": [
+        {
+          "status": "skipped",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "concept-host.spec.ts",
+      "title": "real WebGL scene, reduced motion, selection and disposal; context loss is explicitly limited",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "results": [
+        {
+          "status": "skipped",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "concept-host.spec.ts",
+      "title": "unavailable WebGL retains explicit useful SVG modes and accessible controls",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "results": [
+        {
+          "status": "skipped",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "concept-host.spec.ts",
+      "title": "only the explicitly authorized opener receives hello and separate manual source mapping",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "results": [
+        {
+          "status": "skipped",
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "file": "mosaic-workspace.spec.ts",
+      "title": "native local host opens from the workspace and returns only the matching current mapping",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "results": [
+        {
+          "status": "skipped",
+          "retry": 0
+        }
+      ]
+    }
+  ]
+}

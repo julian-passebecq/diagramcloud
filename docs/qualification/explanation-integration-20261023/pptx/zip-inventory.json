@@ -1,0 +1,44 @@
+{
+  "file": "C:\\Users\\julia\\.codex\\worktrees\\b874\\diagramcloud\\.local\\integration\\pptx\\raster-fallback\\source.pptx",
+  "sha256": "20a49b22623cff1f0feecd14792fcdb08beb8dc299ab795eefc5fc90681d0e28",
+  "bytes": 81151,
+  "zipCrcFailure": null,
+  "entries": 46,
+  "slideCount": 2,
+  "slides": [
+    {
+      "path": "ppt/slides/slide1.xml",
+      "text": [
+        "DIAGRAMCLOUD / PROJECT PORTFOLIO",
+        "Synthetic formats and fallback",
+        "Public export \u00b7 Source labels retained \u00b7 No live telemetry",
+        "Architecture. The work behind it. The evidence."
+      ],
+      "pictures": 0
+    },
+    {
+      "path": "ppt/slides/slide2.xml",
+      "text": [
+        "DIAGRAMCLOUD / PROJECT PORTFOLIO",
+        "Synthetic raster availability",
+        "Public export \u00b7 Source labels retained \u00b7 No live telemetry",
+        "GENERIC",
+        "Synthetic png",
+        "Component",
+        "GENERIC",
+        "Synthetic jpeg",
+        "Component",
+        "GENERIC",
+        "Synthetic webp",
+        "Component",
+        "GENERIC",
+        "Synthetic malformed",
+        "Component"
+      ],
+      "pictures": 3
+    }
+  ],
+  "mediaCount": 3,
+  "externalRelationships": [],
+  "macroEntries": []
+}

@@ -1,0 +1,100 @@
+TAP version 13
+# Subtest: the real checkout HEAD wins over GitHub PR merge and Vercel environment SHAs
+ok 1 - the real checkout HEAD wins over GitHub PR merge and Vercel environment SHAs
+  ---
+  duration_ms: 803.544
+  type: 'test'
+  ...
+# Subtest: a linked worktree .git file resolves its own checked-out commit
+ok 2 - a linked worktree .git file resolves its own checked-out commit
+  ---
+  duration_ms: 947.6713
+  type: 'test'
+  ...
+# Subtest: a source archive uses Vercel source metadata before GitHub metadata
+ok 3 - a source archive uses Vercel source metadata before GitHub metadata
+  ---
+  duration_ms: 2.2799
+  type: 'test'
+  ...
+# Subtest: invalid or missing Vercel metadata falls back to a valid GitHub SHA
+ok 4 - invalid or missing Vercel metadata falls back to a valid GitHub SHA
+  ---
+  duration_ms: 2.0968
+  type: 'test'
+  ...
+# Subtest: absent or invalid source metadata leaves the optional identity absent
+ok 5 - absent or invalid source metadata leaves the optional identity absent
+  ---
+  duration_ms: 3.9857
+  type: 'test'
+  ...
+# Subtest: an archive inside another repository never inherits the enclosing HEAD
+ok 6 - an archive inside another repository never inherits the enclosing HEAD
+  ---
+  duration_ms: 564.7498
+  type: 'test'
+  ...
+# Subtest: an unborn checkout does not pretend provider metadata identifies its source
+ok 7 - an unborn checkout does not pretend provider metadata identifies its source
+  ---
+  duration_ms: 371.2477
+  type: 'test'
+  ...
+# Subtest: a tracked source change omits exact identity even with valid provider SHAs
+ok 8 - a tracked source change omits exact identity even with valid provider SHAs
+  ---
+  duration_ms: 1329.6013
+  type: 'test'
+  ...
+# Subtest: a untracked source change omits exact identity even with valid provider SHAs
+ok 9 - a untracked source change omits exact identity even with valid provider SHAs
+  ---
+  duration_ms: 769.4504
+  type: 'test'
+  ...
+# Subtest: ignored generated output does not invalidate a clean source identity
+ok 10 - ignored generated output does not invalidate a clean source identity
+  ---
+  duration_ms: 656.5477
+  type: 'test'
+  ...
+# Subtest: an unreadable Git index does not fall back to a provider SHA
+ok 11 - an unreadable Git index does not fall back to a provider SHA
+  ---
+  duration_ms: 700.4473
+  type: 'test'
+  ...
+# Subtest: a Vercel build keeps its own commit SHA when only untracked build files appear
+ok 12 - a Vercel build keeps its own commit SHA when only untracked build files appear
+  ---
+  duration_ms: 1171.5503
+  type: 'test'
+  ...
+# Subtest: a Vercel build never stamps a tracked source change
+ok 13 - a Vercel build never stamps a tracked source change
+  ---
+  duration_ms: 759.3462
+  type: 'test'
+  ...
+# Subtest: the identity basis says why a clean checkout or archive was chosen
+ok 14 - the identity basis says why a clean checkout or archive was chosen
+  ---
+  duration_ms: 805.1859
+  type: 'test'
+  ...
+# Subtest: a Vercel build tolerates its own vercel.json edit but no other tracked change
+ok 15 - a Vercel build tolerates its own vercel.json edit but no other tracked change
+  ---
+  duration_ms: 1703.0396
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11096.9454

@@ -1,0 +1,96 @@
+{
+  "sourceRevision": "d7ceb456c6905e6277cdeb1dea801298bd7e77e9",
+  "productVersion": "1.33.1",
+  "target": "http://127.0.0.1:25190",
+  "result": "PASS",
+  "inspectionMethod": "AI visual inspection of 16 automated Playwright Chromium screenshots from disposable contexts; not human native or owner acceptance",
+  "viewports": [
+    "1440x1000",
+    "390x844"
+  ],
+  "observedDefects": [],
+  "sourceAndDraftRetained": true,
+  "oneRevisionAndTourAdded": true,
+  "screenshotFiles": [
+    {
+      "name": "1440-applied.png",
+      "sha256": "77b90bb2efac92259fd3d1d8aa4f247b98942e3c8ddd79b31e95f8f3511a1046",
+      "bytes": 143101
+    },
+    {
+      "name": "1440-form-bottom.png",
+      "sha256": "fb680de98e6aea5a1d621fec7a11fefe7d1dc6ac6f09618a60048339069cd4bf",
+      "bytes": 208645
+    },
+    {
+      "name": "1440-form-middle.png",
+      "sha256": "aee6e49879c25d6d14e40f279638541ae9bebb022e15a6ec85d319070469209c",
+      "bytes": 215416
+    },
+    {
+      "name": "1440-form-top.png",
+      "sha256": "3b479a61b46923631dcbadc6fd9bbdfaa0ddfd13a3be52ba8b5b814ed5e5afe6",
+      "bytes": 221784
+    },
+    {
+      "name": "1440-returned-form-optional.png",
+      "sha256": "69fc545e023e719d8d9ec5f50f6486bd9d94d5ca8dcce839810482ee06f38838",
+      "bytes": 208036
+    },
+    {
+      "name": "1440-returned-form-top.png",
+      "sha256": "3b479a61b46923631dcbadc6fd9bbdfaa0ddfd13a3be52ba8b5b814ed5e5afe6",
+      "bytes": 221784
+    },
+    {
+      "name": "1440-review-actions.png",
+      "sha256": "9a97a6e29608531923c933a7ceefd659077cf05d457811c2427154f3c47e2d01",
+      "bytes": 247192
+    },
+    {
+      "name": "1440-review-top.png",
+      "sha256": "9a97a6e29608531923c933a7ceefd659077cf05d457811c2427154f3c47e2d01",
+      "bytes": 247192
+    },
+    {
+      "name": "390-applied.png",
+      "sha256": "73f4c4f21310b73cba3aea7b700edd0af732a96564ca0e65d422cca26430eb9c",
+      "bytes": 41374
+    },
+    {
+      "name": "390-form-bottom.png",
+      "sha256": "c2635da3af36e4f63d731fe250f1732f130658ec1f3b593f5997c04b3cd31df3",
+      "bytes": 35862
+    },
+    {
+      "name": "390-form-middle.png",
+      "sha256": "42ec180412ca7e8bea6620b03834d490eabca2ecc76876755a5e396527d9b11a",
+      "bytes": 43518
+    },
+    {
+      "name": "390-form-top.png",
+      "sha256": "7c6803ea079288cd10a7f7f918eda62018da7138164a4eb10971b5371cad135e",
+      "bytes": 47852
+    },
+    {
+      "name": "390-returned-form-optional.png",
+      "sha256": "f61c7ce485f0f5a55856c3eeb7ab71954e998bff443bd12e08da552e695e4a72",
+      "bytes": 35351
+    },
+    {
+      "name": "390-returned-form-top.png",
+      "sha256": "7c6803ea079288cd10a7f7f918eda62018da7138164a4eb10971b5371cad135e",
+      "bytes": 47852
+    },
+    {
+      "name": "390-review-actions.png",
+      "sha256": "7a4c27d5d63c5363ca53b72cfa421cb7fb9c9dd3a3e517b6f581fb957536c744",
+      "bytes": 56817
+    },
+    {
+      "name": "390-review-top.png",
+      "sha256": "57c1c8204b243782fa985f55817c8dc16c1967386cb3410ac179cb82b5f59e58",
+      "bytes": 56906
+    }
+  ]
+}

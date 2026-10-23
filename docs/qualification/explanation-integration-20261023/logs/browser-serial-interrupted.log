@@ -1,0 +1,74 @@
+[WebServer] (node:27352) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:55544) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:16664) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:32280) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:54052) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+Running 367 tests using 1 worker
+
+(node:72000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok   1 tests\e2e\actionable-gaps.spec.ts:35:2 › selected-file denied failure offers only producer-supported advice without mutating the document (7.2s)
+  ok   2 tests\e2e\actionable-gaps.spec.ts:35:2 › selected-file generic failure offers only producer-supported advice without mutating the document (5.1s)
+  ok   3 tests\e2e\actionable-gaps.spec.ts:59:1 › an unresolved selected document link retains exact citation and safe advice without inventing source absence (3.0s)
+  ok   4 tests\e2e\actionable-gaps.spec.ts:75:1 › a valid late cockpit proposal cannot open review after leaving Edit for Portfolio (4.4s)
+  ok   5 tests\e2e\actionable-gaps.spec.ts:75:1 › a valid late cockpit proposal cannot open review after leaving Edit for Explore (3.8s)
+  ok   6 tests\e2e\actionable-gaps.spec.ts:97:1 › a newly proposed NOT_RUN check supersedes a valid pending spec file without changing the authoring document (4.6s)
+  ok   7 tests\e2e\adoption-journeys.spec.ts:20:1 › adoption journeys: catalogue lesson and example, self-description mapping round trip, Galaxy and FOIL samples, drawer edit to public export (6.5s)
+  ok   8 tests\e2e\artifacts-playback.spec.ts:11:1 › artifact entry: from a storage component or a dataset reach citing components, producers and consumers, and open one in its view (2.3s)
+  ok   9 tests\e2e\artifacts-playback.spec.ts:36:1 › declared-workflow playback walks the declared steps as a presented sequence, with no run data, without changing the document (2.8s)
+  ok  10 tests\e2e\atlas.spec.ts:10:1 › project atlas: manifest → reviewed project → rescan one repository → snapshot comparison → add repository (8.1s)
+  ok  11 tests\e2e\authoring-backup-roundtrip.spec.ts:17:2 › Authoring backup roundtrip 1440 › a saved near-limit project validates current JSON and reimports its complete authoring backup (17.0s)
+  ok  12 tests\e2e\authoring-backup-roundtrip.spec.ts:17:2 › Authoring backup roundtrip 390 › a saved near-limit project validates current JSON and reimports its complete authoring backup (17.1s)
+  ok  13 tests\e2e\authoring.spec.ts:3:1 › table editor: build a table without JSON, reorder, edit, undo/redo and keep it after reload (4.4s)
+  ok  14 tests\e2e\authoring.spec.ts:45:1 › transformation explainer, block order and sources: ordinary authoring without raw JSON (3.4s)
+  ok  15 tests\e2e\authoring.spec.ts:82:1 › the Inspector reads in the same order for every component: identity, meaning, realization, evidence, work, publication (1.4s)
+  ok  16 tests\e2e\blueprint.spec.ts:7:1 › blueprint: canvas toggle persists, blueprint and editorial SVG exports carry the same components and a title block (4.6s)
+  ok  17 tests\e2e\brainstorming.spec.ts:5:2 › brainstorming 1440 › ordinary import then read-only focus, parent reminder and comparison (2.5s)
+  ok  18 tests\e2e\brainstorming.spec.ts:14:2 › brainstorming 1440 › private discussion retains author context without fabricating completion (2.0s)
+  ok  19 tests\e2e\brainstorming.spec.ts:5:2 › brainstorming 390 › ordinary import then read-only focus, parent reminder and comparison (2.3s)
+  ok  20 tests\e2e\brainstorming.spec.ts:14:2 › brainstorming 390 › private discussion retains author context without fabricating completion (2.4s)
+  ok  21 tests\e2e\bridge.spec.ts:24:1 › repository sidecar opens through review and saves back with a conflict guard (4.7s)
+  ok  22 tests\e2e\bridge.spec.ts:73:1 › an invalid repository sidecar is rejected without touching the open project or the file (2.6s)
+  ok  23 tests\e2e\bridge.spec.ts:87:1 › a folder without a sidecar can create one from the open project (2.5s)
+  ok  24 tests\e2e\business-publication-settings.spec.ts:4:1 › twelve wide source components export readable Classic paper detail pages below the count budget (3.8s)
+  ok  25 tests\e2e\business-publication-settings.spec.ts:10:1 › authored story and public path export offline; publication settings freeze selected views and story without private fields (6.2s)
+  ok  26 tests\e2e\business-publication-settings.spec.ts:20:1 › dense curated handbook exports readable presentation pages and a complete keyed connection ledger offline (4.4s)
+  ok  27 tests\e2e\completion-kit.spec.ts:25:1 › selected completion exports an explicit request, previews a bounded patch and reopens the accepted edit (6.0s)
+  ok  28 tests\e2e\completion-kit.spec.ts:46:1 › completion rejects stale, unrelated and unknown-source responses, and cancel preserves authored bytes (4.9s)
+  ok  29 tests\e2e\completion-kit.spec.ts:54:1 › public mode clears a private draft question and a test-only response never creates an authoring revision (4.3s)
+  -   30 tests\e2e\concept-host.spec.ts:18:2 › native owner concept viewer in isolated local host › actual load/ready, both SVGs, exact-source messages and source mapping boundary
+  -   31 tests\e2e\concept-host.spec.ts:29:2 › native owner concept viewer in isolated local host › real WebGL scene, reduced motion, selection and disposal; context loss is explicitly limited
+  -   32 tests\e2e\concept-host.spec.ts:41:2 › native owner concept viewer in isolated local host › unavailable WebGL retains explicit useful SVG modes and accessible controls
+  -   33 tests\e2e\concept-host.spec.ts:47:2 › native owner concept viewer in isolated local host › only the explicitly authorized opener receives hello and separate manual source mapping
+  ok  34 tests\e2e\concept-preview.spec.ts:6:1 › concept export refuses an empty public view and preserves the author document (2.7s)
+  ok  35 tests\e2e\concept-preview.spec.ts:24:1 › concept download keeps public uncertainty and excludes private source data (2.5s)
+  ok  36 tests\e2e\configured-source-bundle.spec.ts:4:1 › explicit selected files execute imported analyzer profile, retain larger generated graph and review a bounded private projection (5.4s)
+  ok  37 tests\e2e\configured-source-bundle.spec.ts:7:1 › failed selected-file read names only the safe source path, refuses generation and keeps underlying permission details private (2.2s)
+  ok  38 tests\e2e\configured-source-bundle.spec.ts:10:1 › explicit deep configured worker parses bundled local grammars and never invents commented symbols (3.0s)
+  ok  39 tests\e2e\configured-source-bundle.spec.ts:14:1 › cancelled delayed source read cannot clear a newer selected file or surface its stale failure (2.7s)
+  ok  40 tests\e2e\context-pin.spec.ts:30:1 › Pin keeps explanatory A while selection and Edit target B; saved Project and reload remain independent (7.2s)
+  ok  41 tests\e2e\context-pin.spec.ts:61:1 › public projection revokes a private pin without disclosure; project switch starts Follow (4.5s)
+  ok  42 tests\e2e\custom-icons.spec.ts:6:1 › malformed optional artwork falls back while valid PNG JPEG WebP retain 4:1 native deck aspect (3.7s)
+  ok  43 tests\e2e\custom-icons.spec.ts:13:1 › project custom artwork selection persists, preserves aspect and public privacy in offline SVG/HTML/PowerPoint (4.9s)
+  ok  44 tests\e2e\deep-source.spec.ts:3:1 › optional actual Tree-sitter worker parses selected source offline, cancels and reviews a private projection (5.8s)
+  ok  45 tests\e2e\delivery-figures.spec.ts:5:1 › promotion output excludes uncited endpoint declarations with an explicit citation gap while matrix declarations survive (4.1s)
+  ok  46 tests\e2e\delivery-figures.spec.ts:9:1 › human delivery publication choices review closure and produce useful offline environment/release/promotion figures (8.9s)
+  ok  47 tests\e2e\delivery-task-links.spec.ts:34:3 › delivery task binding 1440 › explicit scope and bytes; invalid input retains last valid, changed bytes do not match (2.5s)
+  ok  48 tests\e2e\delivery-task-links.spec.ts:51:3 › delivery task binding 1440 › audience and new plan cut discard task details; return does not silently rebind (3.0s)
+  ok  49 tests\e2e\delivery-task-links.spec.ts:65:3 › delivery task binding 1440 › a slow older file cannot replace the newest file (2.4s)

@@ -1,0 +1,134 @@
+{
+  "format": "diagramcloud.bundled-client-qualification/1",
+  "sourceSha": "d7ceb456c6905e6277cdeb1dea801298bd7e77e9",
+  "sourceWorktreeDirty": false,
+  "hostRuntime": "v22.23.4",
+  "syntheticInputs": true,
+  "bundleOutsideRepository": true,
+  "isolatedFromProjectNodeModules": true,
+  "withoutNodePath": true,
+  "grammars": [
+    {
+      "name": "tree-sitter.wasm",
+      "package": "web-tree-sitter@0.25.10",
+      "sha256": "f38dcc4b43b818f9a0785bc1c6d5611a75ac4cdd428ff3f02757c34ca4e46d7f",
+      "bytes": 205488
+    },
+    {
+      "name": "tree-sitter-typescript.wasm",
+      "package": "@vscode/tree-sitter-wasm@0.3.1",
+      "sha256": "778025db5a8be0e70f8ccc3671e486dfeddd048c25d9e8a70c26de2e1bf6f97d",
+      "bytes": 1413849
+    },
+    {
+      "name": "tree-sitter-tsx.wasm",
+      "package": "@vscode/tree-sitter-wasm@0.3.1",
+      "sha256": "79e5da75ea62855a0cd67177685f0164eac87d5f630b3cbe1e0a099751ad30f8",
+      "bytes": 1445638
+    },
+    {
+      "name": "tree-sitter-javascript.wasm",
+      "package": "@vscode/tree-sitter-wasm@0.3.1",
+      "sha256": "5fb488d0cabb4775a594bab85682de5ad6ce83c0d6ac997a9f82dd084d571240",
+      "bytes": 411770
+    },
+    {
+      "name": "tree-sitter-python.wasm",
+      "package": "@vscode/tree-sitter-wasm@0.3.1",
+      "sha256": "16108b50df4ee9a30168794252ab55e7c93bfc5765d7fa0aa3e335752c515f47",
+      "bytes": 457883
+    },
+    {
+      "name": "tree-sitter-c-sharp.wasm",
+      "package": "@vscode/tree-sitter-wasm@0.3.1",
+      "sha256": "d12d85996c25957b4c1b71e26db2d7cc8a294997b60642e9c2a3b031b2c66dd3",
+      "bytes": 5103332
+    }
+  ],
+  "results": [
+    {
+      "id": "cli-concept-preview",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-graph-one",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-graph-reimport",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-brief",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-analyze",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-delivery",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-inspect",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-query",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-evolution",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-docs",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-profile",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-bundle",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-deep",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-verification-spec",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-verification-receipt",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-cockpit",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-entity-proposal",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-cross-repository",
+      "status": "PASS"
+    },
+    {
+      "id": "cli-publication",
+      "status": "PASS"
+    },
+    {
+      "id": "mcp-public-ten-tools",
+      "status": "PASS"
+    },
+    {
+      "id": "mcp-selected-analysis",
+      "status": "PASS"
+    }
+  ]
+}

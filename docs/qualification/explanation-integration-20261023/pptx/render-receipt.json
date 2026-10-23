@@ -1,0 +1,27 @@
+{
+  "sourceCommit": "d7ceb456c6905e6277cdeb1dea801298bd7e77e9",
+  "sourcePath": "C:\\Users\\julia\\.codex\\worktrees\\b874\\diagramcloud\\test-results\\custom-icons\\raster-fallback.pptx",
+  "sourceSha256": "20a49b22623cff1f0feecd14792fcdb08beb8dc299ab795eefc5fc90681d0e28",
+  "copiedPath": "C:\\Users\\julia\\.codex\\worktrees\\b874\\diagramcloud\\.local\\integration\\pptx\\raster-fallback\\source.pptx",
+  "renderer": "Microsoft PowerPoint COM read-only open, WithWindow=false, Export PNG",
+  "rendererVersion": "16.0",
+  "rendererFileVersion": "16.0.14334.20974",
+  "slideCount": 2,
+  "exportedPngCount": 2,
+  "dimensions": "1600x900",
+  "sourceUnchanged": true,
+  "copyUnchanged": true,
+  "pngs": [
+    {
+      "name": "Slide1.PNG",
+      "sha256": "32c790731a41d8c1324205c70a0b7f7e40542430070bf544205582b39cae847a",
+      "bytes": 23139
+    },
+    {
+      "name": "Slide2.PNG",
+      "sha256": "8a5929f2960210b69560748fe663c4a507c31eeb44fc365ff3e0e9558bbf1f4a",
+      "bytes": 29157
+    }
+  ],
+  "limits": "Agent visual review of synthetic/reference export only; no owner approval, presentation slideshow, installed-host, release or deployment claim."
+}

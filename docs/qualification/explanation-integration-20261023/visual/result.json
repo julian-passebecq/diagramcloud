@@ -1,0 +1,47 @@
+{
+  "target": "http://127.0.0.1:25190",
+  "results": [
+    {
+      "width": 1440,
+      "formGeometry": {
+        "scrollWidth": 928,
+        "clientWidth": 928,
+        "width": 930,
+        "viewport": 1440
+      },
+      "reviewGeometry": {
+        "scrollWidth": 928,
+        "clientWidth": 928,
+        "width": 930,
+        "viewport": 1440
+      },
+      "requestRetained": true,
+      "revisionBefore": 1,
+      "revisionAfter": 2,
+      "toursAdded": 1,
+      "pageErrors": [],
+      "nonLoopbackRequests": []
+    },
+    {
+      "width": 390,
+      "formGeometry": {
+        "scrollWidth": 354,
+        "clientWidth": 354,
+        "width": 356,
+        "viewport": 390
+      },
+      "reviewGeometry": {
+        "scrollWidth": 354,
+        "clientWidth": 354,
+        "width": 356,
+        "viewport": 390
+      },
+      "requestRetained": true,
+      "revisionBefore": 1,
+      "revisionAfter": 2,
+      "toursAdded": 1,
+      "pageErrors": [],
+      "nonLoopbackRequests": []
+    }
+  ]
+}
