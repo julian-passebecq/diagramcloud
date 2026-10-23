@@ -1,0 +1,34 @@
+{
+  "format": "diagramcloud.recovery-independent-review/1",
+  "capturedAt": "2026-10-23T17:09:16.502422+00:00",
+  "result": "PASS",
+  "sourceCommit": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "packageVersion": "1.33.1-130c707",
+  "packageId": 73606090,
+  "projectId": 87564954,
+  "projectVisibility": "private",
+  "method": "Reviewed GET-only recovery code and independently hashed all14 downloaded files locally; no duplicate network downloads",
+  "verifiedFiles": 14,
+  "allLocalDownloadUploadReceiptHashesAndBytesMatch": true,
+  "allAnonymousRefusalStatuses": 401,
+  "originalFailurePreserved": true,
+  "originalPublicationReceiptSha256": "09ff029acaac92978dcb3df14c5a462bef7dd2f1e0283666f78f9fd6f47c3293",
+  "recoveryReceiptSha256": "4cf0e5562647442ca66c05d9228563e00a07d98a6933b9465bbd2c02910b348f",
+  "recoveryScriptSha256": "b4177dead028437790181f7998adffb3ab19e7351afa027cf19cfeae7c2a4ddb",
+  "publisherHelperSha256": "36242068a438bd0c0e015591bba67eec56ff43d6dc3cc4bdefc39a5512612b99",
+  "readySha256": "58ac419fae530c5fbf15402cb7fbb661d74651e3a8cc102536367fff3b33c5a6",
+  "reviewedControls": [
+    "Recovery network call sites use GET only",
+    "All14 original201 upload records match local candidate and fresh downloads",
+    "Whole-file SHA256 and byte lengths match for every file",
+    "Before/after remote identity and file inventory checks are required by reviewed code",
+    "New recovery directory and exclusive download file creation preserve prior artifacts",
+    "No token extraction, authentication configuration command or raw CLI diagnostic logging in recovery code",
+    "HTTP debug environment flags removed; anonymous requests do not follow redirects"
+  ],
+  "limits": [
+    "Remote response and inventory outcomes are recorded by the separate recovery run; this review rehashes its resulting files",
+    "Authenticated redirect behavior is managed by the existing glab CLI; redirect prevention is not claimed",
+    "No installed-host, human acceptance or GA claim"
+  ]
+}

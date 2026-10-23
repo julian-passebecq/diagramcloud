@@ -1,9 +1,9 @@
 {
   "format": "diagramcloud.release-evidence-scan/1",
   "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
-  "capturedAt": "2026-10-23T16:50:12.091Z",
-  "scannedFiles": 59,
-  "scannedTextFiles": 40,
+  "capturedAt": "2026-10-23T17:10:37.283Z",
+  "scannedFiles": 83,
+  "scannedTextFiles": 64,
   "binaryFilesNotTextScanned": [
     "docs/qualification/explanation-release-20261023/editor/1440-applied.png",
     "docs/qualification/explanation-release-20261023/editor/1440-form-bottom.png",
@@ -389,6 +389,150 @@
     },
     {
       "target": "docs/qualification/explanation-release-20261023/tools/release-evidence-files.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/candidate-audit.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/verify-candidate.py",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/candidate-cli-byte-comparison.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/private-publication-preflight.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/candidate-evidence.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/create-candidate.mjs",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/package-build.log",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/compare-build-members.py",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/ci-candidate-dist-comparison.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/publication-receipt.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/READY.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/SHA256SUMS.txt",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/delivery-receipt.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/PACKAGE-README.md",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/initial-evidence-readback.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/final-remote-state.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/tools/verify-initial-evidence.py",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/tools/append-release-evidence.mjs",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/tools/release-evidence-final-files.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/tools/live-explanation-130c707.mjs",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/tools/render-pptx.ps1",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/readback-private-package.py",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/readback-recovery-receipt.json",
+      "text": true,
+      "findings": [],
+      "machinePathMentions": 0
+    },
+    {
+      "target": "docs/qualification/explanation-release-20261023/private-package/recovery-independent-review.json",
       "text": true,
       "findings": [],
       "machinePathMentions": 0

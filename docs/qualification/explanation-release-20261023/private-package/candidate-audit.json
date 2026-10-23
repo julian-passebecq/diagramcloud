@@ -1,0 +1,497 @@
+{
+  "format": "diagramcloud.independent-candidate-audit/1",
+  "capturedAt": "2026-10-23T16:52:10.918334+00:00",
+  "sourceCommit": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "productVersion": "1.33.1",
+  "result": "PASS",
+  "checks": [
+    {
+      "id": "selected-private-input-markers",
+      "status": "PASS",
+      "markerVariants": 5,
+      "privateInputContentsRead": false
+    },
+    {
+      "id": "exact-repository-head",
+      "status": "PASS"
+    },
+    {
+      "id": "clean-repository",
+      "status": "PASS"
+    },
+    {
+      "id": "tracked-file-count",
+      "status": "PASS",
+      "actual": 923,
+      "expected": 923
+    },
+    {
+      "id": "root-file-allowlist",
+      "status": "PASS",
+      "expectedFiles": 14,
+      "actualFiles": 14,
+      "missing": [],
+      "extra": [],
+      "extraDirectories": [],
+      "links": []
+    },
+    {
+      "id": "twelve-sha256-entries",
+      "status": "PASS",
+      "count": 12,
+      "malformedOrDuplicate": 0,
+      "mismatches": []
+    },
+    {
+      "id": "ready-source-version",
+      "status": "PASS"
+    },
+    {
+      "id": "source-commit-file",
+      "status": "PASS"
+    },
+    {
+      "id": "ready-eleven-artifacts",
+      "status": "PASS",
+      "artifacts": 11,
+      "mismatches": []
+    },
+    {
+      "id": "delivery-receipt-binding",
+      "status": "PASS",
+      "missingCheckIds": [],
+      "ciConclusionIsDeclarationOnly": true
+    },
+    {
+      "id": "archive-safety:diagramcloud-source-and-build.tar.gz",
+      "status": "PASS",
+      "members": 1169,
+      "regularFiles": 1160,
+      "uncompressedBytes": 42286488,
+      "unsafe": [],
+      "duplicateMembers": []
+    },
+    {
+      "id": "archive-safety:diagramcloud-web-build.tar.gz",
+      "status": "PASS",
+      "members": 146,
+      "regularFiles": 140,
+      "uncompressedBytes": 29492501,
+      "unsafe": [],
+      "duplicateMembers": []
+    },
+    {
+      "id": "archive-safety:diagramcloud-cli.tar.gz",
+      "status": "PASS",
+      "members": 18,
+      "regularFiles": 16,
+      "uncompressedBytes": 12608316,
+      "unsafe": [],
+      "duplicateMembers": []
+    },
+    {
+      "id": "archive-safety:diagramcloud-synthetic-examples.tar.gz",
+      "status": "PASS",
+      "members": 44,
+      "regularFiles": 26,
+      "uncompressedBytes": 33402,
+      "unsafe": [],
+      "duplicateMembers": []
+    },
+    {
+      "id": "all-923-raw-git-blobs",
+      "status": "PASS",
+      "filesExpected": 923,
+      "filesActual": 923,
+      "missing": [],
+      "extra": [],
+      "byteMismatches": []
+    },
+    {
+      "id": "working-tree-raw-git-blobs",
+      "status": "PASS",
+      "byteMismatches": [],
+      "normalizationApplied": false
+    },
+    {
+      "id": "web-equals-fresh-local-dist",
+      "status": "PASS",
+      "filesExpected": 140,
+      "filesActual": 140,
+      "missing": [],
+      "extra": [],
+      "byteMismatches": []
+    },
+    {
+      "id": "source-archive-allowlist-and-fresh-generated-bytes",
+      "status": "PASS",
+      "filesExpected": 1160,
+      "filesActual": 1160,
+      "missing": [],
+      "extra": [],
+      "byteMismatches": []
+    },
+    {
+      "id": "source-members-manifest",
+      "status": "PASS",
+      "rows": 931
+    },
+    {
+      "id": "handshake:local-dist",
+      "status": "PASS"
+    },
+    {
+      "id": "handshake:web-archive",
+      "status": "PASS"
+    },
+    {
+      "id": "handshake:source-dist",
+      "status": "PASS"
+    },
+    {
+      "id": "handshake:source-public",
+      "status": "PASS"
+    },
+    {
+      "id": "source-package-version",
+      "status": "PASS"
+    },
+    {
+      "id": "synthetic-archive-exact-source-members",
+      "status": "PASS",
+      "filesExpected": 26,
+      "filesActual": 26,
+      "missing": [],
+      "extra": [],
+      "byteMismatches": []
+    },
+    {
+      "id": "cli-members-allowlist",
+      "status": "PASS",
+      "missing": [],
+      "extra": []
+    },
+    {
+      "id": "cli-archive-equals-staged-cli",
+      "status": "PASS",
+      "filesExpected": 16,
+      "filesActual": 16,
+      "missing": [],
+      "extra": [],
+      "byteMismatches": []
+    },
+    {
+      "id": "cli-six-pinned-grammar-bytes",
+      "status": "PASS",
+      "grammars": [
+        {
+          "name": "tree-sitter.wasm",
+          "pass": true,
+          "sha256": "f38dcc4b43b818f9a0785bc1c6d5611a75ac4cdd428ff3f02757c34ca4e46d7f"
+        },
+        {
+          "name": "tree-sitter-typescript.wasm",
+          "pass": true,
+          "sha256": "778025db5a8be0e70f8ccc3671e486dfeddd048c25d9e8a70c26de2e1bf6f97d"
+        },
+        {
+          "name": "tree-sitter-tsx.wasm",
+          "pass": true,
+          "sha256": "79e5da75ea62855a0cd67177685f0164eac87d5f630b3cbe1e0a099751ad30f8"
+        },
+        {
+          "name": "tree-sitter-javascript.wasm",
+          "pass": true,
+          "sha256": "5fb488d0cabb4775a594bab85682de5ad6ce83c0d6ac997a9f82dd084d571240"
+        },
+        {
+          "name": "tree-sitter-python.wasm",
+          "pass": true,
+          "sha256": "16108b50df4ee9a30168794252ab55e7c93bfc5765d7fa0aa3e335752c515f47"
+        },
+        {
+          "name": "tree-sitter-c-sharp.wasm",
+          "pass": true,
+          "sha256": "d12d85996c25957b4c1b71e26db2d7cc8a294997b60642e9c2a3b031b2c66dd3"
+        }
+      ]
+    },
+    {
+      "id": "cli-rights-byte-identity",
+      "status": "PASS",
+      "mismatches": [],
+      "legalRightsExpanded": false
+    },
+    {
+      "id": "root-source-reports",
+      "status": "PASS"
+    },
+    {
+      "id": "package-root-unchanged-during-audit",
+      "status": "PASS"
+    },
+    {
+      "id": "confidentiality-pattern-scan",
+      "status": "PASS",
+      "unexplainedFindings": 0,
+      "exactPublicExceptions": 27,
+      "limitations": "Pattern checks and exact source/member identities are not a guarantee that arbitrary unknown secrets can be recognized."
+    }
+  ],
+  "unexplainedFindings": [],
+  "publicExceptions": [
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::docs/product/README.md",
+      "line": 45,
+      "category": "windows-local-path",
+      "count": 1,
+      "publicSource": "docs/product/README.md",
+      "publicSourceLine": 45,
+      "reason": "Public documentation states a generic unavailable Windows workspace root."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/acquisition.test.ts",
+      "line": 44,
+      "category": "private-key-header",
+      "count": 2,
+      "publicSource": "tests/acquisition.test.ts",
+      "publicSourceLine": 44,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/atlas.test.ts",
+      "line": 25,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/atlas.test.ts",
+      "publicSourceLine": 25,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/atlas.test.ts",
+      "line": 94,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/atlas.test.ts",
+      "publicSourceLine": 94,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/capability-guide.test.ts",
+      "line": 28,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/capability-guide.test.ts",
+      "publicSourceLine": 28,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/concept-host.test.ts",
+      "line": 41,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/concept-host.test.ts",
+      "publicSourceLine": 41,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/development-atlas.test.ts",
+      "line": 29,
+      "category": "windows-local-path",
+      "count": 1,
+      "publicSource": "tests/development-atlas.test.ts",
+      "publicSourceLine": 29,
+      "reason": "Public synthetic redaction fixture; not an actual selected atlas path."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/development-atlas.test.ts",
+      "line": 29,
+      "category": "unix-user-path",
+      "count": 1,
+      "publicSource": "tests/development-atlas.test.ts",
+      "publicSourceLine": 29,
+      "reason": "Public synthetic redaction fixture."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/e2e-target.test.ts",
+      "line": 11,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/e2e-target.test.ts",
+      "publicSourceLine": 11,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/fixtures/projects/secrets/credentials/private.pem",
+      "line": 1,
+      "category": "private-key-header",
+      "count": 1,
+      "publicSource": "tests/fixtures/projects/secrets/credentials/private.pem",
+      "publicSourceLine": 1,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/fixtures/projects/secrets/private-export.md",
+      "line": 2,
+      "category": "private-key-header",
+      "count": 1,
+      "publicSource": "tests/fixtures/projects/secrets/private-export.md",
+      "publicSourceLine": 2,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/fixtures/repo-shop/apps/api/.env.example",
+      "line": 1,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/fixtures/repo-shop/apps/api/.env.example",
+      "publicSourceLine": 1,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/fixtures/repo-shop/docker-compose.yml",
+      "line": 10,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/fixtures/repo-shop/docker-compose.yml",
+      "publicSourceLine": 10,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/ideation.test.ts",
+      "line": 18,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/ideation.test.ts",
+      "publicSourceLine": 18,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/interview-practice.test.ts",
+      "line": 19,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/interview-practice.test.ts",
+      "publicSourceLine": 19,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/library.test.ts",
+      "line": 90,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/library.test.ts",
+      "publicSourceLine": 90,
+      "reason": "Exact public fixture token explicitly marked SYNTHETIC; expected-source Git blob, path and line are pinned."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/pattern-guidance.test.ts",
+      "line": 24,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/pattern-guidance.test.ts",
+      "publicSourceLine": 24,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/realization.test.ts",
+      "line": 44,
+      "category": "github-token",
+      "count": 1,
+      "publicSource": "tests/realization.test.ts",
+      "publicSourceLine": 44,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/realization.test.ts",
+      "line": 43,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/realization.test.ts",
+      "publicSourceLine": 43,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/realization.test.ts",
+      "line": 45,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/realization.test.ts",
+      "publicSourceLine": 45,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/scan.test.ts",
+      "line": 55,
+      "category": "private-key-header",
+      "count": 1,
+      "publicSource": "tests/scan.test.ts",
+      "publicSourceLine": 55,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/scan.test.ts",
+      "line": 55,
+      "category": "credential-assignment",
+      "count": 1,
+      "publicSource": "tests/scan.test.ts",
+      "publicSourceLine": 55,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/scan.test.ts",
+      "line": 55,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/scan.test.ts",
+      "publicSourceLine": 55,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/state-facets.test.ts",
+      "line": 137,
+      "category": "credential-uri",
+      "count": 1,
+      "publicSource": "tests/state-facets.test.ts",
+      "publicSourceLine": 137,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-source-and-build.tar.gz::tests/structured-documents.test.ts",
+      "line": 19,
+      "category": "credential-assignment",
+      "count": 1,
+      "publicSource": "tests/structured-documents.test.ts",
+      "publicSourceLine": 19,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-synthetic-examples.tar.gz::tests/fixtures/projects/secrets/private-export.md",
+      "line": 2,
+      "category": "private-key-header",
+      "count": 1,
+      "publicSource": "tests/fixtures/projects/secrets/private-export.md",
+      "publicSourceLine": 2,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    },
+    {
+      "path": "diagramcloud-synthetic-examples.tar.gz::tests/fixtures/projects/secrets/credentials/private.pem",
+      "line": 1,
+      "category": "private-key-header",
+      "count": 1,
+      "publicSource": "tests/fixtures/projects/secrets/credentials/private.pem",
+      "publicSourceLine": 1,
+      "reason": "Reviewed public negative-test fixture. Exact source path, line, line hash and matched token are pinned; no real credential or private-key body is accepted."
+    }
+  ],
+  "privateInputContentsRead": false,
+  "archivesExtracted": false,
+  "packageFilesModified": false,
+  "notClaimed": [
+    "Live CI result re-verification",
+    "Private publication or remote-byte readback",
+    "Human owner acceptance",
+    "Installed host update/rollback",
+    "GA"
+  ]
+}

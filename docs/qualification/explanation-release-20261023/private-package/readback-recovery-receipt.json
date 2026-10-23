@@ -1,0 +1,167 @@
+{
+  "format": "diagramcloud.private-publication-get-recovery/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "packageId": 73606090,
+  "packageVersion": "1.33.1-130c707",
+  "capturedAt": "2026-10-23T17:05:48.200919+00:00",
+  "status": "PASS",
+  "method": "Existing authenticated glab GET only, binary stdout captured directly to files, fresh exact-byte readback and separate anonymous refusal.",
+  "remoteWrites": 0,
+  "project": {
+    "id": 87564954,
+    "path_with_namespace": "juliandatapass-group/galaxy-release-vault",
+    "visibility": "private",
+    "archived": false,
+    "packages_enabled": true,
+    "access_level": 50
+  },
+  "originalPublicationStatus": "FAILED_OR_PARTIAL",
+  "originalPublicationReceiptSha256": "09ff029acaac92978dcb3df14c5a462bef7dd2f1e0283666f78f9fd6f47c3293",
+  "originalPublicationReceiptUnchanged": true,
+  "candidateValidation": {
+    "files": 14,
+    "checksum_entries": 12,
+    "source_audit": {
+      "tracked_files_compared": 923,
+      "tracked_blob_mismatches": 0,
+      "built_source_revision": "130c70744ec8fdeefebb784c56afb53c182f8dfa"
+    },
+    "ci": {
+      "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+      "url": "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+      "conclusion": "success"
+    }
+  },
+  "workers": 4,
+  "perFileTimeoutSeconds": 60,
+  "readbacks": [
+    {
+      "file": "diagramcloud-synthetic-examples.tar.gz",
+      "status": "PASS",
+      "bytes": 7764,
+      "sha256": "beb466b564d9a1030a23cb96470be0bc2d9d31e8b0fe9934d5514fe476ac874a",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 1.985
+    },
+    {
+      "file": "diagramcloud-web-build.tar.gz",
+      "status": "PASS",
+      "bytes": 5822998,
+      "sha256": "43197e2bc7888039301a6fb41ce2ebe22c9cc6a6d6e7f5ad926036e0b3053b88",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 2.266
+    },
+    {
+      "file": "diagramcloud-source-and-build.tar.gz",
+      "status": "PASS",
+      "bytes": 8735700,
+      "sha256": "59e3a66f279af0ff0dbf6d6eb02f65d50ee1c588e1e5f5806105d631b0ae5375",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 2.297
+    },
+    {
+      "file": "diagramcloud-cli.tar.gz",
+      "status": "PASS",
+      "bytes": 1540290,
+      "sha256": "d61cae38e83eba7e7418fd00318b32dcaecf026bf1960e3ad919fd81d04c744a",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 3.656
+    },
+    {
+      "file": "outcome.json",
+      "status": "PASS",
+      "bytes": 201607,
+      "sha256": "9b05ddd23fc9d1049b66a3b16728a862641f9d21e28a52cfd23ca6dede9b223c",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 1.953
+    },
+    {
+      "file": "RESUME.md",
+      "status": "PASS",
+      "bytes": 8277,
+      "sha256": "78e203a47ea1fc596231e8481659707da005177155ef545bedd2c7780dadd908",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 1.672
+    },
+    {
+      "file": "SHIP-REPORT.md",
+      "status": "PASS",
+      "bytes": 12878,
+      "sha256": "0baefcab5ffbae1adb0eb3c755e2d924270684a84da8f6f65bba60f840975959",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 2.125
+    },
+    {
+      "file": "SOURCE_COMMIT.txt",
+      "status": "PASS",
+      "bytes": 41,
+      "sha256": "0a267cdd724fe4bf7178fc369beb4b162dc4ba981d2e05eb0f62c16edcc7c765",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 1.937
+    },
+    {
+      "file": "delivery-receipt.json",
+      "status": "PASS",
+      "bytes": 6062,
+      "sha256": "340de94a01fa187dec84ed9a3aa87f6a909590c29f4c90a3604710714b6bacc5",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 2.266
+    },
+    {
+      "file": "PACKAGE-README.md",
+      "status": "PASS",
+      "bytes": 987,
+      "sha256": "c28e33165b80c2e030d0b58bc5e528256766c06cada6543992da9a8bde46337f",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 1.969
+    },
+    {
+      "file": "archive-listing.txt",
+      "status": "PASS",
+      "bytes": 46438,
+      "sha256": "f686acf50d767001eafef48558b90d4c5e0fbb822afccb97af61782229532c24",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 2.5
+    },
+    {
+      "file": "READY.json",
+      "status": "PASS",
+      "bytes": 9359,
+      "sha256": "58ac419fae530c5fbf15402cb7fbb661d74651e3a8cc102536367fff3b33c5a6",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 1.656
+    },
+    {
+      "file": "source-members.txt",
+      "status": "PASS",
+      "bytes": 30152,
+      "sha256": "02428fbeed27529d582e345c34151b018a4f291f10401f92eff4556c78c2a88c",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 1.953
+    },
+    {
+      "file": "SHA256SUMS.txt",
+      "status": "PASS",
+      "bytes": 1049,
+      "sha256": "3b1149ecbc15b6219f88336ffabe331087953102387eb7b5ad92f820e3552b25",
+      "authenticatedMatch": true,
+      "anonymousStatus": 401,
+      "elapsedSeconds": 2.0
+    }
+  ],
+  "failures": [],
+  "completedAt": "2026-10-23T17:06:01.868943+00:00"
+}

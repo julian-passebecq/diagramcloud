@@ -1,0 +1,57 @@
+import {chromium, expect} from '@playwright/test';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+const baseURL = process.argv[2];
+if (baseURL !== 'https://diagramcloud.vercel.app') throw new Error('Explicit canonical production target required');
+const expectedSha=process.argv[3];
+if(expectedSha!=='130c70744ec8fdeefebb784c56afb53c182f8dfa')throw new Error('Exact approved source required');
+const original=JSON.parse(await fs.readFile('examples/pro-expressiveness/retry-metadata.base.json','utf8'));
+const out=path.resolve(process.argv[4]);
+await fs.mkdir(out,{recursive:false});
+async function identity(page){const response=await page.request.get(baseURL+'/galaxy/version-handshake.json',{maxRedirects:0,timeout:15000});expect(response.status()).toBe(200);expect(response.headers()['content-type']).toMatch(/application\/json/);const value=await response.json();expect(value).toMatchObject({schema_version:1,app_id:'diagramcloud',product_version:'1.33.1',source_revision:expectedSha,galaxy_level:'G0',standalone:true});return value.source_revision;}
+const browser=await chromium.launch();
+const results=[];
+for(const width of [1440,390]){
+ const context=await browser.newContext({viewport:{width,height:width===390?844:1000},reducedMotion:'reduce',acceptDownloads:true,storageState:{cookies:[],origins:[]},serviceWorkers:'block'});
+ const page=await context.newPage();const errors=[],remote=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/*',route=>{const request=route.request(),u=new URL(request.url());if(!['GET','HEAD'].includes(request.method())||u.origin!==baseURL){remote.push(request.method()+' '+u.origin+u.pathname);return route.abort('blockedbyclient');}return route.continue();});
+ const identityBefore=await identity(page);
+ const pane=async name=>{const nav=page.getByRole('navigation',{name:'Workspace panes',exact:true});if(await nav.isVisible())await nav.getByRole('button',{name,exact:true}).click();};
+ const geometry=async target=>await target.evaluate(e=>({scrollWidth:e.scrollWidth,clientWidth:e.clientWidth,width:e.getBoundingClientRect().width,viewport:innerWidth}));
+ const snap=async name=>{await page.screenshot({path:path.join(out,`${width}-${name}.png`)});};
+ await page.goto(baseURL+'/?workspace=v3');await expect(page.getByText('Local workspace ready',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'JSON / AI',exact:true}).click();await page.getByLabel('Project JSON',{exact:true}).fill(JSON.stringify(original));
+ await page.getByRole('button',{name:'Validate JSON',exact:true}).click();await page.getByRole('button',{name:'Apply imported document',exact:true}).click();
+ await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();await page.getByRole('tab',{name:'Edit',exact:true}).click();await pane('Explorer');await page.getByRole('button',{name:'Tours',exact:true}).click();
+ await page.getByRole('button',{name:'Author explanation',exact:true}).click();const form=page.getByRole('dialog',{name:'Author an explanation',exact:true});
+ await form.getByLabel('Explanation title',{exact:true}).fill('Synthetic authored explanation');await form.getByLabel('Question to explain',{exact:true}).fill('What does the wrapper do?');
+ await form.getByLabel('Step 1 title',{exact:true}).fill('The authored call');await form.getByLabel('Step 1 component Retry wrapper',{exact:true}).check();await form.getByLabel('Step 1 narration',{exact:true}).fill('A synthetic narrated call, not an observed run.');
+ await form.getByText('Optional state, code and takeaway',{exact:true}).click();await form.getByRole('button',{name:'Add before state',exact:true}).click();
+ await form.getByLabel('Step 1 before field 1',{exact:true}).fill('attempt');await form.getByLabel('Step 1 before value 1',{exact:true}).fill('0');
+ await form.getByRole('button',{name:'Add after state',exact:true}).click();await form.getByLabel('Step 1 after field 1',{exact:true}).fill('attempt');await form.getByLabel('Step 1 after value 1',{exact:true}).fill('1');
+ const code=original.blocks.find(b=>b.type==='code'&&original.nodes.find(n=>n.id==='wrapper').blockIds.includes(b.id));
+ await form.getByLabel('Step 1 code block',{exact:true}).selectOption(code.id);await form.getByLabel('Step 1 takeaway',{exact:true}).fill('Illustrative state only; no code was executed.');
+ const draft=async()=>{const pending=page.waitForEvent('download');await form.getByRole('button',{name:'Download request draft',exact:true}).click();const d=await pending;return JSON.parse(await fs.readFile(await d.path(),'utf8'));};
+ const request=await draft();await form.evaluate(e=>{e.scrollTop=0;});await snap('form-top');
+ await form.getByLabel('Step 1 narration',{exact:true}).scrollIntoViewIfNeeded();await snap('form-middle');
+ await form.getByRole('button',{name:'Review explanation',exact:true}).scrollIntoViewIfNeeded();await snap('form-bottom');
+ const formGeometry=await geometry(form);expect(formGeometry.scrollWidth).toBeLessThanOrEqual(formGeometry.clientWidth+2);
+ await form.getByRole('button',{name:'Review explanation',exact:true}).click();const review=page.getByRole('dialog',{name:'Review authored explanation',exact:true});
+ await expect(review.getByRole('region',{name:'Proposed changes',exact:true})).toBeVisible();await review.evaluate(e=>{e.scrollTop=0;});await snap('review-top');
+ await review.getByRole('button',{name:'Back to request',exact:true}).scrollIntoViewIfNeeded();await snap('review-actions');
+ const reviewGeometry=await geometry(review);expect(reviewGeometry.scrollWidth).toBeLessThanOrEqual(reviewGeometry.clientWidth+2);
+ await review.getByRole('button',{name:'Back to request',exact:true}).click();expect(await draft()).toEqual(request);
+ await form.evaluate(e=>{e.scrollTop=0;});await snap('returned-form-top');
+ await form.getByText('Optional state, code and takeaway',{exact:true}).click();await form.getByLabel('Step 1 code block',{exact:true}).scrollIntoViewIfNeeded();await snap('returned-form-optional');
+ await expect(form.getByLabel('Step 1 before field 1',{exact:true})).toHaveValue('attempt');await expect(form.getByLabel('Step 1 before value 1',{exact:true})).toHaveValue('0');
+ await expect(form.getByLabel('Step 1 after value 1',{exact:true})).toHaveValue('1');await expect(form.getByLabel('Step 1 code block',{exact:true})).toHaveValue(code.id);
+ await form.getByRole('button',{name:'Review explanation',exact:true}).click();await review.getByRole('button',{name:'Apply explanation',exact:true}).click();
+ await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();await snap('applied');
+ const applied=await page.evaluate(id=>new Promise((resolve,reject)=>{const r=indexedDB.open('diagramcloud-v1',1);r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,get=db.transaction('projects','readonly').objectStore('projects').get(id);get.onsuccess=()=>{db.close();resolve(JSON.parse(get.result.json));};get.onerror=()=>{db.close();reject(get.error);};};}),original.id);
+ expect(applied.revision).toBe(original.revision+1);expect(applied.tours.length).toBe(original.tours.length+1);expect(errors).toEqual([]);expect(remote).toEqual([]);
+ const identityAfter=await identity(page);
+ results.push({identityBefore,identityAfter,width,formGeometry,reviewGeometry,requestRetained:true,revisionBefore:original.revision,revisionAfter:applied.revision,toursAdded:1,pageErrors:errors,nonLoopbackRequests:remote});await context.close();
+}
+await browser.close();await fs.writeFile(path.join(out,'result.json'),JSON.stringify({target:baseURL,expectedSha,version:'1.33.1',method:'AI visual inspection of automated Chromium screenshots with disposable contexts; local IndexedDB only; same-origin GET and HEAD only',results},null,2));console.log(JSON.stringify(results,null,2));
+

@@ -1,0 +1,243 @@
+{
+  "schema": "galaxy.component-ready/1",
+  "workstreamId": "COCKPIT-20261008-NIGHT4",
+  "lane": "DIAGRAM",
+  "componentId": "diagramcloud",
+  "componentVersion": "1.33.1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "capturedAt": "2026-10-23T16:51:27.622Z",
+  "host": {
+    "hostId": "local-campaign-host",
+    "os": "win32",
+    "architecture": "x64",
+    "runtimeVersion": "v22.23.4"
+  },
+  "contractMajor": 1,
+  "contractMinor": 0,
+  "capabilities": [
+    {
+      "name": "offline-graph-client",
+      "version": 1,
+      "state": "OK"
+    },
+    {
+      "name": "static-domain-adapters",
+      "version": 3,
+      "state": "OK"
+    },
+    {
+      "name": "delivery-declarations",
+      "version": 1,
+      "state": "OK"
+    },
+    {
+      "name": "semantic-evolution",
+      "version": 1,
+      "state": "OK"
+    },
+    {
+      "name": "grouped-canvas-projection",
+      "version": 1,
+      "state": "OK"
+    },
+    {
+      "name": "bounded-local-deep-analysis",
+      "version": 1,
+      "state": "OK"
+    },
+    {
+      "name": "immutable-publication-library",
+      "version": 1,
+      "state": "OK"
+    },
+    {
+      "name": "public-file-mcp",
+      "version": 1,
+      "state": "OK"
+    }
+  ],
+  "artifacts": [
+    {
+      "relativePath": "diagramcloud-source-and-build.tar.gz",
+      "sha256": "59e3a66f279af0ff0dbf6d6eb02f65d50ee1c588e1e5f5806105d631b0ae5375",
+      "bytes": 8735700,
+      "kind": "source"
+    },
+    {
+      "relativePath": "diagramcloud-web-build.tar.gz",
+      "sha256": "43197e2bc7888039301a6fb41ce2ebe22c9cc6a6d6e7f5ad926036e0b3053b88",
+      "bytes": 5822998,
+      "kind": "web-build"
+    },
+    {
+      "relativePath": "diagramcloud-cli.tar.gz",
+      "sha256": "d61cae38e83eba7e7418fd00318b32dcaecf026bf1960e3ad919fd81d04c744a",
+      "bytes": 1540290,
+      "kind": "node-package"
+    },
+    {
+      "relativePath": "diagramcloud-synthetic-examples.tar.gz",
+      "sha256": "beb466b564d9a1030a23cb96470be0bc2d9d31e8b0fe9934d5514fe476ac874a",
+      "bytes": 7764,
+      "kind": "fixture"
+    },
+    {
+      "relativePath": "outcome.json",
+      "sha256": "9b05ddd23fc9d1049b66a3b16728a862641f9d21e28a52cfd23ca6dede9b223c",
+      "bytes": 201607,
+      "kind": "report"
+    },
+    {
+      "relativePath": "SHIP-REPORT.md",
+      "sha256": "0baefcab5ffbae1adb0eb3c755e2d924270684a84da8f6f65bba60f840975959",
+      "bytes": 12878,
+      "kind": "report"
+    },
+    {
+      "relativePath": "RESUME.md",
+      "sha256": "78e203a47ea1fc596231e8481659707da005177155ef545bedd2c7780dadd908",
+      "bytes": 8277,
+      "kind": "report"
+    },
+    {
+      "relativePath": "delivery-receipt.json",
+      "sha256": "340de94a01fa187dec84ed9a3aa87f6a909590c29f4c90a3604710714b6bacc5",
+      "bytes": 6062,
+      "kind": "report"
+    },
+    {
+      "relativePath": "SOURCE_COMMIT.txt",
+      "sha256": "0a267cdd724fe4bf7178fc369beb4b162dc4ba981d2e05eb0f62c16edcc7c765",
+      "bytes": 41,
+      "kind": "report"
+    },
+    {
+      "relativePath": "PACKAGE-README.md",
+      "sha256": "c28e33165b80c2e030d0b58bc5e528256766c06cada6543992da9a8bde46337f",
+      "bytes": 987,
+      "kind": "report"
+    },
+    {
+      "relativePath": "archive-listing.txt",
+      "sha256": "f686acf50d767001eafef48558b90d4c5e0fbb822afccb97af61782229532c24",
+      "bytes": 46438,
+      "kind": "report"
+    }
+  ],
+  "checks": [
+    {
+      "id": "typecheck",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/ci/ARTIFACT-VERIFICATION.md"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Successful exact-source main CI typecheck step"
+    },
+    {
+      "id": "unit",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/ci/ARTIFACT-VERIFICATION.md"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Main CI: 2030 passed, 3 explicit skips"
+    },
+    {
+      "id": "build",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/build-130c707-canonical-final.log"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Main CI plus fresh canonical local production build"
+    },
+    {
+      "id": "browser",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/ci/browser-summary.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/browser/canonical-browser-receipt.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Main CI: 362 passed, 5 skipped; canonical local supplement: 6 passed"
+    },
+    {
+      "id": "real-atlas-quality",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/qualification-130c707-canonical.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Selected local atlas geometry: 3 passed; private input and raw log excluded"
+    },
+    {
+      "id": "pptx-zip",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/pptx/zip-inventory.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/pptx/render-receipt.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Synthetic deck: 46 ZIP entries, CRC pass, 2 slides, no external relationships"
+    },
+    {
+      "id": "pptx-visual",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/pptx/VISUAL-REVIEW.md"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "AI inspection of two native PowerPoint PNG renders; no human acceptance inferred"
+    },
+    {
+      "id": "bundled-cli",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/bundled-client-receipt.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/qualified-cli-inventory-130c707-canonical.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "21 isolated CLI/MCP cases passed with labelled synthetic inputs"
+    },
+    {
+      "id": "installed-vscode",
+      "status": "FAIL",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/vscode-host-diagnosis-130c707-canonical.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Optional host check: two attempts each 4 pass/3 fail, unresolved quick-input timeout"
+    },
+    {
+      "id": "installed-cursor",
+      "status": "NOT_RUN",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/cursor-host-130c707-canonical.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Optional host check not run; existing harness hides onboarding"
+    },
+    {
+      "id": "deployed-web",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/editor/deployed-smoke.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/editor/editor-result.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Exact production source: 4 smoke cases and 2 viewport explanation journeys passed"
+    }
+  ],
+  "unavailable": [
+    {
+      "capability": "autonomous-runner-or-live-collector",
+      "reason": "External owners retain execution, permissions and observations; DiagramCloud consumes reviewed inputs"
+    }
+  ]
+}

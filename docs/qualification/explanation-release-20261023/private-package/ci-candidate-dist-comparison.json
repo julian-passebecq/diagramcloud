@@ -1,0 +1,20 @@
+{
+  "format": "diagramcloud.dist-membership-comparison/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "ciFiles": 140,
+  "candidateFiles": 140,
+  "onlyCi": [],
+  "onlyCandidate": [],
+  "changed": [
+    "galaxy/version-handshake.json",
+    "third-party-licenses.txt"
+  ],
+  "identical": 138,
+  "inspectedDifferences": {
+    "galaxy/version-handshake.json": "Only generated_at differs; source revision and other fields match.",
+    "third-party-licenses.txt": "Build-host dependency inventory: Linux esbuild/rollup/lzma packages versus Windows esbuild/rollup packages.",
+    "method": "Read-only unified text comparison of both archive members; no equivalence claimed for changed raw bytes."
+  },
+  "ciReceiptManifestCount": 127,
+  "ciReceiptManifestScope": "The CI receipt dist manifest excludes 13 source maps by design; each actual web archive contains 140 regular files."
+}

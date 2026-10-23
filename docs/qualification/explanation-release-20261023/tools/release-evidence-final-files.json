@@ -1,0 +1,108 @@
+{
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "parent": "856355e7e57073a7252e55e1eeb15b9555aabd5f",
+  "ref": "refs/heads/codex/diagramcloud-release-evidence-20261023",
+  "prefix": "docs/qualification/explanation-release-20261023/",
+  "files": [
+    {
+      "source": ".local/continuation/candidate-audit.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/candidate-audit.json"
+    },
+    {
+      "source": ".local/continuation/verify-candidate.py",
+      "target": "docs/qualification/explanation-release-20261023/private-package/verify-candidate.py"
+    },
+    {
+      "source": ".local/continuation/candidate-cli-byte-comparison.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/candidate-cli-byte-comparison.json"
+    },
+    {
+      "source": ".local/continuation/private-publication-preflight.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/private-publication-preflight.json"
+    },
+    {
+      "source": ".local/continuation/candidate-evidence.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/candidate-evidence.json"
+    },
+    {
+      "source": ".local/continuation/create-candidate.mjs",
+      "target": "docs/qualification/explanation-release-20261023/private-package/create-candidate.mjs"
+    },
+    {
+      "source": ".local/continuation/package-build.log",
+      "target": "docs/qualification/explanation-release-20261023/private-package/package-build.log"
+    },
+    {
+      "source": ".local/continuation/compare-build-members.py",
+      "target": "docs/qualification/explanation-release-20261023/private-package/compare-build-members.py"
+    },
+    {
+      "source": ".local/continuation/ci-candidate-dist-comparison.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/ci-candidate-dist-comparison.json"
+    },
+    {
+      "source": ".local/continuation/private-publication-1.33.1-130c707/publication-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/publication-receipt.json"
+    },
+    {
+      "source": ".local/continuation/candidate-1.33.1-130c707/READY.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/READY.json"
+    },
+    {
+      "source": ".local/continuation/candidate-1.33.1-130c707/SHA256SUMS.txt",
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/SHA256SUMS.txt"
+    },
+    {
+      "source": ".local/continuation/candidate-1.33.1-130c707/delivery-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/delivery-receipt.json"
+    },
+    {
+      "source": ".local/continuation/candidate-1.33.1-130c707/PACKAGE-README.md",
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/PACKAGE-README.md"
+    },
+    {
+      "source": ".local/continuation/initial-evidence-readback.json",
+      "target": "docs/qualification/explanation-release-20261023/initial-evidence-readback.json"
+    },
+    {
+      "source": ".local/continuation/final-remote-state.json",
+      "target": "docs/qualification/explanation-release-20261023/final-remote-state.json"
+    },
+    {
+      "source": ".local/continuation/RELEASE-SUMMARY.md",
+      "target": "docs/qualification/explanation-release-20261023/RELEASE-SUMMARY.md"
+    },
+    {
+      "source": ".local/continuation/verify-initial-evidence.py",
+      "target": "docs/qualification/explanation-release-20261023/tools/verify-initial-evidence.py"
+    },
+    {
+      "source": ".local/continuation/append-release-evidence.mjs",
+      "target": "docs/qualification/explanation-release-20261023/tools/append-release-evidence.mjs"
+    },
+    {
+      "source": ".local/continuation/release-evidence-final-files.json",
+      "target": "docs/qualification/explanation-release-20261023/tools/release-evidence-final-files.json"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707.mjs",
+      "target": "docs/qualification/explanation-release-20261023/tools/live-explanation-130c707.mjs"
+    },
+    {
+      "source": ".local/continuation/pptx-final/render.ps1",
+      "target": "docs/qualification/explanation-release-20261023/tools/render-pptx.ps1"
+    },
+    {
+      "source": ".local/continuation/readback-private-package.py",
+      "target": "docs/qualification/explanation-release-20261023/private-package/readback-private-package.py"
+    },
+    {
+      "source": ".local/continuation/private-publication-readback-recovery-1.33.1-130c707/readback-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/readback-recovery-receipt.json"
+    },
+    {
+      "source": ".local/continuation/recovery-independent-review.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/recovery-independent-review.json"
+    }
+  ]
+}

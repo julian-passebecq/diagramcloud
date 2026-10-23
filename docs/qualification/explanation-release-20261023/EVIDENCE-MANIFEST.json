@@ -1,7 +1,7 @@
 {
   "format": "diagramcloud.release-evidence-manifest/1",
   "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
-  "parent": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "parent": "856355e7e57073a7252e55e1eeb15b9555aabd5f",
   "ref": "refs/heads/codex/diagramcloud-release-evidence-20261023",
   "prefix": "docs/qualification/explanation-release-20261023/",
   "files": [
@@ -9,355 +9,582 @@
       "source": ".local/continuation/ci-39985734370/verify-artifact.py",
       "target": "docs/qualification/explanation-release-20261023/ci/verify-artifact.py",
       "bytes": 20129,
-      "sha256": "83fe61f116313f388f435d29bd075c923a79cb471594e67cba5c60698591b8b8"
+      "sha256": "83fe61f116313f388f435d29bd075c923a79cb471594e67cba5c60698591b8b8",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/ci-39985734370/artifact-verification.json",
       "target": "docs/qualification/explanation-release-20261023/ci/artifact-verification.json",
       "bytes": 746166,
-      "sha256": "538710ef56289427143bdfd30a2c7b6f16fde147eabba529908320e2a2c0358e"
+      "sha256": "538710ef56289427143bdfd30a2c7b6f16fde147eabba529908320e2a2c0358e",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/ci-39985734370/ARTIFACT-VERIFICATION.md",
       "target": "docs/qualification/explanation-release-20261023/ci/ARTIFACT-VERIFICATION.md",
       "bytes": 3678,
-      "sha256": "2e4407443f4dbbb8dd11e7a60d080efae449d22a1302cc5cead7adb4caba0b02"
+      "sha256": "2e4407443f4dbbb8dd11e7a60d080efae449d22a1302cc5cead7adb4caba0b02",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/ci-39985734370/browser-summary.json",
       "target": "docs/qualification/explanation-release-20261023/ci/browser-summary.json",
       "bytes": 7310,
-      "sha256": "512d8e792f7cad1a5223f1d06235339597f9be9b64dff9e01ad6b949a87ce775"
+      "sha256": "512d8e792f7cad1a5223f1d06235339597f9be9b64dff9e01ad6b949a87ce775",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/ci-39985734370/verification-receipt.json",
       "target": "docs/qualification/explanation-release-20261023/ci/verification-receipt.json",
       "bytes": 3742,
-      "sha256": "eede00208f588cb1b583d38255803ef4dc9c59c2c27a648059c5eba6ddc1e2ea"
+      "sha256": "eede00208f588cb1b583d38255803ef4dc9c59c2c27a648059c5eba6ddc1e2ea",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/ci-39985734370/bundled-client-receipt.json",
       "target": "docs/qualification/explanation-release-20261023/ci/bundled-client-receipt.json",
       "bytes": 3140,
-      "sha256": "b56f86c36b261c83618c135e2e8931dc26416f3a976b6916b771c78b87cfbd98"
+      "sha256": "b56f86c36b261c83618c135e2e8931dc26416f3a976b6916b771c78b87cfbd98",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/ci-39985734370/built-handshake.json",
       "target": "docs/qualification/explanation-release-20261023/ci/built-handshake.json",
       "bytes": 1588,
-      "sha256": "9c875bb255dc6e5487e6ba2a670948ff7c7c330b0e543691f9c2678dab52bd6e"
+      "sha256": "9c875bb255dc6e5487e6ba2a670948ff7c7c330b0e543691f9c2678dab52bd6e",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/ci-39985734370/artifact-metadata.json",
       "target": "docs/qualification/explanation-release-20261023/ci/artifact-metadata.json",
       "bytes": 839,
-      "sha256": "10b31f6196dee6432bd864c9f6fb2f850387405e029aedecc7644eec19b7ae04"
+      "sha256": "10b31f6196dee6432bd864c9f6fb2f850387405e029aedecc7644eec19b7ae04",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/ci-39985734370/job.log",
       "target": "docs/qualification/explanation-release-20261023/ci/job.log",
       "bytes": 949127,
-      "sha256": "e873ffc1c6c981847084e67b0a0350d656ae27fb545af054a461fb6493d141c0"
+      "sha256": "e873ffc1c6c981847084e67b0a0350d656ae27fb545af054a461fb6493d141c0",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/ci-39985734370/workflow-run.json",
       "target": "docs/qualification/explanation-release-20261023/ci/workflow-run.json",
       "bytes": 14923,
-      "sha256": "de73a7a7e5d181711f4913b5e4d2a3f7e20e0cf77f239fda00f8d7403c0c743a"
+      "sha256": "de73a7a7e5d181711f4913b5e4d2a3f7e20e0cf77f239fda00f8d7403c0c743a",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/publish-private-package.py",
       "target": "docs/qualification/explanation-release-20261023/publisher/publish-private-package.py",
       "bytes": 20497,
-      "sha256": "36242068a438bd0c0e015591bba67eec56ff43d6dc3cc4bdefc39a5512612b99"
+      "sha256": "36242068a438bd0c0e015591bba67eec56ff43d6dc3cc4bdefc39a5512612b99",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/PRIVATE-PACKAGE-PUBLISHER.md",
       "target": "docs/qualification/explanation-release-20261023/publisher/PRIVATE-PACKAGE-PUBLISHER.md",
       "bytes": 4419,
-      "sha256": "f1095d5fdff1af3a4dc9fc2a71e2f31364cf04b9a48ff7f7b1434a4782ed77dc"
+      "sha256": "f1095d5fdff1af3a4dc9fc2a71e2f31364cf04b9a48ff7f7b1434a4782ed77dc",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/private-publisher-self-check.json",
       "target": "docs/qualification/explanation-release-20261023/publisher/private-publisher-self-check.json",
       "bytes": 857,
-      "sha256": "92b0ffd25e86295f58909583362ec7afbe10b982b95ce68672d6ce47cf6e1810"
+      "sha256": "92b0ffd25e86295f58909583362ec7afbe10b982b95ce68672d6ce47cf6e1810",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/private-publisher-transport-check.json",
       "target": "docs/qualification/explanation-release-20261023/publisher/private-publisher-transport-check.json",
       "bytes": 649,
-      "sha256": "c97e5d42751e8815a8cb2b930b40d984c9cdcd8790a4dcf6a76376958ec0fb97"
+      "sha256": "c97e5d42751e8815a8cb2b930b40d984c9cdcd8790a4dcf6a76376958ec0fb97",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/canonical-copychecks-130c707-attempt1.json",
       "target": "docs/qualification/explanation-release-20261023/local/canonical-copychecks-130c707-attempt1.json",
       "bytes": 610,
-      "sha256": "8e9fef70111e6f3f6b376c9eb99f51519411ffead67dd20ca15fb6c53e1d9133"
+      "sha256": "8e9fef70111e6f3f6b376c9eb99f51519411ffead67dd20ca15fb6c53e1d9133",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/canonical-copychecks-130c707-canonical.json",
       "target": "docs/qualification/explanation-release-20261023/local/canonical-copychecks-130c707-canonical.json",
       "bytes": 512,
-      "sha256": "685c42c15eae1aa90d5cdb4e72de6a077e68e727a2be36f9c8097b53c3f08d8e"
+      "sha256": "685c42c15eae1aa90d5cdb4e72de6a077e68e727a2be36f9c8097b53c3f08d8e",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/canonicalize-checkout.mjs",
       "target": "docs/qualification/explanation-release-20261023/local/canonicalize-checkout.mjs",
       "bytes": 2516,
-      "sha256": "e10f1e1734040972569975d70abd0d1306471add19952c1c623db7034f16cf62"
+      "sha256": "e10f1e1734040972569975d70abd0d1306471add19952c1c623db7034f16cf62",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/build-130c707-canonical-final.log",
       "target": "docs/qualification/explanation-release-20261023/local/build-130c707-canonical-final.log",
       "bytes": 4772,
-      "sha256": "57748f644e8929b8df5e57c638e2e7c67cb1dd99182e52e42d61e206ad4dd4e9"
+      "sha256": "57748f644e8929b8df5e57c638e2e7c67cb1dd99182e52e42d61e206ad4dd4e9",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/qualification-130c707-canonical.json",
       "target": "docs/qualification/explanation-release-20261023/local/qualification-130c707-canonical.json",
       "bytes": 6433,
-      "sha256": "93a72d8b5fbe3ae7b9eb3fbe168679b5efd02583c90bd0bb947d09d10c3d2f55"
+      "sha256": "93a72d8b5fbe3ae7b9eb3fbe168679b5efd02583c90bd0bb947d09d10c3d2f55",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/qualified-cli-inventory-130c707-canonical.json",
       "target": "docs/qualification/explanation-release-20261023/local/qualified-cli-inventory-130c707-canonical.json",
       "bytes": 2911,
-      "sha256": "d884200143cdf8752584fefc1696acf0feb982ab9504d28911880243c7f1b97b"
+      "sha256": "d884200143cdf8752584fefc1696acf0feb982ab9504d28911880243c7f1b97b",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/vsix-comparison-130c707-canonical.json",
       "target": "docs/qualification/explanation-release-20261023/local/vsix-comparison-130c707-canonical.json",
       "bytes": 655,
-      "sha256": "b88ad28d4ecca26cb03f3dda099234878bfa5db590a39d89a0fba861ef231b50"
+      "sha256": "b88ad28d4ecca26cb03f3dda099234878bfa5db590a39d89a0fba861ef231b50",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/vscode-host-130c707-canonical-attempt1.json",
       "target": "docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical-attempt1.json",
       "bytes": 1540,
-      "sha256": "b5e360156d23ba3b8bc86980ef85d5f81d7a55b407fd120e1ccfd20561e71f3e"
+      "sha256": "b5e360156d23ba3b8bc86980ef85d5f81d7a55b407fd120e1ccfd20561e71f3e",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/vscode-host-130c707-canonical-attempt2.json",
       "target": "docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical-attempt2.json",
       "bytes": 1550,
-      "sha256": "4fa21b2a7f0d6ab8722d0aad6abec6c99657548a5bfadd5599a651a822b90ddf"
+      "sha256": "4fa21b2a7f0d6ab8722d0aad6abec6c99657548a5bfadd5599a651a822b90ddf",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/vscode-host-130c707-canonical.json",
       "target": "docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical.json",
       "bytes": 2936,
-      "sha256": "0b04ce0b354681dd037b4e034857eb65e81c0b6195892deb8f8efb4a07675436"
+      "sha256": "0b04ce0b354681dd037b4e034857eb65e81c0b6195892deb8f8efb4a07675436",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/vscode-host-diagnosis-130c707-canonical.json",
       "target": "docs/qualification/explanation-release-20261023/local/vscode-host-diagnosis-130c707-canonical.json",
       "bytes": 2444,
-      "sha256": "1583f2aad626dccdc5e37a009b115a5dee18b5edceb44a556c23fad4d699b5db"
+      "sha256": "1583f2aad626dccdc5e37a009b115a5dee18b5edceb44a556c23fad4d699b5db",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/cursor-host-130c707-canonical.json",
       "target": "docs/qualification/explanation-release-20261023/local/cursor-host-130c707-canonical.json",
       "bytes": 671,
-      "sha256": "71eab09cfad3167fb43648c113f8871df1a4261f1db8eeec44743b13d2c1fff2"
+      "sha256": "71eab09cfad3167fb43648c113f8871df1a4261f1db8eeec44743b13d2c1fff2",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/clients-130c707-canonical/receipt.json",
       "target": "docs/qualification/explanation-release-20261023/local/bundled-client-receipt.json",
       "bytes": 3008,
-      "sha256": "6719f151c81dcc0ce6f5d4eb0dd4b1bf781add0395a9430206eacd4c679dc070"
+      "sha256": "6719f151c81dcc0ce6f5d4eb0dd4b1bf781add0395a9430206eacd4c679dc070",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/canonical-browser-receipt.json",
       "target": "docs/qualification/explanation-release-20261023/browser/canonical-browser-receipt.json",
       "bytes": 2020,
-      "sha256": "9cdf030fcf48cfad98906e156bbc8b75ce059be0023050e182fcf14e4f34dbd7"
+      "sha256": "9cdf030fcf48cfad98906e156bbc8b75ce059be0023050e182fcf14e4f34dbd7",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/canonical-final-browser/report.json",
       "target": "docs/qualification/explanation-release-20261023/browser/report.json",
       "bytes": 9906,
-      "sha256": "c59be3702fb00e6bb9144451eb7b11d8e74b3bdd769ca50b3efd8440304f9e29"
+      "sha256": "c59be3702fb00e6bb9144451eb7b11d8e74b3bdd769ca50b3efd8440304f9e29",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/canonical-final-browser/browser.log",
       "target": "docs/qualification/explanation-release-20261023/browser/browser.log",
       "bytes": 3043,
-      "sha256": "5b70723539f83e299dafa8340eab44c758e1c7f3e8665865ad8a6755282eb5e9"
+      "sha256": "5b70723539f83e299dafa8340eab44c758e1c7f3e8665865ad8a6755282eb5e9",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/deployed-editor-public/deployed-smoke.json",
       "target": "docs/qualification/explanation-release-20261023/editor/deployed-smoke.json",
       "bytes": 2319,
-      "sha256": "bf7174556d22da7b7daf72befb251c0fa6c04f81e6a99c2808c08f64a2ed327d"
+      "sha256": "bf7174556d22da7b7daf72befb251c0fa6c04f81e6a99c2808c08f64a2ed327d",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/deployed-editor-public/editor-result.json",
       "target": "docs/qualification/explanation-release-20261023/editor/editor-result.json",
       "bytes": 1807,
-      "sha256": "97ae380dfe09d6e54c4940c7c6ef98bc1c02c2884d1b5d41fca7e7bf08a3b60c"
+      "sha256": "97ae380dfe09d6e54c4940c7c6ef98bc1c02c2884d1b5d41fca7e7bf08a3b60c",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/deployed-editor-public/VISUAL-REVIEW.md",
       "target": "docs/qualification/explanation-release-20261023/editor/VISUAL-REVIEW.md",
       "bytes": 1707,
-      "sha256": "4d5a42a3eb7802d06c31c6a1bb92474bada6a9bf0b839775063fe1ac7125270d"
+      "sha256": "4d5a42a3eb7802d06c31c6a1bb92474bada6a9bf0b839775063fe1ac7125270d",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/1440-applied.png",
       "target": "docs/qualification/explanation-release-20261023/editor/1440-applied.png",
       "bytes": 143101,
-      "sha256": "77b90bb2efac92259fd3d1d8aa4f247b98942e3c8ddd79b31e95f8f3511a1046"
+      "sha256": "77b90bb2efac92259fd3d1d8aa4f247b98942e3c8ddd79b31e95f8f3511a1046",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/1440-form-bottom.png",
       "target": "docs/qualification/explanation-release-20261023/editor/1440-form-bottom.png",
       "bytes": 208645,
-      "sha256": "fb680de98e6aea5a1d621fec7a11fefe7d1dc6ac6f09618a60048339069cd4bf"
+      "sha256": "fb680de98e6aea5a1d621fec7a11fefe7d1dc6ac6f09618a60048339069cd4bf",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/1440-form-middle.png",
       "target": "docs/qualification/explanation-release-20261023/editor/1440-form-middle.png",
       "bytes": 215416,
-      "sha256": "aee6e49879c25d6d14e40f279638541ae9bebb022e15a6ec85d319070469209c"
+      "sha256": "aee6e49879c25d6d14e40f279638541ae9bebb022e15a6ec85d319070469209c",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/1440-form-top.png",
       "target": "docs/qualification/explanation-release-20261023/editor/1440-form-top.png",
       "bytes": 221784,
-      "sha256": "3b479a61b46923631dcbadc6fd9bbdfaa0ddfd13a3be52ba8b5b814ed5e5afe6"
+      "sha256": "3b479a61b46923631dcbadc6fd9bbdfaa0ddfd13a3be52ba8b5b814ed5e5afe6",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/1440-returned-form-optional.png",
       "target": "docs/qualification/explanation-release-20261023/editor/1440-returned-form-optional.png",
       "bytes": 208036,
-      "sha256": "69fc545e023e719d8d9ec5f50f6486bd9d94d5ca8dcce839810482ee06f38838"
+      "sha256": "69fc545e023e719d8d9ec5f50f6486bd9d94d5ca8dcce839810482ee06f38838",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/1440-returned-form-top.png",
       "target": "docs/qualification/explanation-release-20261023/editor/1440-returned-form-top.png",
       "bytes": 221784,
-      "sha256": "3b479a61b46923631dcbadc6fd9bbdfaa0ddfd13a3be52ba8b5b814ed5e5afe6"
+      "sha256": "3b479a61b46923631dcbadc6fd9bbdfaa0ddfd13a3be52ba8b5b814ed5e5afe6",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/1440-review-actions.png",
       "target": "docs/qualification/explanation-release-20261023/editor/1440-review-actions.png",
       "bytes": 247192,
-      "sha256": "9a97a6e29608531923c933a7ceefd659077cf05d457811c2427154f3c47e2d01"
+      "sha256": "9a97a6e29608531923c933a7ceefd659077cf05d457811c2427154f3c47e2d01",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/1440-review-top.png",
       "target": "docs/qualification/explanation-release-20261023/editor/1440-review-top.png",
       "bytes": 247192,
-      "sha256": "9a97a6e29608531923c933a7ceefd659077cf05d457811c2427154f3c47e2d01"
+      "sha256": "9a97a6e29608531923c933a7ceefd659077cf05d457811c2427154f3c47e2d01",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/390-applied.png",
       "target": "docs/qualification/explanation-release-20261023/editor/390-applied.png",
       "bytes": 41389,
-      "sha256": "1438118fd6e0b3445fdb46d094f2a9c90836a0759f4903183046141e58a0d7ae"
+      "sha256": "1438118fd6e0b3445fdb46d094f2a9c90836a0759f4903183046141e58a0d7ae",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/390-form-bottom.png",
       "target": "docs/qualification/explanation-release-20261023/editor/390-form-bottom.png",
       "bytes": 35863,
-      "sha256": "dc3821ef90d38c4ef1b77946f4ab56b702b20745ebe61d68febc72f499106105"
+      "sha256": "dc3821ef90d38c4ef1b77946f4ab56b702b20745ebe61d68febc72f499106105",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/390-form-middle.png",
       "target": "docs/qualification/explanation-release-20261023/editor/390-form-middle.png",
       "bytes": 43518,
-      "sha256": "13594021ff9f55576dbf7297439b8e1fe75a80682325ab9fe2ac99d965195edd"
+      "sha256": "13594021ff9f55576dbf7297439b8e1fe75a80682325ab9fe2ac99d965195edd",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/390-form-top.png",
       "target": "docs/qualification/explanation-release-20261023/editor/390-form-top.png",
       "bytes": 47863,
-      "sha256": "8d0f8f69e0d7ee886b0ee31746d89fece003164165b685e9f7456c5a887a98e8"
+      "sha256": "8d0f8f69e0d7ee886b0ee31746d89fece003164165b685e9f7456c5a887a98e8",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/390-returned-form-optional.png",
       "target": "docs/qualification/explanation-release-20261023/editor/390-returned-form-optional.png",
       "bytes": 35361,
-      "sha256": "219a42c1f63ae3e4e285f52362672e88e1cb03cc6fc295c4449cb2836b635fd0"
+      "sha256": "219a42c1f63ae3e4e285f52362672e88e1cb03cc6fc295c4449cb2836b635fd0",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/390-returned-form-top.png",
       "target": "docs/qualification/explanation-release-20261023/editor/390-returned-form-top.png",
       "bytes": 47863,
-      "sha256": "8d0f8f69e0d7ee886b0ee31746d89fece003164165b685e9f7456c5a887a98e8"
+      "sha256": "8d0f8f69e0d7ee886b0ee31746d89fece003164165b685e9f7456c5a887a98e8",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/390-review-actions.png",
       "target": "docs/qualification/explanation-release-20261023/editor/390-review-actions.png",
       "bytes": 56826,
-      "sha256": "77d5dc4d9c191bfb3e4a26f7c450b12a13eb8eab0b54b7a5772996a8ab411e4b"
+      "sha256": "77d5dc4d9c191bfb3e4a26f7c450b12a13eb8eab0b54b7a5772996a8ab411e4b",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/live-explanation-130c707-20261023/390-review-top.png",
       "target": "docs/qualification/explanation-release-20261023/editor/390-review-top.png",
       "bytes": 56922,
-      "sha256": "5d58f99fda8aeb063c5d52d57305a312721ca6d8b7556224a381c161394ff2f2"
+      "sha256": "5d58f99fda8aeb063c5d52d57305a312721ca6d8b7556224a381c161394ff2f2",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/pptx-final/source.pptx",
       "target": "docs/qualification/explanation-release-20261023/pptx/source.pptx",
       "bytes": 81151,
-      "sha256": "79a4e892c70131ebb8d573ea545cc666e1ede3f1d8332990543c60f4ee0b826a"
+      "sha256": "79a4e892c70131ebb8d573ea545cc666e1ede3f1d8332990543c60f4ee0b826a",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/pptx-final/render-receipt.json",
       "target": "docs/qualification/explanation-release-20261023/pptx/render-receipt.json",
       "bytes": 791,
-      "sha256": "9ae794ed0b5288351fa43affcd3ca14935c1724cdd3107e29c18c0426345d681"
+      "sha256": "9ae794ed0b5288351fa43affcd3ca14935c1724cdd3107e29c18c0426345d681",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/pptx-final/zip-inventory.json",
       "target": "docs/qualification/explanation-release-20261023/pptx/zip-inventory.json",
       "bytes": 177,
-      "sha256": "667a7c55779586b959dc15a57cf80c57776fa0d9febdd29b723774d175ed203d"
+      "sha256": "667a7c55779586b959dc15a57cf80c57776fa0d9febdd29b723774d175ed203d",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/pptx-final/VISUAL-REVIEW.md",
       "target": "docs/qualification/explanation-release-20261023/pptx/VISUAL-REVIEW.md",
       "bytes": 1381,
-      "sha256": "c65ad12b991a549e6d6956e7357a5191cbc63edeb6a9335351672681e10b2911"
+      "sha256": "c65ad12b991a549e6d6956e7357a5191cbc63edeb6a9335351672681e10b2911",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/pptx-final/slides/Slide1.PNG",
       "target": "docs/qualification/explanation-release-20261023/pptx/Slide1.PNG",
       "bytes": 23139,
-      "sha256": "32c790731a41d8c1324205c70a0b7f7e40542430070bf544205582b39cae847a"
+      "sha256": "32c790731a41d8c1324205c70a0b7f7e40542430070bf544205582b39cae847a",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/pptx-final/slides/Slide2.PNG",
       "target": "docs/qualification/explanation-release-20261023/pptx/Slide2.PNG",
       "bytes": 29157,
-      "sha256": "8a5929f2960210b69560748fe663c4a507c31eeb44fc365ff3e0e9558bbf1f4a"
+      "sha256": "8a5929f2960210b69560748fe663c4a507c31eeb44fc365ff3e0e9558bbf1f4a",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/deployed-editor-public/MANIFEST.json",
       "target": "docs/qualification/explanation-release-20261023/visual-manifest.json",
       "bytes": 10735,
-      "sha256": "73d2024e3c24a8f7790876f42e14c3be4a7c9e2e9b8318816e458419b8471c1e"
+      "sha256": "73d2024e3c24a8f7790876f42e14c3be4a7c9e2e9b8318816e458419b8471c1e",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/RELEASE-SUMMARY.md",
       "target": "docs/qualification/explanation-release-20261023/RELEASE-SUMMARY.md",
-      "bytes": 4550,
-      "sha256": "f99109d964cf5e4823799b8e190f0a5915526f2ff9dc877f87a57c0a4b3e6fdd"
+      "origin": "local",
+      "bytes": 6515,
+      "sha256": "99164991d1a7a9947d3269347b138284cc2679fc55a2fd5c7f70f2aa5da9904c"
     },
     {
       "source": ".local/continuation/publish-release-evidence.mjs",
       "target": "docs/qualification/explanation-release-20261023/tools/publish-release-evidence.mjs",
       "bytes": 11425,
-      "sha256": "3f3bbc06c48c878d8d3ed552131541a42c78e448ed57b4c8cdebd6cd9e0c7b1e"
+      "sha256": "3f3bbc06c48c878d8d3ed552131541a42c78e448ed57b4c8cdebd6cd9e0c7b1e",
+      "origin": "parent-commit"
     },
     {
       "source": ".local/continuation/release-evidence-files.json",
       "target": "docs/qualification/explanation-release-20261023/tools/release-evidence-files.json",
       "bytes": 11730,
-      "sha256": "7f4d8f1038dd2721eca783456fcb52ae8d8a527697e218a91dc718802facb498"
+      "sha256": "7f4d8f1038dd2721eca783456fcb52ae8d8a527697e218a91dc718802facb498",
+      "origin": "parent-commit"
+    },
+    {
+      "source": ".local/continuation/candidate-audit.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/candidate-audit.json",
+      "origin": "local",
+      "bytes": 17563,
+      "sha256": "84e0e78f3d586e438df8d6e0750f05982bf161fff11cff69d1a55d2e6cfa8110"
+    },
+    {
+      "source": ".local/continuation/verify-candidate.py",
+      "target": "docs/qualification/explanation-release-20261023/private-package/verify-candidate.py",
+      "origin": "local",
+      "bytes": 32077,
+      "sha256": "24a89b8910bd5a5abd5c85c5973d46fe2c574bf7add26f020adb947705bede1c"
+    },
+    {
+      "source": ".local/continuation/candidate-cli-byte-comparison.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/candidate-cli-byte-comparison.json",
+      "origin": "local",
+      "bytes": 7869,
+      "sha256": "30907f30e36b34bfe1f4c8a770b8d6d8ac8e1fe8d27e5b8552760dc4aee6ca9b"
+    },
+    {
+      "source": ".local/continuation/private-publication-preflight.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/private-publication-preflight.json",
+      "origin": "local",
+      "bytes": 3378,
+      "sha256": "1af8fcccf5098be34de9707e292337d30c33051b10b4f1546d81fb7d531d7a7f"
+    },
+    {
+      "source": ".local/continuation/candidate-evidence.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/candidate-evidence.json",
+      "origin": "local",
+      "bytes": 6062,
+      "sha256": "340de94a01fa187dec84ed9a3aa87f6a909590c29f4c90a3604710714b6bacc5"
+    },
+    {
+      "source": ".local/continuation/create-candidate.mjs",
+      "target": "docs/qualification/explanation-release-20261023/private-package/create-candidate.mjs",
+      "origin": "local",
+      "bytes": 2796,
+      "sha256": "bbe12687bec3577480a74c819979ffa997ba9c6647023d8bf2bbec316dc62419"
+    },
+    {
+      "source": ".local/continuation/package-build.log",
+      "target": "docs/qualification/explanation-release-20261023/private-package/package-build.log",
+      "origin": "local",
+      "bytes": 222,
+      "sha256": "bc095b02c41a28987e10c3579a03be8ad8948dcd02c04c97ba4933221e566d3a"
+    },
+    {
+      "source": ".local/continuation/compare-build-members.py",
+      "target": "docs/qualification/explanation-release-20261023/private-package/compare-build-members.py",
+      "origin": "local",
+      "bytes": 1816,
+      "sha256": "0d2297ef18bf3940a604f1a58872bbfeffffd373ad4151f3b9228473fed6fccd"
+    },
+    {
+      "source": ".local/continuation/ci-candidate-dist-comparison.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/ci-candidate-dist-comparison.json",
+      "origin": "local",
+      "bytes": 913,
+      "sha256": "4182a09bd7a75da2fbcb4a52ee16e57d9e11c501ccf6c7069efa7abc64d0c4ae"
+    },
+    {
+      "source": ".local/continuation/private-publication-1.33.1-130c707/publication-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/publication-receipt.json",
+      "origin": "local",
+      "bytes": 6269,
+      "sha256": "09ff029acaac92978dcb3df14c5a462bef7dd2f1e0283666f78f9fd6f47c3293"
+    },
+    {
+      "source": ".local/continuation/candidate-1.33.1-130c707/READY.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/READY.json",
+      "origin": "local",
+      "bytes": 9359,
+      "sha256": "58ac419fae530c5fbf15402cb7fbb661d74651e3a8cc102536367fff3b33c5a6"
+    },
+    {
+      "source": ".local/continuation/candidate-1.33.1-130c707/SHA256SUMS.txt",
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/SHA256SUMS.txt",
+      "origin": "local",
+      "bytes": 1049,
+      "sha256": "3b1149ecbc15b6219f88336ffabe331087953102387eb7b5ad92f820e3552b25"
+    },
+    {
+      "source": ".local/continuation/candidate-1.33.1-130c707/delivery-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/delivery-receipt.json",
+      "origin": "local",
+      "bytes": 6062,
+      "sha256": "340de94a01fa187dec84ed9a3aa87f6a909590c29f4c90a3604710714b6bacc5"
+    },
+    {
+      "source": ".local/continuation/candidate-1.33.1-130c707/PACKAGE-README.md",
+      "target": "docs/qualification/explanation-release-20261023/private-package/reports/PACKAGE-README.md",
+      "origin": "local",
+      "bytes": 987,
+      "sha256": "c28e33165b80c2e030d0b58bc5e528256766c06cada6543992da9a8bde46337f"
+    },
+    {
+      "source": ".local/continuation/initial-evidence-readback.json",
+      "target": "docs/qualification/explanation-release-20261023/initial-evidence-readback.json",
+      "origin": "local",
+      "bytes": 16143,
+      "sha256": "c261b6e5f3f70462b3a67a613ae121517470d85ffab8a73e6f6588c141b219d2"
+    },
+    {
+      "source": ".local/continuation/final-remote-state.json",
+      "target": "docs/qualification/explanation-release-20261023/final-remote-state.json",
+      "origin": "local",
+      "bytes": 1499,
+      "sha256": "b23c2ccc8dd97d2f187cda20a195ae9ece48c27e5c4bb37132b21d31b56cd240"
+    },
+    {
+      "source": ".local/continuation/verify-initial-evidence.py",
+      "target": "docs/qualification/explanation-release-20261023/tools/verify-initial-evidence.py",
+      "origin": "local",
+      "bytes": 4728,
+      "sha256": "c1d476e7c3c14b7c547043c62b8286ff19fd6967f255a66bbe233bc63123d979"
+    },
+    {
+      "source": ".local/continuation/append-release-evidence.mjs",
+      "target": "docs/qualification/explanation-release-20261023/tools/append-release-evidence.mjs",
+      "origin": "local",
+      "bytes": 14363,
+      "sha256": "08d5fb09b1cf5ff17e7042e1b4d6d367b47f0d2b20484c666d254de4a9ea58e1"
+    },
+    {
+      "source": ".local/continuation/release-evidence-final-files.json",
+      "target": "docs/qualification/explanation-release-20261023/tools/release-evidence-final-files.json",
+      "origin": "local",
+      "bytes": 5091,
+      "sha256": "721e5feb4148f40e95111903f44c07833ddc843c5e35d84089a84536b322c4bf"
+    },
+    {
+      "source": ".local/continuation/live-explanation-130c707.mjs",
+      "target": "docs/qualification/explanation-release-20261023/tools/live-explanation-130c707.mjs",
+      "origin": "local",
+      "bytes": 7793,
+      "sha256": "29463447ea9e3668c8bca6d4b7c2c7229dc18a7ba7858e71021bf54cadcd4fa4"
+    },
+    {
+      "source": ".local/continuation/pptx-final/render.ps1",
+      "target": "docs/qualification/explanation-release-20261023/tools/render-pptx.ps1",
+      "origin": "local",
+      "bytes": 2198,
+      "sha256": "05efd3195152ce279b786c2c2045e3074ff38c08286982da7a46659327525691"
+    },
+    {
+      "source": ".local/continuation/readback-private-package.py",
+      "target": "docs/qualification/explanation-release-20261023/private-package/readback-private-package.py",
+      "origin": "local",
+      "bytes": 6458,
+      "sha256": "b4177dead028437790181f7998adffb3ab19e7351afa027cf19cfeae7c2a4ddb"
+    },
+    {
+      "source": ".local/continuation/private-publication-readback-recovery-1.33.1-130c707/readback-receipt.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/readback-recovery-receipt.json",
+      "origin": "local",
+      "bytes": 5456,
+      "sha256": "4cf0e5562647442ca66c05d9228563e00a07d98a6933b9465bbd2c02910b348f"
+    },
+    {
+      "source": ".local/continuation/recovery-independent-review.json",
+      "target": "docs/qualification/explanation-release-20261023/private-package/recovery-independent-review.json",
+      "origin": "local",
+      "bytes": 2037,
+      "sha256": "e535bb07fc05695b79127c17fdbb551f45501c63df0aff43ea0809950570c464"
     }
   ],
   "missing": [],

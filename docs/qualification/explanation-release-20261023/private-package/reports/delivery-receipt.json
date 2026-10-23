@@ -1,0 +1,118 @@
+{
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "ci": {
+    "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+    "url": "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+    "conclusion": "success"
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/ci/ARTIFACT-VERIFICATION.md"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Successful exact-source main CI typecheck step"
+    },
+    {
+      "id": "unit",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/ci/ARTIFACT-VERIFICATION.md"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Main CI: 2030 passed, 3 explicit skips"
+    },
+    {
+      "id": "build",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/build-130c707-canonical-final.log"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Main CI plus fresh canonical local production build"
+    },
+    {
+      "id": "browser",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/ci/browser-summary.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/browser/canonical-browser-receipt.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Main CI: 362 passed, 5 skipped; canonical local supplement: 6 passed"
+    },
+    {
+      "id": "real-atlas-quality",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/qualification-130c707-canonical.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Selected local atlas geometry: 3 passed; private input and raw log excluded"
+    },
+    {
+      "id": "pptx-zip",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/pptx/zip-inventory.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/pptx/render-receipt.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Synthetic deck: 46 ZIP entries, CRC pass, 2 slides, no external relationships"
+    },
+    {
+      "id": "pptx-visual",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/pptx/VISUAL-REVIEW.md"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "AI inspection of two native PowerPoint PNG renders; no human acceptance inferred"
+    },
+    {
+      "id": "bundled-cli",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/bundled-client-receipt.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/qualified-cli-inventory-130c707-canonical.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "21 isolated CLI/MCP cases passed with labelled synthetic inputs"
+    },
+    {
+      "id": "installed-vscode",
+      "status": "FAIL",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/vscode-host-130c707-canonical.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/vscode-host-diagnosis-130c707-canonical.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Optional host check: two attempts each 4 pass/3 fail, unresolved quick-input timeout"
+    },
+    {
+      "id": "installed-cursor",
+      "status": "NOT_RUN",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/local/cursor-host-130c707-canonical.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Optional host check not run; existing harness hides onboarding"
+    },
+    {
+      "id": "deployed-web",
+      "status": "PASS",
+      "evidenceRefs": [
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/editor/deployed-smoke.json",
+        "https://github.com/julian-passebecq/diagramcloud/blob/856355e7e57073a7252e55e1eeb15b9555aabd5f/docs/qualification/explanation-release-20261023/editor/editor-result.json"
+      ],
+      "inspectedBy": "Codex agent team",
+      "method": "Exact production source: 4 smoke cases and 2 viewport explanation journeys passed"
+    }
+  ]
+}

@@ -1,0 +1,455 @@
+{
+  "format": "diagramcloud.independent-evidence-readback/1",
+  "capturedAt": "2026-10-23T16:52:41.238788+00:00",
+  "status": "PASS",
+  "repository": "julian-passebecq/diagramcloud",
+  "branch": "refs/heads/codex/diagramcloud-release-evidence-20261023",
+  "commit": "856355e7e57073a7252e55e1eeb15b9555aabd5f",
+  "parent": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "method": "Fresh fetch into a newly created ignored bare Git repository; raw git cat-file --batch bytes compared against exact local manifest and every published SHA256SUMS entry; remote branch rechecked independently.",
+  "remoteWrites": false,
+  "sourceWorktreeWrites": false,
+  "files": 62,
+  "exactLocalByteMatches": 62,
+  "publishedChecksumEntries": 61,
+  "publishedChecksumMatches": 61,
+  "manifestEntries": 59,
+  "changedPathsOutsideEvidence": 0,
+  "mismatches": [],
+  "entries": [
+    {
+      "path": "EVIDENCE-MANIFEST.json",
+      "bytes": 17802,
+      "sha256": "98c52393fad55ed28bd198cbd53123ecc3e913738361a6837890e95fe09798d9",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "EVIDENCE-SCAN.json",
+      "bytes": 13422,
+      "sha256": "7a912acd1edfd840179ed04d55c29a09077946b0a644957fed2d2eafc93fc8c5",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "RELEASE-SUMMARY.md",
+      "bytes": 4550,
+      "sha256": "f99109d964cf5e4823799b8e190f0a5915526f2ff9dc877f87a57c0a4b3e6fdd",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "SHA256SUMS.txt",
+      "bytes": 5911,
+      "sha256": "c6408f070c5397b8f8b3000cc61f4d008a8ad3bd200b2f44cfccad10852e92fb",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": null
+    },
+    {
+      "path": "browser/browser.log",
+      "bytes": 3043,
+      "sha256": "5b70723539f83e299dafa8340eab44c758e1c7f3e8665865ad8a6755282eb5e9",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "browser/canonical-browser-receipt.json",
+      "bytes": 2020,
+      "sha256": "9cdf030fcf48cfad98906e156bbc8b75ce059be0023050e182fcf14e4f34dbd7",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "browser/report.json",
+      "bytes": 9906,
+      "sha256": "c59be3702fb00e6bb9144451eb7b11d8e74b3bdd769ca50b3efd8440304f9e29",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/ARTIFACT-VERIFICATION.md",
+      "bytes": 3678,
+      "sha256": "2e4407443f4dbbb8dd11e7a60d080efae449d22a1302cc5cead7adb4caba0b02",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/artifact-metadata.json",
+      "bytes": 839,
+      "sha256": "10b31f6196dee6432bd864c9f6fb2f850387405e029aedecc7644eec19b7ae04",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/artifact-verification.json",
+      "bytes": 746166,
+      "sha256": "538710ef56289427143bdfd30a2c7b6f16fde147eabba529908320e2a2c0358e",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/browser-summary.json",
+      "bytes": 7310,
+      "sha256": "512d8e792f7cad1a5223f1d06235339597f9be9b64dff9e01ad6b949a87ce775",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/built-handshake.json",
+      "bytes": 1588,
+      "sha256": "9c875bb255dc6e5487e6ba2a670948ff7c7c330b0e543691f9c2678dab52bd6e",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/bundled-client-receipt.json",
+      "bytes": 3140,
+      "sha256": "b56f86c36b261c83618c135e2e8931dc26416f3a976b6916b771c78b87cfbd98",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/job.log",
+      "bytes": 949127,
+      "sha256": "e873ffc1c6c981847084e67b0a0350d656ae27fb545af054a461fb6493d141c0",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/verification-receipt.json",
+      "bytes": 3742,
+      "sha256": "eede00208f588cb1b583d38255803ef4dc9c59c2c27a648059c5eba6ddc1e2ea",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/verify-artifact.py",
+      "bytes": 20129,
+      "sha256": "83fe61f116313f388f435d29bd075c923a79cb471594e67cba5c60698591b8b8",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "ci/workflow-run.json",
+      "bytes": 14923,
+      "sha256": "de73a7a7e5d181711f4913b5e4d2a3f7e20e0cf77f239fda00f8d7403c0c743a",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/1440-applied.png",
+      "bytes": 143101,
+      "sha256": "77b90bb2efac92259fd3d1d8aa4f247b98942e3c8ddd79b31e95f8f3511a1046",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/1440-form-bottom.png",
+      "bytes": 208645,
+      "sha256": "fb680de98e6aea5a1d621fec7a11fefe7d1dc6ac6f09618a60048339069cd4bf",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/1440-form-middle.png",
+      "bytes": 215416,
+      "sha256": "aee6e49879c25d6d14e40f279638541ae9bebb022e15a6ec85d319070469209c",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/1440-form-top.png",
+      "bytes": 221784,
+      "sha256": "3b479a61b46923631dcbadc6fd9bbdfaa0ddfd13a3be52ba8b5b814ed5e5afe6",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/1440-returned-form-optional.png",
+      "bytes": 208036,
+      "sha256": "69fc545e023e719d8d9ec5f50f6486bd9d94d5ca8dcce839810482ee06f38838",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/1440-returned-form-top.png",
+      "bytes": 221784,
+      "sha256": "3b479a61b46923631dcbadc6fd9bbdfaa0ddfd13a3be52ba8b5b814ed5e5afe6",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/1440-review-actions.png",
+      "bytes": 247192,
+      "sha256": "9a97a6e29608531923c933a7ceefd659077cf05d457811c2427154f3c47e2d01",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/1440-review-top.png",
+      "bytes": 247192,
+      "sha256": "9a97a6e29608531923c933a7ceefd659077cf05d457811c2427154f3c47e2d01",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/390-applied.png",
+      "bytes": 41389,
+      "sha256": "1438118fd6e0b3445fdb46d094f2a9c90836a0759f4903183046141e58a0d7ae",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/390-form-bottom.png",
+      "bytes": 35863,
+      "sha256": "dc3821ef90d38c4ef1b77946f4ab56b702b20745ebe61d68febc72f499106105",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/390-form-middle.png",
+      "bytes": 43518,
+      "sha256": "13594021ff9f55576dbf7297439b8e1fe75a80682325ab9fe2ac99d965195edd",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/390-form-top.png",
+      "bytes": 47863,
+      "sha256": "8d0f8f69e0d7ee886b0ee31746d89fece003164165b685e9f7456c5a887a98e8",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/390-returned-form-optional.png",
+      "bytes": 35361,
+      "sha256": "219a42c1f63ae3e4e285f52362672e88e1cb03cc6fc295c4449cb2836b635fd0",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/390-returned-form-top.png",
+      "bytes": 47863,
+      "sha256": "8d0f8f69e0d7ee886b0ee31746d89fece003164165b685e9f7456c5a887a98e8",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/390-review-actions.png",
+      "bytes": 56826,
+      "sha256": "77d5dc4d9c191bfb3e4a26f7c450b12a13eb8eab0b54b7a5772996a8ab411e4b",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/390-review-top.png",
+      "bytes": 56922,
+      "sha256": "5d58f99fda8aeb063c5d52d57305a312721ca6d8b7556224a381c161394ff2f2",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/VISUAL-REVIEW.md",
+      "bytes": 1707,
+      "sha256": "4d5a42a3eb7802d06c31c6a1bb92474bada6a9bf0b839775063fe1ac7125270d",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/deployed-smoke.json",
+      "bytes": 2319,
+      "sha256": "bf7174556d22da7b7daf72befb251c0fa6c04f81e6a99c2808c08f64a2ed327d",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "editor/editor-result.json",
+      "bytes": 1807,
+      "sha256": "97ae380dfe09d6e54c4940c7c6ef98bc1c02c2884d1b5d41fca7e7bf08a3b60c",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/build-130c707-canonical-final.log",
+      "bytes": 4772,
+      "sha256": "57748f644e8929b8df5e57c638e2e7c67cb1dd99182e52e42d61e206ad4dd4e9",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/bundled-client-receipt.json",
+      "bytes": 3008,
+      "sha256": "6719f151c81dcc0ce6f5d4eb0dd4b1bf781add0395a9430206eacd4c679dc070",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/canonical-copychecks-130c707-attempt1.json",
+      "bytes": 610,
+      "sha256": "8e9fef70111e6f3f6b376c9eb99f51519411ffead67dd20ca15fb6c53e1d9133",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/canonical-copychecks-130c707-canonical.json",
+      "bytes": 512,
+      "sha256": "685c42c15eae1aa90d5cdb4e72de6a077e68e727a2be36f9c8097b53c3f08d8e",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/canonicalize-checkout.mjs",
+      "bytes": 2516,
+      "sha256": "e10f1e1734040972569975d70abd0d1306471add19952c1c623db7034f16cf62",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/cursor-host-130c707-canonical.json",
+      "bytes": 671,
+      "sha256": "71eab09cfad3167fb43648c113f8871df1a4261f1db8eeec44743b13d2c1fff2",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/qualification-130c707-canonical.json",
+      "bytes": 6433,
+      "sha256": "93a72d8b5fbe3ae7b9eb3fbe168679b5efd02583c90bd0bb947d09d10c3d2f55",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/qualified-cli-inventory-130c707-canonical.json",
+      "bytes": 2911,
+      "sha256": "d884200143cdf8752584fefc1696acf0feb982ab9504d28911880243c7f1b97b",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/vscode-host-130c707-canonical-attempt1.json",
+      "bytes": 1540,
+      "sha256": "b5e360156d23ba3b8bc86980ef85d5f81d7a55b407fd120e1ccfd20561e71f3e",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/vscode-host-130c707-canonical-attempt2.json",
+      "bytes": 1550,
+      "sha256": "4fa21b2a7f0d6ab8722d0aad6abec6c99657548a5bfadd5599a651a822b90ddf",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/vscode-host-130c707-canonical.json",
+      "bytes": 2936,
+      "sha256": "0b04ce0b354681dd037b4e034857eb65e81c0b6195892deb8f8efb4a07675436",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/vscode-host-diagnosis-130c707-canonical.json",
+      "bytes": 2444,
+      "sha256": "1583f2aad626dccdc5e37a009b115a5dee18b5edceb44a556c23fad4d699b5db",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "local/vsix-comparison-130c707-canonical.json",
+      "bytes": 655,
+      "sha256": "b88ad28d4ecca26cb03f3dda099234878bfa5db590a39d89a0fba861ef231b50",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "pptx/Slide1.PNG",
+      "bytes": 23139,
+      "sha256": "32c790731a41d8c1324205c70a0b7f7e40542430070bf544205582b39cae847a",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "pptx/Slide2.PNG",
+      "bytes": 29157,
+      "sha256": "8a5929f2960210b69560748fe663c4a507c31eeb44fc365ff3e0e9558bbf1f4a",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "pptx/VISUAL-REVIEW.md",
+      "bytes": 1381,
+      "sha256": "c65ad12b991a549e6d6956e7357a5191cbc63edeb6a9335351672681e10b2911",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "pptx/render-receipt.json",
+      "bytes": 791,
+      "sha256": "9ae794ed0b5288351fa43affcd3ca14935c1724cdd3107e29c18c0426345d681",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "pptx/source.pptx",
+      "bytes": 81151,
+      "sha256": "79a4e892c70131ebb8d573ea545cc666e1ede3f1d8332990543c60f4ee0b826a",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "pptx/zip-inventory.json",
+      "bytes": 177,
+      "sha256": "667a7c55779586b959dc15a57cf80c57776fa0d9febdd29b723774d175ed203d",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "publisher/PRIVATE-PACKAGE-PUBLISHER.md",
+      "bytes": 4419,
+      "sha256": "f1095d5fdff1af3a4dc9fc2a71e2f31364cf04b9a48ff7f7b1434a4782ed77dc",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "publisher/private-publisher-self-check.json",
+      "bytes": 857,
+      "sha256": "92b0ffd25e86295f58909583362ec7afbe10b982b95ce68672d6ce47cf6e1810",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "publisher/private-publisher-transport-check.json",
+      "bytes": 649,
+      "sha256": "c97e5d42751e8815a8cb2b930b40d984c9cdcd8790a4dcf6a76376958ec0fb97",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "publisher/publish-private-package.py",
+      "bytes": 20497,
+      "sha256": "36242068a438bd0c0e015591bba67eec56ff43d6dc3cc4bdefc39a5512612b99",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "tools/publish-release-evidence.mjs",
+      "bytes": 11425,
+      "sha256": "3f3bbc06c48c878d8d3ed552131541a42c78e448ed57b4c8cdebd6cd9e0c7b1e",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "tools/release-evidence-files.json",
+      "bytes": 11730,
+      "sha256": "7f4d8f1038dd2721eca783456fcb52ae8d8a527697e218a91dc718802facb498",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    },
+    {
+      "path": "visual-manifest.json",
+      "bytes": 10735,
+      "sha256": "73d2024e3c24a8f7790876f42e14c3be4a7c9e2e9b8318816e458419b8471c1e",
+      "exactLocalBytesMatch": true,
+      "publishedChecksumMatch": true
+    }
+  ]
+}

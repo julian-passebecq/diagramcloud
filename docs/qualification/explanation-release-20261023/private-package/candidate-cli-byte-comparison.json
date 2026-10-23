@@ -1,0 +1,159 @@
+{
+  "format": "diagramcloud.candidate-cli-byte-comparison/1",
+  "sourceSha": "130c70744ec8fdeefebb784c56afb53c182f8dfa",
+  "checkedAt": "2026-10-23T16:52:39.698411+00:00",
+  "status": "PASS",
+  "archive": "diagramcloud-cli.tar.gz",
+  "archiveSha256": "d61cae38e83eba7e7418fd00318b32dcaecf026bf1960e3ad919fd81d04c744a",
+  "archiveBytes": 1540290,
+  "qualifiedChecks": 21,
+  "qualifiedInventoryReceiptSha256": "d884200143cdf8752584fefc1696acf0feb982ab9504d28911880243c7f1b97b",
+  "qualificationReceiptSha256": "6719f151c81dcc0ce6f5d4eb0dd4b1bf781add0395a9430206eacd4c679dc070",
+  "filesCompared": 13,
+  "exactByteMatches": 13,
+  "mismatches": 0,
+  "archiveRegularFiles": 16,
+  "files": [
+    {
+      "name": "concept-host.mjs",
+      "bytes": 246371,
+      "qualifiedSha256": "18de38ae8e8064b777594173b309295a1beef38e544e31f02232710e7716ec77",
+      "retainedExecutedSha256": "18de38ae8e8064b777594173b309295a1beef38e544e31f02232710e7716ec77",
+      "archiveSha256": "18de38ae8e8064b777594173b309295a1beef38e544e31f02232710e7716ec77",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "concept-preview.mjs",
+      "bytes": 231185,
+      "qualifiedSha256": "2eb889967868ab31e402da7d563ef7bbbe0c76d9fadf70466b06d3270faab4eb",
+      "retainedExecutedSha256": "2eb889967868ab31e402da7d563ef7bbbe0c76d9fadf70466b06d3270faab4eb",
+      "archiveSha256": "2eb889967868ab31e402da7d563ef7bbbe0c76d9fadf70466b06d3270faab4eb",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "grammars/identity.json",
+      "bytes": 1351,
+      "qualifiedSha256": "0e4d0e25fc4b5e49c52fe4c33a4de18251e1b3a7111979aec669f06f4e495214",
+      "retainedExecutedSha256": "0e4d0e25fc4b5e49c52fe4c33a4de18251e1b3a7111979aec669f06f4e495214",
+      "archiveSha256": "0e4d0e25fc4b5e49c52fe4c33a4de18251e1b3a7111979aec669f06f4e495214",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "grammars/tree-sitter-LICENSE",
+      "bytes": 1085,
+      "qualifiedSha256": "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147",
+      "retainedExecutedSha256": "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147",
+      "archiveSha256": "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "grammars/tree-sitter-c-sharp.wasm",
+      "bytes": 5103332,
+      "qualifiedSha256": "d12d85996c25957b4c1b71e26db2d7cc8a294997b60642e9c2a3b031b2c66dd3",
+      "retainedExecutedSha256": "d12d85996c25957b4c1b71e26db2d7cc8a294997b60642e9c2a3b031b2c66dd3",
+      "archiveSha256": "d12d85996c25957b4c1b71e26db2d7cc8a294997b60642e9c2a3b031b2c66dd3",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "grammars/tree-sitter-javascript.wasm",
+      "bytes": 411770,
+      "qualifiedSha256": "5fb488d0cabb4775a594bab85682de5ad6ce83c0d6ac997a9f82dd084d571240",
+      "retainedExecutedSha256": "5fb488d0cabb4775a594bab85682de5ad6ce83c0d6ac997a9f82dd084d571240",
+      "archiveSha256": "5fb488d0cabb4775a594bab85682de5ad6ce83c0d6ac997a9f82dd084d571240",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "grammars/tree-sitter-python.wasm",
+      "bytes": 457883,
+      "qualifiedSha256": "16108b50df4ee9a30168794252ab55e7c93bfc5765d7fa0aa3e335752c515f47",
+      "retainedExecutedSha256": "16108b50df4ee9a30168794252ab55e7c93bfc5765d7fa0aa3e335752c515f47",
+      "archiveSha256": "16108b50df4ee9a30168794252ab55e7c93bfc5765d7fa0aa3e335752c515f47",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "grammars/tree-sitter-tsx.wasm",
+      "bytes": 1445638,
+      "qualifiedSha256": "79e5da75ea62855a0cd67177685f0164eac87d5f630b3cbe1e0a099751ad30f8",
+      "retainedExecutedSha256": "79e5da75ea62855a0cd67177685f0164eac87d5f630b3cbe1e0a099751ad30f8",
+      "archiveSha256": "79e5da75ea62855a0cd67177685f0164eac87d5f630b3cbe1e0a099751ad30f8",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "grammars/tree-sitter-typescript.wasm",
+      "bytes": 1413849,
+      "qualifiedSha256": "778025db5a8be0e70f8ccc3671e486dfeddd048c25d9e8a70c26de2e1bf6f97d",
+      "retainedExecutedSha256": "778025db5a8be0e70f8ccc3671e486dfeddd048c25d9e8a70c26de2e1bf6f97d",
+      "archiveSha256": "778025db5a8be0e70f8ccc3671e486dfeddd048c25d9e8a70c26de2e1bf6f97d",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "grammars/tree-sitter.wasm",
+      "bytes": 205488,
+      "qualifiedSha256": "f38dcc4b43b818f9a0785bc1c6d5611a75ac4cdd428ff3f02757c34ca4e46d7f",
+      "retainedExecutedSha256": "f38dcc4b43b818f9a0785bc1c6d5611a75ac4cdd428ff3f02757c34ca4e46d7f",
+      "archiveSha256": "f38dcc4b43b818f9a0785bc1c6d5611a75ac4cdd428ff3f02757c34ca4e46d7f",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "grammars/vscode-grammars-LICENSE",
+      "bytes": 1141,
+      "qualifiedSha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "retainedExecutedSha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "archiveSha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "intelligence-mcp.mjs",
+      "bytes": 1066871,
+      "qualifiedSha256": "01f08669cf852479a65745f95ac73d1f64f5e359dfe553d16520823d27d1dbbe",
+      "retainedExecutedSha256": "01f08669cf852479a65745f95ac73d1f64f5e359dfe553d16520823d27d1dbbe",
+      "archiveSha256": "01f08669cf852479a65745f95ac73d1f64f5e359dfe553d16520823d27d1dbbe",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    },
+    {
+      "name": "intelligence.mjs",
+      "bytes": 1424678,
+      "qualifiedSha256": "3fe93d7d9e80ad6c400da1ef007cd1e6f7f08ed4e8b015b4737a5055c39f2d58",
+      "retainedExecutedSha256": "3fe93d7d9e80ad6c400da1ef007cd1e6f7f08ed4e8b015b4737a5055c39f2d58",
+      "archiveSha256": "3fe93d7d9e80ad6c400da1ef007cd1e6f7f08ed4e8b015b4737a5055c39f2d58",
+      "byteIdenticalToRetainedExecutedFile": true,
+      "matchesQualifiedInventory": true
+    }
+  ],
+  "additionalLicenseFiles": [
+    {
+      "name": "LICENSE",
+      "bytes": 1073,
+      "sha256": "9bb5ec3cd799c3df84ca365d3e294e86d5496f964fb2637b962ff08e087ea05c",
+      "scope": "Additional license or attribution material, outside the executed bundle inventory."
+    },
+    {
+      "name": "THIRD_PARTY_NOTICES.md",
+      "bytes": 10382,
+      "sha256": "7d62b82cb74a182c3548e29d6d653e62ed76d9be300f82f1aade21eb2e3463cd",
+      "scope": "Additional license or attribution material, outside the executed bundle inventory."
+    },
+    {
+      "name": "dependency-licenses.txt",
+      "bytes": 586219,
+      "sha256": "1933d9727f7b9e32e0ee9cff53e24c5b648e267614cd97749f8fc88cf23428e0",
+      "scope": "Additional license or attribution material, outside the executed bundle inventory."
+    }
+  ],
+  "method": "Archive read in memory without extraction; every qualified runtime, grammar identity and grammar license compared as actual bytes with the retained isolated execution bundle and its recorded SHA-256/size.",
+  "privateLocationPublished": false,
+  "packageModified": false,
+  "scope": "Binds the 13 packaged runtime/grammar files to the exact synthetic-input CLI/MCP bundle that passed 21 checks; no provider or installed-host qualification claim."
+}
