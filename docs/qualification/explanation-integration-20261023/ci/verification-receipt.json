@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "receipt_id": "diagramcloud:1.33.1:d7ceb456c690:1792770253640",
+  "subject": {
+    "schema_version": 1,
+    "entity_id": "galaxy:diagramcloud:release:1.33.1%40d7ceb456c6905e6277cdeb1dea801298bd7e77e9",
+    "owner_app": "diagramcloud",
+    "entity_type": "release",
+    "local_id": "1.33.1@d7ceb456c6905e6277cdeb1dea801298bd7e77e9",
+    "revision": "d7ceb456c6905e6277cdeb1dea801298bd7e77e9",
+    "display_name": "DiagramCloud 1.33.1",
+    "aliases": [],
+    "metadata": {
+      "product_version": "1.33.1"
+    }
+  },
+  "app_id": "diagramcloud",
+  "product_version": "1.33.1",
+  "document_schema_version": 1,
+  "galaxy_level": "G0",
+  "revision": {
+    "vcs": "git",
+    "repository": "julian-passebecq/diagramcloud",
+    "commit": "d7ceb456c6905e6277cdeb1dea801298bd7e77e9",
+    "branch": "codex/diagramcloud-explanation-integration-20261023",
+    "dirty": false
+  },
+  "verification_level": "E2E_VERIFIED",
+  "status": "passed",
+  "checks": [
+    {
+      "check_id": "typecheck",
+      "status": "passed",
+      "command": "npm run check",
+      "evidence_ref_ids": [
+        "github:julian-passebecq/diagramcloud:run:39976506510"
+      ]
+    },
+    {
+      "check_id": "unit",
+      "status": "passed",
+      "command": "npm test",
+      "evidence_ref_ids": [
+        "github:julian-passebecq/diagramcloud:run:39976506510"
+      ]
+    },
+    {
+      "check_id": "build",
+      "status": "passed",
+      "command": "npm run build",
+      "evidence_ref_ids": [
+        "github:julian-passebecq/diagramcloud:run:39976506510"
+      ]
+    },
+    {
+      "check_id": "package",
+      "status": "passed",
+      "command": "static bundle manifest (dist/)",
+      "summary": "127 files",
+      "evidence_ref_ids": [
+        "diagramcloud:dist-manifest:5efd213de6b3c9cc"
+      ]
+    },
+    {
+      "check_id": "e2e",
+      "status": "passed",
+      "command": "npm run test:e2e",
+      "evidence_ref_ids": [
+        "github:julian-passebecq/diagramcloud:run:39976506510"
+      ]
+    }
+  ],
+  "evidence_refs": [
+    {
+      "schema_version": 1,
+      "evidence_id": "diagramcloud:dist-manifest:5efd213de6b3c9cc",
+      "kind": "file",
+      "source_system": "filesystem",
+      "locator": {
+        "path": "dist/",
+        "files": 127,
+        "method": "sha256 over sorted \"path sha256\" lines, source maps excluded"
+      },
+      "captured_at": "2026-10-23T15:44:13.610Z",
+      "observed_revision": "d7ceb456c6905e6277cdeb1dea801298bd7e77e9",
+      "integrity": "sha256:5efd213de6b3c9ccb2b6e2cf5c8f8e2f331c5ae07c4624b7227f9e0217f3d2cb",
+      "visibility": "public",
+      "synthetic": false,
+      "review_state": "unreviewed",
+      "producer_app": "diagramcloud"
+    },
+    {
+      "schema_version": 1,
+      "evidence_id": "github:julian-passebecq/diagramcloud:run:39976506510",
+      "kind": "pipeline",
+      "source_system": "github",
+      "locator": {
+        "url": "https://github.com/julian-passebecq/diagramcloud/actions/runs/39976506510",
+        "run_id": "39976506510",
+        "attempt": "1",
+        "workflow": "DiagramCloud CI"
+      },
+      "captured_at": "2026-10-23T15:44:13.610Z",
+      "observed_revision": "d7ceb456c6905e6277cdeb1dea801298bd7e77e9",
+      "visibility": "public",
+      "synthetic": false,
+      "review_state": "unreviewed",
+      "producer_app": "diagramcloud"
+    }
+  ],
+  "created_at": "2026-10-23T15:44:13.640Z",
+  "caveats": [
+    "No cross-app qualification is part of this receipt, so it never claims GALAXY_QUALIFIED.",
+    "Galaxy maturity stays G0: product version, qualification level and Galaxy maturity are separate dimensions.",
+    "Chromium is the only browser this receipt covers."
+  ]
+}

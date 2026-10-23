@@ -1,0 +1,23 @@
+{
+  "artifacts": [
+    {
+      "id": 12513746196,
+      "name": "diagramcloud-ci",
+      "size_in_bytes": 68693346,
+      "url": "https://api.github.com/repos/julian-passebecq/diagramcloud/actions/artifacts/12513746196",
+      "archive_download_url": "https://api.github.com/repos/julian-passebecq/diagramcloud/actions/artifacts/12513746196/zip",
+      "expired": false,
+      "created_at": "2026-10-23T15:44:21Z",
+      "expires_at": "2026-11-06T15:44:18Z",
+      "updated_at": "2026-10-23T15:44:21Z",
+      "digest": "sha256:aa85fb915226c963f6f6256bdf27000d804fa0a9cc77faae596bb1883917a053",
+      "workflow_run": {
+        "id": 39976506510,
+        "repository_id": 1379708938,
+        "head_repository_id": 1379708938,
+        "head_branch": "codex/diagramcloud-explanation-integration-20261023",
+        "head_sha": "d7ceb456c6905e6277cdeb1dea801298bd7e77e9"
+      }
+    }
+  ]
+}
