@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import './tours.css';
+import './tours.css';import {ExplanationAuthoring} from './ExplanationAuthoring';
 import {Button} from '@fluentui/react-components';
 import {errorMessage,type Project} from '../core/model';
 import {addTour,addTourStop,moveTourStop,recordStop,removeTour,removeTourStop,tourStops,updateTourStop,TOUR_LABEL,type TourSubject} from '../core/tours';
@@ -28,7 +28,7 @@ const subjectText=(s:TourSubject)=>`${s.kind==='node'?'component':'connection'} 
  * or removes a stop as one revision each (one Undo).
  *
  * Interruptible presentation: Pause for a question keeps the presentation on its stop while the presenter inspects,
- * zooms out or drills anywhere; Return and resume resolves the stop again by identity against the document the current
+ * zooms out or drills anywhere; Return and resume resolves the stop again by identity in the document the current
  * audience may read. A source or audience change since the presentation's cut never moves it: the player pauses, says
  * what changed, and the presenter chooses where to continue. Narration is not shown while paused.
  */
@@ -78,7 +78,7 @@ export function ToursPanel({doc,edit,viewId,selectedNodeId,selectedEdgeId,live,o
  const newTour=()=>{try{const d=live(),base='tour-'+(slug(title)||'untitled');let id=base;for(let n=2;(d.tours??[]).some(t=>t.id===id);n++)id=`${base}-${n}`;const stop=recordStop(d,viewId,subjects(),narration);
     if(commit(x=>addTour(x,{id,title:title.trim(),visibility,stop}),`Recorded tour ${title.trim()} at revision ${d.revision}.`)){setTitle('');setNarration('');onPlay(playOf(live(),id,0));focusTo('[data-focus="tour-player"]');}}catch(e){setNotice({kind:'refused',text:errorMessage(e)});}};
  const selectionText=selectedNodeId?<>, subject component {selectedNodeId}</>:selectedEdgeId?<>, subject connection {selectedEdgeId}</>:', no subject selected';
- return <section ref={root} className="inspector tours-panel" aria-label="Tours">
+ return <section ref={root} className="inspector tours-panel" aria-label="Tours"><ExplanationAuthoring doc={doc} edit={edit} viewId={viewId} selectedNodeId={selectedNodeId} live={live} onCommit={onCommit}/>
   <div className="eyebrow">TOURS</div><h2 tabIndex={-1} data-focus="tours-heading">Guided tours</h2>
   <p className="micro">{TOUR_LABEL}. Each stop keeps its view, the stable IDs of its subjects and the content they had when recorded; a changed or missing anchor is shown as such, never repaired silently.</p>
   {tours.length===0?<p className="muted">No tour{edit?' yet':' in this copy'}.</p>:<ul className="variant-list">{tours.map(t=>{const p=resume.positions[t.id];return <li key={t.id}>

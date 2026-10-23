@@ -15,6 +15,7 @@ import {readFileSync,writeFileSync,mkdirSync,copyFileSync,statSync,existsSync} f
 import {resolve,join,relative,dirname,sep} from 'node:path';
 import {platform,arch} from 'node:os';
 import {bundleClients} from './lib/bundleClients';
+import {assertPackageBuildIdentity} from './lib/packageBuildIdentity';
 const git=(...args:string[])=>execFileSync('git',args,{encoding:'utf8'}).trim();
 // Git Bash puts its GNU tar first on PATH, which reads "D:\\..." as a remote host.
 // On Windows use the system bsdtar, and pass workspace-relative paths everywhere.
@@ -37,6 +38,7 @@ if(!dryRun)for(const required of ['typecheck','unit','build','browser','real-atl
 for(const c of evidence.checks)for(const ref of c.evidenceRefs)if(!/^https:/.test(ref)&&!existsSync(ref))throw new Error('Missing host evidence file');
 for(const c of evidence.checks)for(const field of ['inspectedBy','method'] as const)if(c[field]!==undefined&&(typeof c[field]!=='string'||!c[field].trim()||/[\r\n]/.test(c[field])||c[field].length>200))throw new Error('Check '+field+' must be one short line');
 if(!existsSync('dist/index.html'))throw new Error('Build the application first');
+assertPackageBuildIdentity(root,{sourceSha,productVersion:version});
 mkdirSync(dirname(out),{recursive:true});mkdirSync(out);
 await bundleClients(join(out,'cli'));
 for(const [source,target] of [['LICENSE','LICENSE'],['THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md'],['public/third-party-licenses.txt','dependency-licenses.txt']])copyFileSync(source,join(out,'cli',target));

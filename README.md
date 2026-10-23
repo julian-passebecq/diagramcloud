@@ -18,6 +18,8 @@ For contributors, start with [AGENTS.md](AGENTS.md). Agents using the applicatio
 
 The package above is the 1.33.1 reliability successor from `0892f9d` (PR #125 and #126, main CI 39869462768); the earlier `diagramcloud/1.33.1-1ee51db` stays unchanged, and later source commits are not inside either. A matching version string does not mean two source commits or delivered packages are identical. Read the exact source, CI receipt and package identity before claiming a release is installed or verified.
 
+The current combined source candidate brings together the package identity guard (#129) and authored-explanation form (#130). Its qualification is tracked in [RESUME.md](RESUME.md) and the integration pull request; it is not yet a deployed or released successor.
+
 1.33.1 is a patch of storage recovery and persistence fixes ([1.33.1 notes](docs/release-1.33/RELEASE_NOTES-1.33.1.md)). 1.33.0 includes interview practice, idea portfolios, the reading wayfinder, exact delivery-task links, restored linked-view contexts and storage recovery. See [the release notes](docs/release-1.33/RELEASE_NOTES.md). V2/V3 are integrated in bounded slices, not complete products: [the roadmap](docs/ROADMAP.md), [R4 acceptance](docs/product/R4_CROSSWALK.md) and [V3 acceptance](docs/product/V3_WORKSPACE.md) retain the remaining work.
 
 ## Start locally
@@ -69,13 +71,17 @@ The catalogue distinguishes concepts, patterns, procedures, technologies, case s
 
 An explanation walkthrough is an **author-written narrative**, not a live trace, an executed simulation or automatic semantic zoom. The author supplies the question, explicit view/component IDs, step order, narration and any before/after tables or frozen code excerpts. These describe an authored case; they do not prove that a system ran or that a result was measured.
 
+In the current source candidate, choose **Edit → Tours → Author explanation**, fill the question and steps, then **Review explanation → Apply explanation**. Optional state, frozen code and takeaway fields stay authored evidence. Review changes nothing; Apply is one revision and one Undo. **Back to request** retains every authored field and the original full source basis, so a source change, even at the same revision, is refused rather than adopted. If the project has no Tours collection, **Initialize Tours for explanations** is a separate explicit, undoable edit before drafting.
+
+The request draft is private and session-only. Downloading the request or proposed patch does not save it to the project or prove persistence; there is no request-file import or draft autosave. The form does not expose every CLI prerequisite, case or question field. No AI or code execution is involved.
+
 The offline compiler produces a private, revision-guarded `diagramcloud.patch`, a preview and an explanation map. It changes neither input and never applies the patch or publishes the result. For example, from a clean checkout:
 
 ```sh
 npm run explain -- --project examples/pro-expressiveness/retry-metadata.base.json --request examples/pro-expressiveness/retry-metadata.walkthrough.json --out explanation-output
 ```
 
-The output directory must not already exist; each input is limited to 4 MiB of exact UTF-8. Review the generated patch through the ordinary JSON / AI import before applying it. The six teaching projects in [the expressiveness guide](docs/product/EXPRESSIVENESS.md) are labelled synthetic examples, not observed runs. The companion pane follows explicit related-context connections; similarly named subjects are not inferred correspondence. **Focused explanation HTML** exports the selected public story for offline reading, with its code/state evidence. An in-App walkthrough request editor and the companion’s Contract and Questions tabs remain unfinished.
+The output directory must not already exist; each input is limited to 4 MiB of exact UTF-8. Review the generated patch through the ordinary JSON / AI import before applying it. The six teaching projects in [the expressiveness guide](docs/product/EXPRESSIVENESS.md) are labelled synthetic examples, not observed runs. The companion pane follows explicit related-context connections; similarly named subjects are not inferred correspondence. **Focused explanation HTML** exports the selected public story for offline reading, with its code/state evidence. The companion’s Contract and Questions tabs remain unfinished.
 
 ## Project Intelligence (1.24.0)
 
