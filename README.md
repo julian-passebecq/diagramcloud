@@ -6,6 +6,17 @@ DiagramCloud is a local-first, static web studio for explaining, editing and pre
 
 For contributors, start with [AGENTS.md](AGENTS.md). Agents using the application start with [the AI guide](docs/AI_GUIDE.md) and [llms.txt](llms.txt). The detailed earlier walkthroughs and dated checkpoints are preserved in [the historical README](README_HISTORY_20261021.md); their old versions and test counts are not current release evidence.
 
+## Engineering overview
+
+| Concern | Implementation to inspect |
+| --- | --- |
+| One semantic model across nested diagrams and presentations | [Canonical project model](src/core/model.ts), [architecture decisions](docs/ARCHITECTURE.md) |
+| Keep edits, persistence and public sharing explicit | [Storage implementation](src/core/storage.ts), [tests](tests/), [public export boundaries](#exports-and-fidelity) |
+| Explain a project through a reproducible walkthrough | [First walkthrough](#first-walkthrough), [authored explanations](#teach-an-authored-explanation) |
+| Verify the source you are reviewing | [CI workflow](.github/workflows/ci.yml), [recorded CI runs](https://github.com/julian-passebecq/diagramcloud/actions/workflows/ci.yml), [release procedure](docs/RELEASE.md) |
+
+**Stack:** React, TypeScript, Fluent UI, React Flow, Vite and IndexedDB. The validated domain model owns project meaning; the canvas is one rendering of it. Use [the hosted demo](https://diagramcloud.vercel.app) to explore, or [run a checkout locally](#start-locally) to inspect a known source revision.
+
 ## Current state (read this first)
 
 | Dimension | State | Authority |
@@ -18,7 +29,7 @@ For contributors, start with [AGENTS.md](AGENTS.md). Agents using the applicatio
 
 The package above is the 1.33.1 reliability successor from `0892f9d` (PR #125 and #126, main CI 39869462768); the earlier `diagramcloud/1.33.1-1ee51db` stays unchanged, and later source commits are not inside either. A matching version string does not mean two source commits or delivered packages are identical. Read the exact source, CI receipt and package identity before claiming a release is installed or verified.
 
-The current combined source candidate brings together the package identity guard (#129) and authored-explanation form (#130). Its qualification is tracked in [RESUME.md](RESUME.md) and the integration pull request; it is not yet a deployed or released successor.
+The package identity guard (#129) and authored-explanation form (#130) were merged through [PR #131](https://github.com/julian-passebecq/diagramcloud/pull/131) as source commit [`130c707`](https://github.com/julian-passebecq/diagramcloud/commit/130c70744ec8fdeefebb784c56afb53c182f8dfa). [Main CI 39985734370](https://github.com/julian-passebecq/diagramcloud/actions/runs/39985734370) completed successfully on 23 October 2026 for that commit. These source checks do not establish a new private package or the current deployed revision; use the separate delivery receipts in [RESUME.md](RESUME.md).
 
 1.33.1 is a patch of storage recovery and persistence fixes ([1.33.1 notes](docs/release-1.33/RELEASE_NOTES-1.33.1.md)). 1.33.0 includes interview practice, idea portfolios, the reading wayfinder, exact delivery-task links, restored linked-view contexts and storage recovery. See [the release notes](docs/release-1.33/RELEASE_NOTES.md). V2/V3 are integrated in bounded slices, not complete products: [the roadmap](docs/ROADMAP.md), [R4 acceptance](docs/product/R4_CROSSWALK.md) and [V3 acceptance](docs/product/V3_WORKSPACE.md) retain the remaining work.
 
@@ -71,7 +82,7 @@ The catalogue distinguishes concepts, patterns, procedures, technologies, case s
 
 An explanation walkthrough is an **author-written narrative**, not a live trace, an executed simulation or automatic semantic zoom. The author supplies the question, explicit view/component IDs, step order, narration and any before/after tables or frozen code excerpts. These describe an authored case; they do not prove that a system ran or that a result was measured.
 
-In the current source candidate, choose **Edit → Tours → Author explanation**, fill the question and steps, then **Review explanation → Apply explanation**. Optional state, frozen code and takeaway fields stay authored evidence. Review changes nothing; Apply is one revision and one Undo. **Back to request** retains every authored field and the original full source basis, so a source change, even at the same revision, is refused rather than adopted. If the project has no Tours collection, **Initialize Tours for explanations** is a separate explicit, undoable edit before drafting.
+In the merged source, choose **Edit → Tours → Author explanation**, fill the question and steps, then **Review explanation → Apply explanation**. Optional state, frozen code and takeaway fields stay authored evidence. Review changes nothing; Apply is one revision and one Undo. **Back to request** retains every authored field and the original full source basis, so a source change, even at the same revision, is refused rather than adopted. If the project has no Tours collection, **Initialize Tours for explanations** is a separate explicit, undoable edit before drafting.
 
 The request draft is private and session-only. Downloading the request or proposed patch does not save it to the project or prove persistence; there is no request-file import or draft autosave. The form does not expose every CLI prerequisite, case or question field. No AI or code execution is involved.
 
