@@ -22,6 +22,14 @@ Preserve the existing explanation/design/comparison/presentation workbench, lear
 
 Further proposed independent blocks remain explicit source refresh and recoverable return context, and meeting-summary publication parity. Cross-project correspondence follows an explicit identity/authority contract. These proposals do not launch work or replace the original acceptance below; one native integrator owns shared App/contracts/release files.
 
+## Selected continuation — whole-project macro experience, 2 November 2026
+
+The current product priority is the complete visual work application: map a whole system, follow applications and data exchanges, explain workflows and responsibilities, author and save views, then present a coherent story. Foil/cloud and the general catalogue remain acceptance contexts; an anonymous retail template adds a non-cloud journey through the same editor and canonical Project model. No real client identity or data is included.
+
+The new source adds gallery entry points and five retail viewpoints while preserving the existing editor, history, persistence, import review and public exporters. These changes are a reviewable source increment, not completion of the whole Studio or an installed/deployed release. The native integrator retains release authority.
+
+Architecture comparison, migration and the shared Rust engine support this application. Specialized PBIP version readers and field-level analysis are deferred until the whole-project journey is usable; they are not the next delivery target. No new graph authority, capability-ID scheme or second retail application is introduced.
+
 ## Retained complete Studio scope
 
 The selected r3/r4 V2 scope remains the complete standalone architectural Studio. The [eight-workstream status and original acceptance crosswalk](product/V2_WORKSTREAM_STATUS.md) retain its exact clauses. The workstreams are general core; standalone Studio; Galaxy Atlas and external projects; general IT catalogue; analyses/bridges/diagnostics; visualization quality; integrations; and publication. All unfinished criteria remain open. A bounded recovery fix or successful T3 integration does not complete any whole workstream by implication.

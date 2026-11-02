@@ -62,6 +62,14 @@ Open the TotalEnergies example, choose **SQL quality checks**, then **Required f
 
 **Explore** is read-only. **Edit** enables visual authoring and Undo/Redo. **Portfolio** uses the public projection. **Present** follows a guided story. The Studio also supports linked views, saved contexts, interview practice and idea-reading modes. Use the current permitted document when navigating; similarly named objects are not replacements for missing stable IDs.
 
+## Whole-project starting points
+
+The gallery now starts with **Foil · cloud**, **Retail · opérations**, the independent **Catalogue général**, and a guided new-project entry. Each opens the existing validated Project workspace; no separate retail editor or document format is introduced. Existing gallery search, samples, imports and blank projects remain available.
+
+The anonymous retail example has five linked views: whole system, file/API exchanges, proposed workflow, responsibilities and future AI. The same metadata and control components appear across views with one identity. The model is entirely authored and illustrative: no client records, live connections, operational dates or measured outcomes. Open **Fichiers & interfaces** from its overview to keep the parent while exploring the exchange view; switch to **Edit** to adapt it and use the ordinary history/save/export paths.
+
+A trusted local DataPass host may build with `VITE_DATAPASS_COMPARISON=1` to show a companion `/comparison` link. It opens a new tab and transfers no project data. Normal standalone builds omit the link. This adds navigation only; comparison is not yet bound to the active editor project.
+
 ## The grammar
 
 One validated Project owns components, connections, views, evidence, sources and story steps. Views reuse stable identities and own their memberships and positions. The domain is independent of the canvas library.

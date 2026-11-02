@@ -4,6 +4,7 @@ import {block,node,note,project,view} from './builders';
 import {cloudGallery} from './cloudGallery';
 import {contosoForecasting} from './contosoForecasting';
 import {examplePack} from '../experience/sample';
+import {retailOperations} from './retailOperations';
 
 function experience(rootId:string,id:string,title:string){const p=examplePack();p.rootId=rootId;p.id=id;p.title=title;return p;}
 const portfolioSources=[{id:'pdf-six',title:'Total_Foilo_Portfolio_6_pages (2).pdf',location:'User-supplied six-page portfolio; illustrative/synthetic labels retained.',visibility:'public' as const},{id:'pdf-eighteen',title:'Julian_Passebecq_Portfolio_TotalEnergies_First_NoGlossary (2).pdf',location:'User-supplied 18-page portfolio; TotalEnergies first, then Foil\u2019O.',visibility:'public' as const}];
@@ -689,4 +690,4 @@ platform.story=[
 
 const blank=project('blank-project','Start from a blank project','Build a small architecture, attach evidence, then add one drilldown at a time.','Blank',['Your project']);
 node(blank,'first-node','Your first component','process',{summary:'Switch to Edit to change this component.'});view(blank,'overview','Architecture overview','A diagram is the entry point; the evidence explains the work.',['first-node'],[]);
-export const samples:Project[]=[validateDocument(constellation),validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),...cloudGallery(),contosoForecasting(),validateDocument(blank),...referenceCookbook(),...adoptionJourneys()];
+export const samples:Project[]=[validateDocument(constellation),validateDocument(platform),validateDocument(foilo),validateDocument(total),medallion('Microsoft Fabric'),medallion('Databricks'),...cloudGallery(),contosoForecasting(),validateDocument(blank),...referenceCookbook(),...adoptionJourneys(),retailOperations()];
