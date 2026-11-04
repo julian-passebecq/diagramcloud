@@ -11,7 +11,11 @@ const schema=z.object({format:z.literal(ANSWER_FORMAT),binding:bindingSchema,ans
 export type QuestionBinding=z.infer<typeof bindingSchema>;
 export type AnswerRecord=z.infer<typeof schema>;
 export type AnswerRow={block:EvidenceBlock;record?:AnswerRecord;state:'current'|'stale'|'unavailable'|'ambiguous';review:'unreviewed'|'reviewed'|'stale';notice:string};
-export function isAnswerBlock(b:EvidenceBlock){return b.type==='code'&&b.code.includes('diagramcloud.question-answer/');}
+export function isAnswerBlock(b:EvidenceBlock){
+ if(b.type!=='code')return false;
+ try{const value=JSON.parse(b.code);if(value&&typeof value==='object'&&!Array.isArray(value)&&typeof value.format==='string'&&value.format.startsWith('diagramcloud.question-answer/'))return true;}catch{/* Reserved authored envelope remains inspectable even when damaged. */}
+ return b.language==='json'&&b.title==='Authored question answer';
+}
 /** Content identity only, not a security signature. Answer records never become their own source. */
 export function questionBasis(doc:Project,nodeId:string):string{
  const n=doc.nodes.find(n=>n.id===nodeId);if(!n)throw Error('The question component is missing.');
