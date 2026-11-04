@@ -15,8 +15,7 @@ jobs:
     steps:
       # Test the pull request's head commit, not GitHub's temporary merge commit, so the receipt names the code that ran.
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+        with: { ref: "${{ github.event.pull_request.head.sha || github.sha }}" }
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -30,9 +29,7 @@ jobs:
         id: unit
         run: npm test
       - name: Standalone CLI and MCP bundles
-        run: |
-          mkdir -p release
-          npx tsx scripts/qualify-clients.ts --out release/bundled-client-qualification
+        run: mkdir -p release && npx tsx scripts/qualify-clients.ts --out release/bundled-client-qualification
       - name: Build
         id: build
         run: npm run build
