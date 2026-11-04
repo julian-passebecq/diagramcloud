@@ -37,6 +37,6 @@ function AnswerForm({project,binding,row,editMode,onPropose,blocked}:Props&{bind
  {row?.state==='current'&&<><label>Reviewer name<input maxLength={160} value={reviewer} onChange={e=>setReviewer(e.target.value)} style={{maxWidth:'100%',boxSizing:'border-box'}}/></label><p className="micro">Record only a review actually performed by the named person. This is supplied attribution, not identity verification.</p><button type="button" onClick={()=>propose(true)} disabled={changed}>Propose named review</button>{changed&&<p>Apply the edited answer before recording its review. An answer edit clears its previous review.</p>}</>}
  </>}
  {blocked&&<p role="status">Ambiguous or unsupported records prevent new proposals; original evidence remains available.</p>}
- <p role={error?'alert':'status'}>{error|| (sent?'Proposal opened for review. Nothing is saved until Apply.':'')}</p>
+ <p role={error?'alert':'status'}>{error|| (sent&&!stale?'Proposal opened for review. Nothing is saved until Apply.':'')}</p>
  </article>;
 }
