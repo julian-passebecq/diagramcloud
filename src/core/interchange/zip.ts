@@ -5,6 +5,25 @@
 export type ZipEntry={name:string;method:number;offset:number;compressedSize:number;size:number};
 const MAX_ENTRY=64*1024*1024;
 
+/** Thrown when a decompressed stream would exceed its byte limit; callers report it instead of a generic read error. */
+export class InflateLimitError extends Error{}
+
+/**
+ * Inflate `bytes` chunk by chunk and stop as soon as the output passes `limit` bytes, so a small compressed
+ * stream that expands to gigabytes is refused before it is held in memory.
+ */
+export async function inflateBounded(bytes:Uint8Array,format:'deflate-raw'|'deflate',limit:number,message:string):Promise<Uint8Array>{
+ const reader=new Blob([bytes as Uint8Array<ArrayBuffer>]).stream().pipeThrough(new DecompressionStream(format)).getReader();
+ const chunks:Uint8Array[]=[];let size=0;
+ for(;;){
+  const {done,value}=await reader.read();if(done)break;
+  size+=value.byteLength;if(size>limit){await reader.cancel().catch(()=>undefined);throw new InflateLimitError(message);}
+  chunks.push(value);
+ }
+ const out=new Uint8Array(size);let o=0;for(const c of chunks){out.set(c,o);o+=c.byteLength;}
+ return out;
+}
+
 export function zipEntries(bytes:Uint8Array):Map<string,ZipEntry>{
  const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
  if(bytes.length<22||view.getUint32(0,true)!==0x04034b50)throw new Error('Not a ZIP package.');
@@ -31,8 +50,11 @@ export async function zipText(bytes:Uint8Array,entries:Map<string,ZipEntry>,name
  if(view.getUint32(e.offset,true)!==0x04034b50)throw new Error(`The package part ${name} is damaged.`);
  const dataStart=e.offset+30+view.getUint16(e.offset+26,true)+view.getUint16(e.offset+28,true);
  const data=bytes.subarray(dataStart,dataStart+e.compressedSize);
- if(e.method===0)return new TextDecoder().decode(data);
+ // The declared size is checked against the real output: inflation stops at the declared size (at most 64 MiB),
+ // and a part whose real size differs from the central directory is refused as damaged.
+ if(e.method===0){if(data.length!==e.size)throw new Error(`The package part ${name} is damaged.`);return new TextDecoder().decode(data);}
  if(e.method!==8)throw new Error(`The package part ${name} uses an unsupported compression method.`);
- const stream=new Blob([data as Uint8Array<ArrayBuffer>]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
- return new TextDecoder().decode(await new Response(stream).arrayBuffer());
+ const out=await inflateBounded(data,'deflate-raw',Math.min(MAX_ENTRY,e.size),`The package part ${name} is too large.`);
+ if(out.byteLength!==e.size)throw new Error(`The package part ${name} is damaged.`);
+ return new TextDecoder().decode(out);
 }
