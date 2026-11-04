@@ -1,4 +1,4 @@
-import {documentFromGraph,inferKind,inferProvider,plainLabel,type GraphEdge,type GraphNode,type GraphPage,type ImportResult} from './graph';
+import {MAX_EDGES,documentFromGraph,inferKind,inferProvider,plainLabel,type GraphEdge,type GraphNode,type GraphPage,type ImportResult} from './graph';
 import type {ProjectEdge,ProjectNode} from '../model';
 
 /**
@@ -15,6 +15,9 @@ const NEW_SHAPES:Record<string,ProjectNode['kind']>={cyl:'storage',cylinder:'sto
  subproc:'function',subroutine:'function','fr-rect':'function','lean-r':'source','lean-l':'source','in-out':'source',doc:'storage',docs:'storage',document:'storage',hex:'process',hexagon:'process',prepare:'process',stadium:'process',pill:'process',terminal:'process'};
 /** A node ID; a hyphen is part of it only when it does not start a link (`my-node-->b`). */
 const ID=String.raw`[\p{L}\p{N}_](?:[\p{L}\p{N}_.]|-(?![-.>=]))*`;
+
+/** Connections kept while parsing: more than the import keeps (so its own limit message still shows), never a cross product of any size. */
+const EDGE_PARSE_CAP=MAX_EDGES*4;
 
 type Parsed={nodes:Map<string,GraphNode>;edges:GraphEdge[];groups:string[];lost:Map<string,number>;direction:'LR'|'TB';title?:string};
 
@@ -43,7 +46,7 @@ function readNode(s:string,p:Parsed,group:string|undefined):{key:string;rest:str
 /** A list of node references joined by `&`. */
 function readNodes(s:string,p:Parsed,group:string|undefined):{keys:string[];rest:string}|undefined{
  const keys:string[]=[];let rest=s;
- for(;;){const n=readNode(rest,p,group);if(!n)return keys.length?{keys,rest}:undefined;keys.push(n.key);rest=n.rest;const amp=rest.match(/^\s*&\s*/);if(!amp)return {keys,rest};rest=rest.slice(amp[0].length);}
+ for(;;){const n=readNode(rest,p,group);if(!n)return keys.length?{keys,rest}:undefined;if(!keys.includes(n.key))keys.push(n.key);rest=n.rest;const amp=rest.match(/^\s*&\s*/);if(!amp)return {keys,rest};rest=rest.slice(amp[0].length);}
 }
 /** A link at the start of `s`, with its label in either Mermaid form (`-->|text|` or `-- text -->`). */
 function readLink(s:string):{label:string;kind:ProjectEdge['kind'];reverse:boolean;rest:string}|undefined{
@@ -72,7 +75,12 @@ function parseFlowchart(lines:string[],p:Parsed){
   for(;;){
    const link=readLink(rest);if(!link)break;
    const right=readNodes(link.rest,p,group);if(!right)break;
-   for(const s of left.keys)for(const t of right.keys)p.edges.push({source:s,target:t,label:plainLabel(link.label.trim().replace(/^"|"$/g,'')),kind:link.kind});
+   // `a & b --> c & d` links every pair; stop at the parse cap so a long list never builds the whole cross product
+   // (documentFromGraph keeps the first MAX_EDGES and reports the rest).
+   const label=plainLabel(link.label.trim().replace(/^"|"$/g,''));
+   const pairs=left.keys.length*right.keys.length,room=Math.max(0,EDGE_PARSE_CAP-p.edges.length);
+   outer:for(const s of left.keys)for(const t of right.keys){if(p.edges.length>=EDGE_PARSE_CAP)break outer;p.edges.push({source:s,target:t,label,kind:link.kind});}
+   if(pairs>room)p.lost.set('linked pairs beyond the connection limit',(p.lost.get('linked pairs beyond the connection limit')??0)+pairs-room);
    left=right;rest=right.rest;
   }
   if(rest.trim()&&!/^;?\s*$/.test(rest.trim()))p.lost.set('trailing text after a link',(p.lost.get('trailing text after a link')??0)+1);

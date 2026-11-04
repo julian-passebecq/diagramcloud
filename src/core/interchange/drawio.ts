@@ -1,6 +1,7 @@
 import {documentFromGraph,inferKind,inferProvider,plainLabel,type GraphEdge,type GraphNode,type GraphPage,type ImportResult} from './graph';
 import {find,parseXml,type XmlElement} from './xml';
-import {quantitySchema,type ProjectEdge,type ProjectNode} from '../model';
+import {MAX_DOCUMENT_BYTES,quantitySchema,type ProjectEdge,type ProjectNode} from '../model';
+import {InflateLimitError,inflateBounded} from './zip';
 
 /** DiagramCloud's own draw.io export carries its component type, provider and ID so a round trip keeps them. */
 const NODE_KINDS:readonly string[]=['source','process','storage','model','report','app','control','physics','function','table'] satisfies ProjectNode['kind'][];
@@ -30,19 +31,22 @@ type Cell={id:string;parent?:string;value:string;style:string;vertex:boolean;edg
  /** Object/UserObject attributes (custom properties, C4 fields) for %placeholder% labels. */
  data:Record<string,string>;sourcePoint?:{x:number;y:number};targetPoint?:{x:number;y:number}};
 
-async function inflate(bytes:Uint8Array,format:'deflate-raw'|'deflate'):Promise<string>{
- const stream=new Blob([bytes as Uint8Array<ArrayBuffer>]).stream().pipeThrough(new DecompressionStream(format));
- return new TextDecoder().decode(await new Response(stream).arrayBuffer());
+const TOO_LARGE='This draw.io diagram is larger than the 12 MiB import limit once decompressed.';
+/** Decompressed bytes still available to one import: every compressed page (and a PNG's zTXt) draws from it. */
+type InflateBudget={left:number};
+async function inflate(bytes:Uint8Array,format:'deflate-raw'|'deflate',budget:InflateBudget={left:MAX_DOCUMENT_BYTES}):Promise<string>{
+ const out=await inflateBounded(bytes,format,budget.left,TOO_LARGE);budget.left-=out.byteLength;
+ return new TextDecoder().decode(out);
 }
 const fromBase64=(s:string)=>Uint8Array.from(atob(s.replace(/\s+/g,'')),c=>c.charCodeAt(0));
 const uriDecode=(s:string)=>{try{return decodeURIComponent(s);}catch{return s;}};
 
 /** A page's mxGraphModel, whether stored as XML or as draw.io's compressed form (base64 → raw deflate → URI-encoded XML). */
-async function pageModel(diagram:XmlElement):Promise<XmlElement|undefined>{
+async function pageModel(diagram:XmlElement,budget:InflateBudget):Promise<XmlElement|undefined>{
  const direct=find(diagram,'mxGraphModel');if(direct)return direct;
  const text=diagram.text.trim();if(!text)return undefined;
  let xml:string;
- try{xml=uriDecode(await inflate(fromBase64(text),'deflate-raw'));}catch{throw new Error(`The draw.io page “${diagram.attrs.name??'page'}” is compressed in a form DiagramCloud cannot read.`);}
+ try{xml=uriDecode(await inflate(fromBase64(text),'deflate-raw',budget));}catch(e){if(e instanceof InflateLimitError)throw e;throw new Error(`The draw.io page “${diagram.attrs.name??'page'}” is compressed in a form DiagramCloud cannot read.`);}
  return find(parseXml(xml),'mxGraphModel');
 }
 
@@ -78,6 +82,12 @@ const isText=(c:Cell)=>/(^|;)text(;|$)/.test(c.style)||/(^|;)shape=text/.test(c.
 
 function pageGraph(title:string,cells:Cell[],lost:Map<string,number>):GraphPage{
  const byId=new Map(cells.map(c=>[c.id,c])),count=(k:string,n=1)=>lost.set(k,(lost.get(k)??0)+n);
+ // A parent chain that comes back to a cell already on it (a cell that is its own parent, A in B in A) would make
+ // every ancestor walk below endless: the cell that closes the cycle is detached to the page and reported.
+ for(const c of cells){
+  const seen=new Set<Cell>([c]);
+  for(let p:Cell=c;p.parent!==undefined;){const n=byId.get(p.parent);if(!n)break;if(seen.has(n)){p.parent=undefined;count('cell(s) with a cyclic parent detached to the page');break;}seen.add(n);p=n;}
+ }
  const children=new Map<string,Cell[]>();for(const c of cells)if(c.parent)(children.get(c.parent)??children.set(c.parent,[]).get(c.parent)!).push(c);
  const isVertex=(id?:string)=>!!id&&!!byId.get(id)?.vertex,isEdge=(id?:string)=>!!id&&!!byId.get(id)?.edge;
  const vertices=cells.filter(c=>c.vertex&&!isEdge(c.parent));
@@ -186,8 +196,8 @@ export async function drawioPages(raw:string):Promise<{pages:GraphPage[];lost:Ma
  const doc=parseXml(mxfileText(raw)),mxfile=find(doc,'mxfile')??(doc.children[0]?.name==='mxfile'?doc.children[0]:undefined);
  const lost=new Map<string,number>(),pages:GraphPage[]=[];
  if(mxfile){
-  const diagrams=mxfile.children.filter(c=>c.name==='diagram');
-  for(const [i,d] of diagrams.entries()){const model=await pageModel(d);pages.push({...pageGraph(d.attrs.name??`Page ${i+1}`,model?cellsOf(model):[],lost),...(d.attrs.id?{id:d.attrs.id}:{})});}
+  const diagrams=mxfile.children.filter(c=>c.name==='diagram'),budget:InflateBudget={left:MAX_DOCUMENT_BYTES};
+  for(const [i,d] of diagrams.entries()){const model=await pageModel(d,budget);pages.push({...pageGraph(d.attrs.name??`Page ${i+1}`,model?cellsOf(model):[],lost),...(d.attrs.id?{id:d.attrs.id}:{})});}
  }else{
   const model=find(doc,'mxGraphModel');if(!model)throw new Error('Not a draw.io file: no <mxfile> or <mxGraphModel> element.');
   pages.push(pageGraph('',cellsOf(model),lost));

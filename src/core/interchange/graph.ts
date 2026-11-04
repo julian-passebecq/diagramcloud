@@ -18,7 +18,8 @@ export type ImportResult={document:Project;report:ImportReport};
 
 export const FORMAT_LABEL:Record<ImportFormat,string>={drawio:'draw.io',mermaid:'Mermaid',visio:'Visio',repository:'Repository',atlas:'Project atlas','design-brief':'Design brief'};
 const ID=/^[a-z][a-z0-9_.-]{0,79}$/;
-const MAX_NODES=500,MAX_EDGES=1500,MAX_VIEWS=79,COL=300,ROW=180;
+export const MAX_EDGES=1500;
+const MAX_NODES=500,MAX_VIEWS=79,COL=300,ROW=180;
 /** Card size on the canvas and in exports (NODE_WIDTH/NODE_HEIGHT in src/export/scene.ts). */
 const NODE_WIDTH=220,NODE_HEIGHT=100;
 
