@@ -40,9 +40,13 @@ The original F001–F115 inventory and recovered matrices remain in the [product
 
 ## Remaining product gaps are not all release blockers
 
-V3 remains integrated rather than complete. Read current acceptance rows before selecting work: delivery-task links and saved linked contexts already shipped and must not be redispatched from an older “Left” paragraph. Remaining directions include cross-project correspondence, arbitrary free docking, richer delivery/capacity reasoning, the wider explanation-authoring limits beyond the merged increment above, companion Contract/Questions surfaces, meeting-summary PDF/PPTX, and richer semantic/spatial lesson diagrams where their original acceptance is still open.
+V3 remains integrated rather than complete. Read current acceptance rows before selecting work: delivery-task links and saved linked contexts already shipped and must not be redispatched from an older “Left” paragraph. Remaining directions include cross-project correspondence, arbitrary free docking, richer delivery/capacity reasoning, the wider explanation-authoring limits beyond the increments below, meeting-summary PDF/PPTX, and richer semantic/spatial lesson diagrams where their original acceptance is still open.
 
 Named physical workspace arrangements and direct pane resizing now have a [bounded source implementation](product/WORKSPACE_ARRANGEMENTS.md); their explicit Save/Restore/Delete is distinct from route/camera/source state and does not implement floating panes. Exact-source integration qualification remains separate.
+
+The companion now reads authored Contract and Questions evidence; the request form exposes cases, prerequisites and per-step citations. [Request-file exchange](contracts/explanation-request-files.md) preserves the original source binding and routes complete imports through ordinary review/Apply. Incomplete draft backups remain separate from validated request files. Structured answer tracking, draft autosave and remote execution remain open.
+
+The Workflow dock now has a [compute capacity scenario](product/COMPUTE_CAPACITY.md) surface over the existing arithmetic engine. Supplied usage/window and activity/floor assumptions are explicit and session-only. This does not supply the delivery queue, access, calendar or agent scheduler model. Sources & Git can explicitly inspect a host-allowlisted checkout through the native adapter; supplied repository history remains a separate source and cloud hosts report local checkout inspection unavailable.
 
 A token forecast, queue model or claimed current activity requires an actual model and supplied evidence. Supplied allowances and static snapshots are not measurements, execution or live scheduling. UX29/UX30 remain partial where queue/calendar/actual-result evidence is absent. No live collector or dispatcher is launched by this roadmap.
 
