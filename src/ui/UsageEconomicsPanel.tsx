@@ -1,18 +1,37 @@
-import {useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {blankUsageDraft,blankUsageRecord,calculateUsageDraft,USAGE_RECORD_LIMIT,USAGE_ALLOCATION_LIMIT,type UsageDraft,type UsageRecordDraft,type UsageDraftResult} from './usageEconomicsDraft';
+import {readUsageFile,serializeUsageFile,nextUsageDraftKey,USAGE_FILE_REFUSAL} from './usageEconomicsFiles';
+import {download} from '../export/browser';
 /** Author-only, keyed by host project/revision. No Project, storage, provider or network access. */
 export function UsageEconomicsPanel(){
  const [draft,setDraft]=useState(blankUsageDraft),[result,setResult]=useState<UsageDraftResult|null>(null),[error,setError]=useState(''),[open,setOpen]=useState(false);
- const nextKey=useRef(1),calculateButton=useRef<HTMLButtonElement>(null);
- const update=(next:UsageDraft)=>{setDraft(next);setResult(null);setError('');};
+ const nextKey=useRef(1),calculateButton=useRef<HTMLButtonElement>(null),loadInput=useRef<HTMLInputElement>(null),reviewHeading=useRef<HTMLHeadingElement>(null),generation=useRef(0);
+ const [pending,setPending]=useState<UsageDraft|null>(null),[fileError,setFileError]=useState(''),[reading,setReading]=useState(false);
+ useEffect(()=>()=>{generation.current++;},[]);
+ useEffect(()=>{if(pending)reviewHeading.current?.focus();},[pending]);
+ const invalidate=()=>{generation.current++;setPending(null);setReading(false);setFileError('');};
+ const load=async(input:HTMLInputElement)=>{const file=input.files?.[0];input.value='';invalidate();const issued=generation.current;if(!file)return;setReading(true);
+  try{const loaded=await readUsageFile(file);if(issued!==generation.current)return;setPending(loaded);}catch{if(issued===generation.current)setFileError(USAGE_FILE_REFUSAL);}finally{if(issued===generation.current)setReading(false);}
+ };
+ const usePending=()=>{if(!pending)return;nextKey.current=nextUsageDraftKey(pending);calculateButton.current?.focus();update(pending);};
+ const exportInputs=()=>{try{download(serializeUsageFile(draft),'supplied-usage.private.json','application/json');setFileError('');}catch(e){setFileError(e instanceof Error?e.message:'Usage download could not start. Current inputs and results are unchanged.');}};
+ const update=(next:UsageDraft)=>{invalidate();setDraft(next);setResult(null);setError('');};
  const edit=(key:number,next:Partial<UsageRecordDraft>)=>update({...draft,records:draft.records.map(r=>r.key===key?{...r,...next}:r)});
  const inputStyle={display:'block',width:'100%',maxWidth:500,minWidth:0} as const;
  const field=(label:string,value:string,change:(v:string)=>void,max=200,numeric=false)=><label style={{display:'block',margin:'6px 0'}}>{label}<input type="text" aria-label={label} inputMode={numeric?'decimal':'text'} maxLength={max} value={value} onChange={e=>change(e.target.value)} style={inputStyle}/></label>;
  const grid={display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(190px,100%),1fr))',gap:10,minWidth:0} as const;
- const calculate=()=>{try{setResult(calculateUsageDraft(draft));setError('');}catch(e){setResult(null);setError(e instanceof Error?e.message:'Invalid supplied usage.');}};
+ const calculate=()=>{invalidate();try{setResult(calculateUsageDraft(draft));setError('');}catch(e){setResult(null);setError(e instanceof Error?e.message:'Invalid supplied usage.');}};
  return <details className="usage-economics" style={{marginTop:12}} onToggle={e=>setOpen(e.currentTarget.open)}><summary>Supplied usage and cost</summary>{open&&<section aria-label="Supplied usage and cost">
   <p>Summarize explicit leaf-call records in one declared UTC window. No provider is contacted, no rate is fetched, and no cost, token forecast, completion date or bill is inferred.</p>
-  <p>These private drafts and results stay in this session, outside Project saves, Undo and exports. Changing project/revision or entering a public audience clears them.</p>
+  <p>These private drafts and results stay in this session, outside Project saves, Undo and public exports. A private input download is available below. Changing project/revision or entering a public audience clears them.</p>
+  <div role="group" aria-label="Usage files"><label>Load usage file<input ref={loadInput} type="file" accept=".json,application/json" aria-label="Load usage file" onChange={e=>void load(e.currentTarget)}/></label><button type="button" onClick={exportInputs}>Download validated usage inputs</button>
+   <p>Choose a private usage input file (up to 256 KiB). Review it before replacing this form. A download contains supplied inputs and citations, not verified usage or a bill.</p>
+   {reading&&<p role="status">Reading selected usage file…</p>}{fileError&&<p role="alert">{fileError}</p>}
+   {pending&&<section aria-label="Review usage file"><h3 ref={reviewHeading} tabIndex={-1}>Review supplied usage inputs</h3><p>{pending.records.length} supplied rows · {pending.windowStart} → {pending.windowEnd}</p><p>Basis: {pending.basis}</p><p>Using these records replaces the current form and clears its calculation. No Project or saved data changes.</p>
+    <details><summary>Inspect all supplied fields and citations</summary><pre style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere',maxHeight:300,overflow:'auto'}}>{serializeUsageFile(pending)}</pre></details>
+    <button type="button" onClick={usePending}>Use these records</button><button type="button" onClick={()=>{loadInput.current?.focus();invalidate();}}>Keep current inputs</button>
+   </section>}
+  </div>
   <div role="group" aria-label="Usage assumptions">
    <label>Usage assumption basis<textarea aria-label="Usage assumption basis" maxLength={2000} value={draft.basis} onChange={e=>update({...draft,basis:e.target.value})} rows={3} style={inputStyle}/></label>
    <div style={grid}>{field('Usage window start (UTC)',draft.windowStart,v=>update({...draft,windowStart:v}),30)}{field('Usage window end (UTC)',draft.windowEnd,v=>update({...draft,windowEnd:v}),30)}</div>
