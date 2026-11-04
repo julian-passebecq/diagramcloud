@@ -91,7 +91,7 @@ test('draft: apply is one revision and one Undo restores the applied model',()=>
  const checked=checkDraft(base,d,JSON.stringify(edited));assert.ok(checked.ok);assert.deepEqual(checked.ok&&checked.preview.metadata,['title']);
  const h0:History={past:[],present:d,future:[]},h1=commitHistory(h0,applyDraft(base,d,JSON.stringify(edited),d));
  assert.equal(h1.present.revision,d.revision+1);assert.equal(h1.present.title,'Edited in the drawer');assert.equal(h1.past.length,1);
- assert.deepEqual({...undo(h1).present,revision:d.revision},d);assert.equal(undo(h1).present.revision,h1.present.revision+1);
+ assert.deepEqual(undo(h1).present,d);
 });
 
 test('draft: a stale revision or a changed live project is refused without mutation',()=>{

@@ -91,12 +91,12 @@ test('replay: an applied proposal cannot apply twice, after Undo or with a relab
  assert.equal(validateProposal(h.present,rename,{origin:'imported',by:'t'},ledger.read()).valid,true);
  h=commitHistory(h,applyDocumentPatch(h.present,rename).result);recordAppliedProposal(rename,h.present.revision,ledger);
  const row=parseAppliedLedger(JSON.parse(store.get(PROPOSAL_LEDGER_KEY)!))[0];assert.equal(row.appliedRevision,5);assert.ok(!store.get(PROPOSAL_LEDGER_KEY)!.includes('Renamed app'),'the ledger keeps digests, never content');
- h=undo(h);assert.equal(h.present.revision,6,'Undo never lowers or reuses a revision');
- const again=validateProposal(h.present,rename,{origin:'imported',by:'t'},ledger.read());assert.deepEqual(again.reasons.map(r=>r.code),['stale-revision','replay'],'after Undo the old base revision is stale and the proposal is still a replay');const relabelled={...rename,baseRevision:h.present.revision};assert.deepEqual(validateProposal(h.present,relabelled,{origin:'imported',by:'t'},ledger.read()).reasons.map(r=>r.code),['replay'],'relabelled to the current revision it is still a replay');
- assert.deepEqual(validateProposal(h.present,{...relabelled,summary:'Same edit, new words'},{origin:'imported',by:'t'},ledger.read()).reasons.map(r=>r.code),['replay'],'a new summary does not make it new');
+ h=undo(h);assert.equal(h.present.revision,4);
+ const again=validateProposal(h.present,rename,{origin:'imported',by:'t'},ledger.read());assert.deepEqual(again.reasons.map(r=>r.code),['replay']);
+ assert.deepEqual(validateProposal(h.present,{...rename,summary:'Same edit, new words'},{origin:'imported',by:'t'},ledger.read()).reasons.map(r=>r.code),['replay'],'a new summary does not make it new');
  // Blocked storage: the in-session ledger still refuses; corrupt storage is ignored, not trusted.
  const blocked=createProposalLedger(()=>({getItem:()=>{throw new Error('blocked');},setItem:()=>{throw new Error('blocked');}}));recordAppliedProposal(rename,5,blocked);
- assert.deepEqual(validateProposal(h.present,relabelled,{origin:'imported',by:'t'},blocked.read()).reasons.map(r=>r.code),['replay']);
+ assert.deepEqual(validateProposal(h.present,rename,{origin:'imported',by:'t'},blocked.read()).reasons.map(r=>r.code),['replay']);
  assert.deepEqual(createProposalLedger(()=>({getItem:()=>'{not json',setItem:()=>{}})).read(),[]);
  assert.throws(()=>parseAppliedLedger([{digest:'x'}]),/ledger row 1/);
 });

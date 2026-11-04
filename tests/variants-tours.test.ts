@@ -73,7 +73,7 @@ test('variants: Apply is one revision-guarded revision that removes the variant;
  h=commitHistory(h,applyVariant(h.present,'cache-plan'));
  assert.equal(h.present.revision,4);assert.equal(h.present.nodes.find(n=>n.id==='db')!.label,'Orders DB (read replica)');assert.equal(h.present.variants,undefined);
  assert.ok(h.present.views[0].edgeIds.includes('cache-plan.api-cache'));
- h=undo(h);assert.deepEqual({...h.present,revision:doc.revision},doc,'one Undo restores the baseline and the candidate');assert.equal(h.present.revision,5,'Undo never lowers the revision');
+ h=undo(h);assert.deepEqual(h.present,doc,'one Undo restores the baseline and the candidate');
  assert.equal(variantState(h.present,'cache-plan').status,'current');
  const two=addVariant(doc,{id:'no-vault',title:'Drop the vault link',viewId:'overview',operations:[{op:'remove',path:'/edges/@api-vault'},{op:'remove',path:'/views/@overview/edgeIds/1'}]});
  const kept=applyVariant(two,'no-vault');assert.deepEqual(kept.variants!.map(v=>v.id),['cache-plan'],'applying one variant keeps the others as candidates');

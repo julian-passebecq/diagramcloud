@@ -30,7 +30,7 @@ test('walkthrough produces a genuine applicable additive patch with stable actor
 test('native history keeps the new explanation as one Undo',()=>{
  const p=project(),out=prepareExplanationWalkthrough(p,request());
  const h=commitHistory({past:[],present:p,future:[]},out.preview);
- assert.equal(h.past.length,1);assert.deepEqual({...undo(h).present,revision:p.revision},p);assert.ok(undo(h).present.revision>h.present.revision);
+ assert.equal(h.past.length,1);assert.deepEqual(undo(h).present,p);
 });
 test('generated content remains private and makes no publication or execution claim',()=>{
  const p=project(),out=prepareExplanationWalkthrough(p,request()),a=publicDocument(p),b=publicDocument(out.preview);

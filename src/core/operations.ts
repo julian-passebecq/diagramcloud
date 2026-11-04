@@ -66,12 +66,15 @@ export function publicDocument(input:Project):Project{
  publicChoiceReviews(input,d);
  return validateDocument(d);
 }
-export type History={past:Project[];present:Project;future:Project[]};
-export function commitHistory(h:History,input:Project):History{return{past:[...h.past,h.present].slice(-25),present:validateDocument({...input,revision:h.present.revision+1}),future:[]};}
-// Revisions only go up (as in experience/history.ts): Undo and Redo restore content under a new revision, so a
-// patch, tour source revision, review basis or saved context written for an undone state never matches a later edit.
-export function undo(h:History):History{return h.past.length?{past:h.past.slice(0,-1),present:{...h.past[h.past.length-1],revision:h.present.revision+1},future:[h.present,...h.future]}:h;}
-export function redo(h:History):History{return h.future.length?{past:[...h.past,h.present],present:{...h.future[0],revision:h.present.revision+1},future:h.future.slice(1)}:h;}
+// highWater: the highest revision this history has issued, including discarded redo branches.
+export type History={past:Project[];present:Project;future:Project[];highWater?:number};
+function issued(h:History):number{return Math.max(h.highWater??0,h.present.revision,...h.past.map(p=>p.revision),...h.future.map(p=>p.revision));}
+// Undo and Redo restore the exact stored document (same content, same revision). A new edit always gets a revision
+// above every revision this history has issued, so a patch, tour source revision, review basis or saved context written
+// for an undone state never matches a later, different edit. A reload starts a new history and forgets the high-water mark.
+export function commitHistory(h:History,input:Project):History{const revision=issued(h)+1;return{past:[...h.past,h.present].slice(-25),present:validateDocument({...input,revision}),future:[],highWater:revision};}
+export function undo(h:History):History{return h.past.length?{past:h.past.slice(0,-1),present:h.past[h.past.length-1],future:[h.present,...h.future],highWater:issued(h)}:h;}
+export function redo(h:History):History{return h.future.length?{past:[...h.past,h.present],present:h.future[0],future:h.future.slice(1),highWater:issued(h)}:h;}
 
 /** Explicit authored placement of an existing canonical component, not a clone or a source association. */
 export const VIEW_MEMBERSHIP_UNAVAILABLE='This component placement is unavailable in the current authoring context. Reopen the chooser.';
