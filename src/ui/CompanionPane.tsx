@@ -3,9 +3,12 @@ import type {Project} from '../core/model';
 import {buildScene} from '../export/scene';
 import {COMPANION_TAB_LABEL,DEFAULT_FILTERS,DISPLAY_LIMITS,RELATION_KINDS,companionContent,companionRelated,companionTabs,coverageText,detourTarget,permittedDocument,relatedSceneView,startDetour,
  type CompanionAnchor,type CompanionDetour,type CompanionFilters,type CompanionTab} from '../core/companionPane';
+import {isAnswerBlock} from '../core/questionAnswers';
+import {QuestionAnswersPanel} from './QuestionAnswersPanel';
+import type {Patch} from '../core/patch';
 import {Evidence} from './Evidence';
 
-type Props={project:Project;publicMode:boolean;
+type Props={project:Project;publicMode:boolean;editMode?:boolean;onPropose?:(patch:Patch)=>void;
  /** The ProjectContext selection: the pinned one when pinned, otherwise the followed selection. */
  anchor:{viewId?:string;nodeId?:string};pinned:boolean;
  /** The workspace context dispatcher (parent-preserving view route). */
@@ -15,9 +18,10 @@ type Props={project:Project;publicMode:boolean;
  * Optional companion pane (UX31-UX33): explanation, code/state, authored contract/questions, related context and evidence.
  * Related is drawn from relatedContext through the export scene, with a list as the keyboard alternative, explicit
  * depth / scope / direction / relation filters and a bounded-coverage line. Opening a related item is a detour:
- * the original question stays the anchor and Return brings the reader back to it. Read-only; never a revision.
+ * the original question stays the anchor and Return brings the reader back to it. Navigation is read-only;
+ * private Edit answer proposals use the host revision-guarded review path.
  */
-export function CompanionPane({project,publicMode,anchor,pinned,onOpen}:Props){
+export function CompanionPane({project,publicMode,anchor,pinned,onOpen,editMode=false,onPropose}:Props){
  const doc=useMemo(()=>permittedDocument(project,publicMode),[project,publicMode]);
  const [filters,setFilters]=useState<CompanionFilters>(DEFAULT_FILTERS);
  const [detour,setDetour]=useState<CompanionDetour|null>(null);
@@ -30,7 +34,7 @@ export function CompanionPane({project,publicMode,anchor,pinned,onOpen}:Props){
  const current:CompanionAnchor|null=liveDetour?liveDetour.origin:followed;
  const ctx=useMemo(()=>current?companionRelated(project,publicMode,current,filters):null,[project,publicMode,current?.viewId,current?.nodeId,filters]);
  const content=useMemo(()=>current?companionContent(doc,current.nodeId):null,[doc,current?.nodeId]);
- const tabs=companionTabs(content),shownTab=tabs.includes(tab)?tab:'related';
+ const tabs=companionTabs(content);if(!publicMode&&content?.evidence.some(isAnswerBlock)&&!tabs.includes('questions'))tabs.push('questions');const shownTab=tabs.includes(tab)?tab:'related';
  const scene=useMemo(()=>{if(!ctx||ctx.state!=='available')return null;const view=doc.views.find(v=>v.id===ctx.viewId);return view?buildScene(doc,relatedSceneView(ctx,view)):null;},[ctx,doc]);
  const label=(id:string)=>doc.nodes.find(n=>n.id===id)?.label??id;
  // When the move hides this pane (one pane at a time on a compact screen), keyboard focus follows to the opened
@@ -53,7 +57,7 @@ export function CompanionPane({project,publicMode,anchor,pinned,onOpen}:Props){
  const mode=liveDetour?`Detour: the original question stays on ${liveDetour.origin.label}.`:pinned?'Pinned: the companion keeps the pinned component.':'Following the selection.';
  return <section ref={paneRef} className="companion-pane note-card" aria-label="Companion pane" data-testid="companion-pane">
   <h3>Companion</h3>
-  <p className="micro" role="status" aria-label="Companion anchor">{current?<>About <strong>{label(current.nodeId)}</strong> · {mode}</>:'Select a component to see its explanation, code, related context and evidence.'} {publicMode?'Public projection.':'Private authoring context.'} Read-only.</p>
+  <p className="micro" role="status" aria-label="Companion anchor">{current?<>About <strong>{label(current.nodeId)}</strong> · {mode}</>:'Select a component to see its explanation, code, related context and evidence.'} {publicMode?'Public projection.':'Private authoring context.'} {editMode&&!publicMode?'Answer proposals available in Questions.':'Read-only.'}</p>
   {liveDetour&&<div role="region" aria-label="Detour" className="companion-detour" data-testid="companion-detour">
    <p className="micro">You opened <strong>{liveDetour.target.label}</strong> as a detour from <strong>{liveDetour.origin.label}</strong>. The original question is kept.</p>
    <button type="button" onClick={giveBack}>Return to {liveDetour.origin.label}</button> <button type="button" className="link-button" onClick={endDetour}>End detour here</button>
@@ -74,9 +78,10 @@ export function CompanionPane({project,publicMode,anchor,pinned,onOpen}:Props){
       </>:<>
        <h4>Question being explained</h4><p>{content.structure.details.focusQuestion}</p>
        <h4>Questions to explore</h4>{content.structure.details.questions.length?<ol>{content.structure.details.questions.map((x,i)=><li key={i}>{x}</li>)}</ol>:<p>No follow-up questions supplied.</p>}
-       <p className="micro">Answers are not tracked by this section.</p>
+
       </>}
      </>}
+     {shownTab==='questions'&&!publicMode&&<QuestionAnswersPanel key={`${doc.id}:${content.node.id}`} project={doc} nodeId={content.node.id} editMode={editMode} onPropose={onPropose}/>}
      {shownTab==='contract'&&<><h4>Declared inputs and outputs</h4>{content.contract.length?content.contract.map(b=><Evidence key={b.id} block={b} doc={doc}/>):<p>No input or output evidence attached to this component.</p>}</>}
     </>}
     {shownTab==='evidence'&&content&&<>{content.evidence.map(b=><Evidence key={b.id} block={b} doc={doc}/>)}{content.sources.length>0&&<><h4>Cited sources</h4><ul>{content.sources.map(s=><li key={s.id}>{s.title} <span className="stable-id">{s.id}</span></li>)}</ul></>}</>}
