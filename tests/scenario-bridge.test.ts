@@ -20,7 +20,8 @@ test('private-only facts, counters and retention cannot influence public request
 });
 test('retained receipts project without reconstructing an editable document; optional legacy tokens decode safely',async()=>{
  const a=sample(),snapshot=evolutionSnapshot(a,{id:'retained-test'}),doc=applyDocumentPatch(a,retainEvolutionSnapshotPatch(a,snapshot)).result;
- const kept=readEvolutionHistory(doc).snapshots[0];assert.equal((await projectionFromSnapshot(kept,{audience:'author'})).binding.digest,(await projectProjection(a,{audience:'author'})).binding.digest);
+ const kept=readEvolutionHistory(doc).snapshots[0];
+ const malformed=structuredClone(snapshot);malformed.edges[0].semantic='{"source":"missing-node","target":"missing-too"}';await assert.rejects(projectionFromSnapshot(malformed,{audience:'author'}),/endpoints/);assert.equal((await projectionFromSnapshot(kept,{audience:'author'})).binding.digest,(await projectProjection(a,{audience:'author'})).binding.digest);
  assert.deepEqual({...readEvolutionSemantic('{"x":undefined,"y":"undefined","z":"__diagramcloud_absent_20261104__"}')},{y:'undefined',z:'__diagramcloud_absent_20261104__'});
  assert.deepEqual({...readEvolutionSemantic('{"x":"\\u005f_diagramcloud_absent_20261104__"}')},{x:'__diagramcloud_absent_20261104__'});
  for(const malformed of ['{"x":(()=>1)()}','{"x":undefinedfoo}','{"x":1,"x":2}','{"x":undefined};alert(1)','{"x":[undefined]}'])assert.throws(()=>readEvolutionSemantic(malformed));
