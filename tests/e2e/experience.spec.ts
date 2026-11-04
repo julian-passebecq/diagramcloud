@@ -348,8 +348,8 @@ test('multi-select: group move by keys and drag, align, refused overlap, undo, C
  await d.getByRole('button',{name:/^↶ Undo: Align top: 2 panels/}).click();
  expect(await row('foil-chart')).toBe('10 / span 4');
 
- // Ctrl-click on a header toggles selection; Escape clears it without closing the dialog.
- await d.getByTestId('item-schedule-gantt').locator('.xp-card-head h3').click({modifiers:['Control']});
+ // Use the platform selection modifier (Command on macOS); Escape keeps the dialog.
+ await d.getByTestId('item-schedule-gantt').locator('.xp-card-head h3').click({modifiers:['ControlOrMeta']});
  await expect(bar).toContainText('3 selected');
  await d.getByRole('button',{name:'Report view',exact:true}).focus();await page.keyboard.press('Escape');
  await expect(bar).toHaveCount(0);
