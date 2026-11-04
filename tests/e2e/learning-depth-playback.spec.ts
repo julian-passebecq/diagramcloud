@@ -121,6 +121,7 @@ test('at 390 px with reduced motion the lesson figure scrolls inside its own box
  const lesson=catalogue.getByRole('article',{name:'Lesson: Agent worktrees, changes, review and CI'});
  await lesson.getByRole('radio',{name:'Mechanism',exact:true}).check();
  const diagram=lesson.getByRole('region',{name:'Lesson diagram',exact:true}),figure=diagram.getByTestId('lesson-diagram-figure');
+ await expect(diagram.getByRole('status',{name:'Lesson diagram state'})).toContainText('Depth Mechanism');
  await expect(figure.locator('[data-figure-node-id]')).toHaveCount(await diagram.getByTestId('lesson-diagram-list').locator('[data-node-id]').count());
  const overflow=()=>page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
  expect(await overflow()).toBeLessThanOrEqual(0);
