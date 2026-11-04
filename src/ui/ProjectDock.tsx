@@ -1,11 +1,12 @@
 import {useId,useMemo,useRef,useState,type KeyboardEvent} from 'react';
 import type {Project} from '../core/model';
+import {LiveCheckout} from './LiveCheckout';
 import {projectDockModel,type DockAudience,type DockTarget,type ProjectDockTool} from './projectDockModel';
 // CSS is loaded once by the host's src/main.tsx, keeping this component renderable in source tests.
 export type ProjectDockProps={
  project:Project;audience:DockAudience;activeViewId:string;selectedNodeId?:string|null;storyIndex?:number;
  onNavigate:(viewId:string,nodeId?:string)=>void;onStory:(index:number)=>void;
- onRepository?:(repositoryId:string)=>void;onOpenTool?:(tool:ProjectDockTool)=>void;tools?:readonly ProjectDockTool[];
+ onRepository?:(repositoryId:string)=>void;onOpenTool?:(tool:ProjectDockTool)=>void;tools?:readonly ProjectDockTool[];localCheckoutHost?:boolean;
 };
 const PANELS=[['project','Project'],['workflow','Workflow'],['sources','Sources & Git'],['reviews','Reviews']] as const;
 type Panel=typeof PANELS[number][0];
@@ -28,6 +29,8 @@ export function ProjectDock(p:ProjectDockProps){
    <div className="project-dock-grid"><div><h3>Story and explanation steps</h3><p className="project-dock-caption">Presented sequence, not execution order or elapsed time.</p>{model.story.length?<ol className="project-dock-list">{model.story.map(s=><li key={s.index}><button type="button" aria-current={p.storyIndex===s.index?'step':undefined} onClick={()=>p.onStory(s.index)}>{s.index+1}. {s.title}</button>{s.narration&&<p>{s.narration}</p>}</li>)}</ol>:<p>No story steps authored. Use the workflow components or project views.</p>}</div><div><h3>Workflow components</h3>{model.workflow.length?<ul className="project-dock-list">{model.workflow.map(n=><li key={n.id}><button type="button" aria-disabled={!n.target} onClick={()=>navigate(n.target)}>{n.label}</button><small>{n.kind} · designed status: {n.designedStatus} · basis: {n.basis}</small>{n.summary&&<p>{n.summary}</p>}</li>)}</ul>:<p>No process, control or function components in this permitted project.</p>}<div className="project-dock-actions">{toolButton('work')}</div></div></div>
   </section>
   <section role="tabpanel" id={`${id}-sources`} aria-labelledby={`${id}-sources-tab`} hidden={panel!=='sources'} tabIndex={0}>
+   {p.audience==='author'&&(p.localCheckoutHost??import.meta.env?.VITE_DATAPASS_COMPARISON==='1')&&<LiveCheckout key={JSON.stringify([p.project.id,p.project.revision,p.project.atlas?.activeSnapshotId,model.repositories.map(r=>[r.id,r.host,r.locator])])} projectId={p.project.id} repositories={model.repositories.map(r=>({repositoryId:r.id,host:r.host,locator:r.locator}))}/>}
+
    <p className="project-dock-caption">Supplied source records only. This dock does not read a local checkout; branch activity, dirty files and current Git status are unknown.</p>
    <div className="project-dock-grid"><div><h3>Repository revision vector</h3>{model.snapshot&&<p>Snapshot {model.snapshot.label??model.snapshot.id} · captured {model.snapshot.capturedAt}</p>}{model.repositories.length?<ul className="project-dock-list">{model.repositories.map(r=><li key={r.id}><strong>{r.title}</strong><small>{r.host} · supplied by {r.authority} · {r.scanStatus}</small><p>Revision: <code>{r.revision??'Unknown'}</code>{r.ref&&<> · Ref: <code>{r.ref}</code></>}</p><details><summary>Supplied locator and context</summary><p>{r.locator}</p>{r.scannedAt&&<p>Recorded scan time: {r.scannedAt}</p>}{r.note&&<p>{r.note}</p>}</details>{r.target?<button type="button" onClick={()=>navigate(r.target)}>Locate {r.title} in project</button>:p.onRepository?<button type="button" onClick={()=>p.onRepository?.(r.id)}>Inspect {r.title} record</button>:null}</li>)}</ul>:<p>No repository snapshot supplied. A document revision is not a Git commit.</p>}<div className="project-dock-actions">{toolButton('git')}{toolButton('history')}</div></div><div><h3>Evidence sources</h3>{model.sources.length?<ul className="project-dock-list">{model.sources.map(s=><li key={s.id}><strong>{s.title}</strong><p>{s.location||'Location not supplied.'}</p>{s.url&&<a href={s.url} target="_blank" rel="noreferrer noopener">Open supplied reference</a>}<div className="project-dock-actions">{s.components.map(n=><button type="button" key={n.id} aria-disabled={!n.target} onClick={()=>navigate(n.target)}>Locate {n.label}</button>)}</div></li>)}</ul>:<p>No evidence sources supplied.</p>}</div></div>
   </section>
