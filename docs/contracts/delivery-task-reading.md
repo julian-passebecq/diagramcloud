@@ -63,18 +63,27 @@ BOM-stripping and invalid-encoding replacement are refused rather than hashed as
 `datapass.owner-tasks/1` parser (256 KiB, 60 tasks) and the existing SHA-256 function. The resolver checks exact input digest,
 four scope identifiers, revision and task ID. Whitespace changes the digest; refreshing is an explicit new source choice.
 
-States: `NO_SNAPSHOT`, `SNAPSHOT_MISMATCH`, `SCOPE_MISMATCH`, `REVISION_MISMATCH`, `TASK_ABSENT`, `MATCHED`.
+States: `NO_SNAPSHOT`, `SNAPSHOT_MISMATCH`, `AMBIGUOUS_SNAPSHOT`, `SCOPE_MISMATCH`, `REVISION_MISMATCH`, `TASK_ABSENT`, `MATCHED`.
 A mismatch returns no task content. A matched task exposes its **source-declared** state/review, acceptance IDs and dates.
 `DONE` or `APPROVED` never closes a DiagramCloud release gate. No task, review, observation or session is created.
 
-Only one snapshot is loaded at a time. A plan may reference more than one source, but references for another cut remain
-unmatched; no hidden automatic multi-repository fetch occurs. A future multi-snapshot inventory is a separate feature.
+The session inventory accepts at most **8 snapshots and 1 MiB of original UTF-8 bytes in total**; each individual snapshot
+still passes the unchanged PM reader's 256 KiB / 60 task limits. **Load PM task snapshot** explicitly replaces the inventory;
+**Add PM task snapshot** retains its other cuts. Exact duplicate bytes are refused on Add. A changed revision or different
+whitespace is a distinct cut and never replaces an older one automatically. No automatic multi-repository fetch occurs.
+
+Each reference selects by its exact input SHA-256 first, then validates all four scope IDs, revision and task ID. Same local
+task IDs across repositories and multiple revisions of one scope coexist. The resolver refuses ambiguous input rather than
+picking the first candidate. The UI lists retained scope/revision/digest identities and permits individual removal or clearing
+all. Removing a cut leaves its references unmatched; neither a newer revision nor a similar title fills the gap. Invalid or
+over-budget input preserves the whole previous inventory. These are transient supplied snapshots, never a task database.
 
 ## Source/audience safety
 
 Private plan content is withheld from public audiences. PM task details are author-only even for a public surrounding plan.
-A plan source, project/audience epoch or clear action discards the loaded task snapshot. Late file completions/errors cannot
-restore an older plan or task. An invalid file leaves the previous valid snapshot with a visible refusal. Data stays in memory;
+A plan source, project/audience epoch or clear action discards the loaded task inventory. Removing a snapshot or clearing all
+also invalidates pending file reads. Late file completions/errors cannot restore an older plan or task. An invalid file leaves
+the previous valid snapshots with a visible refusal. Data stays in memory;
 reload does not promise persistence. Source-reviewed `checked_at` and producer `event_at` are distinct supplied timestamps.
 
 Cited HTTPS sources can be opened deliberately. Other URL schemes and user-info URLs remain inert text. Loading a file performs
@@ -100,5 +109,6 @@ source, immutable artifact, relevant checks, distribution and owner review disti
 ## Qualification
 
 Run existing native gates plus `tests/delivery-evidence.test.ts`, `tests/delivery-integrity.test.ts`,
-`tests/delivery-task-links.test.ts` and `tests/e2e/delivery-task-links.spec.ts`. The new browser spec exercises the real App at
+`tests/delivery-task-links.test.ts`, `tests/delivery-task-inventory.test.ts`, `tests/e2e/delivery-task-links.spec.ts` and
+`tests/e2e/delivery-task-inventory.spec.ts`. The browser specs exercise the real App at
 1440 and 390 pixels. This source contribution's isolated component checks do not substitute for that native execution.

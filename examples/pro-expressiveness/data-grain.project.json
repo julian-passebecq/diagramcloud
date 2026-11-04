@@ -107,6 +107,7 @@
       "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.grain.contract",
         "walk-lesson.grain.text",
         "walk-lesson.grain.before"
       ],
@@ -145,6 +146,7 @@
       "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.badjoin.contract",
         "walk-lesson.badjoin.text",
         "walk-lesson.badjoin.after",
         "walk-lesson.badjoin.code",
@@ -185,6 +187,7 @@
       "role": "data-grain@revision 1; source fingerprint 19a3b583f846b7cd. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.fix.contract",
         "walk-lesson.fix.text",
         "walk-lesson.fix.after"
       ],
@@ -505,6 +508,32 @@
       "text": "Question: Why can a plausible join double a business measure?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: data-grain revision 1; fingerprint 19a3b583f846b7cd.\n\nThis private addition changes no existing feature, deployment, approval or observation."
     },
     {
+      "id": "walk-lesson.grain.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "Why can a plausible join double a business measure?"
+        ],
+        [
+          "source-cut",
+          "data-grain revision 1"
+        ]
+      ]
+    },
+    {
       "id": "walk-lesson.grain.text",
       "title": "Start with what one row means",
       "visibility": "public",
@@ -533,6 +562,36 @@
         [
           "amount total",
           "35"
+        ]
+      ]
+    },
+    {
+      "id": "walk-lesson.badjoin.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "Why can a plausible join double a business measure?"
+        ],
+        [
+          "source-cut",
+          "data-grain revision 1"
+        ],
+        [
+          "prerequisite",
+          "grain · Start with what one row means"
         ]
       ]
     },
@@ -587,6 +646,44 @@
       "provenance": "synthetic",
       "type": "text",
       "text": "data-grain revision 1, block join-code, lines 1-4, content fingerprint bdadeada686f3834. Frozen excerpt, not live code. Display-only; no execution."
+    },
+    {
+      "id": "walk-lesson.fix.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "Why can a plausible join double a business measure?"
+        ],
+        [
+          "source-cut",
+          "data-grain revision 1"
+        ],
+        [
+          "question",
+          "Which valid-time window applies?"
+        ],
+        [
+          "question",
+          "How are late-arriving facts handled?"
+        ],
+        [
+          "question",
+          "Where is uniqueness tested?"
+        ]
+      ]
     },
     {
       "id": "walk-lesson.fix.text",
@@ -659,7 +756,7 @@
       "sourceRevision": 1,
       "stops": [
         {
-          "id": "stop-db80bca992",
+          "id": "stop-13b907cfc9",
           "viewId": "walk-lesson.grain.view",
           "subjects": [
             {
@@ -675,12 +772,12 @@
               "id": "walk-lesson.grain.note"
             }
           ],
-          "fingerprint": "cd59a101f5d615fc",
-          "referencedFingerprint": "2f0bdd35b5b5489f",
+          "fingerprint": "1dd418bcde469265",
+          "referencedFingerprint": "1cd416401a758575",
           "narration": "The synthetic sales total is 35. Customer history has two rows for the same key. Key labels and cardinality assertions need validation against the intended grain."
         },
         {
-          "id": "stop-b4e4039fda",
+          "id": "stop-c4666d2e9b",
           "viewId": "walk-lesson.badjoin.view",
           "subjects": [
             {
@@ -708,12 +805,12 @@
               "id": "read-customer"
             }
           ],
-          "fingerprint": "7c9f7026ab42467f",
-          "referencedFingerprint": "21384c935473deca",
+          "fingerprint": "2bef702722c59635",
+          "referencedFingerprint": "0fc7b2347424717a",
           "narration": "Each fact matches two dimension records. Four rows contribute 70, not 35. These values are calculated from this explicit synthetic fixture, not production metrics."
         },
         {
-          "id": "stop-ce8a526179",
+          "id": "stop-89d9b52e9c",
           "viewId": "walk-lesson.fix.view",
           "subjects": [
             {
@@ -733,8 +830,8 @@
               "id": "derive"
             }
           ],
-          "fingerprint": "4e1fe4099325d357",
-          "referencedFingerprint": "6f72208caf880d21",
+          "fingerprint": "a539581ae1f805d4",
+          "referencedFingerprint": "8263720b78d6ce0e",
           "narration": "Choosing the applicable unique dimension record restores the intended contribution. DISTINCT over an amount is not a general correction: equal-valued legitimate sales can exist."
         }
       ],

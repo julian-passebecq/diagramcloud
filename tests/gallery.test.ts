@@ -40,6 +40,9 @@ test('gallery buckets and marks',()=>{
  for(const id of ['project-constellation','datapass-platform']){const s=samples.find(s=>s.id===id)!;assert.equal(galleryBucket(s),'portfolio',id);assert.equal(galleryCaption(s),'Portfolio map');}
  assert.deepEqual(samples.filter(s=>galleryBucket(s)==='cloud').map(s=>s.id),['fabric-medallion','databricks-reference',...gallery.map(p=>p.id),'contoso-forecasting']);
  assert.equal(galleryCaption(gallery[0]),'Cloud architecture · AWS');
+ const retail=samples.find(p=>p.id==='retail-operations')!;
+ assert.equal(galleryBucket(retail),'work');
+ assert.equal(galleryCaption(retail),'Illustrative work map');
 });
 
 

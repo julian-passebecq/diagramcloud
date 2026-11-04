@@ -1,0 +1,60 @@
+import {useEffect,useId,useMemo,useRef,useState,type KeyboardEvent} from 'react';
+import type {Project} from '../core/model';
+import {CLAIM_LABEL} from '../core/realization';
+import {Evidence} from './Evidence';
+import {contextPaneFacts,type ContextFlow,type ContextPaneSelection} from './contextPaneModel';
+
+export type ContextPaneProps=ContextPaneSelection&{
+ project:Project;publicMode:boolean;onOpen:(viewId:string,nodeId?:string)=>void;
+ onEdit?:(nodeId:string)=>void;onExplain?:(nodeId:string)=>void;className?:string;
+};
+const DETAIL_TABS=['Overview','Connections','Evidence','Sources'] as const;
+type DetailTab=typeof DETAIL_TABS[number];
+/** Useful read-only context beside the canvas. ProjectContext remains the sole Follow/Pin owner. */
+export function ContextPane({project,publicMode,onOpen,onEdit,onExplain,className,...selection}:ContextPaneProps){
+ const facts=useMemo(()=>contextPaneFacts(project,publicMode,selection),[project,publicMode,selection.selectedViewId,selection.selectedNodeId,selection.hoveredViewId,selection.hoveredNodeId,selection.pinned,selection.unavailable]);
+ const {doc,node,context}=facts;
+ const [allEvidence,setAllEvidence]=useState(false),[allFlows,setAllFlows]=useState(false),[allComponents,setAllComponents]=useState(false);
+ const [tab,setTab]=useState<DetailTab>('Overview'),tabId=useId(),tabButtons=useRef<(HTMLButtonElement|null)[]>([]);
+ const tabKey=(event:KeyboardEvent<HTMLButtonElement>,index:number)=>{const next=event.key==='ArrowRight'?(index+1)%DETAIL_TABS.length:event.key==='ArrowLeft'?(index+DETAIL_TABS.length-1)%DETAIL_TABS.length:event.key==='Home'?0:event.key==='End'?DETAIL_TABS.length-1:-1;if(next<0)return;event.preventDefault();setTab(DETAIL_TABS[next]);tabButtons.current[next]?.focus();};
+ const panel=(name:DetailTab)=>({role:'tabpanel',id:`${tabId}-${name}-panel`,'aria-labelledby':`${tabId}-${name}-tab`,hidden:tab!==name,tabIndex:0});
+ useEffect(()=>{setAllEvidence(false);setAllFlows(false);setAllComponents(false);},[doc.id,node?.id,context?.view?.id,publicMode]);
+ const openNode=(nodeId:string,preferredView?:string)=>{const live=contextPaneFacts(project,publicMode,selection);const view=live.doc.views.find(v=>v.id===preferredView&&v.nodeIds.includes(nodeId))??live.doc.views.find(v=>v.nodeIds.includes(nodeId));if(view)onOpen(view.id,nodeId);};
+ const flowCard=(flow:ContextFlow)=><li key={flow.edge.id} className="context-flow-card">
+  <div className="context-flow-top"><span className="context-flow-kind">{flow.edge.kind}</span><span>{flow.edge.basis??'basis unknown'}</span></div>
+  <strong className="context-flow-contract">{flow.edge.label||'Exchange purpose not supplied'}</strong>
+  <div className="context-flow-target"><span aria-hidden="true">{flow.direction==='input'?'←':flow.direction==='loop'?'↻':'→'}</span><button type="button" onClick={()=>openNode(flow.other.id,flow.destinations[0]?.viewId)} disabled={!flow.destinations.length} aria-label={`Inspect ${flow.other.label} ${flow.direction==='input'?'upstream':'downstream'}`}>{flow.other.label}</button></div>
+  {flow.edge.quantity&&<p className="context-quantity">{flow.edge.quantity.value.toLocaleString('en-US')} {flow.edge.quantity.unit} <span>· {flow.edge.quantity.provenance}</span>{flow.edge.quantity.scope&&<> · {flow.edge.quantity.scope}</>}{flow.edge.quantity.note&&<small>{flow.edge.quantity.note}</small>}</p>}
+  <details className="context-flow-details"><summary>Connection details</summary><dl><div><dt>Identity</dt><dd><code>{flow.edge.id}</code></dd></div><div><dt>From → to</dt><dd>{doc.nodes.find(n=>n.id===flow.edge.source)?.label} → {doc.nodes.find(n=>n.id===flow.edge.target)?.label}</dd></div>{flow.edge.quantity?.measurementId&&<div><dt>Measurement reference</dt><dd>{flow.edge.quantity.measurementId}</dd></div>}{flow.edge.quantity?.window&&<div><dt>Declared window</dt><dd>{flow.edge.quantity.window.from} → {flow.edge.quantity.window.to}</dd></div>}</dl>{flow.destinations.length>1&&<div className="context-view-links" aria-label={`Views containing ${flow.other.label}`}>{flow.destinations.map(v=><button key={v.viewId} type="button" onClick={()=>onOpen(v.viewId,v.nodeId)}>{v.title}</button>)}</div>}</details>
+ </li>;
+ const sectionFlows=(title:string,flows:ContextFlow[],empty:string)=><section className="context-section" aria-label={title}><div className="context-section-heading"><h3>{title}</h3><span>{flows.length}</span></div>{flows.length?<ul className="context-flow-list">{(allFlows?flows:flows.slice(0,5)).map(flowCard)}</ul>:<p className="context-empty">{empty}</p>}</section>;
+ return <section className={`context-pane${className?' '+className:''}`} aria-label="Component detail" data-testid="component-context">
+  <div className="context-kicker"><span>{facts.pinned?'Pinned detail':facts.preview?'Hover preview':'Selected detail'}</span><span>{publicMode?'Public':'Author'}</span></div>
+  {!facts.available?<div className="context-empty"><h2>Context unavailable</h2><p>This selection is unavailable in the current permitted project. Follow the current selection to continue.</p></div>:node&&context?<>
+   <header className="context-title"><span className="context-node-kind">{node.kind}</span><h2>{node.label}</h2><p>{context.view?.title??facts.memberships[0]?.title??'Project component'}</p></header>
+   {facts.preview&&<div className="context-preview-note"><p>Preview only. Your selected component and editing context stay in place.</p><button type="button" onClick={()=>openNode(node.id,facts.selection.viewId)}>Select {node.label}</button></div>}
+   <section className="context-summary" aria-label="Purpose and responsibility"><p>{node.summary||'No component description has been supplied.'}</p></section>
+   <div className="context-primary-actions">{facts.childView&&<button type="button" className="context-primary" onClick={()=>onOpen(facts.childView!.id)}>Explore {facts.childView.title} <span aria-hidden="true">↗</span></button>}{onEdit&&!publicMode&&<button type="button" onClick={()=>onEdit(node.id)}>Edit component</button>}{onExplain&&<button type="button" onClick={()=>onExplain(node.id)}>Explain source</button>}</div>
+   <div className="context-detail-tabs" role="tablist" aria-label="Component detail sections">{DETAIL_TABS.map((name,index)=><button type="button" role="tab" key={name} id={`${tabId}-${name}-tab`} aria-controls={`${tabId}-${name}-panel`} aria-selected={tab===name} tabIndex={tab===name?0:-1} ref={el=>{tabButtons.current[index]=el;}} onClick={()=>setTab(name)} onKeyDown={event=>tabKey(event,index)}>{name}</button>)}</div>
+   <section {...panel("Overview")} className="context-detail-panel">{node.role&&<div className="context-responsibility"><h3>Responsibility / contribution</h3><p>{node.role}</p></div>}
+   <dl className="context-properties" aria-label="Component properties"><div><dt>Provider</dt><dd>{node.provider||'Not supplied'}</dd></div><div><dt>Source basis</dt><dd>{node.basis??'Unknown'}</dd></div><div><dt>Designed state</dt><dd>{node.status}</dd></div><div><dt>Stable identity</dt><dd><code>{node.id}</code></dd></div></dl>
+   <p className="context-qualification">Designed state is authored presentation, not a live result.</p>
+   {!!node.tags.length&&<ul className="context-tags" aria-label="Component tags">{node.tags.map((tag,i)=><li key={i}>{tag}</li>)}</ul>}
+   <section className="context-section" aria-label="Component viewpoints"><div className="context-section-heading"><h3>Appears in</h3><span>{facts.memberships.length}</span></div><div className="context-view-links">{facts.memberships.map(view=><button type="button" key={view.id} aria-current={view.id===facts.selection.viewId?'location':undefined} onClick={()=>onOpen(view.id,node.id)}><span>{view.title}</span><small>{view.perspective??'system'}</small></button>)}</div><p className="context-qualification">These views share the same component identity.</p></section>
+   </section>
+   <section {...panel("Connections")} className="context-detail-panel">
+   <div className="context-flow-columns">{sectionFlows('Inputs',facts.inputs,'No incoming connection is declared in this permitted project.')}{sectionFlows('Outputs',facts.outputs,'No outgoing connection is declared in this permitted project.')}</div>
+   {!!facts.loops.length&&sectionFlows('Self connections',facts.loops,'')}{[facts.inputs,facts.outputs,facts.loops].some(rows=>rows.length>5)&&<button type="button" className="context-show-more" aria-expanded={allFlows} onClick={()=>setAllFlows(v=>!v)}>{allFlows?'Show fewer connections':'Show all declared connections'}</button>}
+   </section>
+   <section {...panel("Evidence")} className="context-detail-panel">
+   <section className="context-section" aria-label="Component evidence"><div className="context-section-heading"><h3>Evidence & implementation</h3><span>{context.blocks.length}</span></div>{context.blocks.length?(allEvidence?context.blocks:context.blocks.slice(0,6)).map((block,i)=><details className="context-evidence-item" key={block.id} open={i===0}><summary><span>{block.title}</span><small>{block.type} · {block.provenance}</small></summary><Evidence block={block} doc={doc}/></details>):<p className="context-empty">No evidence is attached to this component. Add explanation, source code or sample records through the existing editor.</p>}{context.blocks.length>6&&<button type="button" className="context-show-more" aria-expanded={allEvidence} onClick={()=>setAllEvidence(v=>!v)}>{allEvidence?'Show fewer evidence blocks':`Show all ${context.blocks.length} evidence blocks`}</button>}</section>
+   </section>
+   <section {...panel("Sources")} className="context-detail-panel">
+   <section className="context-section" aria-label="Component sources"><div className="context-section-heading"><h3>Sources</h3><span>{context.sources.length}</span></div>{context.sources.length?<ul className="context-source-list">{context.sources.map(source=><li key={source.id}>{source.url?<a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} ↗</a>:<strong>{source.title}</strong>}{source.location&&<p>{source.location}</p>}</li>)}</ul>:<p className="context-empty">No source citation attached. Authored content is not a verified observation.</p>}</section>
+   <details className="context-observations"><summary>Dated external claims ({context.observations.length})</summary>{context.observations.length?<ul>{context.observations.map(o=><li key={o.id}><strong>{CLAIM_LABEL[o.claim]}</strong> · {o.sourceApp}<p>{o.summary}</p><small>{o.observedAt} · {o.reviewedAt?'author reviewed':'awaiting author review'} · source revision {o.sourceRevision}</small>{o.caveat&&<p>{o.caveat}</p>}</li>)}</ul>:<p className="context-empty">No dated external claim in this permitted context.</p>}</details>
+   </section>
+  </>:context?<>
+   <header className="context-title"><span className="context-node-kind">{context.view?'View':'Project'}</span><h2>{context.view?.title??doc.title}</h2></header><p className="context-summary">{context.view?.description||doc.summary||'Select a component to inspect its responsibilities, exchanges and supporting evidence.'}</p><div className="context-overview-counts"><span><strong>{context.components.length}</strong> components</span><span><strong>{context.relations.length}</strong> connections</span><span><strong>{context.blocks.length}</strong> evidence blocks</span></div><h3>Inspect a component</h3><ul className="context-component-list">{context.components.slice(0,allComponents?40:8).map(n=><li key={n.id}><button type="button" onClick={()=>openNode(n.id,context.view?.id)}><strong>{n.label}</strong><small>{n.kind}{n.summary?' · '+n.summary:''}</small></button></li>)}</ul>{context.components.length>8&&<button type="button" className="context-show-more" aria-expanded={allComponents} onClick={()=>setAllComponents(value=>!value)}>{allComponents?'Show fewer components':`Show ${Math.min(context.components.length,40)} components`}</button>}{allComponents&&context.components.length>40&&<p className="context-qualification">Showing the first 40 components. Use the project tree or search to reach the rest.</p>}
+  </>:null}
+ </section>;
+}

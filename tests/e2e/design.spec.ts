@@ -47,6 +47,8 @@ test('Diagram Design mode: figures, open a level, save a hint, apply a design br
  await preview.getByLabel('Figure type').selectOption('layers');await preview.getByLabel('Figure theme').selectOption('editorial');
  await preview.getByRole('button',{name:'Use for this view'}).click();
  await expect(preview.getByRole('button',{name:'Use for this view'})).toBeDisabled();
+ // The button reflects the in-memory hint; wait for IndexedDB before reloading.
+ await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();
  await page.reload();await page.locator('.project-card').filter({hasText:'Contoso Forecasting'}).click();
  await expect(page.getByTestId('design-preview').locator('img.design-figure')).toHaveAttribute('data-design-type','layers');
  await expect(page.getByTestId('design-preview').locator('img.design-figure')).toHaveAttribute('data-theme','editorial');

@@ -62,6 +62,14 @@ Open the TotalEnergies example, choose **SQL quality checks**, then **Required f
 
 **Explore** is read-only. **Edit** enables visual authoring and Undo/Redo. **Portfolio** uses the public projection. **Present** follows a guided story. The Studio also supports linked views, saved contexts, interview practice and idea-reading modes. Use the current permitted document when navigating; similarly named objects are not replacements for missing stable IDs.
 
+## Whole-project starting points
+
+The gallery now starts with **Foil · cloud**, **Retail · opérations**, the independent **Catalogue général**, and a guided new-project entry. Each opens the existing validated Project workspace; no separate retail editor or document format is introduced. Existing gallery search, samples, imports and blank projects remain available.
+
+The anonymous retail example has five linked views: whole system, file/API exchanges, proposed workflow, responsibilities and future AI. The same metadata and control components appear across views with one identity. The model is entirely authored and illustrative: no client records, live connections, operational dates or measured outcomes. Open **Fichiers & interfaces** from its overview to keep the parent while exploring the exchange view; switch to **Edit** to adapt it and use the ordinary history/save/export paths.
+
+A trusted local DataPass host may build with `VITE_DATAPASS_COMPARISON=1` to expose **Compare this project**. It sends a frozen, audience-permitted semantic projection of the active Project, selected variants or retained evolution history to the same-origin native Rust host. Before/after and A/B/C reviews can be saved and reopened with recomputation; selection never applies an alternative. Coverage and unavailable source freshness stay explicit. Author review bundles are private backups, separate from public exports. Illustrative retail/agentic packs and source-bound Hop explanations use this same workspace. Normal standalone builds omit this host feature. The older `/comparison` link remains an independent companion in a new tab and does not transfer active project data.
+
 ## The grammar
 
 One validated Project owns components, connections, views, evidence, sources and story steps. Views reuse stable identities and own their memberships and positions. The domain is independent of the canvas library.
@@ -84,7 +92,7 @@ An explanation walkthrough is an **author-written narrative**, not a live trace,
 
 In the merged source, choose **Edit → Tours → Author explanation**, fill the question and steps, then **Review explanation → Apply explanation**. Optional state, frozen code and takeaway fields stay authored evidence. Review changes nothing; Apply is one revision and one Undo. **Back to request** retains every authored field and the original full source basis, so a source change, even at the same revision, is refused rather than adopted. If the project has no Tours collection, **Initialize Tours for explanations** is a separate explicit, undoable edit before drafting.
 
-The request draft is private and session-only. Downloading the request or proposed patch does not save it to the project or prove persistence; there is no request-file import or draft autosave. The form does not expose every CLI prerequisite, case or question field. No AI or code execution is involved.
+The request draft is private. A supplied request file can be reviewed in the form with its original source binding, and validated drafts can be exported. Optional browser draft recovery keeps that binding and requires an explicit restore; a download or draft backup does not apply the request to the project. The form exposes selected cases, explicit prerequisites and questions; compiled step notes show these in the companion Contract and Questions tabs. [Details and limits](docs/contracts/explanation-details.md). No AI or code execution is involved.
 
 The offline compiler produces a private, revision-guarded `diagramcloud.patch`, a preview and an explanation map. It changes neither input and never applies the patch or publishes the result. For example, from a clean checkout:
 
@@ -92,7 +100,7 @@ The offline compiler produces a private, revision-guarded `diagramcloud.patch`, 
 npm run explain -- --project examples/pro-expressiveness/retry-metadata.base.json --request examples/pro-expressiveness/retry-metadata.walkthrough.json --out explanation-output
 ```
 
-The output directory must not already exist; each input is limited to 4 MiB of exact UTF-8. Review the generated patch through the ordinary JSON / AI import before applying it. The six teaching projects in [the expressiveness guide](docs/product/EXPRESSIVENESS.md) are labelled synthetic examples, not observed runs. The companion pane follows explicit related-context connections; similarly named subjects are not inferred correspondence. **Focused explanation HTML** exports the selected public story for offline reading, with its code/state evidence. The companion’s Contract and Questions tabs remain unfinished.
+The output directory must not already exist; each input is limited to 4 MiB of exact UTF-8. Review the generated patch through the ordinary JSON / AI import before applying it. The six teaching projects in [the expressiveness guide](docs/product/EXPRESSIVENESS.md) are labelled synthetic examples, not observed runs. The companion pane follows explicit related-context connections; similarly named subjects are not inferred correspondence. **Focused explanation HTML** exports the selected public story for offline reading, with its code/state evidence. The companion reads Contract and Questions evidence. Private authored answers and named review records use the ordinary proposal preview and Apply flow; source changes make those records stale rather than rebinding them. See [question answers](docs/contracts/question-answers.md).
 
 ## Project Intelligence (1.24.0)
 
@@ -153,3 +161,9 @@ No live cloud discovery, arbitrary code execution, automatic agent dispatch, ser
 Original source is MIT. Dependencies and provider artwork retain their own terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Do not bundle font files.
 
 Use [architecture decisions](docs/ARCHITECTURE.md), [research decisions](docs/RESEARCH.md), [release verification](docs/RELEASE.md), [the canonical roadmap](docs/ROADMAP.md) and [current continuation](RESUME.md) for their separate purposes. Dated architecture/research checkpoints are not current qualification receipts. [Optional Drive guidance](docs/GOOGLE_DRIVE.md) is separate from core local persistence.
+
+### Follow the selected component
+
+In the bottom Project dock, **Show workflow steps** opens the authored story and gives it reading space. The dock distinguishes the active story step from every step that explicitly names the selected component. Story controls appear before optional calculations. [Workflow reading](docs/product/WORKFLOW_DOCK_READING.md).
+
+**Workflow → Supplied usage and cost** can load a private input file for review before replacing the form, or download validated inputs with their citations. Unknown amounts stay unknown; these supplied records are not a provider bill. [Usage files](docs/contracts/supplied-usage-files.md).

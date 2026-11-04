@@ -1,10 +1,13 @@
 import * as React from 'react';
-import {defaultWorkbenchLayout,fitWorkbenchLayout,selectWorkbenchPane,setWorkbenchPreset,validateWorkbenchLayout,type WorkbenchLayout,type WorkbenchPane,type WorkbenchPreset} from '../core/workbenchLayout';
-import './workbenchFrame.css';
+import {defaultWorkbenchLayout,fitWorkbenchLayout,fitFloatingRect,type FloatingPane,type FloatingRect,selectWorkbenchPane,setWorkbenchPreset,validateWorkbenchLayout,type WorkbenchLayout,type WorkbenchPane,type WorkbenchPreset} from '../core/workbenchLayout';
+import {WorkspaceArrangements} from './WorkspaceArrangements';
+import {arrangementScopeKey,type ArrangementScope,type ArrangementStorage} from '../core/workspaceArrangements';
 
 export type WorkbenchFrameProps={
  id:string;title:string;scopeCaption?:string;layout:WorkbenchLayout;width:number;height:number;
  onLayoutChange:(layout:WorkbenchLayout)=>void;
+ /** Exact host/project/audience preference scope; absent for embedded shells that do not offer persistence. */
+ arrangementScope?:ArrangementScope;arrangementStorage?:()=>ArrangementStorage|null;
  primary:React.ReactNode;explorer?:React.ReactNode;companion?:React.ReactNode;
  navigationMap?:React.ReactNode;activity?:React.ReactNode;rail?:React.ReactNode;
  primaryTitle?:string;companionTitle?:string;activityTitle?:string;
@@ -22,14 +25,67 @@ const present=(slot:React.ReactNode)=>slot!==undefined&&slot!==null&&slot!==fals
  * invalidate private pins and bind async callbacks to its current project/audience epoch.
  *
  * Presets affect physical layout only. "Present" never publishes or changes an Edit capability.
- * This slice has native keyboard width controls, not free drag docking or cross-device preferences.
+ * Direct separator resizing keeps keyboard range controls. Floating placements stay within this frame; no cross-device synchronization.
  */
-export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
+export class WorkbenchFrame extends React.Component<WorkbenchFrameProps,{area:{top:number;width:number;height:number}}>{
+ state={area:{top:0,width:0,height:0}};
+ private observer:ResizeObserver|null=null;
+ private floatDrag:{pointerId:number;pane:FloatingPane;action:'move'|'resize';x:number;y:number;rect:FloatingRect;original:FloatingRect;scope:string}|null=null;
+ private measure=()=>{
+  const root=this.root;if(!root)return;
+  const top=(root.querySelector<HTMLElement>('.wb-header')?.offsetHeight??0)+8;
+  const area={top,width:Math.max(1,root.clientWidth-16),height:Math.max(1,root.clientHeight-top-(root.querySelector<HTMLElement>('.wb-status')?.offsetHeight??0)-8)};
+  if(Object.keys(area).some(k=>area[k as keyof typeof area]!==this.state.area[k as keyof typeof area]))this.setState({area});
+ };
+ componentDidMount(){this.measure();this.observer=new ResizeObserver(this.measure);if(this.root){this.observer.observe(this.root);for(const el of this.root.querySelectorAll('.wb-header,.wb-status'))this.observer.observe(el);}}
+ componentWillUnmount(){this.observer?.disconnect();}
+ private setFloating=(pane:FloatingPane,rect:FloatingRect|null)=>{
+  const layout=validateWorkbenchLayout(this.props.layout);this.props.onLayoutChange({...layout,floating:{...layout.floating,[pane]:rect}});
+ };
+ private floatingRect=(pane:FloatingPane)=>{
+  const requested=validateWorkbenchLayout(this.props.layout).floating[pane];
+  return requested?fitFloatingRect(requested,Math.max(1,this.state.area.width),Math.max(1,this.state.area.height),pane):null;
+ };
+ private cancelFloat=()=>{const drag=this.floatDrag;this.floatDrag=null;if(drag&&drag.scope===this.scope())this.setFloating(drag.pane,drag.original);};
+ private floatKey=(event:React.KeyboardEvent<HTMLElement>,pane:FloatingPane,action:'move'|'resize')=>{
+  if(event.key==='Escape'&&this.floatDrag){event.preventDefault();this.cancelFloat();return;}
+  const rect=this.floatingRect(pane);if(this.state.area.width<120||this.state.area.height<120||!rect||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(event.key))return;
+  event.preventDefault();event.stopPropagation();const next={...rect},step=event.shiftKey?1:10;
+  if(event.key==='Home'||event.key==='End'){
+   if(action==='move'){next.x=event.key==='Home'?0:this.state.area.width;next.y=event.key==='Home'?0:this.state.area.height;}
+   else {next.width=event.key==='Home'?260:this.state.area.width;next.height=event.key==='Home'?180:this.state.area.height;}
+  }else{const horizontal=event.key==='ArrowLeft'||event.key==='ArrowRight',key=action==='move'?(horizontal?'x':'y'):(horizontal?'width':'height');next[key]+=(event.key==='ArrowLeft'||event.key==='ArrowUp'?-step:step);}
+  this.setFloating(pane,fitFloatingRect(next,this.state.area.width,this.state.area.height,pane));
+ };
+ private beginFloat=(event:React.PointerEvent<HTMLElement>,pane:FloatingPane,action:'move'|'resize')=>{
+  const rect=this.floatingRect(pane);if(event.button!==0||!rect)return;
+  event.preventDefault();event.currentTarget.focus();event.currentTarget.setPointerCapture(event.pointerId);
+  this.floatDrag={pointerId:event.pointerId,pane,action,x:event.clientX,y:event.clientY,rect,original:validateWorkbenchLayout(this.props.layout).floating[pane]!,scope:this.scope()};
+ };
+ private moveFloat=(event:React.PointerEvent<HTMLElement>)=>{
+  const drag=this.floatDrag;if(!drag||drag.scope!==this.scope()||event.pointerId!==drag.pointerId)return;
+  const next={...drag.rect},dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+  if(drag.action==='move'){next.x+=dx;next.y+=dy;}else{next.width+=dx;next.height+=dy;}
+  this.setFloating(drag.pane,fitFloatingRect(next,this.state.area.width,this.state.area.height,drag.pane));
+ };
+
+ private drag:{pointerId:number;kind:'explorer'|'companion'|'dock';x:number;y:number;layout:WorkbenchLayout;scope:string;available:number}|null=null;
+ private scope=()=>this.props.arrangementScope?arrangementScopeKey(this.props.arrangementScope):this.props.id;
  private root:HTMLDivElement|null=null;
- componentDidUpdate(){
+ private positionLayout=()=>{
+  const details=this.root?.querySelector<HTMLDetailsElement>('details.wb-layout');const panel=details?.querySelector<HTMLElement>('.wb-layout-fields');if(!details?.open||!panel)return;
+  if(this.root?.dataset.compact==='true'){const bottom=details.getBoundingClientRect().bottom;panel.style.top=`${bottom+4}px`;panel.style.maxHeight=`${Math.max(100,(details.ownerDocument.defaultView?.innerHeight??844)-bottom-16)}px`;}
+  else{panel.style.removeProperty('top');panel.style.removeProperty('max-height');}
+ };
+ private closeLayout=(element:HTMLElement)=>{const details=element.closest('details.wb-layout') as HTMLDetailsElement|null;if(details){details.open=false;details.querySelector<HTMLElement>('summary')?.focus();}};
+ getSnapshotBeforeUpdate(){const active=this.root?.ownerDocument.activeElement;return active&&this.root?.contains(active)?active as HTMLElement:null;}
+ componentDidUpdate(_previous:WorkbenchFrameProps,_state:unknown,previousFocus:HTMLElement|null){
+  this.positionLayout();
+  if(this.floatDrag&&(this.floatDrag.scope!==this.scope()||this.root?.dataset.compact==='true'||this.props.layout.preset==='present'||this.root?.querySelector<HTMLElement>(`[data-wb-region="${this.floatDrag.pane}"]`)?.dataset.floating!=='true'))this.floatDrag=null;
+  if(this.drag&&this.drag.scope!==this.scope())this.drag=null;
   const root=this.root,active=root?.ownerDocument.activeElement as HTMLElement|null;
   // A collapsed or compact-hidden region must not retain invisible keyboard focus.
-  if(root&&active&&root.contains(active)&&active.getClientRects().length===0){
+  if(root&&active&&((root.contains(active)&&active.getClientRects().length===0)||(previousFocus&&previousFocus.getClientRects().length===0&&active===root.ownerDocument.body))){
    root.querySelector<HTMLElement>('[data-wb-recovery]')?.focus();
   }
  }
@@ -40,6 +96,29 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
   if(!regions.length)return;
   const at=regions.findIndex(el=>el.contains(target)),next=at<0?(event.shiftKey?regions.length-1:0):(at+(event.shiftKey?-1:1)+regions.length)%regions.length;
   event.preventDefault();regions[next].focus();
+ };
+ private resize=(kind:'explorer'|'companion'|'dock',value:number,base=this.props.layout)=>{
+  const layout=validateWorkbenchLayout(base),round=(min:number,max:number)=>Math.round(Math.max(min,Math.min(max,value)));
+  const next=kind==='dock'?{...layout,dockHeight:round(140,360)}:kind==='explorer'?{...layout,panels:{...layout.panels,sidebarWidth:round(220,420)}}:layout.preset==='compare'?{...layout,companionPercent:round(30,70)}:{...layout,panels:{...layout.panels,detailsWidth:round(260,480)}};
+  this.props.onLayoutChange(validateWorkbenchLayout(next));
+ };
+ private resizeKey=(event:React.KeyboardEvent<HTMLElement>,kind:'explorer'|'companion'|'dock')=>{
+  const layout=validateWorkbenchLayout(this.props.layout),compare=kind==='companion'&&layout.preset==='compare',value=kind==='dock'?layout.dockHeight:kind==='explorer'?layout.panels.sidebarWidth??300:compare?layout.companionPercent:layout.panels.detailsWidth??360;
+  const min=kind==='dock'?140:kind==='explorer'?220:compare?30:260,max=kind==='dock'?360:kind==='explorer'?420:compare?70:480;
+  if(event.key==='Escape'&&this.drag){event.preventDefault();const drag=this.drag;this.drag=null;if(drag.scope===this.scope())this.props.onLayoutChange(drag.layout);return;}
+  const positive=kind==='dock'?'ArrowUp':(kind==='explorer')===(layout.panels.sidebarSide==='left')?'ArrowRight':'ArrowLeft',negative=kind==='dock'?'ArrowDown':positive==='ArrowRight'?'ArrowLeft':'ArrowRight';
+  if(![positive,negative,'Home','End'].includes(event.key))return;event.preventDefault();this.resize(kind,event.key==='Home'?min:event.key==='End'?max:value+(event.key===positive?1:-1)*(compare?1:10));
+ };
+ private beginResize=(event:React.PointerEvent<HTMLElement>,kind:'explorer'|'companion'|'dock',available:number)=>{
+  if(event.button!==0)return;event.preventDefault();event.currentTarget.focus();event.currentTarget.setPointerCapture(event.pointerId);
+  this.drag={pointerId:event.pointerId,kind,x:event.clientX,y:event.clientY,layout:validateWorkbenchLayout(this.props.layout),scope:this.scope(),available};
+ };
+ private moveResize=(event:React.PointerEvent<HTMLElement>)=>{
+  const drag=this.drag;if(!drag||drag.pointerId!==event.pointerId||drag.scope!==this.scope())return;
+  const layout=drag.layout,kind=drag.kind,compare=kind==='companion'&&layout.preset==='compare',sign=(kind==='explorer')===(layout.panels.sidebarSide==='left')?1:-1;
+  const delta=kind==='dock'?drag.y-event.clientY:(event.clientX-drag.x)*sign;
+  const value=kind==='dock'?layout.dockHeight:kind==='explorer'?layout.panels.sidebarWidth??300:compare?layout.companionPercent:layout.panels.detailsWidth??360;
+  this.resize(kind,value+(compare?delta/Math.max(1,drag.available)*100:delta),layout);
  };
  render(){
   const p=this.props;if(!/^[a-z][a-z0-9_-]{0,60}$/.test(p.id))throw Error('Invalid workbench instance ID');
@@ -53,10 +132,21 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
    else if(name==='companion')change({...layout,panels:{...layout.panels,detailsCollapsed:!layout.panels.detailsCollapsed}});
   };
   const css={'--wb-explorer':`${fit.explorer}px`,'--wb-companion':`${fit.companion}px`,'--wb-rail':fit.rail?'48px':'0px','--wb-dock':`${fit.dock}px`} as React.CSSProperties;
+  const scope=this.scope();
+  const resizeHandle=(kind:'explorer'|'companion'|'dock')=>{const compare=kind==='companion'&&layout.preset==='compare',value=kind==='dock'?layout.dockHeight:kind==='explorer'?layout.panels.sidebarWidth??300:compare?layout.companionPercent:layout.panels.detailsWidth??360;return <div key={kind} className={`wb-resize wb-resize-${kind}`} role="separator" tabIndex={0} aria-label={`Resize ${kind==='dock'?'bottom panel':kind}`} aria-orientation={kind==='dock'?'horizontal':'vertical'} aria-controls={id(kind)} aria-valuemin={kind==='dock'?140:kind==='explorer'?220:compare?30:260} aria-valuemax={kind==='dock'?360:kind==='explorer'?420:compare?70:480} aria-valuenow={value} aria-valuetext={`${value}${compare?' percent':' pixels'} requested`} onKeyDown={event=>this.resizeKey(event,kind)} onPointerDown={event=>this.beginResize(event,kind,fit.primary+fit.companion)} onPointerMove={this.moveResize} onPointerUp={()=>{this.drag=null;}} onPointerCancel={()=>{const drag=this.drag;this.drag=null;if(drag&&drag.scope===this.scope())change(drag.layout);}} onLostPointerCapture={()=>{this.drag=null;}}/>;};
+  const floatingStyle=(name:FloatingPane):React.CSSProperties|undefined=>{const rect=this.floatingRect(name);return fit.floating[name]&&rect?{left:rect.x+8,top:rect.y+this.state.area.top,width:rect.width,height:rect.height}:undefined;};
+  const floatControl=(name:FloatingPane,action:'move'|'resize')=><button type="button" className={`wb-native wb-float-${action}`} hidden={!fit.floating[name]} aria-label={`${action==='move'?'Move':'Resize'} floating ${name==='dock'?'bottom panel':name}`} aria-describedby={`${id('float-help')} ${id(name+'-placement')}`} onKeyDown={event=>this.floatKey(event,name,action)} onPointerDown={event=>this.beginFloat(event,name,action)} onPointerMove={this.moveFloat} onPointerUp={()=>{this.floatDrag=null;}} onPointerCancel={this.cancelFloat} onLostPointerCapture={()=>{this.floatDrag=null;}}>{action==='move'?'Move':'Resize ↘'}</button>;
+  const floatHeader=(name:FloatingPane,title:string)=><div className="wb-pane-heading"><h2>{title}</h2><span id={id(name+'-placement')} className="wb-sr-only" aria-live="polite">{fit.floating[name]&&(()=>{const r=this.floatingRect(name)!;return `${title}: position ${r.x}, ${r.y}; size ${r.width} by ${r.height} pixels.`;})()}</span><span className="wb-pane-tools" hidden={fit.compact||layout.preset==='present'}>{floatControl(name,'move')}<button type="button" className="wb-native" aria-label={`${fit.floating[name]?'Dock':'Float'} ${name==='dock'?'bottom panel':name}`} aria-controls={id(name)} onClick={()=>{
+   this.floatDrag=null;
+   const rect=fit.floating[name]?null:fitFloatingRect({x:name==='companion'?this.state.area.width-400:40,y:name==='companion'?16:120,width:name==='companion'?380:720,height:name==='companion'?Math.max(180,Math.min(480,this.state.area.height-fit.dock-24)):300},this.state.area.width,this.state.area.height,name);
+   if(rect&&(rect.width<120||rect.height<120))return;
+   this.setFloating(name,rect);
+  }}>{fit.floating[name]?'Dock':'Float'}</button></span></div>;
   const region=(name:WorkbenchPane)=>({id:id(name),tabIndex:-1,'data-wb-region':name,hidden:!fit.visible[name]});
   return <div ref={el=>{this.root=el;}} className="workbench-frame" data-preset={layout.preset} data-compact={String(fit.compact)} data-side={layout.panels.sidebarSide} style={css} onKeyDownCapture={this.cycle}>
+   <span id={id('float-help')} className="wb-sr-only">Drag, or use arrow keys. Shift moves one pixel. Home and End use the bounds. Escape cancels a drag. Dock returns the pane to its original position.</span>
    <header className="wb-header">
-    <div className="wb-heading"><strong>{p.title}</strong>{p.scopeCaption&&<span>{p.scopeCaption}</span>}</div>
+    <div className="wb-heading"><h1>{p.title}</h1>{p.scopeCaption&&<span>{p.scopeCaption}</span>}</div>
     <div className="wb-controls" aria-label="Workspace controls">
      <label>Workspace <select className="wb-native" data-wb-recovery aria-label="Workspace layout preset" value={layout.preset} onChange={e=>change(setWorkbenchPreset(layout,e.target.value as WorkbenchPreset))}>
       <option value="explain">Explain</option><option value="compare">Compare</option><option value="present">Present focus</option>
@@ -65,15 +155,18 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
       {slots.explorer&&<button className="wb-native" type="button" aria-controls={id('explorer')} aria-expanded={!layout.panels.sidebarCollapsed} onClick={()=>toggle('explorer')}>Explorer</button>}
       {slots.companion&&<button className="wb-native" type="button" aria-controls={id('companion')} aria-expanded={!layout.panels.detailsCollapsed} onClick={()=>toggle('companion')}>Companion</button>}
       {slots.dock&&<button className="wb-native" type="button" aria-controls={id('dock')} aria-expanded={!layout.dockCollapsed} onClick={()=>toggle('dock')}>Bottom panel</button>}
+      {present(p.rail)&&<button className="wb-native" type="button" aria-controls={id('rail')} aria-expanded={!layout.railCollapsed} onClick={()=>change({...layout,railCollapsed:!layout.railCollapsed})}>Route bar</button>}
      </span>}
-     <details className="wb-layout"><summary className="wb-native">Layout</summary><div className="wb-layout-fields">
+     <details className="wb-layout" onToggle={this.positionLayout} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();this.closeLayout(event.currentTarget);}}}><summary className="wb-native">Layout</summary><div className="wb-layout-fields">
+      <button type="button" className="wb-native wb-close-layout" onClick={event=>this.closeLayout(event.currentTarget)}>Close layout settings</button>
       <label>Explorer side <select className="wb-native" aria-label="Explorer side" value={layout.panels.sidebarSide} onChange={e=>change({...layout,panels:{...layout.panels,sidebarSide:e.target.value as 'left'|'right'}})}><option value="left">Left</option><option value="right">Right</option></select></label>
       <label>Explorer width <input className="wb-native" aria-label="Requested desktop explorer width" type="range" min={220} max={420} step={10} value={layout.panels.sidebarWidth??300} onChange={e=>change({...layout,panels:{...layout.panels,sidebarWidth:Number(e.target.value)}})}/></label>
       <label>Companion width <input className="wb-native" aria-label="Requested desktop companion width" type="range" min={260} max={480} step={10} value={layout.panels.detailsWidth??360} onChange={e=>change({...layout,panels:{...layout.panels,detailsWidth:Number(e.target.value)}})}/></label>
       <label>Compare split <input className="wb-native" aria-label="Requested desktop comparison percentage" type="range" min={30} max={70} step={5} value={layout.companionPercent} onChange={e=>change({...layout,companionPercent:Number(e.target.value)})}/></label>
       <label>Bottom height <input className="wb-native" aria-label="Requested desktop bottom height" type="range" min={140} max={360} step={10} value={layout.dockHeight} onChange={e=>change({...layout,dockHeight:Number(e.target.value)})}/></label>
-      <p>Session-only layout. Compact screens show one pane at a time. These sizes are desktop requests, not current measured dimensions.</p>
+      <p>Physical layout only; save a named arrangement to restore it later. Compact screens show one pane at a time. These sizes are desktop requests, not current measured dimensions.</p>
       <button className="wb-native" type="button" onClick={()=>change(defaultWorkbenchLayout())}>Reset session layout</button>
+      {p.arrangementScope&&<WorkspaceArrangements key={scope} scope={p.arrangementScope} layout={layout} storage={p.arrangementStorage} isCurrent={()=>this.scope()===scope} onRestore={next=>{if(this.scope()===scope)change(next);}}/>}
       {p.layoutExtras}
      </div></details>
      {p.controls}
@@ -85,15 +178,20 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
    <div className="wb-body" hidden={fit.compact&&fit.active==='dock'}>
     <aside {...region('explorer')} className="wb-explorer wb-region" aria-label="Explorer"><h2>Explorer</h2>{p.explorer}</aside>
     <section {...region('primary')} className="wb-primary wb-region" aria-label={p.primaryTitle??'Architecture view'}><h2>{p.primaryTitle??'Architecture view'}</h2>{p.orientation}{p.primary}</section>
-    <aside {...region('companion')} className="wb-companion wb-region" aria-label={p.companionTitle??'Context and explanation'}><h2>{p.companionTitle??'Context and explanation'}</h2>{p.companion}</aside>
+    <aside {...region('companion')} className="wb-companion wb-region" data-floating={String(fit.floating.companion)} style={floatingStyle('companion')} aria-label={p.companionTitle??'Context and explanation'}>{floatHeader('companion',p.companionTitle??'Context and explanation')}<div className="wb-pane-content">{p.companion}</div>{floatControl('companion','resize')}</aside>
+    {!fit.compact&&fit.visible.explorer&&resizeHandle('explorer')}
+    {!fit.compact&&fit.visible.companion&&!fit.floating.companion&&resizeHandle('companion')}
     <nav id={id('rail')} className="wb-rail wb-region" hidden={!fit.rail} aria-label="Semantic navigation" data-wb-region="rail" tabIndex={-1}>{p.rail}</nav>
    </div>
-   <section {...region('dock')} className="wb-bottom wb-region" aria-label="Navigation map and contextual activity">
-    <div className="wb-dock-content" data-map={String(present(p.navigationMap))} data-activity={String(present(p.activity))}>
-     <section className="wb-map" hidden={!present(p.navigationMap)} aria-label="Navigation map"><h2>Navigation map</h2>{p.navigationMap}</section>
+   <section {...region('dock')} className="wb-bottom wb-region" data-floating={String(fit.floating.dock)} style={floatingStyle('dock')} aria-label="Navigation map and contextual activity">
+    {floatHeader('dock','Bottom panel')}
+    <div className="wb-dock-content" data-map={String(present(p.navigationMap))} data-map-collapsed={String(layout.mapCollapsed)} data-activity={String(present(p.activity))}>
+     <section className="wb-map" hidden={!present(p.navigationMap)} aria-label="Navigation map"><button type="button" className="wb-native wb-map-toggle" aria-expanded={!layout.mapCollapsed} aria-controls={id('route-map')} onClick={()=>change({...layout,mapCollapsed:!layout.mapCollapsed})}>{layout.mapCollapsed?'Route ▸':'Route ▾'}</button><div id={id('route-map')} hidden={layout.mapCollapsed}>{p.navigationMap}</div></section>
      <section className="wb-activity" hidden={!present(p.activity)} aria-label={p.activityTitle??'Contextual activity'}><h2>{p.activityTitle??'Contextual activity'}</h2>{p.activity}</section>
     </div>
+    {floatControl('dock','resize')}
    </section>
+   {!fit.compact&&fit.visible.dock&&!fit.floating.dock&&resizeHandle('dock')}
    <footer className="wb-status">{p.status??'Layout only. Source, evidence and permissions remain owned by the host.'}</footer>
   </div>;
  }

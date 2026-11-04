@@ -11,6 +11,7 @@
     "check": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "test:e2e": "playwright test",
+    "test:browser": "node --test tests/question-answers.browser.mjs tests/project-dock.browser.test.mjs tests/workspace-preview.browser.mjs tests/navigator-selection.browser.mjs",
     "generate": "tsx scripts/generate.ts",
     "qualify": "tsx scripts/qualify.ts run",
     "scan": "tsx scripts/scan-repo.ts",

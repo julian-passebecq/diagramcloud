@@ -17,3 +17,8 @@ for(const a of [{resourceId:'',startSeconds:0,endSeconds:1},{resourceId:'a',star
 test('unknown scenarios are not a zero result',()=>assert.throws(()=>onlineIntervals(null as any,0,{startSeconds:0,endSeconds:10})));
 test('missing floor basis refuses',()=>assert.throws(()=>floorScenario([],{tailSeconds:900,floorCu:1.74,capacityCu:2,startSeconds:0,endSeconds:3600,basis:''})));
 test('interval input is unchanged and order-independent',()=>{const rows=[{resourceId:'a',startSeconds:20,endSeconds:30},{resourceId:'a',startSeconds:0,endSeconds:10}];const before=JSON.stringify(rows);const a=onlineIntervals(rows,10,{startSeconds:0,endSeconds:100});assert.deepEqual(a,onlineIntervals([...rows].reverse(),10,{startSeconds:0,endSeconds:100}));assert.equal(JSON.stringify(rows),before)});
+
+test('duration totals do not mix accumulated seconds with large absolute offsets',()=>{
+ const result=floorScenario([{resourceId:'a',startSeconds:0,endSeconds:1},{resourceId:'b',startSeconds:1e16,endSeconds:1e16+2}],{tailSeconds:0,floorCu:1,capacityCu:1,startSeconds:0,endSeconds:1e16+4,basis:'Synthetic numeric-offset regression'});
+ assert.equal(result.onlineResourceSeconds,3);assert.equal(result.floorCuSeconds,3);
+});

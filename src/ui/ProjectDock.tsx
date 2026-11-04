@@ -1,0 +1,66 @@
+import {useId,useMemo,useRef,useState,type KeyboardEvent} from 'react';
+import type {Project} from '../core/model';
+import {UsageEconomicsPanel} from './UsageEconomicsPanel';
+import {CapacityScenarioPanel} from './CapacityScenarioPanel';
+import {LiveCheckout} from './LiveCheckout';
+import {projectDockModel,type DockAudience,type DockTarget,type ProjectDockTool} from './projectDockModel';
+// CSS is loaded once by the host's src/main.tsx, keeping this component renderable in source tests.
+export type ProjectDockProps={
+ project:Project;audience:DockAudience;activeViewId:string;selectedNodeId?:string|null;storyIndex?:number;
+ onNavigate:(viewId:string,nodeId?:string)=>void;onStory:(index:number)=>void;
+ /** Optional host-only physical reveal; called by an explicit workflow-open action, never selection changes. */
+ onRevealWorkflow?:()=>void;
+ onRepository?:(repositoryId:string)=>void;onOpenTool?:(tool:ProjectDockTool)=>void;tools?:readonly ProjectDockTool[];localCheckoutHost?:boolean;
+};
+const PANELS=[['project','Project'],['workflow','Workflow'],['sources','Sources & Git'],['reviews','Reviews']] as const;
+type Panel=typeof PANELS[number][0];
+const TOOL_LABEL:Record<ProjectDockTool,string>={variants:'Open variants',comparison:'Compare this project',history:'Open supplied history',git:'Inspect Git history records',work:'Open plan and owner records'};
+/** Bottom navigation over the real Project. Selection navigates; it never executes or accepts authored work. */
+export function ProjectDock(p:ProjectDockProps){
+ const model=useMemo(()=>projectDockModel(p.project,p.audience,p.activeViewId,p.selectedNodeId),[p.project,p.audience,p.activeViewId,p.selectedNodeId]);
+ const [panel,setPanel]=useState<Panel>('project'),id=useId(),tabs=useRef<(HTMLButtonElement|null)[]>([]);
+ const activeStep=Number.isSafeInteger(p.storyIndex)?model.story.find(s=>s.index===p.storyIndex):undefined;
+ const revealWorkflow=()=>{setPanel('workflow');p.onRevealWorkflow?.();tabs.current[1]?.focus();};
+ const openStory=(index:number)=>{if(model.story.some(s=>s.index===index))p.onStory(index);};
+ const tools=(p.tools??[]).filter(tool=>p.audience==='author'||tool!=='variants');
+ const navigate=(target:DockTarget|undefined)=>{if(target)p.onNavigate(target.viewId,target.nodeId);};
+ const switchTab=(event:KeyboardEvent<HTMLButtonElement>,index:number)=>{let next:number|undefined;if(event.key==='ArrowRight')next=(index+1)%PANELS.length;else if(event.key==='ArrowLeft')next=(index+PANELS.length-1)%PANELS.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=PANELS.length-1;if(next!==undefined){event.preventDefault();setPanel(PANELS[next][0]);tabs.current[next]?.focus();}};
+ const toolButton=(tool:ProjectDockTool)=>p.onOpenTool&&tools.includes(tool)?<button type="button" onClick={()=>p.onOpenTool?.(tool)}>{TOOL_LABEL[tool]}</button>:null;
+ return <section className="project-dock" aria-label="Project workflow and source dock">
+  <div className="project-dock-tabs" role="tablist" aria-label="Project dock panels">{PANELS.map(([key,label],index)=><button type="button" key={key} id={`${id}-${key}-tab`} role="tab" aria-selected={panel===key} aria-controls={`${id}-${key}`} tabIndex={panel===key?0:-1} ref={el=>{tabs.current[index]=el;}} onKeyDown={e=>switchTab(e,index)} onClick={()=>setPanel(key)}>{label}</button>)}</div>
+  <div className="project-dock-context"><strong>{model.title}</strong><span>{model.activeView?.title??'View unavailable'}{model.selected?' · '+model.selected.label:''}</span>{model.story.length>0&&<button type="button" className="project-dock-show-workflow" aria-controls={`${id}-workflow`} onClick={revealWorkflow}>Show workflow steps</button>}</div>
+  <section role="tabpanel" id={`${id}-project`} aria-labelledby={`${id}-project-tab`} hidden={panel!=='project'} tabIndex={0}>
+   <div className="project-dock-grid"><div><h3>Project context</h3><p>{model.summary||'No project summary supplied.'}</p><p className="project-dock-caption">{model.revision===null?'Permitted public project':`Author document revision ${model.revision}`} · {model.views.length} available views</p>{model.provenance&&<details><summary>Source and authorship</summary><p>{model.provenance}</p></details>}<div className="project-dock-actions">{toolButton('comparison')}{toolButton('work')}</div></div><div><h3>Navigate views</h3><ul className="project-dock-list">{model.views.map(v=><li key={v.id}><button type="button" aria-current={v.id===model.activeView?.id?'location':undefined} onClick={()=>p.onNavigate(v.id)}>{v.title}</button><small>{v.perspective}</small></li>)}</ul></div></div>
+  </section>
+  <section role="tabpanel" id={`${id}-workflow`} aria-labelledby={`${id}-workflow-tab`} hidden={panel!=='workflow'} tabIndex={0}>
+   <div className="project-dock-reading">
+    <section className="project-dock-current" aria-label="Active story step">
+     <h3>Active story step</h3>
+     {activeStep?<><strong>{activeStep.index+1}. {activeStep.title}</strong><p>{activeStep.narration||'No narration supplied for this step.'}</p></>:<p>No story step is active. Choose a declared step to read its narration.</p>}
+     <p className="project-dock-caption">Presented sequence, not execution order or elapsed time. Selecting a component does not choose a story step.</p>
+     {model.story.length>0&&<div className="project-dock-actions">
+      <button type="button" onClick={()=>openStory(0)}>Open first story step</button>
+      <button type="button" aria-disabled={!activeStep||activeStep.index===0} onClick={()=>{if(activeStep&&activeStep.index>0)openStory(activeStep.index-1);}}>Previous story step</button>
+      <button type="button" aria-disabled={!activeStep||activeStep.index===model.story.length-1} onClick={()=>{if(activeStep&&activeStep.index<model.story.length-1)openStory(activeStep.index+1);}}>Next story step</button>
+     </div>}
+    </section>
+    <section className="project-dock-participation" aria-label="Selected component in authored steps">
+     <h3>Selected component in authored steps</h3>
+     {!model.selected?<p>Select a component to find its explicit story references.</p>:<><p><strong>{model.selected.label}</strong> · exact component identity</p>{model.selectedSteps.length?<ul className="project-dock-list">{model.selectedSteps.map(s=><li key={s.index}><button type="button" onClick={()=>openStory(s.index)}>Read step {s.index+1}: {s.title}</button>{s.selectedSubject&&<small>Named component in this step.</small>}</li>)}</ul>:<p>No authored step explicitly names this component. View membership, highlighted connection endpoints and similar labels are not matches.</p>}</>}
+    </section>
+   </div>
+   <div className="project-dock-grid"><div><h3>Story and explanation steps</h3>{model.story.length?<ol className="project-dock-list">{model.story.map(s=><li key={s.index}><button type="button" aria-current={activeStep?.index===s.index?'step':undefined} onClick={()=>openStory(s.index)}>{s.index+1}. {s.title}</button>{s.narration&&<p>{s.narration}</p>}</li>)}</ol>:<p>No story steps authored. Use the workflow components or project views.</p>}</div><div><h3>Workflow components</h3>{model.workflow.length?<ul className="project-dock-list">{model.workflow.map(n=><li key={n.id}><button type="button" aria-disabled={!n.target} onClick={()=>navigate(n.target)}>{n.label}</button><small>{n.kind} · designed status: {n.designedStatus} · basis: {n.basis}</small>{n.summary&&<p>{n.summary}</p>}</li>)}</ul>:<p>No process, control or function components in this permitted project.</p>}<div className="project-dock-actions">{toolButton('work')}</div></div></div>
+   {p.audience==='author'&&<section className="project-dock-calculations" aria-label="Supplied calculations"><h3>Supplied calculations</h3><p className="project-dock-caption">Optional capacity and usage arithmetic; separate from the authored story.</p><CapacityScenarioPanel key={'capacity'+JSON.stringify([p.project.id,p.project.revision])}/><UsageEconomicsPanel key={'usage'+JSON.stringify([p.project.id,p.project.revision])}/></section>}
+  </section>
+  <section role="tabpanel" id={`${id}-sources`} aria-labelledby={`${id}-sources-tab`} hidden={panel!=='sources'} tabIndex={0}>
+   {p.audience==='author'&&(p.localCheckoutHost??import.meta.env?.VITE_DATAPASS_COMPARISON==='1')&&<LiveCheckout key={JSON.stringify([p.project.id,p.project.revision,p.project.atlas?.activeSnapshotId,model.repositories.map(r=>[r.id,r.host,r.locator])])} projectId={p.project.id} repositories={model.repositories.map(r=>({repositoryId:r.id,host:r.host,locator:r.locator}))}/>}
+
+   <p className="project-dock-caption">Repository revisions and evidence below are supplied records. They do not establish current checkout status; an explicitly captured checkout inspection is shown separately when available.</p>
+   <div className="project-dock-grid"><div><h3>Repository revision vector</h3>{model.snapshot&&<p>Snapshot {model.snapshot.label??model.snapshot.id} · captured {model.snapshot.capturedAt}</p>}{model.repositories.length?<ul className="project-dock-list">{model.repositories.map(r=><li key={r.id}><strong>{r.title}</strong><small>{r.host} · supplied by {r.authority} · {r.scanStatus}</small><p>Revision: <code>{r.revision??'Unknown'}</code>{r.ref&&<> · Ref: <code>{r.ref}</code></>}</p><details><summary>Supplied locator and context</summary><p>{r.locator}</p>{r.scannedAt&&<p>Recorded scan time: {r.scannedAt}</p>}{r.note&&<p>{r.note}</p>}</details>{r.target?<button type="button" onClick={()=>navigate(r.target)}>Locate {r.title} in project</button>:p.onRepository?<button type="button" onClick={()=>p.onRepository?.(r.id)}>Inspect {r.title} record</button>:null}</li>)}</ul>:<p>No repository snapshot supplied. A document revision is not a Git commit.</p>}<div className="project-dock-actions">{toolButton('git')}{toolButton('history')}</div></div><div><h3>Evidence sources</h3>{model.sources.length?<ul className="project-dock-list">{model.sources.map(s=><li key={s.id}><strong>{s.title}</strong><p>{s.location||'Location not supplied.'}</p>{s.url&&<a href={s.url} target="_blank" rel="noreferrer noopener">Open supplied reference</a>}<div className="project-dock-actions">{s.components.map(n=><button type="button" key={n.id} aria-disabled={!n.target} onClick={()=>navigate(n.target)}>Locate {n.label}</button>)}</div></li>)}</ul>:<p>No evidence sources supplied.</p>}</div></div>
+  </section>
+  <section role="tabpanel" id={`${id}-reviews`} aria-labelledby={`${id}-reviews-tab`} hidden={panel!=='reviews'} tabIndex={0}>
+   <div className="project-dock-actions">{toolButton('comparison')}{toolButton('variants')}{toolButton('history')}</div>
+   {p.audience==='public'?<p>Author variants and retained review inputs are private. Public comparison uses only permitted materialization.</p>:<div className="project-dock-grid"><div><h3>Authored alternatives</h3>{model.variants.length?<ul className="project-dock-list">{model.variants.map(v=><li key={v.id}><strong>{v.title}</strong><small>{v.state} · selecting does not apply</small>{v.summary&&<p>{v.summary}</p>}<p>{v.message}</p><button type="button" onClick={()=>p.onNavigate(v.viewId)}>Open variant baseline view</button></li>)}</ul>:<p>No variants authored. Create alternatives through the existing variant editor.</p>}</div><div><h3>Retained evolution inputs</h3>{model.historyState==='invalid'?<p role="alert">Retained review records are invalid. Preserve an author backup before repair.</p>:model.snapshots.length?<ul className="project-dock-list">{model.snapshots.map(s=><li key={s.id}><strong>{s.label}</strong><small>Frozen revision {s.documentRevision} · captured {s.capturedAt}</small>{s.revisionVector.length?<details><summary>Recorded source revisions</summary><ul>{s.revisionVector.map(r=><li key={r.id}>{r.id}: <code>{r.revision}</code> · {r.authority}</li>)}</ul></details>:<p>No repository revisions retained.</p>}</li>)}</ul>:<p>No evolution inputs retained. Use comparison to retain a before snapshot; it follows the existing project save and Undo history.</p>}</div></div>}
+  </section>
+ </section>;
+}

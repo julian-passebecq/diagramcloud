@@ -37,7 +37,7 @@ export function onlineIntervals(activities:readonly Activity[],tailSeconds:numbe
 export function floorScenario(activities:readonly Activity[],options:{tailSeconds:number;floorCu:number;capacityCu:number;startSeconds:number;endSeconds:number;basis:string}):{onlineResourceSeconds:number;floorCuSeconds:number;sharePercent:number;basis:string;excludes:string[]}{
  number(options.floorCu);if(typeof options.basis!=='string'||!options.basis.trim())throw new Error('An explicit scenario basis is required.');
  const rows=onlineIntervals(activities,options.tailSeconds,options);
- const onlineResourceSeconds=rows.reduce((sum,r)=>sum+r.endSeconds-r.startSeconds,0),floorCuSeconds=onlineResourceSeconds*options.floorCu;
+ const onlineResourceSeconds=rows.reduce((sum,r)=>sum+(r.endSeconds-r.startSeconds),0),floorCuSeconds=onlineResourceSeconds*options.floorCu;
  const share=capacityShare(floorCuSeconds,{capacityCu:options.capacityCu,seconds:options.endSeconds-options.startSeconds});
  return {onlineResourceSeconds,floorCuSeconds,sharePercent:share.percent,basis:options.basis,excludes:['Autoscaling above the supplied floor','Storage','GraphQL and function operations','Semantic-model queries','Smoothing, throttling and billing-price conversion']};
 }

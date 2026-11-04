@@ -124,7 +124,7 @@ export function DeliveryEvidencePanel(p: DeliveryEvidencePanelProps) {
       <tbody>{e.intervals.map(({blockId, interval: x}) => <tr key={blockId}><td>{blockButton({id: blockId})}</td><td>{x.start}</td><td>{x.end}</td><td>{x.timezone ?? 'Not supplied'}</td><td>{x.basis}</td><td>{x.sourceIds.join(', ') || 'None'}</td></tr>)}</tbody></table>
       : <p>No dated interval supplied. When the work happened is unknown.</p>)}
     {section('Result and artifact references', e.results.length ? <table><thead><tr><th>Block</th><th>Kind</th><th>Reference</th><th>Link</th><th>Basis</th><th>Sources</th></tr></thead>
-      <tbody>{e.results.map(({blockId, ref}, i) => <tr key={i}><td>{blockButton({id: blockId})}</td><td>{ref.kind}</td><td>{ref.ref}</td><td>{ref.url ?? ''}</td><td>{ref.basis}</td><td>{ref.sourceIds.join(', ') || 'None'}</td></tr>)}</tbody></table>
+      <tbody>{e.results.map(({blockId, ref}, i) => <tr key={i}><td>{blockButton({id: blockId})}</td><td>{ref.kind}</td><td>{ref.ref}</td><td>{safeSourceUrl(ref.url) ? <a href={safeSourceUrl(ref.url)!} target="_blank" rel="noopener noreferrer">Open supplied reference</a> : ref.url ?? ''}</td><td>{ref.basis}</td><td>{ref.sourceIds.join(', ') || 'None'}</td></tr>)}</tbody></table>
       : <p>No result or artifact reference supplied.</p>)}
   </section>;
 }

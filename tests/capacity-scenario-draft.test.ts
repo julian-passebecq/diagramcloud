@@ -1,0 +1,31 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import React from 'react';import {renderToStaticMarkup} from 'react-dom/server';
+import {blankCapacityDraft,calculateCapacityDraft,blankActivity,CAPACITY_ACTIVITY_LIMIT,type CapacityDraft} from '../src/ui/capacityScenarioDraft';
+import {ProjectDock} from '../src/ui/ProjectDock';import {documentSchema} from '../src/core/model';
+const usage=():CapacityDraft=>({...blankCapacityDraft(),basis:'Illustrative supplied usage; no metering',capacityCu:'2',usageCuSeconds:'3',windowSeconds:'30'});
+const floor=():CapacityDraft=>({...usage(),mode:'floor',startSeconds:'0',endSeconds:'3600',tailSeconds:'900',floorCu:'1.74',activities:[{key:0,resourceId:'database-a',startSeconds:'0',endSeconds:'600'},{key:1,resourceId:'database-a',startSeconds:'900',endSeconds:'1200'}]});
+test('blank draft never supplies example values or converts unknown fields into zero',()=>{const d=blankCapacityDraft();assert.equal(d.capacityCu,'');assert.equal(d.usageCuSeconds,'');assert.equal(d.noActivity,false);assert.deepEqual(d.activities,[blankActivity(0)]);assert.throws(()=>calculateCapacityDraft(d),/basis/);});
+test('usage mode reuses both explicit denominators and retains supplied basis',()=>{const a=calculateCapacityDraft(usage()),b=calculateCapacityDraft({...usage(),windowSeconds:'300'});assert.equal(a.mode,'share');assert.equal(b.mode,'share');if(a.mode==='share'&&b.mode==='share'){assert.equal(a.percent,5);assert.equal(b.percent,.5);assert.equal(a.budgetCuSeconds,60);assert.equal(b.budgetCuSeconds,600);assert.equal(a.basis,usage().basis);}});
+for(const field of ['capacityCu','usageCuSeconds','windowSeconds'] as const)test(`missing ${field} is unknown`,()=>{assert.throws(()=>calculateCapacityDraft({...usage(),[field]:''}),/unknown/);assert.throws(()=>calculateCapacityDraft({...usage(),[field]:'  '}),/unknown/);});
+for(const invalid of ['-1','NaN','Infinity','1e309','0x10','3 seconds','1e-999'])test(`invalid supplied usage ${invalid} refuses`,()=>assert.throws(()=>calculateCapacityDraft({...usage(),usageCuSeconds:invalid})));
+test('explicit zero usage and floor remain zero while zero denominator refuses',()=>{const r=calculateCapacityDraft({...usage(),usageCuSeconds:'0'});assert.equal(r.mode==='share'&&r.percent,0);const f=calculateCapacityDraft({...floor(),floorCu:'0'});assert.equal(f.mode==='floor'&&f.floorCuSeconds,0);for(const field of ['capacityCu','windowSeconds'])assert.throws(()=>calculateCapacityDraft({...usage(),[field]:'0'}));});
+test('floor result delegates interval merge, clipping and total to existing engine without mutation',()=>{const d=floor(),before=JSON.stringify(d),r=calculateCapacityDraft(d);assert.equal(r.mode,'floor');if(r.mode==='floor'){assert.equal(r.onlineResourceSeconds,2100);assert.equal(r.floorCuSeconds,3654);assert.equal(r.sharePercent,50.75);assert.deepEqual(r.intervals,[{resourceId:'database-a',startSeconds:0,endSeconds:2100}]);assert(r.excludes.includes('Storage'));}assert.equal(JSON.stringify(d),before);});
+test('different resource IDs remain distinct and pre-window tail clips',()=>{const d=floor();d.activities[1].resourceId='database-b';const r=calculateCapacityDraft(d);assert.equal(r.mode==='floor'&&r.intervals.length,2);const clipped=calculateCapacityDraft({...floor(),startSeconds:'1500',endSeconds:'1800'});assert.equal(clipped.mode==='floor'&&clipped.onlineResourceSeconds,300);});
+test('empty activity is unknown until explicitly declared absent',()=>{assert.throws(()=>calculateCapacityDraft({...floor(),activities:[]}),/unknown/);const r=calculateCapacityDraft({...floor(),activities:[],noActivity:true});assert.equal(r.mode==='floor'&&r.onlineResourceSeconds,0);assert.equal(r.mode==='floor'&&r.explicitNoActivity,true);});
+for(const field of ['startSeconds','endSeconds','tailSeconds','floorCu'] as const)test(`missing floor ${field} refuses`,()=>assert.throws(()=>calculateCapacityDraft({...floor(),[field]:''}),/unknown/));
+test('invalid basis, reversed intervals, incomplete rows, ambiguous identity and bounds refuse',()=>{
+ for(const basis of ['', ' ', 'x'.repeat(2001)])assert.throws(()=>calculateCapacityDraft({...usage(),basis}));
+ assert.throws(()=>calculateCapacityDraft({...floor(),startSeconds:'3600',endSeconds:'3600'}));
+ assert.throws(()=>calculateCapacityDraft({...floor(),activities:[blankActivity(0)]}));
+ assert.throws(()=>calculateCapacityDraft({...floor(),activities:[{...floor().activities[0],resourceId:' database-a'}]}));
+ assert.throws(()=>calculateCapacityDraft({...floor(),activities:Array.from({length:CAPACITY_ACTIVITY_LIMIT+1},(_,key)=>({...floor().activities[0],key}))}));
+});
+test('public dock omits private capacity surface and mounting author never calculates',()=>{const project=documentSchema.parse({schemaVersion:1,id:'capacity',title:'Capacity',rootViewId:'root',nodes:[],edges:[],views:[{id:'root',title:'Root'}]});const render=(audience:'author'|'public')=>renderToStaticMarkup(React.createElement(ProjectDock,{project,audience,activeViewId:'root',onNavigate(){},onStory(){},localCheckoutHost:false}));assert(!render('public').includes('Capacity assumption basis'));const html=render('author');assert(html.includes('Compute capacity scenario'));assert(!html.includes('Capacity assumption basis'));assert(!html.includes('aria-label="Computed capacity result"'));assert.equal(project.revision,0);});
+
+test('derived underflow never presents positive usage or floor as zero',()=>{
+ assert.throws(()=>calculateCapacityDraft({...usage(),usageCuSeconds:'5e-324',capacityCu:'1e308',windowSeconds:'1'}),/rounding to zero/);
+ assert.throws(()=>calculateCapacityDraft({...floor(),capacityCu:'1',floorCu:'5e-324',tailSeconds:'0',startSeconds:'0',endSeconds:'1',activities:[{key:0,resourceId:'a',startSeconds:'0',endSeconds:'.5'}]}),/rounding to zero/);
+ assert.throws(()=>calculateCapacityDraft({...floor(),capacityCu:'1e308',floorCu:'5e-324',tailSeconds:'0',startSeconds:'0',endSeconds:'1',activities:[{key:0,resourceId:'a',startSeconds:'0',endSeconds:'1'}]}),/rounding to zero/);
+});
+
+test('a positive idle tail that disappears at extreme numeric offsets is refused',()=>assert.throws(()=>calculateCapacityDraft({...floor(),tailSeconds:'1',endSeconds:'1e21',activities:[{key:0,resourceId:'a',startSeconds:'0',endSeconds:'1e20'}]}),/idle tail is too small/));

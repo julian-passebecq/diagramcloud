@@ -130,6 +130,7 @@
       "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.context.contract",
         "walk-lesson.context.text"
       ],
       "sourceIds": [],
@@ -167,6 +168,7 @@
       "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.tool.contract",
         "walk-lesson.tool.text"
       ],
       "sourceIds": [],
@@ -204,6 +206,7 @@
       "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.human.contract",
         "walk-lesson.human.text"
       ],
       "sourceIds": [],
@@ -241,6 +244,7 @@
       "role": "agent-context@revision 1; source fingerprint 55d8d5e78faae67d. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.contributors.contract",
         "walk-lesson.contributors.text"
       ],
       "sourceIds": [],
@@ -589,6 +593,32 @@
       "text": "Question: What is instruction, what is capability, and who actually authorizes an action?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: agent-context revision 1; fingerprint 55d8d5e78faae67d.\n\nThis private addition changes no existing feature, deployment, approval or observation."
     },
     {
+      "id": "walk-lesson.context.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "What is instruction, what is capability, and who actually authorizes an action?"
+        ],
+        [
+          "source-cut",
+          "agent-context revision 1"
+        ]
+      ]
+    },
+    {
       "id": "walk-lesson.context.text",
       "title": "Loading a skill is not a permission grant",
       "visibility": "public",
@@ -596,6 +626,32 @@
       "provenance": "synthetic",
       "type": "text",
       "text": "Instructions, model configuration and execution capability are distinct. This conceptual fixture does not describe any currently running ChatGPT or Claude session.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of agent-context revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.tool.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "What is instruction, what is capability, and who actually authorizes an action?"
+        ],
+        [
+          "source-cut",
+          "agent-context revision 1"
+        ]
+      ]
     },
     {
       "id": "walk-lesson.tool.text",
@@ -607,6 +663,32 @@
       "text": "A model can propose a tool call; the host validates available operations and scope. Displaying an MCP connection does not enable access or prove an installed integration.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of agent-context revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
     },
     {
+      "id": "walk-lesson.human.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "What is instruction, what is capability, and who actually authorizes an action?"
+        ],
+        [
+          "source-cut",
+          "agent-context revision 1"
+        ]
+      ]
+    },
+    {
       "id": "walk-lesson.human.text",
       "title": "Approvals stay with their real owner",
       "visibility": "public",
@@ -614,6 +696,40 @@
       "provenance": "synthetic",
       "type": "text",
       "text": "A task card can explain what is waiting. A visualization must not answer MFA, permissions or publication decisions on the owner's behalf.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of agent-context revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.contributors.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "What is instruction, what is capability, and who actually authorizes an action?"
+        ],
+        [
+          "source-cut",
+          "agent-context revision 1"
+        ],
+        [
+          "question",
+          "Which model was requested and which was observed?"
+        ],
+        [
+          "question",
+          "Is this a proposed workflow, a recorded run, or an illustrative explanation?"
+        ]
+      ]
     },
     {
       "id": "walk-lesson.contributors.text",
@@ -674,7 +790,7 @@
       "sourceRevision": 1,
       "stops": [
         {
-          "id": "stop-a12f132c9d",
+          "id": "stop-e06c27b34f",
           "viewId": "walk-lesson.context.view",
           "subjects": [
             {
@@ -702,12 +818,12 @@
               "id": "instructions"
             }
           ],
-          "fingerprint": "5fd62e71e3dd458c",
-          "referencedFingerprint": "8d1ce1a853a22a6e",
+          "fingerprint": "4b53c6760bf6a5e8",
+          "referencedFingerprint": "ea5862eb7646cf61",
           "narration": "Instructions, model configuration and execution capability are distinct. This conceptual fixture does not describe any currently running ChatGPT or Claude session."
         },
         {
-          "id": "stop-67cf131f22",
+          "id": "stop-0d2b35ce2e",
           "viewId": "walk-lesson.tool.view",
           "subjects": [
             {
@@ -735,12 +851,12 @@
               "id": "operation"
             }
           ],
-          "fingerprint": "786f8a302891d9dd",
-          "referencedFingerprint": "a6211db0a755966a",
+          "fingerprint": "9480ce58d42466e1",
+          "referencedFingerprint": "14d3d9337bb12cba",
           "narration": "A model can propose a tool call; the host validates available operations and scope. Displaying an MCP connection does not enable access or prove an installed integration."
         },
         {
-          "id": "stop-1d54885310",
+          "id": "stop-b7ff90901d",
           "viewId": "walk-lesson.human.view",
           "subjects": [
             {
@@ -764,12 +880,12 @@
               "id": "approval"
             }
           ],
-          "fingerprint": "6abb97946c759b92",
-          "referencedFingerprint": "9acc7e1b731fb5aa",
+          "fingerprint": "2c967f0d50d977b4",
+          "referencedFingerprint": "c095f70a8f68da7f",
           "narration": "A task card can explain what is waiting. A visualization must not answer MFA, permissions or publication decisions on the owner's behalf."
         },
         {
-          "id": "stop-92d40f9d3e",
+          "id": "stop-8b65f83b44",
           "viewId": "walk-lesson.contributors.view",
           "subjects": [
             {
@@ -789,8 +905,8 @@
               "id": "walk-lesson.contributors.note"
             }
           ],
-          "fingerprint": "ce084a49fea53c23",
-          "referencedFingerprint": "963044590def3e30",
+          "fingerprint": "efb7282567097f1b",
+          "referencedFingerprint": "c2e63a3141211870",
           "narration": "The team or agents that built this system belong to a separate contributor lens. Hiding that lens must not remove the deployed product agent, its tools or trust boundaries."
         }
       ],

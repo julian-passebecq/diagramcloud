@@ -181,3 +181,20 @@ Public recovery notices expose no private draft identity or authoring backup con
 `learning-release-recovery.spec.ts` cases remain required. These were NOT_RUN in the Pro environment, whose
 actual App navigation was refused; they run in the native 1.33.0 gates. The controlled IndexedDB-protocol double is not browser-persistence
 qualification. UX45 and UX46 are implemented; the private 1.33.0 candidate is recorded in `outcome.json` `privatePackages`.
+
+## Named physical workspace arrangements — 4 November 2026
+
+The [workspace arrangement slice](WORKSPACE_ARRANGEMENTS.md) adds explicit named Save/Restore/Delete for the complete physical WorkbenchLayout, isolated by exact project, audience and browser host. Route and route-map collapse now use that same controlled layout authority. Direct separator resizing and keyboard/range controls preserve compact pane/F6 navigation. No Project revision, Undo, route, camera, source or permissions change. Earlier “saved workspace layouts not built” statements above describe their dated cuts; arbitrary floating/free drag docking remains unimplemented. Source and browser tests are named in the slice document; this is not a release receipt.
+
+## Authored contract and questions — 4 November 2026
+
+The source continuation exposes selected case, explicit prerequisite steps and follow-up questions in the existing explanation request form. The companion adds Contract and Questions tabs over private structured table evidence emitted by the same compiler. Ordinary review/Apply, original source binding and one-revision Undo remain authoritative; no execution or answer inference is introduced. Existing prose-only walkthroughs remain readable without guessed metadata. See [the evidence convention and qualification](../contracts/explanation-details.md). Request autosave, structured answers and AI execution remain unfinished; this does not close the full UX31 journey.
+
+
+## Explicit request files and compute scenarios — 4 November 2026
+
+The [request-file slice](../contracts/explanation-request-files.md) loads complete version 1 requests into the existing private form, preserves the exact original source cut and exposes per-step citations. Loading does not apply a patch. Stale source bindings cannot review or apply against a different current source. Validated request export supports roundtrips; incomplete draft backup remains available separately. The [compute capacity slice](COMPUTE_CAPACITY.md) exposes existing usage-share and merged activity/floor arithmetic in the Workflow dock. Missing input is not zero; assumptions, denominator and exclusions remain visible. This is not a delivery schedule, provider bill or agent dispatch. Earlier no-App-surface paragraphs describe their dated cuts; capacity forecasting and wider UX31 acceptance remain open. Exact-source qualification is separate.
+
+## Bounded in-window floating placements
+
+The [workspace arrangement slice](WORKSPACE_ARRANGEMENTS.md) now includes explicit Float/Dock for the companion and bottom panel, with pointer and keyboard move/resize, measured frame bounds and named persistence through the existing layout authority. Their content stays mounted. Compact and Present layouts suspend these placements without destroying them. Earlier no-floating statements describe dated cuts; arbitrary drag-docking trees, nested placement and separate windows remain outside this slice. Exact-source integration qualification is separate.

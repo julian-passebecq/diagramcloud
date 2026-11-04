@@ -101,7 +101,7 @@ test.describe('1440px linked views',()=>{
   await page.goBack();await expect(toolbar(page).getByLabel('Right view',{exact:true})).toHaveValue('data');
   await page.goForward();await expect(toolbar(page).getByLabel('Right view',{exact:true})).toHaveValue('etl');
   // The dock's labelled route controls: unavailable ones stay focusable with aria-disabled.
-  await workspace(page).getByRole('button',{name:'Bottom panel',exact:true}).click();
+  if(await workspace(page).getByRole('button',{name:'Bottom panel',exact:true}).getAttribute('aria-expanded')!=='true')await workspace(page).getByRole('button',{name:'Bottom panel',exact:true}).click();
   const route=page.getByTestId('linked-route');await expect(route).toBeVisible();
   for(const name of ['Back','Forward','Up to parent view','Down to child view','Swap sides','Back to business question'])await expect(route.getByRole('button',{name,exact:true})).toBeVisible();
   await expect(route.getByRole('button',{name:'Forward',exact:true})).toHaveAttribute('aria-disabled','true');
@@ -148,7 +148,7 @@ test.describe('1440px linked views',()=>{
   expect(new URL(page.url()).searchParams.get('linked')).toBe('physical~data');expect(new URL(page.url()).searchParams.get('anchor')).toBe('wind.goal');
   // The restored anchor works: Back to business question returns to the anchor component by its stable ID.
   await paneCard(page,'left','Wind sensor channel').click();
-  await workspace(page).getByRole('button',{name:'Bottom panel',exact:true}).click();
+  if(await workspace(page).getByRole('button',{name:'Bottom panel',exact:true}).getAttribute('aria-expanded')!=='true')await workspace(page).getByRole('button',{name:'Bottom panel',exact:true}).click();
   const back=page.getByTestId('linked-route').getByRole('button',{name:'Back to business question',exact:true});
   await expect(back).not.toHaveAttribute('aria-disabled','true');await back.click();
   await expect.poll(()=>new URL(page.url()).searchParams.get('node')).toBe('wind.goal');

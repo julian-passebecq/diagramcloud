@@ -3,34 +3,38 @@ import type {Project} from '../core/model';
 import {buildScene} from '../export/scene';
 import {COMPANION_TAB_LABEL,DEFAULT_FILTERS,DISPLAY_LIMITS,RELATION_KINDS,companionContent,companionRelated,companionTabs,coverageText,detourTarget,permittedDocument,relatedSceneView,startDetour,
  type CompanionAnchor,type CompanionDetour,type CompanionFilters,type CompanionTab} from '../core/companionPane';
+import {isAnswerBlock} from '../core/questionAnswers';
+import {QuestionAnswersPanel} from './QuestionAnswersPanel';
+import type {Patch} from '../core/patch';
 import {Evidence} from './Evidence';
 
-type Props={project:Project;publicMode:boolean;
+type Props={project:Project;publicMode:boolean;editMode?:boolean;onPropose?:(patch:Patch)=>void;
  /** The ProjectContext selection: the pinned one when pinned, otherwise the followed selection. */
  anchor:{viewId?:string;nodeId?:string};pinned:boolean;
  /** The workspace context dispatcher (parent-preserving view route). */
  onOpen:(viewId:string,nodeId:string)=>void};
 
 /**
- * Optional companion pane (UX31-UX33): Explanation, Code/State, Related and Evidence for one anchor component.
+ * Optional companion pane (UX31-UX33): explanation, code/state, authored contract/questions, related context and evidence.
  * Related is drawn from relatedContext through the export scene, with a list as the keyboard alternative, explicit
  * depth / scope / direction / relation filters and a bounded-coverage line. Opening a related item is a detour:
- * the original question stays the anchor and Return brings the reader back to it. Read-only; never a revision.
+ * the original question stays the anchor and Return brings the reader back to it. Navigation is read-only;
+ * private Edit answer proposals use the host revision-guarded review path.
  */
-export function CompanionPane({project,publicMode,anchor,pinned,onOpen}:Props){
+export function CompanionPane({project,publicMode,anchor,pinned,onOpen,editMode=false,onPropose}:Props){
  const doc=useMemo(()=>permittedDocument(project,publicMode),[project,publicMode]);
  const [filters,setFilters]=useState<CompanionFilters>(DEFAULT_FILTERS);
  const [detour,setDetour]=useState<CompanionDetour|null>(null);
  const [tab,setTab]=useState<CompanionTab>('related');
  const [picked,setPicked]=useState<string|null>(null);
- const listRef=useRef<HTMLUListElement>(null);
+ const listRef=useRef<HTMLUListElement>(null),paneRef=useRef<HTMLElement>(null);
  const liveDetour=detour?.projectId===doc.id?detour:null;
  const followed:CompanionAnchor|null=anchor.viewId&&anchor.nodeId?{viewId:anchor.viewId,nodeId:anchor.nodeId}:null;
  // During a detour the original question stays the anchor, whether the context follows or is pinned.
  const current:CompanionAnchor|null=liveDetour?liveDetour.origin:followed;
  const ctx=useMemo(()=>current?companionRelated(project,publicMode,current,filters):null,[project,publicMode,current?.viewId,current?.nodeId,filters]);
  const content=useMemo(()=>current?companionContent(doc,current.nodeId):null,[doc,current?.nodeId]);
- const tabs=companionTabs(content),shownTab=tabs.includes(tab)?tab:'related';
+ const tabs=companionTabs(content);if(!publicMode&&content?.evidence.some(isAnswerBlock)&&!tabs.includes('questions'))tabs.push('questions');const shownTab=tabs.includes(tab)?tab:'related';
  const scene=useMemo(()=>{if(!ctx||ctx.state!=='available')return null;const view=doc.views.find(v=>v.id===ctx.viewId);return view?buildScene(doc,relatedSceneView(ctx,view)):null;},[ctx,doc]);
  const label=(id:string)=>doc.nodes.find(n=>n.id===id)?.label??id;
  // When the move hides this pane (one pane at a time on a compact screen), keyboard focus follows to the opened
@@ -40,25 +44,46 @@ export function CompanionPane({project,publicMode,anchor,pinned,onOpen}:Props){
   const active=document.activeElement as HTMLElement|null;if(active&&active!==document.body&&active.getClientRects().length&&!active.hasAttribute('data-wb-recovery'))return;
   document.querySelector<HTMLElement>(`[data-testid="view-${CSS.escape(a.viewId)}"] .react-flow__node[data-id="${CSS.escape(a.nodeId)}"] .node-button`)?.focus();}));
  const open=(nodeId:string)=>{if(!ctx||!current)return;const target=detourTarget(ctx,nodeId);if(!target)return;setDetour(d=>startDetour(doc,current,target,d));setPicked(null);onOpen(target.viewId,target.nodeId);keepFocus(target);};
- const giveBack=()=>{if(!liveDetour)return;const o=liveDetour.origin;setDetour(null);onOpen(o.viewId,o.nodeId);keepFocus(o);};
+ // A detour control is removed by the action itself. Park focus on a retained tab before the DOM update,
+ // so the workspace can recover it synchronously when the compact pane becomes hidden. The later canvas
+ // handoff must not be the only recovery: two animation frames leave an observable body-focus gap.
+ const endDetour=()=>{paneRef.current?.querySelector<HTMLButtonElement>('[role="tab"][aria-selected="true"]')?.focus();setDetour(null);};
+ const giveBack=()=>{if(!liveDetour)return;const o=liveDetour.origin;endDetour();onOpen(o.viewId,o.nodeId);keepFocus(o);};
  const focusRow=(id:string)=>{setPicked(id);listRef.current?.querySelector<HTMLButtonElement>(`[data-related-id="${CSS.escape(id)}"]`)?.focus();};
  const moveTab=(e:KeyboardEvent<HTMLButtonElement>)=>{const i=tabs.indexOf(shownTab),n=e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i+tabs.length-1)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:-1;
   if(n<0)return;e.preventDefault();setTab(tabs[n]);e.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`#companion-tab-${tabs[n]}`)?.focus();};
  const set=<K extends keyof CompanionFilters>(k:K,v:CompanionFilters[K])=>setFilters(f=>({...f,[k]:v}));
  const toggleKind=(k:typeof RELATION_KINDS[number])=>setFilters(f=>({...f,kinds:f.kinds.includes(k)?f.kinds.filter(x=>x!==k):RELATION_KINDS.filter(x=>x===k||f.kinds.includes(x))}));
  const mode=liveDetour?`Detour: the original question stays on ${liveDetour.origin.label}.`:pinned?'Pinned: the companion keeps the pinned component.':'Following the selection.';
- return <section className="companion-pane note-card" aria-label="Companion pane" data-testid="companion-pane">
+ return <section ref={paneRef} className="companion-pane note-card" aria-label="Companion pane" data-testid="companion-pane">
   <h3>Companion</h3>
-  <p className="micro" role="status" aria-label="Companion anchor">{current?<>About <strong>{label(current.nodeId)}</strong> · {mode}</>:'Select a component to see its explanation, code, related context and evidence.'} {publicMode?'Public projection.':'Private authoring context.'} Read-only.</p>
+  <p className="micro" role="status" aria-label="Companion anchor">{current?<>About <strong>{label(current.nodeId)}</strong> · {mode}</>:'Select a component to see its explanation, code, related context and evidence.'} {publicMode?'Public projection.':'Private authoring context.'} {editMode&&!publicMode?'Answer proposals available in Questions.':'Read-only.'}</p>
   {liveDetour&&<div role="region" aria-label="Detour" className="companion-detour" data-testid="companion-detour">
    <p className="micro">You opened <strong>{liveDetour.target.label}</strong> as a detour from <strong>{liveDetour.origin.label}</strong>. The original question is kept.</p>
-   <button type="button" onClick={giveBack}>Return to {liveDetour.origin.label}</button> <button type="button" className="link-button" onClick={()=>setDetour(null)}>End detour here</button>
+   <button type="button" onClick={giveBack}>Return to {liveDetour.origin.label}</button> <button type="button" className="link-button" onClick={endDetour}>End detour here</button>
   </div>}
   {current&&<>
    <div className="pi-tabs" role="tablist" aria-label="Companion sections">{tabs.map(t=><button type="button" key={t} id={`companion-tab-${t}`} role="tab" aria-selected={shownTab===t} aria-controls="companion-panel" tabIndex={shownTab===t?0:-1} onKeyDown={moveTab} onClick={()=>setTab(t)} style={{flex:'1 1 80px'}}>{COMPANION_TAB_LABEL[t]}</button>)}</div>
    <div id="companion-panel" role="tabpanel" aria-labelledby={`companion-tab-${shownTab}`}>
     {shownTab==='explanation'&&content&&<>{content.node.summary&&<p>{content.node.summary}</p>}{content.node.role&&<p className="micro">{content.node.role}</p>}{content.explanation.map(b=><Evidence key={b.id} block={b} doc={doc}/>)}</>}
     {shownTab==='code'&&content&&<>{content.codeState.map(b=><Evidence key={b.id} block={b} doc={doc}/>)}<p className="micro">Displayed, never executed. A table is a declared state, not an observed run.</p></>}
+    {(shownTab==='contract'||shownTab==='questions')&&content&&<>
+     <p className="micro">Authored explanation, not an executed contract or a verified result. Missing facts remain unknown.</p>
+     {content.structure?.state==='unavailable'&&<p role="status">{content.structure.notice} The original record remains in Evidence.</p>}
+     {content.structure?.state==='available'&&<>
+      <p className="micro">Basis: {content.structure.block.provenance} · Frozen source: {content.structure.details.sourceCut}</p>
+      {shownTab==='contract'?<>
+       <h4>Selected case</h4><p>{content.structure.details.caseLabel||'No case supplied.'}</p>
+       <h4>Declared prerequisites</h4>{content.structure.details.prerequisites.length?<ul>{content.structure.details.prerequisites.map((x,i)=><li key={i}>{x}</li>)}</ul>:<p>No prerequisites supplied. Presentation order does not establish independence or execution order.</p>}
+      </>:<>
+       <h4>Question being explained</h4><p>{content.structure.details.focusQuestion}</p>
+       <h4>Questions to explore</h4>{content.structure.details.questions.length?<ol>{content.structure.details.questions.map((x,i)=><li key={i}>{x}</li>)}</ol>:<p>No follow-up questions supplied.</p>}
+
+      </>}
+     </>}
+     {shownTab==='questions'&&!publicMode&&<QuestionAnswersPanel key={`${doc.id}:${content.node.id}`} project={doc} nodeId={content.node.id} editMode={editMode} onPropose={onPropose}/>}
+     {shownTab==='contract'&&<><h4>Declared inputs and outputs</h4>{content.contract.length?content.contract.map(b=><Evidence key={b.id} block={b} doc={doc}/>):<p>No input or output evidence attached to this component.</p>}</>}
+    </>}
     {shownTab==='evidence'&&content&&<>{content.evidence.map(b=><Evidence key={b.id} block={b} doc={doc}/>)}{content.sources.length>0&&<><h4>Cited sources</h4><ul>{content.sources.map(s=><li key={s.id}>{s.title} <span className="stable-id">{s.id}</span></li>)}</ul></>}</>}
     {shownTab==='related'&&<>
      <fieldset className="companion-filters"><legend>Related-context filters</legend>

@@ -1,0 +1,25 @@
+{
+  "materialization": {
+    "entities": [
+      {
+        "id": "api",
+        "label": "Café \"API\"",
+        "kind": "component",
+        "properties": {
+          "é": "unknown",
+          "𐀀": "supplementary",
+          "": "private-use"
+        },
+        "evidenceRefs": []
+      }
+    ],
+    "relationships": [],
+    "scope": {
+      "kind": "project",
+      "ids": [],
+      "coverage": "declared-complete"
+    }
+  },
+  "canonical": "{\"entities\":[{\"evidenceRefs\":[],\"id\":\"api\",\"kind\":\"component\",\"label\":\"Café \\\"API\\\"\",\"properties\":{\"é\":\"unknown\",\"\":\"private-use\",\"𐀀\":\"supplementary\"}}],\"relationships\":[],\"scope\":{\"coverage\":\"declared-complete\",\"ids\":[],\"kind\":\"project\"}}",
+  "digest": "8778a733d5a0c64298cb92100c3d3d406c31064620db32975ddfcb00d4ad1929"
+}
