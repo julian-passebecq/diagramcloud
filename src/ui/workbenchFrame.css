@@ -168,3 +168,23 @@
 .studio-workbench .context-title h2{font-size:19px}
 /* Tabster must not offer descendants of native closed disclosures as focus targets. */
 .v3-drawing-tools:not([open])>:not(summary),.v3-drawing-tools:not([open])>:not(summary) *{display:none!important;visibility:hidden!important}
+
+/* Physical pane handles share the existing grid tracks; no detached viewer or document coordinates. */
+.workbench-frame .wb-resize{z-index:5;touch-action:none;user-select:none;background:transparent;border-radius:4px;outline-offset:-1px}
+.workbench-frame .wb-resize:hover,.workbench-frame .wb-resize:focus-visible{background:var(--accent,#2255aa);opacity:.65;outline:2px solid var(--accent,#2255aa)}
+.workbench-frame .wb-resize-explorer,.workbench-frame .wb-resize-companion{width:10px;min-height:40px;cursor:col-resize;align-self:stretch}
+.workbench-frame .wb-resize-explorer{grid-area:explorer;justify-self:end;margin-right:-7px}
+.workbench-frame .wb-resize-companion{grid-area:companion;justify-self:start;margin-left:-7px}
+.workbench-frame[data-side=right] .wb-resize-explorer{justify-self:start;margin-left:-7px;margin-right:0}
+.workbench-frame[data-side=right] .wb-resize-companion{justify-self:end;margin-right:-7px;margin-left:0}
+.workbench-frame .wb-resize-dock{grid-row:3;grid-column:1;align-self:start;justify-self:stretch;height:9px;margin:-5px 12px 0;cursor:row-resize}
+.workbench-frame .wb-bottom{grid-column:1}
+.workbench-frame .wb-arrangements{border-top:1px solid var(--border,#bec5cf);padding-top:10px;margin-top:12px;min-width:0}
+.workbench-frame .wb-arrangements h3{font-size:13px;margin:0 0 8px}
+.workbench-frame .wb-arrangements label{margin-top:9px}
+.workbench-frame .wb-arrangements input,.workbench-frame .wb-arrangements select{min-width:0;max-width:100%;width:100%}
+.workbench-frame .wb-arrangement-actions{display:flex;flex-wrap:wrap;gap:5px}
+.workbench-frame .wb-arrangements button{max-width:100%;white-space:normal}
+.workbench-frame .wb-arrangements [role=alert]{color:var(--text,#202327);border-left:3px solid #b45613;padding-left:8px}
+.workbench-frame .wb-arrangements [role=status]:empty{display:none}
+.workbench-frame .wb-close-layout{margin-bottom:10px;width:100%;text-align:center}

@@ -181,3 +181,7 @@ Public recovery notices expose no private draft identity or authoring backup con
 `learning-release-recovery.spec.ts` cases remain required. These were NOT_RUN in the Pro environment, whose
 actual App navigation was refused; they run in the native 1.33.0 gates. The controlled IndexedDB-protocol double is not browser-persistence
 qualification. UX45 and UX46 are implemented; the private 1.33.0 candidate is recorded in `outcome.json` `privatePackages`.
+
+## Named physical workspace arrangements — 4 November 2026
+
+The [workspace arrangement slice](WORKSPACE_ARRANGEMENTS.md) adds explicit named Save/Restore/Delete for the complete physical WorkbenchLayout, isolated by exact project, audience and browser host. Route and route-map collapse now use that same controlled layout authority. Direct separator resizing and keyboard/range controls preserve compact pane/F6 navigation. No Project revision, Undo, route, camera, source or permissions change. Earlier “saved workspace layouts not built” statements above describe their dated cuts; arbitrary floating/free drag docking remains unimplemented. Source and browser tests are named in the slice document; this is not a release receipt.

@@ -1,3 +1,4 @@
+import './ui/workbenchFrame.css';
 import './ui/contextPane.css';
 import './ui/projectDock.css';
 import React from 'react';
