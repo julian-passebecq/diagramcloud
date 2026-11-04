@@ -2,8 +2,7 @@ import {publicDocument} from '../core/operations';
 import type {Project,ProjectNode} from '../core/model';
 import {CLAIM_LABEL,presentedObservation} from '../core/realization';
 import {buildScene} from './scene';
-import {xmlChars} from './diagram';
-
+import {xmlChars} from './xmlText';
 /**
  * draw.io / diagrams.net export: one page per public view (root first, then each drilldown), boxes at their canvas
  * positions, the shared orthogonal routes as fixed waypoints, connection labels, and drilldown cards as page links.

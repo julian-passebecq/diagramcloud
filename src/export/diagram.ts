@@ -7,23 +7,8 @@ import {glyphSvg} from '../core/iconGlyph';
 import {assetFidelity} from './assetFidelity';
 import {measureLines,textWidth} from './measure';
 import {CLAIM_LABEL,REALIZATION_EXPORT_NOTE,presentedObservation} from '../core/realization';
-/** Classic figure frame: text inset, and the widest a narrow scene is widened to fit its header and footer lines. */
-const FRAME_PAD=30,FRAME_MAX=640;
-/** Characters XML 1.0 forbids (C0 controls other than tab, LF and CR; U+FFFE, U+FFFF) and unpaired surrogates. */
-const XML_INVALID=/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g;
-/** Text with every XML-forbidden character replaced by U+FFFD, so SVG, draw.io and PPTX parts stay well-formed. */
-export const xmlChars=(value:string)=>value.replace(XML_INVALID,'\uFFFD');
-/**
- * A copy of a plain JSON-like value with xmlChars applied to every string (the same reference when nothing changes),
- * for writers such as pptxgenjs that only escape &lt; &gt; &amp; and quotes.
- */
-export function xmlSafe<T>(value:T):T{
- if(typeof value==='string')return xmlChars(value) as T;
- if(Array.isArray(value)){let changed=false;const out=value.map(v=>{const s=xmlSafe(v);if(s!==v)changed=true;return s;});return (changed?out:value) as T;}
- if(value&&typeof value==='object'&&Object.getPrototypeOf(value)===Object.prototype){let out:Record<string,unknown>|undefined;
-  for(const [k,v] of Object.entries(value)){const s=xmlSafe(v);if(s!==v)(out??={...value as Record<string,unknown>})[k]=s;}return (out??value) as T;}
- return value;
-}
+import {xmlChars} from './xmlText';
+/** Classic figure frame: text inset, and the widest a narrow scene is widened to fit its header and footer lines. */ const FRAME_PAD=30,FRAME_MAX=640;
 export const xml=(value:unknown)=>xmlChars(String(value)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]!));
 export function bounds(view:ProjectView){return sceneBounds(view.nodeIds.map(id=>positionFor(view,id)));}
 /** SVG text for a scene text block: one tspan per measured line, so no renderer re-wraps it. */
@@ -67,3 +52,5 @@ export function documentFromSvg(raw:string):Project{
  return parseDocument(decoded);
 }
 export function mermaidDiagram(input:Project,viewId=input.rootViewId):string{const d=publicDocument(input),v=d.views.find(v=>v.id===viewId)??d.views[0],ids=new Map(v.nodeIds.map((id,i)=>[id,`n${i}`]));const observed=d.nodes.filter(n=>v.nodeIds.includes(n.id)).flatMap(n=>{const o=presentedObservation(d,n.id);return o?[{n,o}]:[];});const comment=(s:string)=>s.replace(/[\r\n]+/g,' ');const label=(s:string)=>s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/\|/g,'&#124;').replace(/[\r\n]/g,' ').replace(/</g,'&lt;').replace(/>/g,'&gt;');return['flowchart LR','  %% DiagramCloud: current view only; evidence and hierarchy remain in JSON.',...d.nodes.filter(n=>v.nodeIds.includes(n.id)).map(n=>`  ${ids.get(n.id)}["${label(n.label)}"]`),...d.edges.filter(e=>v.edgeIds.includes(e.id)).map(e=>`  ${ids.get(e.source)} -->|"${label(e.label)}"| ${ids.get(e.target)}`),...(observed.length?['  %% Realization: reviewed, public observations owned by other apps. Unclassed nodes are planned / designed only.',...observed.map(({n,o})=>`  %% ${ids.get(n.id)} ${comment(CLAIM_LABEL[o.claim])} by ${comment(o.sourceApp)} @ ${comment(o.sourceRevision)} (${o.observedAt.slice(0,10)})`),...[...new Set(observed.map(x=>x.o.claim))].map(c=>`  classDef ${c.replace('-','_')} stroke-width:3px,stroke-dasharray:${c==='verified'||c==='observed'?'0':'4 3'}`),...observed.map(({n,o})=>`  class ${ids.get(n.id)} ${o.claim.replace('-','_')}`)]:[])].join('\n');}
+/** XML text helpers, re-exported for the export writers that import them from here. */
+export {xmlChars,xmlSafe} from './xmlText';
