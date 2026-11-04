@@ -29,7 +29,7 @@ test('desktop tree previews and selected detail form one workspace with existing
  await intake.click();await expect(page.getByTestId('view-implementation').getByRole('heading',{name:'Validation implementation',exact:true})).toBeInViewport();await expect(intake).toHaveAttribute('aria-current','true');await expect(detail(page).getByRole('heading',{name:'Order intake',exact:true})).toBeVisible();
  const committed=page.url();await store.hover();await expect(detail(page).getByRole('heading',{name:'Order storage',exact:true})).toBeVisible();await expect(detail(page)).toContainText('Hover preview');expect(page.url()).toBe(committed);await expect(intake).toHaveAttribute('aria-current','true');
  await page.getByRole('heading',{name:'Explorer',exact:true}).hover();await expect(detail(page).getByRole('heading',{name:'Order intake',exact:true})).toBeVisible();expect(page.url()).toBe(committed);
- await store.click();await expect(store).toHaveAttribute('aria-current','true');await expect(detail(page).getByRole('heading',{name:'Order storage',exact:true})).toBeVisible();
+ await page.getByTestId('view-root').getByRole('button',{name:'Explore Order storage',exact:true}).click();await expect(tree(page)).toBeVisible();await expect(store).toHaveAttribute('aria-current','true');await expect(detail(page).getByRole('heading',{name:'Order storage',exact:true})).toBeVisible();
  await page.getByTestId('project-context').getByRole('button',{name:'Pin context',exact:true}).click();await intake.hover();await expect(detail(page).getByRole('heading',{name:'Order storage',exact:true})).toBeVisible();
  await page.getByTestId('project-context').getByRole('button',{name:'Follow selection',exact:true}).click();
  await page.getByRole('heading',{name:'Explorer',exact:true}).hover();const beforeFocus=page.url();await intake.focus();await expect(detail(page).getByRole('heading',{name:'Order intake',exact:true})).toBeVisible();await expect(store).toHaveAttribute('aria-current','true');expect(page.url()).toBe(beforeFocus);
@@ -43,7 +43,7 @@ test('route context collapses with focus retained and the bottom dock navigates 
  if(wasOpen)await expect(rail).toBeHidden();else await expect(rail).toBeVisible();
  await page.keyboard.press('Enter');await expect(route).toBeFocused();await expect(route).toHaveAttribute('aria-expanded',String(wasOpen));
  await dock(page).getByRole('tab',{name:'Workflow',exact:true}).click();await expect(dock(page)).toContainText('Presented sequence');await dock(page).getByRole('button',{name:'2. Inspect validation',exact:true}).click();
- await expect(page.getByTestId('view-implementation')).toBeVisible();await expect(page.getByTestId('view-implementation').getByRole('heading',{name:'Validation implementation',exact:true})).toBeInViewport();await expect(detail(page).getByRole('heading',{name:'Schema check',exact:true})).toBeVisible();
+ await expect(tree(page)).toBeVisible();await expect(page.getByTestId('view-implementation')).toBeVisible();await expect(page.getByTestId('view-implementation').getByRole('heading',{name:'Validation implementation',exact:true})).toBeInViewport();await expect(detail(page).getByRole('heading',{name:'Schema check',exact:true})).toBeVisible();
  await dock(page).getByRole('tab',{name:'Sources & Git',exact:true}).click();await expect(dock(page)).toContainText('No repository snapshot supplied');await expect(dock(page)).toContainText('A document revision is not a Git commit');await expect(dock(page)).toContainText('No evidence sources supplied');await noOverflow(page);
 });
 
