@@ -145,7 +145,7 @@ test('audience change and source replacement never show private data in any work
  // Collapse the explorer so that it is a hidden pane, not an unmounted one.
  await page.getByRole('button',{name:'Explorer',exact:true}).click();await expect(explorer(page)).toBeHidden();
  for(const audience of ['Portfolio','Present']){
-  await page.getByRole('tab',{name:audience,exact:true}).click();await expect(page.getByText('Permitted public copy',{exact:false}).first()).toBeVisible();
+  await page.getByRole('tab',{name:audience,exact:true}).click();await expect(workspace(page).locator('.wb-heading').getByText('Permitted public copy',{exact:false})).toBeVisible();
   const html=await page.content();expect(html,`${audience}: no private label anywhere, hidden panes included`).not.toContain(PRIVATE_LABEL);expect(html).not.toContain(PRIVATE_FACT);
   expect(page.url()).not.toContain('node=hidden');
  }
