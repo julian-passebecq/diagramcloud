@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {documentSchema,validateDocument,type Project} from '../src/core/model';
-import {depthScene,explore,lessonDiagrams,LESSON_JOURNEYS,SEMANTIC_DEPTHS,type ExplorerAction,type ExplorerState} from '../src/intelligence/learning/depth';
+import {depthFigureDocument,depthHighlight,depthScene,depthSceneViewSpec,explore,lessonDiagrams,DEPTH_FIGURE,LESSON_JOURNEYS,SEMANTIC_DEPTHS,type ExplorerAction,type ExplorerState} from '../src/intelligence/learning/depth';
+import {buildScene} from '../src/export/scene';
+import {LessonDiagramFigure} from '../src/ui/LessonDiagramFigure';
 import {lessonPlayback,playbackFrame,procedurePlayback,PLAYBACK_LABEL} from '../src/intelligence/learning/playback';
 import {foilEnvironments,galaxyProcess} from '../src/intelligence/learning/journeys';
 import {learningCatalogue} from '../src/intelligence/learning/catalogue';
@@ -89,4 +91,55 @@ test('a lesson opened from its return context shows the diagram at that depth wi
  assert.ok(html.includes('aria-label="Step playback: Lesson example steps" tabindex="0"'));assert.ok(html.includes('aria-current="step"'));
  const overview=renderToStaticMarkup(createElement(LearningCatalogue,{host:{initial:{lessonId:entry.id,depth:'overview',contentRevision:entry.editorial.contentRevision}}}));
  assert.ok(!overview.includes('Step playback: Declared procedure'));assert.match(overview,/Opens Intended procedure: shown at a deeper depth/);
+});
+
+// Spatial figure (1.34.0): the depth scene drawn by the shared export scene over a derived view.
+test('the depth figure view holds exactly the depth scene IDs for every lesson diagram and depth',()=>{
+ for(const entry of learningCatalogue)for(const d of lessonDiagrams(entry)){const doc=d.load(),source=depthFigureDocument(doc,d.audience);
+  for(const depth of SEMANTIC_DEPTHS){const scene=depthScene(doc,doc.rootViewId,depth.id,{audience:d.audience}),figure=depthSceneViewSpec(scene,source);
+   assert.deepEqual(figure.view.nodeIds,scene.nodes.map(n=>n.id));assert.deepEqual(figure.view.edgeIds,scene.edges.map(e=>e.id));
+   assert.deepEqual(Object.keys(figure.view.positions).sort(),scene.nodes.map(n=>n.id).sort());
+   const built=buildScene(source,figure.view);
+   assert.deepEqual(built.nodes.map(n=>n.id).sort(),scene.nodes.map(n=>n.id).sort());assert.deepEqual(built.edges.map(e=>e.id).sort(),scene.edges.map(e=>e.id).sort());
+   assert.deepEqual(figure.frames.map(f=>f.viewId).sort(),scene.views.filter(v=>v.via).map(v=>v.viewId).sort());
+   // Every frame encloses the components first shown in its view.
+   for(const f of figure.frames)for(const n of scene.nodes.filter(n=>n.viewId===f.viewId)){const p=figure.view.positions[n.id];
+    assert.ok(p.x>=f.x&&p.y>=f.y+DEPTH_FIGURE.header&&p.x+DEPTH_FIGURE.box.w<=f.x+f.w&&p.y+DEPTH_FIGURE.box.h<=f.y+f.h,`${n.id} inside ${f.viewId}`);}
+  }}
+});
+test('the depth figure keeps the public projection: author-only components are absent from the public audience',()=>{
+ const doc=chain(),pub=depthScene(doc,'v1','detail'),figure=depthSceneViewSpec(pub,depthFigureDocument(doc,'public'));
+ assert.ok(!figure.view.nodeIds.includes('secret'));assert.deepEqual(figure.view.edgeIds,[]);assert.ok(!JSON.stringify(figure).includes('SYNTHETIC_PRIVATE'));
+ const html=renderToStaticMarkup(createElement(LessonDiagramFigure,{doc:depthFigureDocument(doc,'public'),scene:pub,figure,zoom:1,highlight:depthHighlight(pub,'b'),instances:new Set<string>(),depthLabel:'Detail'}));
+ assert.ok(!html.includes('SYNTHETIC_PRIVATE'));assert.ok(!html.includes('private link'));assert.match(html,/data-figure-node-id="b" data-highlighted="true"/);
+ const author=depthScene(doc,'v1','detail',{audience:'author'}),authored=depthSceneViewSpec(author,doc);
+ assert.ok(authored.view.nodeIds.includes('secret'));assert.deepEqual(authored.view.edgeIds,['b-secret']);
+ // Frames nest by drilldown: Inside B sits within the frame of Inside A.
+ const [inA,inB]=figure.frames;assert.deepEqual([inA.viewId,inA.via,inB.viewId,inB.via],['v2','a','v3','b']);
+ assert.ok(inB.x>inA.x&&inB.y>inA.y&&inB.x+inB.w<=inA.x+inA.w&&inB.y+inB.h<=inA.y+inA.h);
+});
+test('a connection never becomes a container in the depth figure',()=>{
+ const flat=validateDocument(documentSchema.parse({schemaVersion:1,id:'synthetic-flat',title:'Synthetic flat',rootViewId:'v1',
+  nodes:[{id:'a',label:'A',kind:'app'},{id:'b',label:'B',kind:'function'}],edges:[{id:'a-b',source:'a',target:'b',label:'contains',kind:'dependency'}],
+  views:[{id:'v1',title:'Root',nodeIds:['a','b'],edgeIds:['a-b']},{id:'v2',title:'Unlinked',nodeIds:['b']}]}));
+ for(const d of SEMANTIC_DEPTHS){const scene=depthScene(flat,'v1',d.id),figure=depthSceneViewSpec(scene,flat);
+  assert.deepEqual(figure.frames,[]);assert.deepEqual(figure.view.nodeIds,['a','b']);assert.deepEqual(figure.view.edgeIds,['a-b']);}
+ const foil=foilEnvironments(),scene=depthScene(foil,'overview','architecture');
+ assert.deepEqual(depthSceneViewSpec(scene,foil).frames.map(f=>f.via+'>'+f.viewId),['refinement>refinement-detail','environments>environment-detail']);
+});
+test('a played step highlights its component and only the scene connections that touch it',()=>{
+ const doc=galaxyProcess(),scene=depthScene(doc,doc.rootViewId,'architecture'),proc=procedurePlayback(doc,'procedure-steps')!;
+ const worktree=depthHighlight(scene,'worktree');assert.deepEqual(worktree.nodeIds,['worktree']);
+ assert.ok(worktree.edgeIds.length>=2);for(const id of worktree.edgeIds){const e=scene.edges.find(e=>e.id===id)!;assert.ok(e.from==='worktree'||e.to==='worktree');}
+ assert.deepEqual(depthHighlight(scene,null),{nodeIds:[],edgeIds:[]});assert.deepEqual(depthHighlight(scene,'not-in-scene'),{nodeIds:[],edgeIds:[]});
+ assert.deepEqual(depthHighlight(depthScene(doc,doc.rootViewId,'overview'),'worktree'),{nodeIds:[],edgeIds:[]});
+ for(const step of proc.steps)assert.deepEqual(depthHighlight(scene,step.nodeId).nodeIds,[step.nodeId]);
+});
+test('the lesson renders a spatial figure for each depth beside the list alternative',()=>{
+ const entry=learningCatalogue.find(e=>e.id==='medallion-environments')!;
+ for(const d of SEMANTIC_DEPTHS){const html=renderToStaticMarkup(createElement(LearningCatalogue,{host:{initial:{lessonId:entry.id,depth:d.id,contentRevision:entry.editorial.contentRevision}}}));
+  const scene=depthScene(foilEnvironments(),'overview',d.id);
+  assert.ok(html.includes('data-testid="lesson-diagram-figure"'));assert.ok(html.includes(`data-depth="${d.id}"`));
+  assert.equal((html.match(/data-figure-node-id=/g)??[]).length,scene.nodes.length);assert.equal((html.match(/ data-node-id=/g)??[]).length,scene.nodes.length);
+  assert.equal((html.match(/data-figure-frame=/g)??[]).length,d.level?2:0);assert.match(html,/The list below is the text and keyboard alternative/);}
 });
