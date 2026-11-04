@@ -24,13 +24,19 @@ export function childLinks(doc:Project,viewId:string):{nodeId:string;viewId:stri
 export function parentPaths(doc:Project,target:string,limit=MAX_PARENT_PATHS):{paths:ParentPath[];truncated:boolean}{
  const paths:ParentPath[]=[];let truncated=false;
  if(!doc.views.some(v=>v.id===target))return {paths,truncated};
+ // A path is its chain of views: two components of one view opening the same child are one parent, listed once
+ // (the first component leads down). Index once, keep only views that can reach the target, then walk: a shared
+ // drilldown DAG has exponentially many raw walks, and disconnected branches must not be traversed at all.
+ const children=new Map<string,{nodeId:string;viewId:string}[]>(),reverse=new Map<string,string[]>();
+ for(const view of doc.views){const seen=new Set<string>();children.set(view.id,childLinks(doc,view.id).filter(link=>!seen.has(link.viewId)&&!!seen.add(link.viewId)));
+  for(const link of children.get(view.id)!){const parents=reverse.get(link.viewId)??[];parents.push(view.id);reverse.set(link.viewId,parents);}}
+ const canReach=new Set<string>([target]),pending=[target];
+ for(let i=0;i<pending.length;i++)for(const parent of reverse.get(pending[i])??[])if(!canReach.has(parent)){canReach.add(parent);pending.push(parent);}
+ if(!canReach.has(doc.rootViewId))return {paths,truncated};
  const visit=(viewId:string,viewIds:string[],via:string[])=>{
   if(truncated)return;
-  if(viewId===target){
-   // A path is its chain of views: two components of one view opening the same child are one parent, listed once.
-   const key=[...viewIds,viewId].join('\u0000');if(paths.some(p=>p.viewIds.join('\u0000')===key))return;
-   if(paths.length>=limit){truncated=true;return;}paths.push({viewIds:[...viewIds,viewId],via:[...via]});return;}
-  for(const link of childLinks(doc,viewId))if(!viewIds.includes(link.viewId)&&link.viewId!==viewId)visit(link.viewId,[...viewIds,viewId],[...via,link.nodeId]);
+  if(viewId===target){if(paths.length>=limit){truncated=true;return;}paths.push({viewIds:[...viewIds,viewId],via:[...via]});return;}
+  for(const link of children.get(viewId)??[])if(canReach.has(link.viewId)&&!viewIds.includes(link.viewId)&&link.viewId!==viewId)visit(link.viewId,[...viewIds,viewId],[...via,link.nodeId]);
  };
  visit(doc.rootViewId,[],[]);
  return {paths,truncated};

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {documentSchema,validateDocument,type Project} from '../src/core/model';
-import {publicDocument} from '../src/core/operations';
+import {pathToView,publicDocument} from '../src/core/operations';
 import {childLinks,hierarchyRail,isPermittedPath,MAX_PARENT_PATHS,parentPaths} from '../src/core/hierarchy';
 
 // Synthetic hierarchy: root holds A (opens view A), B (opens view B) and C (opens other). Views A and B each hold a
@@ -66,6 +66,25 @@ test('hierarchy rail: Up keeps the parent and selects the leading component, Dow
  const ancestor=hierarchyRail(doc,['root','va','shared','deep'],'shared','s');
  assert.deepEqual(ancestor.down,{path:['root','va','shared','deep'],view:'deep',selected:null});
  assert.deepEqual(ancestor.up,{path:['root','va'],view:'va',selected:'s1'});
+});
+
+// A valid chain of views where every view holds two components opening the next one, plus one unreachable view:
+// 2^N raw walks, one view chain. Parent paths and pathToView must stay polynomial.
+function doubledChain(n:number):Project{
+ const nodes:Project['nodes'][number][]=[],views:{id:string;title:string;nodeIds:string[]}[]=[];
+ for(let i=0;i<n;i++){const ids=i<n-1?[`c${i}a`,`c${i}b`]:[`c${i}a`];for(const id of ids)nodes.push({id,label:`Synthetic ${id}`,...(i<n-1?{childViewId:`v${i+1}`}:{})} as Project['nodes'][number]);views.push({id:`v${i}`,title:`Synthetic chain ${i}`,nodeIds:ids});}
+ nodes.push({id:'u0',label:'Synthetic unreachable'} as Project['nodes'][number]);views.push({id:'unreachable',title:'Synthetic unreachable',nodeIds:['u0']});
+ return validateDocument(documentSchema.parse({schemaVersion:1,id:'synthetic-doubled-chain',title:'Synthetic doubled chain',rootViewId:'v0',nodes,edges:[],views}));
+}
+test('hierarchy: duplicate links and unreachable views never make parent paths or pathToView exponential',()=>{
+ const doc=doubledChain(40),chain=doc.views.filter(v=>v.id!=='unreachable').map(v=>v.id);
+ const started=performance.now();
+ const last=parentPaths(doc,'v39');
+ assert.equal(last.truncated,false);assert.equal(last.paths.length,1);assert.deepEqual(last.paths[0].viewIds,chain);assert.deepEqual(last.paths[0].via,chain.slice(0,-1).map((_,i)=>`c${i}a`),'the first component leading down is named');
+ assert.deepEqual(parentPaths(doc,'unreachable'),{paths:[],truncated:false});
+ assert.deepEqual(pathToView(doc,'unreachable'),['unreachable']);
+ assert.deepEqual(pathToView(doc,'v39'),chain);
+ assert.ok(performance.now()-started<500,`hierarchy queries took ${Math.round(performance.now()-started)} ms`);
 });
 
 test('hierarchy rail: an invalid recorded path offers no move, and nothing is written to the document',()=>{

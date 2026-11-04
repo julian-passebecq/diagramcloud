@@ -45,6 +45,21 @@ test('Mermaid escapes pipe characters in labels',()=>{const d=clone(total);d.edg
 test('stable IDs have bounded safe syntax',()=>{assert.throws(()=>nodeSchema.parse({id:'<script>',label:'Bad'}));assert.throws(()=>nodeSchema.parse({id:'a'.repeat(90),label:'Bad'}));});
 
 
+test('undo restores the exact revision, and a new edit never reuses a revision an undone state had',()=>{
+ const a=validateDocument({...clone(total),revision:5}),node=a.nodes[0].id,b=clone(a);b.nodes[0].label='Synthetic B';
+ const h1=commitHistory({past:[],present:a,future:[]},b);assert.equal(h1.present.revision,6);
+ const forB={format:'diagramcloud.patch',version:1,target:'project',targetId:a.id,baseRevision:h1.present.revision,summary:'Written for B',operations:[{op:'replace',path:`/nodes/@${node}/label`,value:'Written for B'}]};
+ const back=undo(h1);assert.equal(back.present,a,'undo restores the exact stored document');
+ assert.deepEqual(redo(back).present,h1.present,'redo restores B exactly');
+ const c=clone(back.present);c.nodes[0].label='Synthetic C';const h2=commitHistory(back,c);
+ assert.equal(h2.present.revision,7,'the next edit gets a revision above every issued one');
+ assert.throws(()=>applyDocumentPatch(h2.present,forB),/Stale patch/);
+ const h3=commitHistory(undo(h2),clone(a));assert.equal(h3.present.revision,8,'an edit after a second Undo still never reuses 6 or 7');
+ const seen=[a.revision,h1.present.revision,h2.present.revision,h3.present.revision];assert.equal(new Set(seen).size,seen.length);
+ assert.equal(redo(h2),h2,'nothing to redo is a no-op');const solo:History={past:[],present:a,future:[]};assert.equal(undo(solo),solo,'nothing to undo is a no-op');
+ assert.equal(commitHistory({past:[],present:a,future:[]},clone(a)).present.revision,6,'a history without a high-water mark keeps revision+1');
+});
+
 function componentReuseProject(){return validateDocument(documentSchema.parse({schemaVersion:1,id:'synthetic-reuse-unit',revision:7,title:'Synthetic canonical reuse',rootViewId:'root',
  nodes:[{id:'left-portal',label:'Left',childViewId:'left'},{id:'right-portal',label:'Right',childViewId:'right'},{id:'shared',label:'Same label',summary:'Canonical authored explanation',blockIds:['example'],sourceIds:['source']},{id:'other',label:'Same label'},{id:'private',label:'SYNTHETIC_REUSE_PRIVATE',visibility:'private'}],
  edges:[{id:'native-link',source:'shared',target:'other',kind:'dependency',basis:'planned',quantity:{value:0,unit:'items/day',provenance:'synthetic'}}],
