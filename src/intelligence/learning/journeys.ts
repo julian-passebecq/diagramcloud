@@ -20,7 +20,7 @@ export const SELF_CITATIONS=[
  {id:'src-patch-apply',title:'applyDocumentPatch',path:'src/core/patch.ts',line:118,token:'export function applyDocumentPatch'},
  {id:'src-public-document',title:'publicDocument',path:'src/core/operations.ts',line:9,token:'export function publicDocument'},
  {id:'src-export-project',title:'exportProject',path:'src/app/exports.ts',line:19,token:'const safe=publicDocument(project)'},
- {id:'src-ci-receipt',title:'CI verification receipt step',path:'.github/workflows/ci.yml',line:43,token:'if: always()'},
+ {id:'src-ci-receipt',title:'CI verification receipt step',path:'.github/workflows/ci.yml',line:46,token:'if: always()'},
  {id:'src-learning-catalogue',title:'learningCatalogue',path:'src/intelligence/learning/catalogue.ts',line:96,token:'export const learningCatalogue'},
  {id:'src-lesson-ui',title:'LearningCatalogue panel',path:'src/ui/LearningCatalogue.tsx',line:100,token:'export function LearningCatalogue'},
  {id:'src-suggest-mapping',title:'suggestMapping',path:'src/intelligence/learning/mappings.ts',line:80,token:'export function suggestMapping'},
@@ -48,7 +48,7 @@ export function selfDescription():Project{
  sn('mapping','Concept mapping','function','Suggest, review or reject a mapping.','Binds a concept revision to one exact component, citing evidence.',['src-suggest-mapping','src-review-mapping'],'generic-function');
  sn('ci','CI receipt','process','The verification receipt runs with always().','Records each step outcome even after a failure.',['src-ci-receipt'],'generic-ci');
  note(d,'review','self-review-note','What the guard checks','The patch envelope must name the open project and its exact base revision; otherwise nothing changes and the author reloads. Source: src/core/patch.ts:113.','source-derived',['src-patch-guard']);
- note(d,'ci','self-ci-note','Why always()','The receipt and package steps run even when typecheck, unit, build or browser tests fail, so a red run still names what ran. Source: .github/workflows/ci.yml:43.','source-derived',['src-ci-receipt']);
+ note(d,'ci','self-ci-note','Why always()','The receipt and package steps run even when typecheck, unit, build or browser tests fail, so a red run still names what ran. Source: .github/workflows/ci.yml:46.','source-derived',['src-ci-receipt']);
  view(d,'overview','Author, validate, review, export','The authoring workflow. Click Learning catalogue to drill into the learning loop.',['author','validate','review','export','catalogue'],[['author','validate','draft'],['validate','review','valid document'],['review','export','applied revision']],4);
  view(d,'learning-loop','Lesson and mapping','Inside the learning catalogue: a lesson and an exact mapped instance.',['lesson','mapping'],[['lesson','mapping','In my project']]);
  view(d,'verification','Verification','Behind the revision guard: what CI records about the code that ran. A green check is not a release.',['ci','export'],[['ci','export','packaged build','control']]);
@@ -56,7 +56,7 @@ export function selfDescription():Project{
  d.nodes.find(n=>n.id==='catalogue')!.childViewId='learning-loop';d.nodes.find(n=>n.id==='review')!.childViewId='verification';
  d.story=[{title:'Author then validate',viewId:'overview',nodeId:'validate',narration:'A draft only becomes the document after validateDocument accepts it. This order is the code path, not timing.',highlightEdgeIds:['overview-e0'],},{title:'Learn the concept',viewId:'learning-loop',nodeId:'lesson',narration:'A lesson works without a project; In my project lists only cited mappings.',highlightEdgeIds:[]}];
  declare(d,'workflow-agent','review',['src-patch-guard','src-patch-apply'],'Source-declared: the revision guard is the review gate between an agent proposal and the applied document (src/core/patch.ts:113, :118).');
- declare(d,'worktrees-ci','ci',['src-ci-receipt'],'Source-declared: the CI receipt step runs with always() so a check outcome is recorded per step (.github/workflows/ci.yml:43).');
+ declare(d,'worktrees-ci','ci',['src-ci-receipt'],'Source-declared: the CI receipt step runs with always() so a check outcome is recorded per step (.github/workflows/ci.yml:46).');
  return validateDocument(d);
 }
 
