@@ -17,7 +17,7 @@ const pkg=JSON.parse(readFileSync('package.json','utf8')) as {version:string};
 const git=(...args:string[])=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const sha256=(bytes:Uint8Array|string)=>createHash('sha256').update(bytes).digest('hex');
 
-const COMMANDS:Array<[string,string]>=[['typecheck','npm run check'],['unit','npm test'],['build','npm run build'],['e2e','npm run test:e2e']];
+const COMMANDS:Array<[string,string]>=[['typecheck','npm run check'],['unit','npm test'],['build','npm run build'],['e2e','npm run test:e2e'],['browser','npm run test:browser']];
 
 function files(dir:string):string[]{return readdirSync(dir).flatMap(f=>{const p=join(dir,f);return statSync(p).isDirectory()?files(p):[p];});}
 /** One hash for the static bundle: sha256 over "path sha256" lines of every dist file, sorted, source maps excluded. */
@@ -41,7 +41,7 @@ if(mode==='record'){
  for(const [id,command] of COMMANDS){
   const start=Date.now(),r=spawnSync(command,{shell:true,stdio:'inherit'});
   checks.push({check_id:id,command,status:r.status===0?'passed':'failed',duration_ms:Date.now()-start});
-  if(r.status!==0&&id!=='e2e')break;
+  if(r.status!==0&&id!=='e2e'&&id!=='browser')break;
  }
  for(const [id,command] of COMMANDS)if(!checks.some(c=>c.check_id===id))checks.push({check_id:id,command,status:'not_run'});
 }else throw new Error(`Unknown mode ${mode}: use run or record`);

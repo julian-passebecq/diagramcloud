@@ -2,8 +2,9 @@
 import {createServer} from 'node:http';
 import assert from 'node:assert/strict';
 import {build} from 'esbuild';
+import {fileURLToPath} from 'node:url';
 import {chromium} from '@playwright/test';
-const result=await build({entryPoints:[new URL('./fixtures/workspace-preview/probe.tsx',import.meta.url).pathname],bundle:true,write:false,format:'esm',platform:'browser',jsx:'automatic',logLevel:'error'});
+const result=await build({entryPoints:[fileURLToPath(new URL('./fixtures/workspace-preview/probe.tsx',import.meta.url))],bundle:true,write:false,format:'esm',platform:'browser',jsx:'automatic',logLevel:'error'});
 const server=createServer((req,res)=>{res.setHeader('content-type',req.url==='/probe.js'?'text/javascript':'text/html');res.end(req.url==='/probe.js'?result.outputFiles[0].text:'<div id="root"></div><script type="module" src="/probe.js"></script>');});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 let browser;
