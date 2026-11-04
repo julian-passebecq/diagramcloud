@@ -23,7 +23,7 @@ export function CompanionPane({project,publicMode,anchor,pinned,onOpen}:Props){
  const [detour,setDetour]=useState<CompanionDetour|null>(null);
  const [tab,setTab]=useState<CompanionTab>('related');
  const [picked,setPicked]=useState<string|null>(null);
- const listRef=useRef<HTMLUListElement>(null);
+ const listRef=useRef<HTMLUListElement>(null),paneRef=useRef<HTMLElement>(null);
  const liveDetour=detour?.projectId===doc.id?detour:null;
  const followed:CompanionAnchor|null=anchor.viewId&&anchor.nodeId?{viewId:anchor.viewId,nodeId:anchor.nodeId}:null;
  // During a detour the original question stays the anchor, whether the context follows or is pinned.
@@ -40,19 +40,23 @@ export function CompanionPane({project,publicMode,anchor,pinned,onOpen}:Props){
   const active=document.activeElement as HTMLElement|null;if(active&&active!==document.body&&active.getClientRects().length&&!active.hasAttribute('data-wb-recovery'))return;
   document.querySelector<HTMLElement>(`[data-testid="view-${CSS.escape(a.viewId)}"] .react-flow__node[data-id="${CSS.escape(a.nodeId)}"] .node-button`)?.focus();}));
  const open=(nodeId:string)=>{if(!ctx||!current)return;const target=detourTarget(ctx,nodeId);if(!target)return;setDetour(d=>startDetour(doc,current,target,d));setPicked(null);onOpen(target.viewId,target.nodeId);keepFocus(target);};
- const giveBack=()=>{if(!liveDetour)return;const o=liveDetour.origin;setDetour(null);onOpen(o.viewId,o.nodeId);keepFocus(o);};
+ // A detour control is removed by the action itself. Park focus on a retained tab before the DOM update,
+ // so the workspace can recover it synchronously when the compact pane becomes hidden. The later canvas
+ // handoff must not be the only recovery: two animation frames leave an observable body-focus gap.
+ const endDetour=()=>{paneRef.current?.querySelector<HTMLButtonElement>('[role="tab"][aria-selected="true"]')?.focus();setDetour(null);};
+ const giveBack=()=>{if(!liveDetour)return;const o=liveDetour.origin;endDetour();onOpen(o.viewId,o.nodeId);keepFocus(o);};
  const focusRow=(id:string)=>{setPicked(id);listRef.current?.querySelector<HTMLButtonElement>(`[data-related-id="${CSS.escape(id)}"]`)?.focus();};
  const moveTab=(e:KeyboardEvent<HTMLButtonElement>)=>{const i=tabs.indexOf(shownTab),n=e.key==='ArrowRight'?(i+1)%tabs.length:e.key==='ArrowLeft'?(i+tabs.length-1)%tabs.length:e.key==='Home'?0:e.key==='End'?tabs.length-1:-1;
   if(n<0)return;e.preventDefault();setTab(tabs[n]);e.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`#companion-tab-${tabs[n]}`)?.focus();};
  const set=<K extends keyof CompanionFilters>(k:K,v:CompanionFilters[K])=>setFilters(f=>({...f,[k]:v}));
  const toggleKind=(k:typeof RELATION_KINDS[number])=>setFilters(f=>({...f,kinds:f.kinds.includes(k)?f.kinds.filter(x=>x!==k):RELATION_KINDS.filter(x=>x===k||f.kinds.includes(x))}));
  const mode=liveDetour?`Detour: the original question stays on ${liveDetour.origin.label}.`:pinned?'Pinned: the companion keeps the pinned component.':'Following the selection.';
- return <section className="companion-pane note-card" aria-label="Companion pane" data-testid="companion-pane">
+ return <section ref={paneRef} className="companion-pane note-card" aria-label="Companion pane" data-testid="companion-pane">
   <h3>Companion</h3>
   <p className="micro" role="status" aria-label="Companion anchor">{current?<>About <strong>{label(current.nodeId)}</strong> · {mode}</>:'Select a component to see its explanation, code, related context and evidence.'} {publicMode?'Public projection.':'Private authoring context.'} Read-only.</p>
   {liveDetour&&<div role="region" aria-label="Detour" className="companion-detour" data-testid="companion-detour">
    <p className="micro">You opened <strong>{liveDetour.target.label}</strong> as a detour from <strong>{liveDetour.origin.label}</strong>. The original question is kept.</p>
-   <button type="button" onClick={giveBack}>Return to {liveDetour.origin.label}</button> <button type="button" className="link-button" onClick={()=>setDetour(null)}>End detour here</button>
+   <button type="button" onClick={giveBack}>Return to {liveDetour.origin.label}</button> <button type="button" className="link-button" onClick={endDetour}>End detour here</button>
   </div>}
   {current&&<>
    <div className="pi-tabs" role="tablist" aria-label="Companion sections">{tabs.map(t=><button type="button" key={t} id={`companion-tab-${t}`} role="tab" aria-selected={shownTab===t} aria-controls="companion-panel" tabIndex={shownTab===t?0:-1} onKeyDown={moveTab} onClick={()=>setTab(t)} style={{flex:'1 1 80px'}}>{COMPANION_TAB_LABEL[t]}</button>)}</div>
