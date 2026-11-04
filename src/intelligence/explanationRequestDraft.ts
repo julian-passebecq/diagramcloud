@@ -16,7 +16,9 @@ export function explanationSourceMatches(project:Project,basis:ExplanationBasis)
  return project.id===basis.projectId&&project.revision===basis.revision&&walkthroughFingerprint(project)===basis.fingerprint;
 }
 export function newExplanationStep(existing:readonly ExplanationStep[],viewId:string):ExplanationStep{
- let n=1;while(existing.some(step=>step.id===`step-${n}`))n++;
+ // A deleted prerequisite remains an unresolved identity, never a name for a newly added step.
+ const reserved=new Set(existing.flatMap(step=>[step.id,...step.dependsOn]));
+ let n=1;while(reserved.has(`step-${n}`))n++;
  return {id:`step-${n}`,title:'',viewId,nodeIds:[],edgeIds:[],narration:'',sourceIds:[],provenance:'synthetic',dependsOn:[],before:[],after:[],takeaway:'',questions:[]};
 }
 export function newExplanationDraft(project:Project,viewId:string,selectedNodeId:string|null):ExplanationDraft{

@@ -38,3 +38,13 @@ test('walkthrough preserves exact case, prerequisite and questions as private ev
  if(content.structure?.state!=='available')throw Error('missing');assert.deepEqual(content.structure.details.prerequisites,['validate · Validate fields']);assert.equal(content.contract.length,2);assert.ok(companionTabs(content).includes('contract'));
  assert.deepEqual(publicDocument(result.preview),publicDocument(doc));assert.equal(doc.nodes.length,1);
 });
+
+test('compiler normalizes optional blank cases and refuses blank questions before producing unreadable metadata',()=>{
+ const doc=validateDocument({schemaVersion:1,id:'p',title:'P',rootViewId:'root',nodes:[{id:'n',label:'N'}],edges:[],views:[{id:'root',title:'Root',nodeIds:['n']}],tours:[]});
+ const request={format:'diagramcloud.explanation-walkthrough',version:1,projectId:doc.id,baseRevision:doc.revision,baseFingerprint:walkthroughFingerprint(doc),id:'whitespace',title:'Whitespace example',question:'Why?',sourceIds:[],steps:[{id:'step',title:'Inspect',viewId:'root',nodeIds:['n'],narration:'An authored example.',caseLabel:' \t ',questions:['  Who follows up?  ']}]};
+ const before=JSON.stringify(request),result=prepareExplanationWalkthrough(doc,request),read=companionContent(result.preview,'walk-whitespace.step.note')!.structure;
+ assert.equal(read?.state,'available');if(read?.state!=='available')throw Error('Compiler emitted unreadable detail');assert.equal(read.details.caseLabel,undefined);assert.deepEqual(read.details.questions,['Who follows up?']);assert.equal(JSON.stringify(request),before);
+ request.steps[0].caseLabel='  Rejected batch  ';const named=prepareExplanationWalkthrough(doc,request);const namedRead=companionContent(named.preview,'walk-whitespace.step.note')!.structure;assert.equal(namedRead?.state,'available');if(namedRead?.state==='available')assert.equal(namedRead.details.caseLabel,'Rejected batch');
+ for(const blank of ['', ' ', '\t\n']){request.steps[0].questions=[blank];assert.throws(()=>prepareExplanationWalkthrough(doc,request));}
+ assert.equal(doc.nodes.length,1);assert.equal(doc.blocks.length,0);
+});

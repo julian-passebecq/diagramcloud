@@ -129,6 +129,7 @@
       "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.logical.contract",
         "walk-lesson.logical.text"
       ],
       "sourceIds": [
@@ -170,6 +171,7 @@
       "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.environment.contract",
         "walk-lesson.environment.text"
       ],
       "sourceIds": [
@@ -211,6 +213,7 @@
       "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.trust.contract",
         "walk-lesson.trust.text"
       ],
       "sourceIds": [
@@ -252,6 +255,7 @@
       "role": "cloud-boundaries@revision 1; source fingerprint ad65629392ed6411. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.failure.contract",
         "walk-lesson.failure.text",
         "walk-lesson.failure.after"
       ],
@@ -618,6 +622,34 @@
       "text": "Question: Where does this component run, and which boundary does a request cross?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: cloud-boundaries revision 1; fingerprint ad65629392ed6411.\n\nThis private addition changes no existing feature, deployment, approval or observation."
     },
     {
+      "id": "walk-lesson.logical.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "Where does this component run, and which boundary does a request cross?"
+        ],
+        [
+          "source-cut",
+          "cloud-boundaries revision 1"
+        ]
+      ]
+    },
+    {
       "id": "walk-lesson.logical.text",
       "title": "Logical components are not deployment instances",
       "visibility": "public",
@@ -627,6 +659,34 @@
       "provenance": "synthetic",
       "type": "text",
       "text": "This view explains software responsibilities. It does not imply a specific cloud vendor or a provisioned resource.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of cloud-boundaries revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.environment.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "Where does this component run, and which boundary does a request cross?"
+        ],
+        [
+          "source-cut",
+          "cloud-boundaries revision 1"
+        ]
+      ]
     },
     {
       "id": "walk-lesson.environment.text",
@@ -640,6 +700,46 @@
       "text": "One logical service can have several environment-specific instances. A TEST configuration is not proof of PROD configuration, reachability, identity or installed version.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nSnapshot of cloud-boundaries revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
     },
     {
+      "id": "walk-lesson.trust.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "Where does this component run, and which boundary does a request cross?"
+        ],
+        [
+          "source-cut",
+          "cloud-boundaries revision 1"
+        ],
+        [
+          "question",
+          "Which identity makes the downstream query?"
+        ],
+        [
+          "question",
+          "What is denied?"
+        ],
+        [
+          "question",
+          "Which data may cross this boundary?"
+        ]
+      ]
+    },
+    {
       "id": "walk-lesson.trust.text",
       "title": "Network reachability and authorization differ",
       "visibility": "public",
@@ -649,6 +749,34 @@
       "provenance": "synthetic",
       "type": "text",
       "text": "A route and a token are not blanket authorization. Tenant isolation, allowed actions, secret handling and rejected requests need explicit explanation and evidence.\n\nCausal prerequisites not supplied; this is presentation order only.\n\nQuestion to explore: Which identity makes the downstream query?\n\nQuestion to explore: What is denied?\n\nQuestion to explore: Which data may cross this boundary?\n\nSnapshot of cloud-boundaries revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.failure.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [
+        "c4"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "Where does this component run, and which boundary does a request cross?"
+        ],
+        [
+          "source-cut",
+          "cloud-boundaries revision 1"
+        ]
+      ]
     },
     {
       "id": "walk-lesson.failure.text",
@@ -747,7 +875,7 @@
       "sourceRevision": 1,
       "stops": [
         {
-          "id": "stop-85b24f4c42",
+          "id": "stop-ad857304f1",
           "viewId": "walk-lesson.logical.view",
           "subjects": [
             {
@@ -783,12 +911,12 @@
               "id": "data"
             }
           ],
-          "fingerprint": "57c596ef4bdb2f8a",
-          "referencedFingerprint": "95d2c649c71b3d4f",
+          "fingerprint": "4a4653b49279e731",
+          "referencedFingerprint": "fbfdb66484c029aa",
           "narration": "This view explains software responsibilities. It does not imply a specific cloud vendor or a provisioned resource."
         },
         {
-          "id": "stop-7162c0e50e",
+          "id": "stop-7b9059f3bc",
           "viewId": "walk-lesson.environment.view",
           "subjects": [
             {
@@ -808,12 +936,12 @@
               "id": "data"
             }
           ],
-          "fingerprint": "58ea4783c5a4bbda",
-          "referencedFingerprint": "f73a9c7fc6a019f9",
+          "fingerprint": "e726fbf0fd0b1bfa",
+          "referencedFingerprint": "99252e96934076ac",
           "narration": "One logical service can have several environment-specific instances. A TEST configuration is not proof of PROD configuration, reachability, identity or installed version."
         },
         {
-          "id": "stop-419b5352b6",
+          "id": "stop-bfe7b03a1d",
           "viewId": "walk-lesson.trust.view",
           "subjects": [
             {
@@ -841,12 +969,12 @@
               "id": "token"
             }
           ],
-          "fingerprint": "685175339a13d996",
-          "referencedFingerprint": "21dccf259aefbfb4",
+          "fingerprint": "882bc6cf02a106f9",
+          "referencedFingerprint": "278c67dd27a92eb7",
           "narration": "A route and a token are not blanket authorization. Tenant isolation, allowed actions, secret handling and rejected requests need explicit explanation and evidence."
         },
         {
-          "id": "stop-e5fb51327a",
+          "id": "stop-a2f391c672",
           "viewId": "walk-lesson.failure.view",
           "subjects": [
             {
@@ -874,8 +1002,8 @@
               "id": "data"
             }
           ],
-          "fingerprint": "9299f1dd9dfb7dab",
-          "referencedFingerprint": "466dd4cee353fee3",
+          "fingerprint": "53fbd1cbab0ab76e",
+          "referencedFingerprint": "4485d9256e48092c",
           "narration": "A resilient design must describe capacity, timeout, failover, backup and recovery assumptions. No availability percentage or recovery time is inferred from replica icons."
         }
       ],

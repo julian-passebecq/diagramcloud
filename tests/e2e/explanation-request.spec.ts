@@ -194,3 +194,12 @@ for(const width of [1440,390])test.describe(`explanation request form ${width}`,
   await expect(form).toHaveCount(0);await expect.poll(()=>stored(page,before.id)).toEqual(before);
  });
 });
+
+test('deleted prerequisite stays unresolved after adding and moving an unrelated new step',async({page})=>{
+ const before=await openProject(page),form=await fillRequest(page);await form.getByRole('button',{name:'Add explanation step',exact:true}).click();
+ const dependent=form.getByRole('group',{name:'Step 2 (step-2)',exact:true});await dependent.getByLabel('Step 2 title',{exact:true}).fill('Dependent');await dependent.getByLabel('Step 2 component Retry wrapper',{exact:true}).check();await dependent.getByLabel('Step 2 narration',{exact:true}).fill('Needs the deleted authored prerequisite.');await dependent.getByText('Case, prerequisites and questions',{exact:true}).click();await dependent.getByLabel('Step 2 requires step-1',{exact:true}).check();
+ await form.getByRole('button',{name:'Remove step 1',exact:true}).click();await form.getByRole('button',{name:'Add explanation step',exact:true}).click();
+ const added=form.getByRole('group',{name:'Step 2 (step-3)',exact:true});await expect(added).toBeVisible();await added.getByLabel('Step 2 title',{exact:true}).fill('Unrelated new step');await added.getByLabel('Step 2 component Retry wrapper',{exact:true}).check();await added.getByLabel('Step 2 narration',{exact:true}).fill('New content must not inherit the deleted identity.');await added.getByRole('button',{name:'Move step 2 earlier',exact:true}).click();
+ await form.getByRole('button',{name:'Review explanation',exact:true}).click();await expect(form.getByRole('alert')).toContainText('Step prerequisite is missing');
+ const retained=form.getByRole('group',{name:'Step 2 (step-2)',exact:true});await expect(retained.getByLabel('Step 2 missing prerequisite step-1',{exact:true})).toBeChecked();expect(await stored(page,before.id)).toEqual(before);
+});

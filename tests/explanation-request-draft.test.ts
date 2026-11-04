@@ -40,3 +40,14 @@ for(const [name,edit] of [
  ['same-revision source',(p:Project)=>{p.sources[0].location='New source';}],['project',(p:Project)=>{p.id='foreign';}]
 ] as const)test(`Apply refuses ${name} drift after a valid preparation`,()=>{const p=project(),basis=explanationBasis(p),out=prepareExplanationDraft(p,basis,draft(p));edit(p);const before=structuredClone(p);assert.throws(()=>applyPreparedExplanation(p,basis,out.patch),/source changed/);assert.deepEqual(p,before);});
 test('Apply uses the native patch and a replay is refused after the host commits',()=>{const p=project(),basis=explanationBasis(p),out=prepareExplanationDraft(p,basis,draft(p));const next=applyPreparedExplanation(p,basis,out.patch);assert.deepEqual(next,applyDocumentPatch(p,out.patch).result);const committed=commitHistory({past:[],present:p,future:[]},next).present;assert.throws(()=>applyPreparedExplanation(committed,basis,out.patch),/source changed/);});
+
+test('remove, add and reorder cannot bind a missing prerequisite to a new step',()=>{
+ const p=project(),d=draft(p),original=d.steps[0];
+ const dependent={...original,id:'step-2',title:'Dependent',dependsOn:[original.id]};
+ d.steps=[dependent]; // The author removed the original prerequisite, preserving the unresolved reference.
+ const added={...newExplanationStep(d.steps,'root'),title:'Unrelated replacement',nodeIds:['caller'],narration:'Another authored action.'};
+ assert.equal(added.id,'step-3');d.steps=[added,dependent]; // Moving it earlier must not silently repair the old dependency.
+ const before=structuredClone(d);assert.throws(()=>prepareExplanationDraft(p,explanationBasis(p),d),/prerequisite is missing/);assert.deepEqual(d,before);
+ dependent.dependsOn=[added.id]; // Only an explicit author choice establishes this new link.
+ assert.doesNotThrow(()=>prepareExplanationDraft(p,explanationBasis(p),d));
+});

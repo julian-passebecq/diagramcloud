@@ -21,10 +21,10 @@ export const explanationWalkthroughSchema=z.object({
   narration:z.string().trim().min(1).max(1600),sourceIds:refs,
   provenance:z.enum(['synthetic','reference','source-derived','author']).default('synthetic'),
   /** Explicit prerequisite step IDs. An absent link is unknown, not proof of independence. */
-  dependsOn:z.array(id).max(20).default([]),caseLabel:z.string().max(200).optional(),
+  dependsOn:z.array(id).max(20).default([]),caseLabel:z.string().trim().max(200).transform(value=>value||undefined).optional(),
   before:z.array(stateRow).max(20).default([]),after:z.array(stateRow).max(20).default([]),
   code:z.object({blockId:ref,fromLine:z.number().int().positive(),toLine:z.number().int().positive()}).strict().optional(),
-  takeaway:z.string().max(1000).default(''),questions:z.array(z.string().min(1).max(300)).max(8).default([])
+  takeaway:z.string().max(1000).default(''),questions:z.array(z.string().trim().min(1).max(300)).max(8).default([])
  }).strict()).min(1).max(30)
 }).strict();
 export type ExplanationWalkthrough=z.infer<typeof explanationWalkthroughSchema>;

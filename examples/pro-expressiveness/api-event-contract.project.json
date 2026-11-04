@@ -129,6 +129,7 @@
       "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.contract.contract",
         "walk-lesson.contract.text",
         "walk-lesson.contract.code",
         "walk-lesson.contract.locator"
@@ -178,6 +179,7 @@
       "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.accept.contract",
         "walk-lesson.accept.text",
         "walk-lesson.accept.after"
       ],
@@ -226,6 +228,7 @@
       "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.delivery.contract",
         "walk-lesson.delivery.text"
       ],
       "sourceIds": [
@@ -273,6 +276,7 @@
       "role": "api-event-contract@revision 1; source fingerprint d5000950ef82b0e5. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.",
       "status": "idle",
       "blockIds": [
+        "walk-lesson.evidence.contract",
         "walk-lesson.evidence.text",
         "walk-lesson.evidence.after"
       ],
@@ -651,6 +655,37 @@
       "text": "Question: How does an accepted request become a completed business operation?\n\nAuthored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed.\nSource: api-event-contract revision 1; fingerprint d5000950ef82b0e5.\n\nThis private addition changes no existing feature, deployment, approval or observation."
     },
     {
+      "id": "walk-lesson.contract.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "How does an accepted request become a completed business operation?"
+        ],
+        [
+          "source-cut",
+          "api-event-contract revision 1"
+        ]
+      ]
+    },
+    {
       "id": "walk-lesson.contract.text",
       "title": "The interface is a declaration",
       "visibility": "public",
@@ -695,6 +730,41 @@
       "text": "api-event-contract revision 1, block http-contract, lines 1-1, content fingerprint 4a91dd7179f479cb. Frozen excerpt, not live code. Display-only; no execution."
     },
     {
+      "id": "walk-lesson.accept.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "How does an accepted request become a completed business operation?"
+        ],
+        [
+          "source-cut",
+          "api-event-contract revision 1"
+        ],
+        [
+          "prerequisite",
+          "contract · The interface is a declaration"
+        ]
+      ]
+    },
+    {
       "id": "walk-lesson.accept.text",
       "title": "Accepted is not completed",
       "visibility": "public",
@@ -737,6 +807,49 @@
       ]
     },
     {
+      "id": "walk-lesson.delivery.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "How does an accepted request become a completed business operation?"
+        ],
+        [
+          "source-cut",
+          "api-event-contract revision 1"
+        ],
+        [
+          "prerequisite",
+          "accept · Accepted is not completed"
+        ],
+        [
+          "question",
+          "What uniquely identifies one event and one processing attempt?"
+        ],
+        [
+          "question",
+          "What happens if writing succeeds but acknowledgement fails?"
+        ]
+      ]
+    },
+    {
       "id": "walk-lesson.delivery.text",
       "title": "Delivery and processing are separate",
       "visibility": "public",
@@ -749,6 +862,37 @@
       "provenance": "synthetic",
       "type": "text",
       "text": "A redelivery may repeat the same event. Deduplication, transaction boundaries, ordering and compensation require their own explicit contracts.\n\nExplicit prerequisites: accept.\n\nQuestion to explore: What uniquely identifies one event and one processing attempt?\n\nQuestion to explore: What happens if writing succeeds but acknowledgement fails?\n\nSnapshot of api-event-contract revision 1. Authored explanation snapshots. Presentation order is not causal order, elapsed time or a recorded run. No code or API is executed."
+    },
+    {
+      "id": "walk-lesson.evidence.contract",
+      "title": "Authored explanation details",
+      "visibility": "public",
+      "sourceIds": [
+        "openapi",
+        "asyncapi",
+        "http",
+        "otel"
+      ],
+      "provenance": "synthetic",
+      "type": "table",
+      "columns": [
+        "Explanation field",
+        "Authored value"
+      ],
+      "rows": [
+        [
+          "format",
+          "diagramcloud.explanation-details/1"
+        ],
+        [
+          "focus-question",
+          "How does an accepted request become a completed business operation?"
+        ],
+        [
+          "source-cut",
+          "api-event-contract revision 1"
+        ]
+      ]
     },
     {
       "id": "walk-lesson.evidence.text",
@@ -872,7 +1016,7 @@
       "sourceRevision": 1,
       "stops": [
         {
-          "id": "stop-29b37cba99",
+          "id": "stop-2b2681c2a0",
           "viewId": "walk-lesson.contract.view",
           "subjects": [
             {
@@ -892,12 +1036,12 @@
               "id": "post"
             }
           ],
-          "fingerprint": "b7c43e2f0a38603e",
-          "referencedFingerprint": "eb9f79460fad3224",
+          "fingerprint": "90887b435acff412",
+          "referencedFingerprint": "3e7de145d055c4b4",
           "narration": "Operation name, request, response and authorization requirements belong to the versioned interface. A contract does not prove a deployment or successful call."
         },
         {
-          "id": "stop-8b5ddfbe3a",
+          "id": "stop-c862956038",
           "viewId": "walk-lesson.accept.view",
           "subjects": [
             {
@@ -925,12 +1069,12 @@
               "id": "publish"
             }
           ],
-          "fingerprint": "370eee617cb1f8f3",
-          "referencedFingerprint": "555c0d310e2f8d63",
+          "fingerprint": "bf6217a338054a26",
+          "referencedFingerprint": "337b6798b9004651",
           "narration": "HTTP acceptance and event publication are distinct milestones. This illustrative scenario assumes an outbox or equivalent consistency policy would be specified; it is not implemented here."
         },
         {
-          "id": "stop-f3fbb5c170",
+          "id": "stop-467eb0be38",
           "viewId": "walk-lesson.delivery.view",
           "subjects": [
             {
@@ -950,12 +1094,12 @@
               "id": "consume"
             }
           ],
-          "fingerprint": "bd9abf8ad0343bac",
-          "referencedFingerprint": "06542fbf51151d41",
+          "fingerprint": "4e657548b581ea56",
+          "referencedFingerprint": "7226d3f412b4c676",
           "narration": "A redelivery may repeat the same event. Deduplication, transaction boundaries, ordering and compensation require their own explicit contracts."
         },
         {
-          "id": "stop-c1fe1379ac",
+          "id": "stop-8f4b17b1a0",
           "viewId": "walk-lesson.evidence.view",
           "subjects": [
             {
@@ -983,8 +1127,8 @@
               "id": "consume"
             }
           ],
-          "fingerprint": "0f89339f72b472ee",
-          "referencedFingerprint": "7855bf308ac66aee",
+          "fingerprint": "640d806c05ea058d",
+          "referencedFingerprint": "3c79b631c06b340b",
           "narration": "Actual telemetry needs trace/span identities, links and timestamps from a producer. Clock order alone is not causality; an authored animation cannot supply a missing span."
         }
       ],
