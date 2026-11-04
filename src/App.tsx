@@ -635,6 +635,7 @@ function HierarchyRailBar({doc,path,selected,step,storyLength,onMove,onStory}:{d
  const deepest=path[path.length-1],rail=useMemo(()=>hierarchyRail(doc,path,deepest,selected),[doc,path,deepest,selected]),parents=useMemo(()=>parentPaths(doc,deepest),[doc,deepest]);
  const title=(id:string)=>doc.views.find(v=>v.id===id)?.title??id,label=(id:string)=>doc.nodes.find(n=>n.id===id)?.label??id;
  const current=parents.paths.findIndex(p=>p.viewIds.length===path.length&&p.viewIds.every((id,i)=>id===path[i]));
+ const chooseParent=(value:string)=>{if(value==='')return;const chosen=parents.paths[Number(value)];if(!chosen)return;const view=doc.views.find(v=>v.id===deepest);onMove({path:chosen.viewIds,view:deepest,selected:selected&&view?.nodeIds.includes(selected)?selected:null});};
  const button=(name:string,text:string,move:RailMove|undefined,hint:string)=><button type="button" aria-label={name} title={move?`${name}: ${hint}`:`${name}: unavailable`} aria-disabled={!move} onClick={()=>{if(move)onMove(move);}}>{text}</button>;
  const story=(name:string,text:string,index:number|null)=><button type="button" aria-label={name} title={index===null?`${name}: unavailable`:name} aria-disabled={index===null} onClick={()=>{if(index!==null)onStory(index);}}>{text}</button>;
  return <div className="hierarchy-rail" role="group" aria-label="Hierarchy navigation">
@@ -644,6 +645,11 @@ function HierarchyRailBar({doc,path,selected,step,storyLength,onMove,onStory}:{d
   {button('Next sibling view','Sibling ›',rail.next,rail.next?title(rail.next.view):'')}
   {rail.siblings>1&&<span className="micro">{`Sibling ${rail.position} of ${rail.siblings}`}</span>}
   {storyLength>0&&<>{story('Previous story step','‹ Step',step>0?step-1:null)}{story('Next story step','Step ›',step<storyLength-1?step+1:null)}</>}
-  {parents.paths.length>1&&<label className="parent-choice">Choose parent <select aria-label="Choose parent" value={current<0?'':String(current)} onChange={e=>{const chosen=parents.paths[Number(e.target.value)];if(!chosen)return;const view=doc.views.find(v=>v.id===deepest);onMove({path:chosen.viewIds,view:deepest,selected:selected&&view?.nodeIds.includes(selected)?selected:null});}}>{current<0&&<option value="">Current path</option>}{parents.paths.map((p,i)=><option key={p.viewIds.join('>')} value={String(i)}>{p.viewIds.slice(0,-1).map((id,j)=>`${title(id)} (via ${label(p.via[j])})`).join(' › ')}</option>)}</select><span className="micro" role="note">{`${title(deepest)} has ${parents.truncated?'more than ':''}${parents.paths.length} parent paths; the choice is navigation only.`}</span></label>}
+  {parents.paths.length>1&&<label className="parent-choice">Choose parent <select aria-label="Choose parent" value={current<0?'':String(current)} onChange={e=>chooseParent(e.target.value)} onKeyDown={e=>{
+   // One arrow is one navigation action, including hosts with a native popup menu.
+   if(e.altKey||e.ctrlKey||e.metaKey||e.nativeEvent.isComposing||!['ArrowDown','ArrowUp'].includes(e.key))return;
+   e.preventDefault();const select=e.currentTarget,next=Math.max(0,Math.min(select.options.length-1,select.selectedIndex+(e.key==='ArrowDown'?1:-1)));
+   if(next!==select.selectedIndex)chooseParent(select.options[next].value);
+  }}>{current<0&&<option value="">Current path</option>}{parents.paths.map((p,i)=><option key={p.viewIds.join('>')} value={String(i)}>{p.viewIds.slice(0,-1).map((id,j)=>`${title(id)} (via ${label(p.via[j])})`).join(' › ')}</option>)}</select><span className="micro" role="note">{`${title(deepest)} has ${parents.truncated?'more than ':''}${parents.paths.length} parent paths; the choice is navigation only.`}</span></label>}
  </div>;
 }

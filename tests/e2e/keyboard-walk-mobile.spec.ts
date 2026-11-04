@@ -63,6 +63,9 @@ test('390x844 keyboard walk: canvas cards and sidebar tabs by Tab, Up Down sibli
  const choose=rail.getByLabel('Choose parent',{exact:true});await expect(rail).toContainText('Synthetic shared has 2 parent paths; the choice is navigation only.');
  await tabTo(page,choose,true);await inViewport(page,choose);await page.keyboard.press('ArrowDown');
  await expect(page.getByTestId('view-vb')).toBeVisible();await expect(page.getByTestId('view-va')).toHaveCount(0);await expect(page.getByTestId('view-shared')).toBeVisible();await focusKept(page);
+ // Reverse and repeat with real arrows; each action preserves keyboard focus and the shared child.
+ await expect(choose).toBeFocused();await page.keyboard.press('ArrowUp');await expect(page.getByTestId('view-va')).toBeVisible();await expect(page.getByTestId('view-vb')).toHaveCount(0);await expect(choose).toBeFocused();
+ await page.keyboard.press('ArrowDown');await expect(page.getByTestId('view-vb')).toBeVisible();await expect(page.getByTestId('view-va')).toHaveCount(0);await expect(page.getByTestId('view-shared')).toBeVisible();await expect(choose).toBeFocused();
  // Back undoes exactly the parent choice.
  const back=page.getByRole('button',{name:'Back',exact:true});await tabTo(page,back,true);await page.keyboard.press('Enter');await expect(page.getByTestId('view-va')).toBeVisible();await expect(page.getByTestId('view-vb')).toHaveCount(0);
 
