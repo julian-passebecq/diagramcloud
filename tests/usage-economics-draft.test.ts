@@ -22,3 +22,13 @@ test('blank/no records never become assumed free work and forms are bounded',()=
  const d=fixture();d.records[0].allocations=Array.from({length:USAGE_ALLOCATION_LIMIT+1},(_,key)=>({key,featureId:'f'+key,basisPoints:'0'}));assert.throws(()=>calculateUsageDraft(d));
 });
 test('private dock only exposes empty disclosure and public dock omits usage UI',()=>{const p=documentSchema.parse({schemaVersion:1,id:'usage',title:'Usage',rootViewId:'root',nodes:[],edges:[],views:[{id:'root',title:'Root'}]});const render=(audience:'author'|'public')=>renderToStaticMarkup(React.createElement(ProjectDock,{project:p,audience,activeViewId:'root',onNavigate(){},onStory(){},localCheckoutHost:false}));assert.match(render('author'),/Supplied usage and cost/);assert.doesNotMatch(render('author'),/aria-label="Usage assumption basis"/);assert.doesNotMatch(render('public'),/Supplied usage and cost/);assert.equal(p.revision,0);});
+
+test('positive remainder uses the exact shared-engine expression when checking underflow',()=>{
+ const d=fixture();d.records[0].amount='2.5e-323';d.records[0].allocations=[{key:1,featureId:'a',basisPoints:'9000'}];
+ const events=calculateUsageDraft(fixture()).events;events[0].cost!.amount=Number(d.records[0].amount);events[0].allocations=[{featureId:'a',basisPoints:9000}];
+ assert.ok(events[0].cost!.amount*((10000-9000)/10000)>0,'alternate expression would miss underflow');
+ assert.equal(summarizeUsage(events).costs[0].unattributed,0,'actual shared arithmetic loses the positive remainder');
+ assert.throws(()=>calculateUsageDraft(d),/rounds to zero/);
+ d.records[0].amount='5e-323';assert.ok(calculateUsageDraft(d).totals.costs[0].unattributed>0);
+ d.records[0].amount='2.5e-323';d.records[0].allocations[0].basisPoints='10000';assert.equal(calculateUsageDraft(d).totals.costs[0].unattributed,0,'fully allocated has a real zero remainder');
+});

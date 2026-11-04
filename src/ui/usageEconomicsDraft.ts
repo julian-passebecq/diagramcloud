@@ -29,8 +29,9 @@ export function calculateUsageDraft(draft:UsageDraft){
  if(typeof draft.featureFilter!=='string'||draft.featureFilter.length>2000)throw Error('Feature filter exceeds 2000 characters.');
  const selectedFeatures=draft.featureFilter.trim()?draft.featureFilter.split('\n').filter(v=>v.trim()).map(v=>identity(v,'Feature filter ID')):undefined;
  const events=normalizeUsage(records);
- // Do not turn a positive supplied amount into a zero allocation due to floating-point underflow.
- for(const event of events)if(event.cost&&event.cost.amount>0){const points=event.allocations.reduce((n,a)=>n+a.basisPoints,0);for(const p of [...event.allocations.map(a=>a.basisPoints),10000-points])if(p>0&&event.cost.amount*(p/10000)===0)throw Error('Positive allocated cost rounds to zero; supply a representable amount.');}
+ // Use the exact shared-engine fractions: algebraically equivalent remainder expressions
+ // can round differently for subnormal amounts. Refuse positive shares that become zero.
+ for(const event of events)if(event.cost&&event.cost.amount>0){const points=event.allocations.reduce((n,a)=>n+a.basisPoints,0);for(const fraction of [...event.allocations.map(a=>a.basisPoints/10000),1-points/10000])if(fraction>0&&event.cost.amount*fraction===0)throw Error('Positive allocated cost rounds to zero; supply a representable amount.');}
  const totals=summarizeUsage(events,selectedFeatures);
  return {basis,windowStart,windowEnd,submittedRows:draft.records.length,events,totals,provenance:[...provenance.values()],selectedFeatures,unknownCachedCalls:events.filter(e=>e.cachedInputTokens===null).length,unknownReasoningCalls:events.filter(e=>e.reasoningOutputTokens===null).length};
 }
