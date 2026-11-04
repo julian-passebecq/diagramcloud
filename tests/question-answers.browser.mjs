@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';import {mkd
 const root=fileURLToPath(new URL('..',import.meta.url));
 for(const width of [1440,390])test(`Questions ${width}: guarded answer, named review, edit clears review, Undo/reload, source drift and public boundary`,async()=>{const temp=await mkdtemp(path.join(os.tmpdir(),'dc-answers-'));let browser;try{const out=path.join(temp,'fixture.js');
  await build({entryPoints:[path.join(root,'tests/fixtures/question-answers/fixture.tsx')],bundle:true,platform:'browser',format:'iife',outfile:out,define:{'process.env.NODE_ENV':'"test"'}});browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.setDefaultTimeout(5000);page.on('pageerror',e=>errors.push(e.message));
- await page.setContent('<style>*{box-sizing:border-box}body{margin:8px;font-family:system-ui}input,textarea{display:block}button{margin:4px}article{overflow-wrap:anywhere}svg{max-width:100%}</style><div id="root"></div>');
+ await page.setContent('<style>*{box-sizing:border-box}body{margin:8px;font-family:system-ui}input,textarea{display:block}button{margin:4px}article,[role=alert]{overflow-wrap:anywhere}svg{max-width:100%}</style><div id="root"></div>');
  await page.addScriptTag({path:out});
  await page.getByRole('tab',{name:'Questions',exact:true}).click();let answer=page.getByRole('article',{name:'Answer: Why validate?',exact:true});
  await answer.getByLabel('Answer text').fill('Illustrative reply');
