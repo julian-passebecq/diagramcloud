@@ -23,6 +23,8 @@ function AnswerForm({project,binding,row,editMode,onPropose,blocked}:Props&{bind
  const [basis,setBasis]=useState(project),[originalBinding,setBinding]=useState(binding);
  const stale=canonical(basis)!==canonical(project)||canonical(originalBinding)!==canonical(binding)||!questions(project,binding.nodeId).items.some(q=>canonical(q)===canonical(originalBinding));
  const [answer,setAnswer]=useState(row?.record?.answer??''),[author,setAuthor]=useState(row?.record?.author??''),[citationIds,setCitations]=useState<string[]>(row?.record?.citationIds??[]),[reviewer,setReviewer]=useState(''),[error,setError]=useState(''),[sent,setSent]=useState(false);
+ // A completed Project change or leaving Edit ends the proposal notice, including after Undo returns to its old basis.
+ useLayoutEffect(()=>{setSent(false);},[project,editMode]);
  const freshId=()=>{const base=`answer-${fnv64(canonical(binding))}`;let id=base,n=1;while(project.blocks.some(b=>b.id===id))id=`${base}-${n++}`;return id;};
  const blockId=useRef(row?.block.id??freshId());
  const reset=()=>{setBasis(project);setBinding(binding);setAnswer(row?.record?.answer??'');setAuthor(row?.record?.author??'');setCitations(row?.record?.citationIds??[]);setReviewer('');setError('');setSent(false);blockId.current=row?.block.id??freshId();};
