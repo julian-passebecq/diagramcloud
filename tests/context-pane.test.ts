@@ -68,3 +68,17 @@ test('view-only hover replaces the selected node, respects pins and ignores priv
  }
  assert.equal(html(p,{publicMode:true,hoveredViewId:'hidden-view'}),html(p,{publicMode:true,hoveredViewId:'missing'}));
 });
+
+test('compact detail starts on Overview with mounted labelled panels and one tab stop',()=>{
+ const rendered=html();assert.match(rendered,/aria-label="Component detail sections"/);
+ assert.equal((rendered.match(/role="tab"/g)??[]).length,4);assert.equal((rendered.match(/role="tabpanel"/g)??[]).length,4);
+ assert.equal((rendered.match(/aria-selected="true"/g)??[]).length,1);assert.equal((rendered.match(/hidden=""/g)??[]).length,3);
+ for(const name of ['Overview','Connections','Evidence','Sources']){assert.ok(rendered.includes(`-${name}-panel`));assert.ok(rendered.includes(`-${name}-tab`));}
+ assert.match(rendered,/Schema validation/);assert.match(rendered,/Order contract/);
+});
+
+test('project overview initially offers eight components and an explicit expansion control',()=>{
+ const p=fixture();for(let i=0;i<12;i++){p.nodes.push({...p.nodes[0],id:`extra-${i}`,label:`Extra ${i}`});p.views[0].nodeIds.push(`extra-${i}`);}
+ const rendered=html(validateDocument(p),{selectedNodeId:null});assert.match(rendered,/Show 16 components/);assert.ok(!rendered.includes('<strong>Extra 11</strong>'));
+ assert.equal((rendered.match(/<strong>Extra /g)??[]).length,4);
+});
