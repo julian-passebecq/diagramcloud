@@ -1,0 +1,22 @@
+.project-dock{min-width:0;font-size:13px;line-height:1.45;color:var(--text,#202938)}
+.project-dock-tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--border,#d8dee8);padding-bottom:6px}
+.project-dock button{font:inherit;border:1px solid var(--border,#ccd5e2);border-radius:5px;padding:5px 9px;color:inherit;background:var(--surface,#fff);cursor:pointer;text-align:left;max-width:100%;overflow-wrap:anywhere}
+.project-dock button[aria-selected=true],.project-dock button[aria-current]{background:var(--accent-soft,#e7efff);border-color:var(--accent,#315fc6);font-weight:650}
+.project-dock button[aria-disabled=true]{opacity:.65;cursor:default}
+.project-dock button:focus-visible,.project-dock a:focus-visible,.project-dock [role=tabpanel]:focus-visible{outline:2px solid var(--accent,#315fc6);outline-offset:2px}
+.project-dock-context{display:flex;flex-wrap:wrap;gap:4px 12px;padding:7px 0;overflow-wrap:anywhere}
+.project-dock-context span,.project-dock-caption,.project-dock small{color:var(--muted,#566578)}
+.project-dock h3{font-size:13px;margin:3px 0 6px}
+.project-dock p{margin:5px 0;overflow-wrap:anywhere}
+.project-dock-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.project-dock-grid>div{min-width:0}
+.project-dock-list{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.project-dock-list>li{min-width:0;border-bottom:1px solid var(--border,#e2e7ef);padding:4px 0 8px;overflow-wrap:anywhere}
+.project-dock-list small{display:block;margin:3px 0}
+.project-dock code{font-size:11px;overflow-wrap:anywhere;white-space:normal}
+.project-dock details{margin:5px 0;min-width:0}
+.project-dock summary{cursor:pointer}
+.project-dock-actions{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0}
+.project-dock [hidden]{display:none!important}
+@media(max-width:700px){.project-dock-grid{grid-template-columns:minmax(0,1fr);gap:12px}.project-dock-tabs button{flex:1 1 auto;min-height:36px}.project-dock button{min-height:32px}}
+@media(prefers-reduced-motion:reduce){.project-dock *{scroll-behavior:auto;transition:none;animation:none}}
