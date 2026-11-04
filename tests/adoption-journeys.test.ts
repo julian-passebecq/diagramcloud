@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readText} from './helpers/readText';
 import {validateDocument,parseDocument} from '../src/core/model';
 import {publicDocument} from '../src/core/operations';
 import {samples} from '../src/data/samples';
@@ -10,7 +10,7 @@ import {lessonInstanceFacts,conceptsExplaining,mappingStatus} from '../src/intel
 import {learningCatalogue} from '../src/intelligence/learning/catalogue';
 import {galleryBucket,galleryCaption} from '../src/ui/Gallery';
 
-const lines=(path:string)=>readFileSync(path,'utf8').split('\n');
+const lines=(path:string)=>readText(path).split('\n');
 
 test('adoption journeys: three valid gallery projects, registered with stable IDs, none observed',()=>{
  const journeys=adoptionJourneys();

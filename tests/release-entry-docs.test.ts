@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import {dirname,resolve,sep} from 'node:path';
 import {createHash} from 'node:crypto';
+import {readText} from './helpers/readText';
 
-const read=(path:string)=>readFileSync(path,'utf8');
+const read=(path:string)=>readText(path);
 const entries=['README.md','docs/ROADMAP.md','RESUME.md'];
 const archives=[
  ['README_HISTORY_20261021.md','f1bd356605999ae8ed951d36501dabfaf749ed83'],
