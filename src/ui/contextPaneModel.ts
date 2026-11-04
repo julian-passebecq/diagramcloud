@@ -9,7 +9,7 @@ export type ContextFlow={edge:ProjectEdge;direction:'input'|'output'|'loop';othe
 export function contextPaneFacts(input:Project,publicMode:boolean,selection:ContextPaneSelection){
  const doc=publicMode?publicDocument(input):input;
  const selected={...(selection.selectedViewId?{viewId:selection.selectedViewId}:{}),...(selection.selectedNodeId?{nodeId:selection.selectedNodeId}:{})};
- const hovered=selection.hoveredNodeId?{nodeId:selection.hoveredNodeId,...(selection.hoveredViewId?{viewId:selection.hoveredViewId}:{})}:null;
+ const hovered=selection.hoveredNodeId||selection.hoveredViewId?{...(selection.hoveredNodeId?{nodeId:selection.hoveredNodeId}:{}),...(selection.hoveredViewId?{viewId:selection.hoveredViewId}:{})}:null;
  const canResolve=(value:{nodeId?:string;viewId?:string})=>resolveContextPin(doc,{projectId:doc.id,...value}).state==='available';
  const preview=!selection.pinned&&hovered&&canResolve(hovered)?hovered:null;
  const target=preview??selected;

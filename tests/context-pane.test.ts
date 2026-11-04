@@ -53,3 +53,18 @@ test('view and project overviews show actionable permitted components and truthf
  const rendered=html(fixture(),{selectedNodeId:null,publicMode:true});assert.match(rendered,/Inspect a component/);assert.match(rendered,/Architecture/);assert.doesNotMatch(rendered,/SECRET/);
  const f=contextPaneFacts(fixture(),true,{pinned:false});assert.equal(f.context?.components.length,4);assert.equal(f.context?.relations.length,2);
 });
+
+
+test('view-only hover replaces the selected node, respects pins and ignores private or missing views',()=>{
+ const p=fixture(),hover={...selected,hoveredViewId:'implementation'};
+ const f=contextPaneFacts(p,false,hover);
+ assert.equal(f.preview,true);assert.equal(f.node,undefined);assert.equal(f.context?.view?.id,'implementation');
+ assert.deepEqual(f.selection,{viewId:'implementation'});
+ assert.deepEqual(f.context?.components.map(n=>n.id),['fn']);
+ const rendered=html(p,hover);assert.match(rendered,/Hover preview/);assert.match(rendered,/Validation implementation/);assert.doesNotMatch(rendered,/Reject malformed records/);
+ const pinned=contextPaneFacts(p,false,{...hover,pinned:true});assert.equal(pinned.preview,false);assert.equal(pinned.node?.id,'validate');
+ for(const hoveredViewId of ['hidden-view','missing']){
+  const ignored=contextPaneFacts(p,true,{...selected,hoveredViewId});assert.equal(ignored.preview,false);assert.equal(ignored.node?.id,'validate');
+ }
+ assert.equal(html(p,{publicMode:true,hoveredViewId:'hidden-view'}),html(p,{publicMode:true,hoveredViewId:'missing'}));
+});
