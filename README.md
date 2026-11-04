@@ -100,7 +100,7 @@ The offline compiler produces a private, revision-guarded `diagramcloud.patch`, 
 npm run explain -- --project examples/pro-expressiveness/retry-metadata.base.json --request examples/pro-expressiveness/retry-metadata.walkthrough.json --out explanation-output
 ```
 
-The output directory must not already exist; each input is limited to 4 MiB of exact UTF-8. Review the generated patch through the ordinary JSON / AI import before applying it. The six teaching projects in [the expressiveness guide](docs/product/EXPRESSIVENESS.md) are labelled synthetic examples, not observed runs. The companion pane follows explicit related-context connections; similarly named subjects are not inferred correspondence. **Focused explanation HTML** exports the selected public story for offline reading, with its code/state evidence. The companion’s Contract and Questions tabs remain unfinished.
+The output directory must not already exist; each input is limited to 4 MiB of exact UTF-8. Review the generated patch through the ordinary JSON / AI import before applying it. The six teaching projects in [the expressiveness guide](docs/product/EXPRESSIVENESS.md) are labelled synthetic examples, not observed runs. The companion pane follows explicit related-context connections; similarly named subjects are not inferred correspondence. **Focused explanation HTML** exports the selected public story for offline reading, with its code/state evidence. The companion reads Contract and Questions evidence. Private authored answers and named review records use the ordinary proposal preview and Apply flow; source changes make those records stale rather than rebinding them. See [question answers](docs/contracts/question-answers.md).
 
 ## Project Intelligence (1.24.0)
 
@@ -161,3 +161,9 @@ No live cloud discovery, arbitrary code execution, automatic agent dispatch, ser
 Original source is MIT. Dependencies and provider artwork retain their own terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Do not bundle font files.
 
 Use [architecture decisions](docs/ARCHITECTURE.md), [research decisions](docs/RESEARCH.md), [release verification](docs/RELEASE.md), [the canonical roadmap](docs/ROADMAP.md) and [current continuation](RESUME.md) for their separate purposes. Dated architecture/research checkpoints are not current qualification receipts. [Optional Drive guidance](docs/GOOGLE_DRIVE.md) is separate from core local persistence.
+
+### Follow the selected component
+
+In the bottom Project dock, **Show workflow steps** opens the authored story and gives it reading space. The dock distinguishes the active story step from every step that explicitly names the selected component. Story controls appear before optional calculations. [Workflow reading](docs/product/WORKFLOW_DOCK_READING.md).
+
+**Workflow → Supplied usage and cost** can load a private input file for review before replacing the form, or download validated inputs with their citations. Unknown amounts stay unknown; these supplied records are not a provider bill. [Usage files](docs/contracts/supplied-usage-files.md).
