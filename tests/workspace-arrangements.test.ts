@@ -44,3 +44,16 @@ test('storage never auto-applies an arrangement and public rendered markup omits
  const render=(audience:'public'|'author')=>renderToStaticMarkup(createElement(WorkspaceArrangements,{scope:{...scope,audience},layout:defaultWorkbenchLayout(),storage:()=>storage,isCurrent:()=>true,onRestore:()=>{restores++;}}));
  assert.match(render('author'),/PRIVATE_AUTHOR_DESK/);assert.doesNotMatch(render('public'),/PRIVATE_AUTHOR_DESK/);assert.equal(restores,0);
 });
+
+test('density and a floating Explorer round-trip through an explicit save and restore only',()=>{
+ const storage=memory(),dense={...layout(),density:'compact' as const,floating:{explorer:{x:24,y:40,width:300,height:420},companion:null,dock:{x:40,y:120,width:720,height:300}}};
+ const saved=changeWorkspaceArrangements(storage,scope,null,{type:'save',name:'Dense desk',layout:dense});assert(saved.ok);
+ const raw=storage.getItem(arrangementScopeKey(scope))!;assert.match(raw,/"density":"compact"/);assert.match(raw,/"explorer":\{"x":24/);
+ const restored=restoreWorkspaceArrangement(storage,scope,saved.read.basis,'Dense desk');assert(restored.ok);assert.deepEqual(restored.layout,dense);
+ restored.layout.floating.explorer!.x=0;assert.equal(dense.floating.explorer.x,24);
+ // An older record (no density, two floating keys) still restores; storage is not rewritten.
+ const {density,floating,...old}=layout(),legacyRaw=JSON.stringify({version:1,scope,entries:[{name:'Before 1.34',layout:{...old,floating:{companion:null,dock:null}}}]});storage.setItem(arrangementScopeKey(scope),legacyRaw);
+ const legacy=restoreWorkspaceArrangement(storage,scope,legacyRaw,'Before 1.34');assert(legacy.ok);assert.equal(legacy.layout.density,'comfortable');assert.equal(legacy.layout.floating.explorer,null);assert.equal(storage.getItem(arrangementScopeKey(scope)),legacyRaw);
+ // An unknown density or an extra floating key makes the whole record corrupt and untouched.
+ for(const entry of [{...dense,density:'cosy'},{...dense,floating:{...dense.floating,map:null}}]){const bad=JSON.stringify({version:1,scope,entries:[{name:'Bad',layout:entry}]});storage.setItem(arrangementScopeKey(scope),bad);assert.equal(readWorkspaceArrangements(storage,scope).status,'corrupt');assert.equal(storage.getItem(arrangementScopeKey(scope)),bad);}
+});
