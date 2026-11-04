@@ -12,6 +12,12 @@ import {previewCompletionPatch,type CompletionRequest} from '../intelligence/com
 import {isProviderRequest,parseAppliedLedger,proposalDigests,proposalRefusal,PROVIDER_LAUNCH_MESSAGE,validateProposal,type AppliedProposal,type ProposalContext,type ProposalValidation} from '../core/proposal';
 
 export type StagedPatch={patch:Patch;result:Project;snapshot?:StagedPublicationSnapshot;validation?:ProposalValidation};
+/** Re-run a reviewed patch against the live document immediately before Apply. Revision equality alone
+ * does not protect a same-revision replacement; the patch tests and the complete preview must still match. */
+export function revalidateStagedPatch(project:Project,preview:StagedPatch):void{
+ const fresh=applyDocumentPatch(project,preview.patch);
+ if(JSON.stringify(fresh.result)!==JSON.stringify(preview.result))throw new Error('Patch preview changed; prepare and review a fresh proposal.');
+}
 /** What the JSON / AI review shows next. Nothing here is applied: Apply stays the reviewed, revision-guarded step. */
 export type StagedImport={staged:Project;patched:StagedPatch|null;report:ImportReport|null;importName?:string;
  /** Unknown top-level modules the author confirmed dropping; they are not in `staged` and grant nothing. */
