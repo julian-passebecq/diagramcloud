@@ -25,6 +25,7 @@ const present=(slot:React.ReactNode)=>slot!==undefined&&slot!==null&&slot!==fals
  * This slice has native keyboard width controls, not free drag docking or cross-device preferences.
  */
 export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
+ state={railCollapsed:false,mapCollapsed:false};
  private root:HTMLDivElement|null=null;
  componentDidUpdate(){
   const root=this.root,active=root?.ownerDocument.activeElement as HTMLElement|null;
@@ -43,7 +44,7 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
  };
  render(){
   const p=this.props;if(!/^[a-z][a-z0-9_-]{0,60}$/.test(p.id))throw Error('Invalid workbench instance ID');
-  const layout=validateWorkbenchLayout(p.layout),slots={explorer:present(p.explorer),companion:present(p.companion),dock:present(p.navigationMap)||present(p.activity),rail:present(p.rail)};
+  const layout=validateWorkbenchLayout(p.layout),slots={explorer:present(p.explorer),companion:present(p.companion),dock:present(p.navigationMap)||present(p.activity),rail:present(p.rail)&&!this.state.railCollapsed};
   const fit=fitWorkbenchLayout(layout,p.width,p.height,slots),id=(name:string)=>`${p.id}-${name}`;
   const change=(next:WorkbenchLayout)=>p.onLayoutChange(validateWorkbenchLayout(next));
   const pane=(name:WorkbenchPane)=>change(selectWorkbenchPane(layout,name));
@@ -56,7 +57,7 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
   const region=(name:WorkbenchPane)=>({id:id(name),tabIndex:-1,'data-wb-region':name,hidden:!fit.visible[name]});
   return <div ref={el=>{this.root=el;}} className="workbench-frame" data-preset={layout.preset} data-compact={String(fit.compact)} data-side={layout.panels.sidebarSide} style={css} onKeyDownCapture={this.cycle}>
    <header className="wb-header">
-    <div className="wb-heading"><strong>{p.title}</strong>{p.scopeCaption&&<span>{p.scopeCaption}</span>}</div>
+    <div className="wb-heading"><h1>{p.title}</h1>{p.scopeCaption&&<span>{p.scopeCaption}</span>}</div>
     <div className="wb-controls" aria-label="Workspace controls">
      <label>Workspace <select className="wb-native" data-wb-recovery aria-label="Workspace layout preset" value={layout.preset} onChange={e=>change(setWorkbenchPreset(layout,e.target.value as WorkbenchPreset))}>
       <option value="explain">Explain</option><option value="compare">Compare</option><option value="present">Present focus</option>
@@ -65,6 +66,7 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
       {slots.explorer&&<button className="wb-native" type="button" aria-controls={id('explorer')} aria-expanded={!layout.panels.sidebarCollapsed} onClick={()=>toggle('explorer')}>Explorer</button>}
       {slots.companion&&<button className="wb-native" type="button" aria-controls={id('companion')} aria-expanded={!layout.panels.detailsCollapsed} onClick={()=>toggle('companion')}>Companion</button>}
       {slots.dock&&<button className="wb-native" type="button" aria-controls={id('dock')} aria-expanded={!layout.dockCollapsed} onClick={()=>toggle('dock')}>Bottom panel</button>}
+      {present(p.rail)&&<button className="wb-native" type="button" aria-controls={id('rail')} aria-expanded={!this.state.railCollapsed} onClick={()=>this.setState({railCollapsed:!this.state.railCollapsed})}>Route bar</button>}
      </span>}
      <details className="wb-layout"><summary className="wb-native">Layout</summary><div className="wb-layout-fields">
       <label>Explorer side <select className="wb-native" aria-label="Explorer side" value={layout.panels.sidebarSide} onChange={e=>change({...layout,panels:{...layout.panels,sidebarSide:e.target.value as 'left'|'right'}})}><option value="left">Left</option><option value="right">Right</option></select></label>
@@ -89,8 +91,8 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps>{
     <nav id={id('rail')} className="wb-rail wb-region" hidden={!fit.rail} aria-label="Semantic navigation" data-wb-region="rail" tabIndex={-1}>{p.rail}</nav>
    </div>
    <section {...region('dock')} className="wb-bottom wb-region" aria-label="Navigation map and contextual activity">
-    <div className="wb-dock-content" data-map={String(present(p.navigationMap))} data-activity={String(present(p.activity))}>
-     <section className="wb-map" hidden={!present(p.navigationMap)} aria-label="Navigation map"><h2>Navigation map</h2>{p.navigationMap}</section>
+    <div className="wb-dock-content" data-map={String(present(p.navigationMap))} data-map-collapsed={String(this.state.mapCollapsed)} data-activity={String(present(p.activity))}>
+     <section className="wb-map" hidden={!present(p.navigationMap)} aria-label="Navigation map"><button type="button" className="wb-native wb-map-toggle" aria-expanded={!this.state.mapCollapsed} aria-controls={id('route-map')} onClick={()=>this.setState({mapCollapsed:!this.state.mapCollapsed})}>{this.state.mapCollapsed?'Route ▸':'Route ▾'}</button><div id={id('route-map')} hidden={this.state.mapCollapsed}>{p.navigationMap}</div></section>
      <section className="wb-activity" hidden={!present(p.activity)} aria-label={p.activityTitle??'Contextual activity'}><h2>{p.activityTitle??'Contextual activity'}</h2>{p.activity}</section>
     </div>
    </section>

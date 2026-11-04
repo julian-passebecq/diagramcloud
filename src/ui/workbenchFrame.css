@@ -64,3 +64,78 @@
 .workbench-frame[data-compact=true] .v3-dock-controls .wb-layout-fields{left:12px;right:auto}
 .workbench-frame .wb-layout-fields .v3-default-surface label{flex-direction:row;align-items:center;gap:6px}
 .workbench-frame .wb-layout-fields .v3-default-surface{border-top:1px solid var(--border,#bec5cf);margin-top:10px;padding-top:10px}
+
+/* Connected desktop workspace: give the document panes the viewport, not repeated introductions. */
+.studio-workbench{height:100dvh;min-height:720px;display:flex;flex-direction:column;overflow:hidden}
+.studio-workbench>.app-header{height:auto;min-height:58px;flex:none;position:static;padding:8px 14px;gap:12px}
+.studio-workbench>.app-header .brand{min-width:180px}
+.studio-workbench>.app-header .header-actions{gap:4px;justify-content:flex-end}
+.studio-workbench>.app-header .header-actions button{font-size:12px;padding-inline:7px;min-width:0}
+.studio-workbench>.presentation-profile{display:flex;align-items:center;gap:12px;padding:4px 14px;flex:none;min-height:34px}
+.studio-workbench>.presentation-profile select{width:130px;min-height:26px;padding:2px 6px}
+.studio-workbench>.presentation-profile p{margin:0;font-size:11px}
+.studio-workbench>.presentation-profile .presentation-profile-scope{display:none}
+.studio-workbench>.workspace-status{position:static;min-height:26px;height:auto;padding:4px 14px;flex:none}
+.studio-workbench>.v3-workspace{min-height:0;flex:1;padding:0;gap:0}
+.studio-workbench .v3-frame-box{height:auto;min-height:0;flex:1}
+.studio-workbench .dc-perspective{flex:none}
+.studio-workbench .dc-destinations{padding:4px 12px;gap:12px}
+.studio-workbench .dc-destinations>strong{display:none}
+.studio-workbench .dc-destinations button{min-height:28px;padding:3px 9px;font-size:12px}
+.studio-workbench .dc-scope{font-size:11px;display:flex;gap:10px;align-items:center}
+.studio-workbench .dc-contextbar{padding:4px 12px;gap:8px}
+.studio-workbench .dc-topic-links button{min-height:26px;padding:2px 7px}
+.studio-workbench .dc-reading-controls{gap:10px}
+.studio-workbench .dc-reading-controls label{flex-direction:row;align-items:center;gap:5px}
+.studio-workbench .dc-reading-controls select{min-height:28px;padding:3px 6px;font-size:12px}
+.studio-workbench .dc-perspective-note{display:none}
+.studio-workbench .wb-header{padding:6px 10px;gap:6px}
+.studio-workbench .wb-heading{font-size:12px}
+.studio-workbench .wb-heading>span{font-size:10px}
+.studio-workbench .wb-controls{font-size:11px;gap:4px}
+.studio-workbench .wb-body{padding:6px 8px;gap:6px}
+.studio-workbench .wb-region{background:var(--panel,#fff)}
+.studio-workbench .wb-explorer,.studio-workbench .wb-primary,.studio-workbench .wb-companion{padding:9px}
+.studio-workbench .wb-region>h2{margin-bottom:6px}
+.studio-workbench .wb-bottom{margin:0 8px 6px}
+.studio-workbench .wb-map,.studio-workbench .wb-activity{padding:7px 10px}
+.studio-workbench .wb-activity>h2{display:none}
+.studio-workbench .wb-status{font-size:10px;padding:3px 10px}
+.workbench-frame .wb-dock-content[data-map-collapsed=true][data-activity=true]{grid-template-columns:70px minmax(0,1fr)}
+.workbench-frame .wb-map-toggle{margin-bottom:5px;font-size:11px;white-space:nowrap}
+.studio-workbench .wb-rail{padding:4px;gap:5px}
+.studio-workbench .wb-rail button{width:100%;min-height:32px;padding:3px 1px;border:1px solid var(--border);border-radius:5px;background:var(--soft);color:var(--ink);font-size:10px;white-space:normal;overflow-wrap:anywhere}
+.studio-workbench .wb-rail button[aria-disabled=true],.studio-workbench .wb-rail button:disabled{opacity:.45}
+.studio-workbench .wb-rail .hierarchy-rail{display:flex;flex-direction:column;gap:5px;margin:0;padding:0;border:0}
+.studio-workbench .wb-rail .parent-choice{writing-mode:initial;font-size:9px}
+.studio-workbench .wb-rail .parent-choice select{max-width:35px}
+.studio-workbench .wb-rail .parent-choice .micro,.studio-workbench .wb-rail .hierarchy-rail>.micro{display:none}
+.v3-project-about,.v3-drawing-tools{font-size:11px;margin:4px 0;border-bottom:1px solid var(--border)}
+.v3-project-about>summary,.v3-drawing-tools>summary{cursor:pointer;min-height:27px;padding:4px 0}
+.v3-project-about .hero-title h1{font-size:22px}.v3-project-about .hero-title{margin:8px 0}.v3-project-about .project-hero{padding:6px 0}
+.v3-drawing-tools .canvas-toolbar{margin:0;padding:6px 0;border:0}
+.studio-workbench .main-workspace>.breadcrumb{margin:4px 0;font-size:10px}
+.studio-workbench .view-heading{padding:9px 12px 5px}
+.studio-workbench .view-heading h2{font-size:14px;margin:0}
+.studio-workbench .view-description{padding:0 12px 7px;font-size:10px;line-height:1.4}
+.studio-workbench .canvas-frame{height:clamp(250px,38dvh,480px)}
+.studio-workbench .diagram-section{margin-bottom:8px}
+.studio-workbench .project-context .context-follow{font-size:10px}
+.studio-workbench .v3-dock-panel{border-top:1px solid var(--border);padding-top:8px;margin-top:10px}
+@media(max-width:1200px){
+ .studio-workbench{height:auto;min-height:100dvh;overflow:visible}
+ .studio-workbench .v3-frame-box{height:calc(100dvh - 160px);min-height:580px;flex:none}
+ .studio-workbench>.app-header{flex-wrap:wrap}
+ .studio-workbench>.presentation-profile{flex-wrap:wrap}
+ .studio-workbench>.presentation-profile p{max-width:100%}
+ .studio-workbench .dc-contextbar{flex-wrap:wrap}
+ .studio-workbench .dc-compact-controls{width:auto;margin-left:auto}
+ .studio-workbench .dc-compact-controls[open]{width:100%}
+ .studio-workbench .dc-reading-controls label{flex-direction:column;align-items:stretch}
+ .studio-workbench .dc-destinations{flex-wrap:wrap}
+ .studio-workbench .dc-scope{margin:0;max-width:100%}
+ .studio-workbench .wb-header{padding:8px}
+ .workbench-frame[data-compact=true] .wb-dock-content[data-map-collapsed=true][data-activity=true]{grid-template-columns:minmax(0,1fr)}
+}
+
+.workbench-frame .wb-heading>h1{font-size:inherit;line-height:1.4;margin:0;font-weight:650;letter-spacing:0}

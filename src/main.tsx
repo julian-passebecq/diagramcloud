@@ -1,3 +1,5 @@
+import './ui/contextPane.css';
+import './ui/projectDock.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '@xyflow/react/dist/style.css';
