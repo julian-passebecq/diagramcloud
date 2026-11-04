@@ -3,6 +3,7 @@ import {MAX_DOCUMENT_BYTES,validateDocument,type Project,type ProjectNode,type P
 import {canonical,fnv64} from '../core/learningMapping';
 import {applyDocumentPatch,type Patch} from '../core/patch';
 import {recordStop,newStopId} from '../core/tours';
+import {EXPLANATION_DETAILS_COLUMNS,explanationDetailsRows} from '../core/explanationDetails';
 
 const id=z.string().regex(/^[a-z][a-z0-9_.-]{0,39}$/);
 const ref=z.string().regex(/^[a-z][a-z0-9_.-]{0,79}$/);
@@ -81,6 +82,9 @@ export function prepareExplanationWalkthrough(input:Project,value:unknown):Walkt
   const refs=[...new Set([...r.sourceIds,...step.sourceIds])],owned:string[]=[];
   const base={visibility:'private' as const,sourceIds:refs,provenance:step.provenance};
   if(step.provenance!=='synthetic'&&!refs.length)throw new Error('A nonsynthetic explanation needs an explicit source reference.');
+  owned.push(block({...base,id:fresh(`${prefix}.${step.id}.contract`),title:'Authored explanation details',type:'table',columns:EXPLANATION_DETAILS_COLUMNS,
+   rows:explanationDetailsRows({focusQuestion:r.question,sourceCut:`${doc.id} revision ${doc.revision}`,caseLabel:step.caseLabel,
+    prerequisites:step.dependsOn.map(id=>`${id} · ${r.steps.find(s=>s.id===id)!.title}`),questions:step.questions})}));
   owned.push(block({...base,id:fresh(`${prefix}.${step.id}.text`),title:step.title,type:'text',text:[
    step.narration,step.caseLabel?`Selected case: ${step.caseLabel}`:'',
    step.dependsOn.length?`Explicit prerequisites: ${step.dependsOn.join(', ')}.`:'Causal prerequisites not supplied; this is presentation order only.',

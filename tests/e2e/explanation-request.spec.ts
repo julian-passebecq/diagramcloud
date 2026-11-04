@@ -25,8 +25,47 @@ async function fillRequest(page:Page){
  await form.getByLabel('Step 1 narration',{exact:true}).fill('A synthetic narrated call, not an observed run.');
  return form;
 }
+test('moving an authored prerequisite after its dependent step keeps the request and refuses review without editing the project',async({page})=>{
+ const before=await openProject(page),form=await fillRequest(page);await form.getByRole('button',{name:'Add explanation step',exact:true}).click();
+ const second=form.getByRole('group',{name:'Step 2 (step-2)',exact:true});await second.getByLabel('Step 2 title',{exact:true}).fill('Dependent step');await second.getByLabel('Step 2 component Retry wrapper',{exact:true}).check();await second.getByLabel('Step 2 narration',{exact:true}).fill('Depends on the authored first step.');
+ await second.getByText('Case, prerequisites and questions',{exact:true}).click();await second.getByLabel('Step 2 requires step-1',{exact:true}).check();await second.getByRole('button',{name:'Move step 2 earlier',exact:true}).click();
+ await form.getByRole('button',{name:'Review explanation',exact:true}).click();await expect(form.getByRole('alert')).toContainText('Step prerequisite is missing, forward or cyclic');
+ const first=form.getByRole('group',{name:'Step 1 (step-2)',exact:true});await expect(first.getByLabel('Step 1 requires step-1',{exact:true})).toBeChecked();await expect(first.getByLabel('Step 1 title',{exact:true})).toHaveValue('Dependent step');expect(await stored(page,before.id)).toEqual(before);
+ await first.getByRole('button',{name:'Move step 1 later',exact:true}).click();await form.getByRole('button',{name:'Review explanation',exact:true}).click();await expect(page.getByRole('region',{name:'Proposed changes',exact:true})).toBeVisible();expect(await stored(page,before.id)).toEqual(before);
+});
 for(const width of [1440,390])test.describe(`explanation request form ${width}`,()=>{
  test.use({viewport:{width,height:width===390?844:1000},reducedMotion:'reduce'});
+ test('authored case, prerequisites and questions survive review and reopen in the companion without changing public content',async({page})=>{
+  const before=await openProject(page),form=await fillRequest(page);
+  await form.getByRole('button',{name:'Add explanation step',exact:true}).click();
+  const second=form.getByRole('group',{name:'Step 2 (step-2)',exact:true});
+  await second.getByLabel('Step 2 title',{exact:true}).fill('Inspect the rejection');
+  await second.getByLabel('Step 2 component Retry wrapper',{exact:true}).check();
+  await second.getByLabel('Step 2 narration',{exact:true}).fill('An authored case; no request ran.');
+  await second.getByText('Case, prerequisites and questions',{exact:true}).click();
+  await second.getByLabel('Step 2 selected case',{exact:true}).fill('Synthetic rejected call');
+  await second.getByLabel('Step 2 requires step-1',{exact:true}).check();
+  await second.getByRole('button',{name:'Add question to step 2',exact:true}).click();
+  await second.getByLabel('Step 2 question 1',{exact:true}).fill('Who owns the rejected call?');
+  expect(await stored(page,before.id)).toEqual(before);
+  await form.getByRole('button',{name:'Review explanation',exact:true}).click();
+  await page.getByRole('button',{name:'Back to request',exact:true}).click();
+  await second.getByText('Case, prerequisites and questions',{exact:true}).click();
+  await expect(second.getByLabel('Step 2 selected case',{exact:true})).toHaveValue('Synthetic rejected call');
+  await expect(second.getByLabel('Step 2 requires step-1',{exact:true})).toBeChecked();
+  await expect(second.getByLabel('Step 2 question 1',{exact:true})).toHaveValue('Who owns the rejected call?');
+  await form.getByRole('button',{name:'Review explanation',exact:true}).click();await page.getByRole('button',{name:'Apply explanation',exact:true}).click();
+  await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();const applied=await stored(page,before.id);
+  expect(applied.revision).toBe(before.revision+1);expect({...publicDocument(applied),revision:before.revision}).toEqual(publicDocument(before));
+  await page.goto(`/?workspace=v3&project=${encodeURIComponent(before.id)}&view=walk-explanation.step-2.view&node=walk-explanation.step-2.note`);
+  await expect(page.getByText('Local workspace ready',{exact:true})).toBeVisible();
+  const nav=page.getByRole('navigation',{name:'Workspace panes',exact:true});if(await nav.isVisible())await nav.getByRole('button',{name:'Explanation / compare',exact:true}).click();
+  const companion=page.getByTestId('companion-pane'),tabs=companion.getByRole('tablist',{name:'Companion sections'});
+  await tabs.getByRole('tab',{name:'Contract',exact:true}).click();await expect(companion).toContainText('Synthetic rejected call');await expect(companion).toContainText('step-1 · The authored call');
+  await page.keyboard.press('ArrowRight');await expect(tabs.getByRole('tab',{name:'Questions',exact:true})).toBeFocused();await expect(companion).toContainText('Who owns the rejected call?');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);expect(await stored(page,before.id)).toEqual(applied);
+  await page.getByRole('tab',{name:'Portfolio',exact:true}).click();expect(await page.content()).not.toContain('Who owns the rejected call?');expect(await page.content()).not.toContain('Synthetic rejected call');
+ });
  test('form prepares ordinary review, applies once, undoes, reloads and stays private',async({page})=>{
   const errors:string[]=[],remote:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/*',route=>{const u=new URL(route.request().url());if(!['127.0.0.1','localhost'].includes(u.hostname)){remote.push(u.origin);return route.abort();}return route.continue();});

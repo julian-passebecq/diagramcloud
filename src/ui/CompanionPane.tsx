@@ -12,7 +12,7 @@ type Props={project:Project;publicMode:boolean;
  onOpen:(viewId:string,nodeId:string)=>void};
 
 /**
- * Optional companion pane (UX31-UX33): Explanation, Code/State, Related and Evidence for one anchor component.
+ * Optional companion pane (UX31-UX33): explanation, code/state, authored contract/questions, related context and evidence.
  * Related is drawn from relatedContext through the export scene, with a list as the keyboard alternative, explicit
  * depth / scope / direction / relation filters and a bounded-coverage line. Opening a related item is a detour:
  * the original question stays the anchor and Return brings the reader back to it. Read-only; never a revision.
@@ -63,6 +63,22 @@ export function CompanionPane({project,publicMode,anchor,pinned,onOpen}:Props){
    <div id="companion-panel" role="tabpanel" aria-labelledby={`companion-tab-${shownTab}`}>
     {shownTab==='explanation'&&content&&<>{content.node.summary&&<p>{content.node.summary}</p>}{content.node.role&&<p className="micro">{content.node.role}</p>}{content.explanation.map(b=><Evidence key={b.id} block={b} doc={doc}/>)}</>}
     {shownTab==='code'&&content&&<>{content.codeState.map(b=><Evidence key={b.id} block={b} doc={doc}/>)}<p className="micro">Displayed, never executed. A table is a declared state, not an observed run.</p></>}
+    {(shownTab==='contract'||shownTab==='questions')&&content&&<>
+     <p className="micro">Authored explanation, not an executed contract or a verified result. Missing facts remain unknown.</p>
+     {content.structure?.state==='unavailable'&&<p role="status">{content.structure.notice} The original record remains in Evidence.</p>}
+     {content.structure?.state==='available'&&<>
+      <p className="micro">Basis: {content.structure.block.provenance} · Frozen source: {content.structure.details.sourceCut}</p>
+      {shownTab==='contract'?<>
+       <h4>Selected case</h4><p>{content.structure.details.caseLabel||'No case supplied.'}</p>
+       <h4>Declared prerequisites</h4>{content.structure.details.prerequisites.length?<ul>{content.structure.details.prerequisites.map((x,i)=><li key={i}>{x}</li>)}</ul>:<p>No prerequisites supplied. Presentation order does not establish independence or execution order.</p>}
+      </>:<>
+       <h4>Question being explained</h4><p>{content.structure.details.focusQuestion}</p>
+       <h4>Questions to explore</h4>{content.structure.details.questions.length?<ol>{content.structure.details.questions.map((x,i)=><li key={i}>{x}</li>)}</ol>:<p>No follow-up questions supplied.</p>}
+       <p className="micro">Answers are not tracked by this section.</p>
+      </>}
+     </>}
+     {shownTab==='contract'&&<><h4>Declared inputs and outputs</h4>{content.contract.length?content.contract.map(b=><Evidence key={b.id} block={b} doc={doc}/>):<p>No input or output evidence attached to this component.</p>}</>}
+    </>}
     {shownTab==='evidence'&&content&&<>{content.evidence.map(b=><Evidence key={b.id} block={b} doc={doc}/>)}{content.sources.length>0&&<><h4>Cited sources</h4><ul>{content.sources.map(s=><li key={s.id}>{s.title} <span className="stable-id">{s.id}</span></li>)}</ul></>}</>}
     {shownTab==='related'&&<>
      <fieldset className="companion-filters"><legend>Related-context filters</legend>

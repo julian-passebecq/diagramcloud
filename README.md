@@ -92,7 +92,7 @@ An explanation walkthrough is an **author-written narrative**, not a live trace,
 
 In the merged source, choose **Edit → Tours → Author explanation**, fill the question and steps, then **Review explanation → Apply explanation**. Optional state, frozen code and takeaway fields stay authored evidence. Review changes nothing; Apply is one revision and one Undo. **Back to request** retains every authored field and the original full source basis, so a source change, even at the same revision, is refused rather than adopted. If the project has no Tours collection, **Initialize Tours for explanations** is a separate explicit, undoable edit before drafting.
 
-The request draft is private and session-only. Downloading the request or proposed patch does not save it to the project or prove persistence; there is no request-file import or draft autosave. The form does not expose every CLI prerequisite, case or question field. No AI or code execution is involved.
+The request draft is private and session-only. Downloading the request or proposed patch does not save it to the project or prove persistence; there is no request-file import or draft autosave. The form exposes selected cases, explicit prerequisites and questions; compiled step notes show these in the companion Contract and Questions tabs. [Details and limits](docs/contracts/explanation-details.md). No AI or code execution is involved.
 
 The offline compiler produces a private, revision-guarded `diagramcloud.patch`, a preview and an explanation map. It changes neither input and never applies the patch or publishes the result. For example, from a clean checkout:
 

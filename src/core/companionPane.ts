@@ -1,14 +1,15 @@
 import {validateDocument,type EvidenceBlock,type Project,type ProjectView} from './model';
 import {publicDocument} from './operations';
 import {relatedContext,resolveRelatedPick,type RelatedContext,type RelatedContextRequest,type RelatedContextResult} from './relatedContext';
+import {isExplanationDetails,readExplanationDetails,type ExplanationDetailsResult} from './explanationDetails';
 
 /**
  * Pure state for the optional companion pane (UX31-UX33). The pane is a reading aid next to the canvas: it renders
  * relatedContext through the export scene and a keyboard list, never edits the document, never grants scope and never
  * moves the reader except through an explicit detour that keeps the original question and offers an explicit return.
  */
-export type CompanionTab='explanation'|'code'|'related'|'evidence';
-export const COMPANION_TAB_LABEL:Record<CompanionTab,string>={explanation:'Explanation',code:'Code/State',related:'Related',evidence:'Evidence'};
+export type CompanionTab='explanation'|'code'|'contract'|'questions'|'related'|'evidence';
+export const COMPANION_TAB_LABEL:Record<CompanionTab,string>={explanation:'Explanation',code:'Code/State',contract:'Contract',questions:'Questions',related:'Related',evidence:'Evidence'};
 export type CompanionAnchor={viewId:string;nodeId:string};
 export type CompanionFilters=Pick<RelatedContextRequest,'scope'|'direction'|'depth'|'kinds'|'maxNodes'>;
 export const RELATION_KINDS=['batch','stream','query','control','dependency'] as const;
@@ -20,14 +21,15 @@ export function permittedDocument(project:Project,publicMode:boolean):Project{
  const doc=validateDocument(project);return publicMode?publicDocument(doc):doc;
 }
 
-export type CompanionContent={node:Project['nodes'][number];explanation:EvidenceBlock[];codeState:EvidenceBlock[];evidence:EvidenceBlock[];sources:Project['sources']};
+export type CompanionContent={node:Project['nodes'][number];explanation:EvidenceBlock[];codeState:EvidenceBlock[];contract:EvidenceBlock[];structure:ExplanationDetailsResult;evidence:EvidenceBlock[];sources:Project['sources']};
 /** Blocks attached to the anchor component in the permitted document, sorted by tab. Nothing is inferred. */
 export function companionContent(doc:Project,nodeId:string):CompanionContent|null{
  const node=doc.nodes.find(n=>n.id===nodeId);if(!node)return null;
  const blocks=node.blockIds.map(id=>doc.blocks.find(b=>b.id===id)).filter((b):b is EvidenceBlock=>!!b);
  const sourceIds=new Set([...node.sourceIds,...blocks.flatMap(b=>b.sourceIds)]);
- return {node,explanation:blocks.filter(b=>b.type==='text'),codeState:blocks.filter(b=>b.type==='code'||b.type==='table'),
-  evidence:blocks.filter(b=>b.type!=='text'&&b.type!=='code'&&b.type!=='table'),sources:doc.sources.filter(s=>sourceIds.has(s.id))};
+ return {node,explanation:blocks.filter(b=>b.type==='text'),codeState:blocks.filter(b=>(b.type==='code'||b.type==='table')&&!isExplanationDetails(b)),
+  contract:blocks.filter(b=>b.transform==='input'||b.transform==='output'),structure:readExplanationDetails(blocks),
+  evidence:blocks.filter(b=>(b.type!=='text'&&b.type!=='code'&&b.type!=='table')||isExplanationDetails(b)),sources:doc.sources.filter(s=>sourceIds.has(s.id))};
 }
 /** Tabs with something to show; Related is always offered because it carries the filters and the coverage. */
 export function companionTabs(content:CompanionContent|null):CompanionTab[]{
@@ -35,6 +37,8 @@ export function companionTabs(content:CompanionContent|null):CompanionTab[]{
  const tabs:CompanionTab[]=[];
  if(content.explanation.length||content.node.summary||content.node.role)tabs.push('explanation');
  if(content.codeState.length)tabs.push('code');
+ if(content.contract.length||content.structure)tabs.push('contract');
+ if(content.structure)tabs.push('questions');
  tabs.push('related');
  if(content.evidence.length||content.sources.length)tabs.push('evidence');
  return tabs;
