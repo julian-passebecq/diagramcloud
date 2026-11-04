@@ -1,5 +1,6 @@
 import {useId,useMemo,useRef,useState,type KeyboardEvent} from 'react';
 import type {Project} from '../core/model';
+import {CapacityScenarioPanel} from './CapacityScenarioPanel';
 import {LiveCheckout} from './LiveCheckout';
 import {projectDockModel,type DockAudience,type DockTarget,type ProjectDockTool} from './projectDockModel';
 // CSS is loaded once by the host's src/main.tsx, keeping this component renderable in source tests.
@@ -26,6 +27,8 @@ export function ProjectDock(p:ProjectDockProps){
    <div className="project-dock-grid"><div><h3>Project context</h3><p>{model.summary||'No project summary supplied.'}</p><p className="project-dock-caption">{model.revision===null?'Permitted public project':`Author document revision ${model.revision}`} · {model.views.length} available views</p>{model.provenance&&<details><summary>Source and authorship</summary><p>{model.provenance}</p></details>}<div className="project-dock-actions">{toolButton('comparison')}{toolButton('work')}</div></div><div><h3>Navigate views</h3><ul className="project-dock-list">{model.views.map(v=><li key={v.id}><button type="button" aria-current={v.id===model.activeView?.id?'location':undefined} onClick={()=>p.onNavigate(v.id)}>{v.title}</button><small>{v.perspective}</small></li>)}</ul></div></div>
   </section>
   <section role="tabpanel" id={`${id}-workflow`} aria-labelledby={`${id}-workflow-tab`} hidden={panel!=='workflow'} tabIndex={0}>
+   {p.audience==='author'&&<CapacityScenarioPanel key={JSON.stringify([p.project.id,p.project.revision])}/>}
+
    <div className="project-dock-grid"><div><h3>Story and explanation steps</h3><p className="project-dock-caption">Presented sequence, not execution order or elapsed time.</p>{model.story.length?<ol className="project-dock-list">{model.story.map(s=><li key={s.index}><button type="button" aria-current={p.storyIndex===s.index?'step':undefined} onClick={()=>p.onStory(s.index)}>{s.index+1}. {s.title}</button>{s.narration&&<p>{s.narration}</p>}</li>)}</ol>:<p>No story steps authored. Use the workflow components or project views.</p>}</div><div><h3>Workflow components</h3>{model.workflow.length?<ul className="project-dock-list">{model.workflow.map(n=><li key={n.id}><button type="button" aria-disabled={!n.target} onClick={()=>navigate(n.target)}>{n.label}</button><small>{n.kind} · designed status: {n.designedStatus} · basis: {n.basis}</small>{n.summary&&<p>{n.summary}</p>}</li>)}</ul>:<p>No process, control or function components in this permitted project.</p>}<div className="project-dock-actions">{toolButton('work')}</div></div></div>
   </section>
   <section role="tabpanel" id={`${id}-sources`} aria-labelledby={`${id}-sources-tab`} hidden={panel!=='sources'} tabIndex={0}>
