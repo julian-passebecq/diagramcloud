@@ -1,0 +1,1891 @@
+{
+  "schema": "datapass.scenario-conformance/0.1",
+  "note": "Layout/private cases assert identical permitted projections; canonical Project materialization tested separately by editor owner. Missing metric has no reading, never zero.",
+  "cases": [
+    {
+      "id": "unchanged",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "explicit",
+        "changed": 0
+      }
+    },
+    {
+      "id": "label-change",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-3c0b263cc6a1732f39e1ea8c3d1bdad0c82d17e1598a6eb63585c0ee84f331b7"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "3c0b263cc6a1732f39e1ea8c3d1bdad0c82d17e1598a6eb63585c0ee84f331b7",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Commerce API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-3c0b263cc6a1732f39e1ea8c3d1bdad0c82d17e1598a6eb63585c0ee84f331b7"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "3c0b263cc6a1732f39e1ea8c3d1bdad0c82d17e1598a6eb63585c0ee84f331b7",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "explicit",
+        "changed": 1
+      }
+    },
+    {
+      "id": "layout-only-projection-unchanged",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "explicit",
+        "changed": 0
+      }
+    },
+    {
+      "id": "private-only-projection-unchanged",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "explicit",
+        "changed": 0
+      }
+    },
+    {
+      "id": "edge-contract-basis",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-78f625913dc3b8bad703ffc59cb3e3464bd661d94752228a720204e17b152a0f"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "78f625913dc3b8bad703ffc59cb3e3464bd661d94752228a720204e17b152a0f",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "static-source",
+                "protocol": "HTTPS"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-78f625913dc3b8bad703ffc59cb3e3464bd661d94752228a720204e17b152a0f"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "78f625913dc3b8bad703ffc59cb3e3464bd661d94752228a720204e17b152a0f",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "explicit",
+        "changed": 1
+      }
+    },
+    {
+      "id": "partial-view-omission",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-aa9794a0651a7baf4e1074805add39ddf550443c4837199702229abe348dd9ea"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "aa9794a0651a7baf4e1074805add39ddf550443c4837199702229abe348dd9ea",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "views",
+            "ids": [
+              "overview"
+            ],
+            "coverage": "partial"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-aa9794a0651a7baf4e1074805add39ddf550443c4837199702229abe348dd9ea"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "aa9794a0651a7baf4e1074805add39ddf550443c4837199702229abe348dd9ea",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            }
+          ],
+          "relationships": []
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "explicit",
+        "changed": 0,
+        "coverageWarning": true
+      }
+    },
+    {
+      "id": "explicit-cross-source",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "supplied-other-project",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "supplied-other-project",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "explicit",
+        "changed": 0
+      }
+    },
+    {
+      "id": "unrelated-equal-labels",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "unrelated",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": null,
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "unresolved",
+        "changed": 0
+      }
+    },
+    {
+      "id": "stale-left",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+          "targetDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "stale",
+        "changed": 0
+      }
+    },
+    {
+      "id": "stale-right",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "stale",
+        "changed": 0
+      }
+    },
+    {
+      "id": "duplicate-mapping",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            },
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "ambiguous",
+        "changed": 0
+      }
+    },
+    {
+      "id": "unknown-metric",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "mapping": "explicit",
+        "changed": 0,
+        "metrics": []
+      }
+    },
+    {
+      "id": "invalid-payload",
+      "request": {
+        "schema": "datapass.comparison/0.2",
+        "comparisonId": "golden",
+        "title": "Synthetic golden comparison",
+        "before": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "Shopify API",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "after": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "label": "Illustrative retail",
+          "binding": {
+            "digest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+            "audience": "public",
+            "revision": null,
+            "derivation": null
+          },
+          "scope": {
+            "kind": "project",
+            "ids": [],
+            "coverage": "declared-complete"
+          },
+          "entities": [
+            {
+              "id": "api",
+              "label": "tampered",
+              "kind": "service",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            },
+            {
+              "id": "store",
+              "label": "Operational store",
+              "kind": "database",
+              "properties": {
+                "basis": "planned"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "relationships": [
+            {
+              "id": "exchange",
+              "fromId": "api",
+              "toId": "store",
+              "relation": "data",
+              "label": "Orders",
+              "properties": {
+                "basis": "planned",
+                "protocol": "unknown"
+              },
+              "evidenceRefs": []
+            }
+          ],
+          "warnings": []
+        },
+        "correspondence": {
+          "source": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "target": {
+            "projectId": "synthetic-retail",
+            "snapshotId": "sha256-743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266"
+          },
+          "sourceDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "targetDigest": "743f4c632b859ad6ecfac8af338bb4decd3e16b24a87c687389a7b60880f5266",
+          "evidenceRef": "illustrative-common-ancestor",
+          "entities": [
+            {
+              "beforeId": "api",
+              "afterId": "api"
+            },
+            {
+              "beforeId": "store",
+              "afterId": "store"
+            }
+          ],
+          "relationships": [
+            {
+              "beforeId": "exchange",
+              "afterId": "exchange"
+            }
+          ]
+        },
+        "metrics": [],
+        "migration": []
+      },
+      "expect": {
+        "error": "C06"
+      }
+    }
+  ]
+}
