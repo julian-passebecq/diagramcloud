@@ -188,3 +188,20 @@
 .workbench-frame .wb-arrangements [role=alert]{color:var(--text,#202327);border-left:3px solid #b45613;padding-left:8px}
 .workbench-frame .wb-arrangements [role=status]:empty{display:none}
 .workbench-frame .wb-close-layout{margin-bottom:10px;width:100%;text-align:center}
+
+/* Floating is a placement of the same mounted region, bounded by this frame. */
+.workbench-frame{position:relative}
+.wb-header{position:relative;z-index:16}
+.wb-pane-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px;margin-bottom:6px}
+.wb-pane-heading h2{margin:0;flex:1 1 90px;font-size:13px;letter-spacing:.02em}
+.wb-pane-tools{display:flex;gap:4px}
+.wb-bottom{display:flex;flex-direction:column}
+.wb-bottom>.wb-pane-heading{padding:5px 8px;margin:0}
+.wb-bottom>.wb-dock-content{flex:1;min-height:0;height:auto}
+.workbench-frame .wb-region[data-floating=true]{position:absolute;grid-area:auto;z-index:12;margin:0;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 28px #0004;border:2px solid var(--colorBrandStroke1,#6876c8)}
+.workbench-frame .wb-region[data-floating=true]:focus-within{z-index:14}
+.wb-region[data-floating=true]>.wb-pane-content{min-height:0;flex:1;overflow:auto}
+.wb-float-move,.wb-float-resize{touch-action:none;user-select:none}
+.wb-float-move{cursor:move}
+.wb-float-resize{cursor:nwse-resize;align-self:flex-end;flex-shrink:0;margin:3px}
+.wb-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
