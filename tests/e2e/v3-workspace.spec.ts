@@ -76,7 +76,7 @@ test('explorer, Follow/Pin, parent-preserving drill, browser Back/Forward and de
  await expect(choice).toHaveCount(0);await expect(page.getByTestId('view-shared')).toBeVisible();await expect(crumbs(page)).toContainText('Synthetic view A');
  await focusKept(page);
  // The dock's route panel lists both parents and marks the open one.
- await page.getByRole('button',{name:'Bottom panel',exact:true}).click();
+ if(await page.getByRole('button',{name:'Bottom panel',exact:true}).getAttribute('aria-expanded')!=='true')await page.getByRole('button',{name:'Bottom panel',exact:true}).click();
  const route=page.getByTestId('workspace-route');await expect(route).toBeVisible();
  await expect(route.getByRole('button',{name:'Synthetic root › Synthetic view A',exact:true})).toHaveAttribute('aria-pressed','true');
  await route.getByRole('button',{name:'Synthetic root › Synthetic view B',exact:true}).click();await expect(crumbs(page)).toContainText('Synthetic view B');
@@ -138,7 +138,7 @@ test('audience change and source replacement never show private data in any work
  // Author context: the private component is selectable, pinned in the companion and shown in the dock evidence panel.
  await card(page,'root',PRIVATE_LABEL).click();await page.getByTestId('project-context').getByRole('button',{name:'Pin context',exact:true}).click();
  await expect(followMode(page)).toContainText('Pinned scope: '+PRIVATE_LABEL);
- await page.getByRole('button',{name:'Bottom panel',exact:true}).click();
+ if(await page.getByRole('button',{name:'Bottom panel',exact:true}).getAttribute('aria-expanded')!=='true')await page.getByRole('button',{name:'Bottom panel',exact:true}).click();
  await page.getByText('Dock panels',{exact:true}).click();await page.getByLabel('Second dock panel',{exact:true}).selectOption('evidence');await page.getByText('Dock panels',{exact:true}).click();
  await expect(workspace(page).getByRole('region',{name:'Selection evidence'})).toBeVisible();
  await expect(workspace(page).getByRole('region',{name:'Navigation map and contextual activity'})).toBeVisible();
