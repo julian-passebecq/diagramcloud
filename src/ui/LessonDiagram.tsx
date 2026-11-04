@@ -1,6 +1,7 @@
 import {useEffect,useMemo,useReducer,useState,type KeyboardEvent} from 'react';
 import type {LearningEntry} from '../intelligence/learning/catalogue';
-import {depthLabel,depthScene,explore,lessonDiagrams,DEPTH_NOTE,ZOOM_LIMITS,type DepthNode,type SemanticDepth} from '../intelligence/learning/depth';
+import {depthFigureDocument,depthHighlight,depthLabel,depthScene,depthSceneViewSpec,explore,lessonDiagrams,DEPTH_NOTE,ZOOM_LIMITS,type DepthNode,type SemanticDepth} from '../intelligence/learning/depth';
+import {LessonDiagramFigure} from './LessonDiagramFigure';
 import {playbackFrame,procedurePlayback,PLAYBACK_LABEL,type PlaybackSource,type PlaybackStep} from '../intelligence/learning/playback';
 /** Previous / next over declared steps. Teaching only: it reads the declaration, highlights one step, runs and records nothing. */
 export function StepPlayback({source,onStep}:{source:PlaybackSource;onStep?:(step:PlaybackStep)=>void}){
@@ -24,10 +25,13 @@ export function LessonDiagram({entry,depth}:{entry:LearningEntry;depth:SemanticD
  useEffect(()=>{dispatch({type:'depth',depth});},[depth]);
  const diagram=diagrams.find(d=>d.id===chosen)??diagrams[0],doc=useMemo(()=>diagram?.load(),[diagram]);
  const scene=useMemo(()=>doc?depthScene(doc,doc.rootViewId,state.depth,{audience:diagram.audience}):null,[doc,diagram,state.depth]);
+ const source=useMemo(()=>doc&&diagram?depthFigureDocument(doc,diagram.audience):null,[doc,diagram]);
+ const figure=useMemo(()=>scene&&source?depthSceneViewSpec(scene,source):null,[scene,source]);
  const procedures=useMemo(()=>doc&&scene?scene.views.flatMap(v=>{const p=procedurePlayback(doc,v.viewId,{audience:diagram.audience});return p?[p]:[];}):[],[doc,scene,diagram]);
- if(!diagram||!doc||!scene)return null;
- const environments=doc.delivery?.environments??[],environment=environments.find(e=>e.id===state.environmentId);
- const instances=new Set((doc.delivery?.instances??[]).filter(i=>i.environmentId===state.environmentId).map(i=>i.nodeId));
+ if(!diagram||!doc||!scene||!source||!figure)return null;
+ const environments=source.delivery?.environments??[],environment=environments.find(e=>e.id===state.environmentId);
+ const lit=depthHighlight(scene,highlight),litEdges=new Set(lit.edgeIds);
+ const instances=new Set((source.delivery?.instances??[]).filter(i=>i.environmentId===state.environmentId).map(i=>i.nodeId));
  const viewTitle=(id:string)=>scene.views.find(v=>v.viewId===id)?.title??id;
  const card=(n:DepthNode)=>{const inside=scene.nodes.filter(c=>c.container===n.id),collapsed=scene.collapsed.find(c=>c.nodeId===n.id);
   return <li key={n.id} data-node-id={n.id} aria-current={highlight===n.id?'step':undefined} style={{border:'1px solid var(--line, #cbd5e1)',borderRadius:6,padding:'4px 8px',margin:'4px 0',listStyle:'none',...(highlight===n.id?{outline:'3px solid var(--accent, #2563eb)'}:{})}}>
@@ -47,10 +51,12 @@ export function LessonDiagram({entry,depth}:{entry:LearningEntry;depth:SemanticD
    {environments.length>0&&<>{' '}<label>Environment <select aria-label="Lesson diagram environment" value={state.environmentId??''} onChange={e=>dispatch({type:'environment',environmentId:e.target.value||null})}><option value="">All (no environment chosen)</option>{environments.map(e=><option key={e.id} value={e.id}>{e.label}</option>)}</select></label></>}
   </div>
   <p role="status" aria-label="Lesson diagram state">Depth {label} · containment level {scene.level} · {scene.nodes.length} components · camera zoom {Math.round(state.zoom*100)}% · environment {environment?environment.label+' (declared)':'not chosen'}</p>
-  <div style={{overflow:'auto',maxWidth:'100%'}}><div data-testid="lesson-diagram-camera" style={{transform:`scale(${state.zoom})`,transformOrigin:'0 0'}}>
+  <LessonDiagramFigure doc={source} scene={scene} figure={figure} zoom={state.zoom} highlight={lit} environment={environment} instances={instances} depthLabel={label}/>
+  <p className="micro">Figure: each frame is a view a component opens (explicit drilldown only, never a connection); camera zoom sizes the figure only. Text and keyboard alternative:</p>
+  <div data-testid="lesson-diagram-list" style={{minWidth:0,overflowWrap:'anywhere'}}>
    <ul aria-label={'Components at depth '+label} style={{paddingLeft:0}}>{scene.nodes.filter(n=>!n.container).map(card)}</ul>
-   {scene.edges.length>0&&<ul aria-label={'Connections at depth '+label}>{scene.edges.map(e=><li key={e.id}>{scene.nodes.find(n=>n.id===e.from)?.label} → {scene.nodes.find(n=>n.id===e.to)?.label}{e.label?' ('+e.label+')':''}</li>)}</ul>}
-  </div></div>
+   {scene.edges.length>0&&<ul aria-label={'Connections at depth '+label}>{scene.edges.map(e=><li key={e.id} data-edge-id={e.id} aria-current={litEdges.has(e.id)?'true':undefined} style={litEdges.has(e.id)?{fontWeight:600}:undefined}>{scene.nodes.find(n=>n.id===e.from)?.label} → {scene.nodes.find(n=>n.id===e.to)?.label}{e.label?' ('+e.label+')':''}</li>)}</ul>}
+  </div>
   <p className="micro">{DEPTH_NOTE}</p>
   {procedures.map(p=><StepPlayback key={diagram.id+p.id} source={p} onStep={step=>setHighlight(step.nodeId??null)}/>)}
  </section>;

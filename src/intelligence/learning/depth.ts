@@ -1,4 +1,4 @@
-import type {Perspective,Project} from '../../core/model';
+import type {Perspective,Project,ProjectView} from '../../core/model';
 import {publicDocument} from '../../core/operations';
 import {viewSpec,type SpecNode} from '../../core/viewspec';
 import {compileLearningExample,learningExamplesForLesson} from './examples';
@@ -41,6 +41,46 @@ export function depthScene(doc:Project,viewId:string,depth:SemanticDepth,options
  const collapsed=[...nodes.values()].filter(n=>n.opens&&!n.expanded&&!seen.has(n.opens)).flatMap(n=>{const v=source.views.find(v=>v.id===n.opens);return v?[{nodeId:n.id,viewId:v.id,title:v.title}]:[];});
  return {format:'diagramcloud.depth-scene/1',projectId:root.projectId,viewId,viewTitle:root.title,depth,level,nodes:[...nodes.values()],edges:[...edges.values()],views,collapsed,note:DEPTH_NOTE};
 }
+/**
+ * Spatial figure of a depth scene (R4-AC-12 extension). A renderer-neutral view over exactly the depth scene's IDs, for the
+ * shared export scene (`buildScene`): the root view's components first, then one frame per view the scene opened, placed inside
+ * the frame of the view that holds its container. Frames come only from `scene.views[].via` (explicit childViewId drilldown);
+ * a connection never makes a container. Positions are the author's own positions in each source view (shifted, never re-ranked),
+ * or a grid in scene order when a view has none. No new model: nothing here is stored, exported or read back.
+ */
+export type DepthFrame={viewId:string;title:string;level:number;via:string;viaLabel:string;x:number;y:number;w:number;h:number};
+export type DepthSceneFigure={format:'diagramcloud.depth-figure/1';projectId:string;viewId:string;depth:SemanticDepth;view:ProjectView;frames:DepthFrame[];
+ bounds:{x:number;y:number;width:number;height:number}};
+export const DEPTH_FIGURE={box:{w:220,h:100},pad:24,header:34,gap:40,minFrame:260,grid:{x:290,y:170,columns:3}} as const;
+export function depthSceneViewSpec(scene:DepthScene,layoutFrom?:Pick<Project,'views'>):DepthSceneFigure{
+ const F=DEPTH_FIGURE,positions:Record<string,{x:number;y:number}>={},frames:DepthFrame[]=[];
+ const groups=new Map<string,DepthNode[]>();for(const n of scene.nodes)groups.set(n.viewId,[...(groups.get(n.viewId)??[]),n]);
+ const holderView=new Map(scene.nodes.map(n=>[n.id,n.viewId])),label=new Map(scene.nodes.map(n=>[n.id,n.label]));
+ const place=(viewId:string,ox:number,oy:number):{w:number;h:number}=>{
+  const members=groups.get(viewId)??[],source=layoutFrom?.views.find(v=>v.id===viewId);
+  const raw=members.map((n,i)=>({id:n.id,p:source?.positions[n.id]??{x:(i%F.grid.columns)*F.grid.x,y:Math.floor(i/F.grid.columns)*F.grid.y}}));
+  const minX=Math.min(...raw.map(r=>r.p.x)),minY=Math.min(...raw.map(r=>r.p.y));
+  let w=0,h=0;for(const r of raw){const x=ox+r.p.x-minX,y=oy+r.p.y-minY;positions[r.id]={x,y};w=Math.max(w,x-ox+F.box.w);h=Math.max(h,y-oy+F.box.h);}
+  let cy=oy+(raw.length?h+F.gap:0);const nested=scene.views.filter(v=>v.via&&holderView.get(v.via)===viewId);
+  for(const child of nested){
+   const frame:DepthFrame={viewId:child.viewId,title:child.title,level:child.level,via:child.via!,viaLabel:label.get(child.via!)??child.via!,x:ox,y:cy,w:0,h:0};frames.push(frame);
+   const inner=place(child.viewId,ox+F.pad,cy+F.header);
+   frame.w=Math.max(inner.w,F.minFrame)+2*F.pad;frame.h=F.header+Math.max(inner.h,20)+F.pad;
+   w=Math.max(w,frame.w);cy+=frame.h+F.gap;
+  }
+  return {w,h:nested.length?cy-oy-F.gap:h};
+ };
+ const size=place(scene.viewId,0,0),ids=scene.nodes.map(n=>n.id);
+ const view={id:'depth-figure:'+scene.viewId+':'+scene.depth,title:scene.viewTitle,description:'',nodeIds:ids,edgeIds:scene.edges.map(e=>e.id),positions} as ProjectView;
+ return {format:'diagramcloud.depth-figure/1',projectId:scene.projectId,viewId:scene.viewId,depth:scene.depth,view,frames,bounds:{x:-F.pad,y:-F.pad,width:size.w+2*F.pad,height:size.h+2*F.pad}};
+}
+/** What a played step lights up in the figure: its component and the scene's connections that touch it. Nothing outside the scene. */
+export function depthHighlight(scene:Pick<DepthScene,'nodes'|'edges'>,nodeId:string|null|undefined):{nodeIds:string[];edgeIds:string[]}{
+ if(!nodeId||!scene.nodes.some(n=>n.id===nodeId))return {nodeIds:[],edgeIds:[]};
+ return {nodeIds:[nodeId],edgeIds:scene.edges.filter(e=>e.from===nodeId||e.to===nodeId).map(e=>e.id)};
+}
+/** The document a lesson figure reads: the public projection for a public audience, the author's copy otherwise. */
+export const depthFigureDocument=(doc:Project,audience:'public'|'author')=>audience==='public'?publicDocument(doc):doc;
 /** Independent navigation dimensions. Each action changes exactly its own dimension: zooming the camera never changes depth or environment. */
 export type ExplorerState={depth:SemanticDepth;zoom:number;environmentId:string|null;perspective:Perspective|null};
 export type ExplorerAction={type:'depth';depth:SemanticDepth}|{type:'zoom';zoom:number}|{type:'environment';environmentId:string|null}|{type:'perspective';perspective:Perspective|null};
