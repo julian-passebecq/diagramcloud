@@ -120,6 +120,15 @@ test('galaxy map: apps become declared members, connections become labelled rela
  assert.ok(d.atlas!.snapshots[0].repositories.every(r=>r.scanStatus==='not-scanned'),'reading the map scans nothing');
 });
 
+test('galaxy map: a local app without a repository is located by its ID; its filesystem path stays for scanning and never reaches the public atlas',()=>{
+ const g=JSON.parse(readFileSync('tests/fixtures/atlas/galaxy.sample.json','utf8'));
+ const board=g.apps.find((a:{id:string})=>a.id==='board');board.repo=null;board.path='D:/PROJ/SYNTHETIC_PRIVATE_LOCAL_PATH';
+ const {manifest}=parseManifest(JSON.stringify(g)),repo=manifest.repositories.find(r=>r.id==='board')!;
+ assert.equal(repo.locator,'board');assert.equal(repo.host,'local');assert.equal(repo.path,'D:/PROJ/SYNTHETIC_PRIVATE_LOCAL_PATH');
+ const {document:d}=documentFromAtlas(manifest,{},{now:NOW});
+ assert.doesNotMatch(JSON.stringify(publicDocument(d)),/SYNTHETIC_PRIVATE_LOCAL_PATH/);
+});
+
 test('Lens minimap: observed Git and delivery pointers in a new snapshot; components untouched; unknown repositories never added; scans go stale when the head moves',()=>{
  const {document:d}=atlas();
  const out=applyLensMinimap(d,parseLensMinimap(readFileSync('tests/fixtures/atlas/lens.minimap.json','utf8')),{now:LATER});

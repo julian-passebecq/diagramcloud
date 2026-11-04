@@ -18,6 +18,9 @@ import {defects} from '../src/export/design/quality';
 import {explanationGaps} from '../src/intelligence/learning/gaps';
 import {queryProject,renderPublicView,renderPublicArtifact} from '../src/intelligence/context';
 import {proposeMappingSuggestion} from '../src/intelligence/learning/query';
+import {suggestMapping,reviewMapping,rejectMapping} from '../src/intelligence/learning/mappings';
+import {applyDocumentPatch} from '../src/core/patch';
+import {stageImportText} from '../src/app/stageImport';
 import {catalogueRows} from '../src/intelligence/learning/catalogue';
 import {prepareViewer,viewerSourceIntent,REACT_VIEWER_API_VERSION,VIEWER_UNAVAILABLE,type ViewerInput} from '../src/react/viewerBoundary';
 import {negotiateCapabilities,createReturnGuard,createReturnIntent} from '../src/react/hostSession';
@@ -149,6 +152,32 @@ test('AC16: MCP query, render and mapping tools refuse private and nonexistent I
  const dir=mkdtempSync(join(tmpdir(),'dc-ac16-'));try{const file=join(dir,'project.json');writeFileSync(file,JSON.stringify(hidden));
   const results=mcpCalls(file,[['diagramcloud_query',{kind:'impact',nodeId:node}],['diagramcloud_query',{kind:'impact',nodeId:'zz-never-node'}],['diagramcloud_render',{viewId:'zz-hidden-view'}],['diagramcloud_render',{viewId:'zz-never-view'}],['diagramcloud_catalogue',{op:'search',query:'medallion'}]]);
   assert.ok(results[0].isError);assert.deepEqual(results[0],results[1]);assert.ok(results[2].isError);assert.deepEqual(results[2],results[3]);assert.ok(!results[4].isError);
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+test('AC16: MCP propose_mapping answers a pair held only by a hidden mapping exactly like an unmapped pair',async()=>{
+ const target={kind:'node' as const,id:pubNode},agent={origin:'ai' as const,suggestedBy:'synthetic-agent'};
+ const suggested=suggestMapping(hidden,{conceptId,target},{origin:'ai',suggestedBy:'other-agent'}),id=suggested.learningMappings!.at(-1)!.id;
+ const privateReviewed=reviewMapping(suggestMapping(hidden,{conceptId,target,visibility:'private'},{origin:'ai',suggestedBy:'other-agent'}),id,{reviewedBy:'Synthetic Person',reviewedAt:'2026-11-04T00:00:00Z',evidence:{sourceIds:['zz-hidden-source'],blockIds:[]}});
+ const rejected=rejectMapping(suggested,id,{reviewedBy:'Synthetic Person',reviewedAt:'2026-11-04T00:00:00Z'});
+ const baseline=outcome(()=>proposeMappingSuggestion(hidden,{conceptId,target},agent));assert.equal(baseline.ok,true);
+ const dir=mkdtempSync(join(tmpdir(),'dc-ac16-map-'));try{
+  const unmapped=join(dir,'unmapped.json');writeFileSync(unmapped,JSON.stringify(hidden));
+  const [viaMcpBaseline]=mcpCalls(unmapped,[['diagramcloud_propose_mapping',{conceptId,target}]]);assert.ok(!viaMcpBaseline.isError);
+  for(const [name,doc] of [['private reviewed',privateReviewed],['suggested',suggested],['rejected',rejected]] as const){
+   assert.equal(doc.revision,hidden.revision);assert.equal(publicDocument(doc).learningMappings,undefined,name);
+   const a=outcome(()=>proposeMappingSuggestion(doc,{conceptId,target},agent));assert.deepEqual(a,baseline,`${name}: same reply as an unmapped pair`);assert.doesNotMatch(JSON.stringify(a),/already mapped/);
+   const file=join(dir,`${name.replace(' ','-')}.json`);writeFileSync(file,JSON.stringify(doc));
+   assert.deepEqual(mcpCalls(file,[['diagramcloud_propose_mapping',{conceptId,target}]])[0],viaMcpBaseline,`${name}: MCP reply`);
+   // The author's own import review refuses the duplicate pair, without mutation.
+   const before=JSON.stringify(doc),patch=(a as {value:{patch:unknown}}).value.patch;
+   assert.throws(()=>applyDocumentPatch(doc,patch),/duplicate mapping/);
+   await assert.rejects(stageImportText({project:doc,library:[doc],raw:JSON.stringify(patch),importName:'',completionRequest:null,applied:[]}),/duplicate mapping/);
+   assert.equal(JSON.stringify(doc),before);
+  }
+  // A hidden mapping of another pair survives the append: the patch never replaces an array it cannot see.
+  const other=suggestMapping(hidden,{conceptId,target:{kind:'view',id:root},visibility:'private'},{origin:'ai',suggestedBy:'other-agent'});
+  const reply=proposeMappingSuggestion(other,{conceptId,target},agent) as {patch:unknown};assert.deepEqual(reply,baseline.value);
+  assert.deepEqual(applyDocumentPatch(other,reply.patch).result.learningMappings!.map(m=>m.target.id),[root,pubNode]);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
 test('AC16: the public viewer and host return refuse a private selection or source exactly like an unknown one',()=>{
