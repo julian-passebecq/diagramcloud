@@ -71,8 +71,10 @@ test('meeting summary dialog: labelled fields, public views only, current public
  const f=buildReviewWorkspace(),noop=()=>{};
  const render=(project=f.project,activeViewId='join-detail')=>renderToStaticMarkup(createElement(MeetingSummaryDialog,{project,activeViewId,onDone:noop,onCancel:noop}));
  const html=render();
- for(const label of ['Title','Audience','Views (1 to 6)','Detail','Paper','Profile','Story stops (optional)'])assert.ok(html.includes(label),label);
- assert.match(html,/Browser print gives the PDF\. The PDF is a snapshot, not a backup[^<]*No PPTX is produced here\./);
+ for(const label of ['Title','Audience','Views (1 to 6)','Detail','Paper','Profile','Story stops (optional)','Format'])assert.ok(html.includes(label),label);
+ assert.match(html,/Browser print gives the PDF, on A4 or Letter[^<]*The PDF is a snapshot, not a backup[^<]*The PPTX is editable native shapes, text and tables/);
+ assert.equal((html.match(/type="radio"/g)??[]).length,3+2+2+3,'detail, paper, profile and format radios');
+ for(const label of ['Web page (HTML), offline','PDF: browser print on the chosen paper','PowerPoint: editable shapes, text and tables'])assert.ok(html.includes(label),label);
  assert.equal((html.match(/type="checkbox"/g)??[]).length,3,'three public reachable views');
  assert.match(html,/<input type="checkbox" checked=""\/>Input, join and output/);assert.doesNotMatch(html,/<input type="checkbox" checked=""\/>Business question/);
  assert.match(html,/maxLength="160"/);assert.match(html,/<button type="submit">Download meeting summary<\/button>/);assert.doesNotMatch(html,/role="alert"/);
