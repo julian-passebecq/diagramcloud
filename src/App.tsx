@@ -563,6 +563,16 @@ const focus=useMemo(()=>basisFilter==='all'?null:new Set(doc.nodes.filter(n=>(n.
   {linkedRouteButton('Down to child view','↓ Down',!!linkedDown,()=>{if(linkedDown)applyLinked(setLinkedView(linked,doc,perspectiveBinding,linkedSide,linkedDown));})}
   {linkedRouteButton('Swap sides','⇄ Swap sides',true,()=>applyLinked(swapLinkedSides(linked,perspectiveBinding)))}
   {linkedRouteButton('Back to business question','Back to business question',!!linked.anchorNodeId,backToQuestion)}</div></div>:null;
+ // Keep the retained parent diagrams, but reveal the requested child inside this pane.
+ // Scrolling never changes keyboard focus, the route, camera state or the Project.
+ useEffect(()=>{
+  if(!workspaceSurface||sheet!=='diagram'||designMode||ideasOn||linkedOn||comparisonView)return;
+  const frame=window.requestAnimationFrame(()=>{const primary=frameElement.current?.querySelector<HTMLElement>('[data-wb-region="primary"]');if(!primary||!primary.getClientRects().length)return;
+   if(deepestView===doc.rootViewId){primary.scrollTop=0;return;}
+   const target=Array.from(primary.querySelectorAll<HTMLElement>('[data-testid]')).find(el=>el.dataset.testid===`view-${deepestView}`);
+   if(target)primary.scrollTop+=target.getBoundingClientRect().top-primary.getBoundingClientRect().top-8;
+  });return()=>window.cancelAnimationFrame(frame);
+ },[workspaceSurface,doc.id,doc.rootViewId,deepestView,sheet,designMode,ideasOn,linkedOn,!!comparisonView,workbench.compactPane]);
  const routeDock=linkedOn?linkedRoutePanel:routePanel;
  const plan=deliveryPlan&&deliveryPlan.projectId===doc.id?deliveryPlan:null;
  const workPanel=<DeliveryEvidencePanel view={plan?.view??null} audience={audience} binding={perspectiveBinding} compact={frameSize.width<=1200} fileName={plan?.fileName} onLoad={(raw,name,issued)=>{if(!samePerspectiveBinding(issued,perspectiveBinding))return;try{setDeliveryPlan({view:parseDeliveryView(raw),fileName:name,projectId:doc.id});}catch(e){setMessage(errorMessage(e));}}} onClear={()=>setDeliveryPlan(null)}/>;

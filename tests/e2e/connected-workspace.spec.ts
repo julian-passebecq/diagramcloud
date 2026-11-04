@@ -26,7 +26,7 @@ test('desktop tree previews and selected detail form one workspace with existing
  await expect(tree(page)).toBeVisible();await expect(detail(page)).toBeVisible();await expect(dock(page)).toBeVisible();await expect(page.getByTestId('view-root')).toBeVisible();
  for(const pane of [tree(page),detail(page),dock(page),page.getByTestId('view-root')])await expect(pane).toBeInViewport();
  const intake=tree(page).getByRole('button',{name:'Order intake',exact:true}),store=tree(page).getByRole('button',{name:'Order storage',exact:true});
- await intake.click();await expect(intake).toHaveAttribute('aria-current','true');await expect(detail(page).getByRole('heading',{name:'Order intake',exact:true})).toBeVisible();
+ await intake.click();await expect(page.getByTestId('view-implementation').getByRole('heading',{name:'Validation implementation',exact:true})).toBeInViewport();await expect(intake).toHaveAttribute('aria-current','true');await expect(detail(page).getByRole('heading',{name:'Order intake',exact:true})).toBeVisible();
  const committed=page.url();await store.hover();await expect(detail(page).getByRole('heading',{name:'Order storage',exact:true})).toBeVisible();await expect(detail(page)).toContainText('Hover preview');expect(page.url()).toBe(committed);await expect(intake).toHaveAttribute('aria-current','true');
  await page.getByRole('heading',{name:'Explorer',exact:true}).hover();await expect(detail(page).getByRole('heading',{name:'Order intake',exact:true})).toBeVisible();expect(page.url()).toBe(committed);
  await store.click();await expect(store).toHaveAttribute('aria-current','true');await expect(detail(page).getByRole('heading',{name:'Order storage',exact:true})).toBeVisible();
@@ -43,7 +43,7 @@ test('route context collapses with focus retained and the bottom dock navigates 
  if(wasOpen)await expect(rail).toBeHidden();else await expect(rail).toBeVisible();
  await page.keyboard.press('Enter');await expect(route).toBeFocused();await expect(route).toHaveAttribute('aria-expanded',String(wasOpen));
  await dock(page).getByRole('tab',{name:'Workflow',exact:true}).click();await expect(dock(page)).toContainText('Presented sequence');await dock(page).getByRole('button',{name:'2. Inspect validation',exact:true}).click();
- await expect(page.getByTestId('view-implementation')).toBeVisible();await expect(detail(page).getByRole('heading',{name:'Schema check',exact:true})).toBeVisible();
+ await expect(page.getByTestId('view-implementation')).toBeVisible();await expect(page.getByTestId('view-implementation').getByRole('heading',{name:'Validation implementation',exact:true})).toBeInViewport();await expect(detail(page).getByRole('heading',{name:'Schema check',exact:true})).toBeVisible();
  await dock(page).getByRole('tab',{name:'Sources & Git',exact:true}).click();await expect(dock(page)).toContainText('No repository snapshot supplied');await expect(dock(page)).toContainText('A document revision is not a Git commit');await expect(dock(page)).toContainText('No evidence sources supplied');await noOverflow(page);
 });
 
@@ -54,5 +54,5 @@ test('compact workspace keeps tree, detail and workflow reachable by keyboard wi
  await show('Explanation / compare');await expect(detail(page).getByRole('heading',{name:'Order intake',exact:true})).toBeVisible();
  await show('Map / activity');const workflow=dock(page).getByRole('tab',{name:'Workflow',exact:true});await workflow.focus();await page.keyboard.press('Enter');await expect(workflow).toHaveAttribute('aria-selected','true');
  await dock(page).getByRole('button',{name:'2. Inspect validation',exact:true}).focus();await page.keyboard.press('Enter');
- await show('View');await expect(page.getByTestId('view-implementation')).toBeVisible();await noOverflow(page);
+ await show('View');await expect(page.getByTestId('view-implementation')).toBeVisible();await expect(page.getByTestId('view-implementation').getByRole('heading',{name:'Validation implementation',exact:true})).toBeInViewport();await noOverflow(page);
 });
