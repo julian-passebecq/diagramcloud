@@ -54,7 +54,7 @@ test('retail declarations contain no observed runs, synthetic measurements, sche
  assert.equal(d.delivery,undefined);assert.equal(d.atlas,undefined);
  assert(d.nodes.every(n=>n.basis==='planned'&&n.status==='idle'));
  assert(d.edges.every(e=>e.basis==='planned'&&e.kind==='dependency'&&!e.quantity));
- assert(d.blocks.every(b=>b.type==='text'&&b.provenance==='synthetic'&&b.sourceIds.length===0));
+ assert(d.blocks.every(b=>['text','code','table'].includes(b.type)&&b.provenance==='synthetic'&&b.sourceIds.length===0));
  assert(d.views.every(v=>/illustrati|questions|proposé|possible|proposition/i.test(v.description)));
  assert.equal(d.nodes.find(n=>n.id==='retail-pos')?.provider,'Generic');
  assert.match(d.nodes.find(n=>n.id==='retail-ftp')!.summary,/protocole exact.*inconnus/);
@@ -81,4 +81,31 @@ test('canonical public HTML and SVG include the whole retail journey and redact 
  }
  assert.equal(published.views.length,5);assert.equal(published.story.length,6);
  assert.equal(d.privateNotes,sentinel,'public export must leave the authoring document intact');
+});
+
+
+test('illustrative retail contracts connect source rows to transformations, rejection and an unapproved decision',()=>{
+ const d=retailOperations(),published=validateDocument(publicDocument(d));
+ const evidence=(nodeId:string,id:string)=>{
+  assert(d.nodes.find(n=>n.id===nodeId)!.blockIds.includes(id),`${id} belongs to its navigable component`);
+  const b=d.blocks.find(b=>b.id===id)!;assert(b);assert.equal(b.provenance,'synthetic');
+  assert.deepEqual(published.blocks.find(x=>x.id===id),b);return b;
+ };
+ const csv=evidence('retail-files','retail-orders-csv');assert.equal(csv.type,'code');if(csv.type!=='code')return;
+ const [header,...lines]=csv.code.split('\n');
+ assert.equal(header,'order_id,line_id,sku,quantity,unit_price_minor,currency');
+ const rows=lines.map(line=>line.split(','));assert.equal(rows.length,3);
+ const acceptable=rows.filter(r=>Number(r[3])>0),rejected=rows.filter(r=>Number(r[3])<=0);
+ assert.equal(acceptable.reduce((sum,r)=>sum+Number(r[3])*Number(r[4]),0),3000);
+ assert.deepEqual(rejected.map(r=>r.slice(0,2)),[['DEMO-101','L1']]);
+ const api=evidence('retail-api','retail-order-api');assert.equal(api.type,'code');if(api.type!=='code')return;
+ const message=JSON.parse(api.code);assert.equal(message.order_id,rows[0][0]);assert.equal(message.quantity,Number(rows[0][3]));
+ assert.equal(message.unit_price_minor,Number(rows[0][4]));
+ evidence('retail-metadata','retail-order-dictionary');
+ const transform=evidence('retail-describe','retail-order-transform');assert.match(JSON.stringify(transform),/Aucune étape exécutée/);
+ const criteria=evidence('retail-controls','retail-order-acceptance');assert.match(JSON.stringify(criteria),/QUANTITY_NON_POSITIVE/);
+ assert.match(JSON.stringify(criteria),/3000/);
+ evidence('retail-controls','retail-order-failures');evidence('retail-responsibilities','retail-order-ownership');evidence('retail-decide','retail-order-decision');
+ assert.equal(d.observations.length,0);
+ const html=portfolioHtml(d);assert(html.includes('orders-example.csv'));assert(html.includes('QUANTITY_NON_POSITIVE'));
 });

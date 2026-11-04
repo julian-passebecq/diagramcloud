@@ -1,5 +1,5 @@
 import type {Project,ProjectNode,ProjectView} from '../core/model';
-import {node,note,project,validateDocument,view} from './builders';
+import {block,node,note,project,validateDocument,view} from './builders';
 
 /**
  * An anonymous, authored retail map for learning the whole-workspace journey.
@@ -77,7 +77,7 @@ export function retailOperations():Project{
   'retail-ftp':{x:0,y:480}
  },['retail-files','retail-api']);
  explain('retail-interfaces','Ouvrir les échanges','La vue d’ensemble pose le périmètre ; la vue enfant distingue applications, transport, contenu et contrat. Relier ces sujets dans un atelier ne signifie pas qu’ils sont déjà connectés.');
- explain('retail-files','Raconter la vie d’un fichier','Partir d’un exemple anonymisé choisi par son auteur : pourquoi il existe, qui le produit, qui le consomme et ce qui indique sa bonne prise en compte. Format et calendrier restent ouverts ; aucun exemple de données client n’est embarqué.');
+ explain('retail-files','Raconter la vie d’un fichier','Partir d’un exemple anonymisé choisi par son auteur : pourquoi il existe, qui le produit, qui le consomme et ce qui indique sa bonne prise en compte. Format et calendrier restent ouverts ; les données pédagogiques ci-dessous sont entièrement inventées, sans données client.');
  explain('retail-api','Décrire une interface avant de la brancher','Préciser l’usage attendu, l’appelant, la réponse, les droits nécessaires et le comportement en cas d’échec. La version et les opérations sont à choisir dans le contexte du projet ; le modèle ne fournit ni accès ni connecteur.');
 
  add('retail-need','Clarifier le besoin','process','Proposition : formuler une question métier et le résultat attendu.',{tags:['Travail','Proposé']});
@@ -139,6 +139,52 @@ export function retailOperations():Project{
  },['retail-ai-purpose','retail-ai-review']);
  explain('retail-ai','Faire évoluer sans brouiller l’existant','Conserver la carte du système et ouvrir une vue dédiée aux propositions. Commencer par une tâche utile, ses données et sa validation. L’ajout d’une carte IA ne prouve ni intégration, ni autonomie, ni gain.');
  explain('retail-ai-trial','Un essai a besoin de critères','Décrire ce qui sera comparé, les entrées autorisées, le résultat attendu et la personne qui l’examinera. Qualité, délai et coût restent des critères à renseigner ; aucune valeur n’est inventée dans ce modèle.');
+
+ // Concrete teaching artifacts remain inert synthetic evidence, never observations.
+ note(d,'retail-shopify','retail-order-scope','Commande illustrative · périmètre à décider',
+  'Cas proposé : expliquer les lignes de commande reçues pour préparer un rapprochement quotidien. La boutique Shopify situe le besoin ; orders-example.csv est notre format pédagogique, pas un export Shopify officiel. Aucun champ, endpoint, abonnement ou connecteur Shopify réel n’est présumé. Le référent métier doit décider : inclut-on les commandes annulées, remboursements, taxes et frais de port ? Cet exemple exclut ces sujets, les données personnelles et toute conversion de devise.','synthetic');
+ block(d,'retail-files',{id:'retail-orders-csv',title:'orders-example.csv · entrée synthétique',type:'code',language:'text',provenance:'synthetic',sourceIds:[],code:
+`order_id,line_id,sku,quantity,unit_price_minor,currency
+DEMO-100,L1,SKU-A,2,1250,EUR
+DEMO-100,L2,SKU-B,1,500,EUR
+DEMO-101,L1,SKU-A,0,1250,EUR`});
+ note(d,'retail-files','retail-file-contract','Contrat proposé · réception du fichier',
+  'Exemple uniquement : UTF-8, séparateur virgule, en-tête exact, une ligne par (order_id, line_id). quantity et unit_price_minor sont des entiers ; currency vaut EUR dans ce jeu. Le producteur proposé est le responsable des systèmes ; le consommateur proposé est le traitement décrit dans Décrire le changement. Aucun transport n’est configuré. Questions : qui dépose le fichier complet, comment annonce-t-il sa fin, quel identifiant de lot empêche un doublon et qui approuve une nouvelle version du schéma ? Un en-tête inconnu ou un fichier incomplet bloque le lot avant publication.','synthetic');
+ block(d,'retail-metadata',{id:'retail-order-dictionary',title:'Dictionnaire illustratif · grain et unités',type:'table',provenance:'synthetic',sourceIds:[],columns:['Champ','Sens proposé','Règle à faire approuver'],rows:[
+  ['order_id + line_id','Identité de ligne dans ce jeu','Clé composée obligatoire ; jamais dédupliquer sur sku seul'],
+  ['sku','Référence article fictive','Non vide ; référentiel réel et responsable à identifier'],
+  ['quantity','Nombre d’unités commandées','Entier strictement positif ; zéro rejeté dans cet exemple'],
+  ['unit_price_minor','Prix unitaire en centimes EUR dans cet exemple','Entier positif ou nul ; pas de flottants ni conversion implicite'],
+  ['line_total_minor','quantity × unit_price_minor','Montant de ligne dérivé ; ne constitue pas un revenu net'],
+  ['currency','Devise de la ligne','EUR seulement dans le jeu ; ne pas additionner des devises différentes']
+ ]});
+ block(d,'retail-api',{id:'retail-order-api',title:'API interne envisagée · exemple de message, non appelé',type:'code',language:'json',provenance:'synthetic',sourceIds:[],code:JSON.stringify({contract:'illustrative-order-line/1',batch_id:'DEMO-BATCH-01',order_id:'DEMO-100',line_id:'L1',sku:'SKU-A',quantity:2,unit_price_minor:1250,currency:'EUR'},null,2)});
+ note(d,'retail-api','retail-api-contract','Contrat API à discuter · alternative au fichier',
+  'Ce message interne inventé représente le même grain que le CSV ; ce n’est pas un payload Shopify. Contrat proposé : une répétition de batch_id + order_id + line_id avec le même contenu ne crée aucune ligne supplémentaire ; un contenu différent sous la même clé devient un conflit à examiner. Authentification, adresse, version réelle, pagination et délais restent inconnus. Question au responsable des systèmes : après une réponse perdue, comment distinguer un envoi non reçu d’un envoi déjà accepté ? Prévoir une consultation de réception avant une relance ; aucun mécanisme n’est implémenté ici.','synthetic');
+ block(d,'retail-describe',{id:'retail-order-transform',title:'Transformation proposée · pseudo-code non exécuté',type:'code',language:'text',provenance:'synthetic',sourceIds:[],code:
+`Entrée : orders-example.csv OU message illustrative-order-line/1
+1. Vérifier le schéma, le lot complet et la clé (order_id, line_id).
+2. Refuser une clé répétée dans le lot ; ne jamais sommer ses doublons.
+3. Valider quantity > 0, prix entier >= 0, currency = EUR.
+4. Conserver les valeurs source et calculer line_total_minor = quantity * unit_price_minor.
+5. Séparer les lignes acceptables des rejets avec un code et la clé source.
+6. Proposer un aperçu ; publier seulement après résolution des rejets et accord humain.
+Reprise : corriger la source, identifier le lot de remplacement, vérifier l’idempotence.
+Aucune étape exécutée ; politique de publication et responsable à confirmer.`});
+ block(d,'retail-controls',{id:'retail-order-acceptance',title:'Critères d’acceptation proposés · résultats attendus, non constatés',type:'table',provenance:'synthetic',sourceIds:[],columns:['Cas synthétique','Attendu à vérifier','Décision / reprise proposée'],rows:[
+  ['DEMO-100 / L1 : 2 × 1250','line_total_minor = 2500 EUR centimes','Conserver la clé et les valeurs source'],
+  ['DEMO-100 / L2 : 1 × 500','line_total_minor = 500 EUR centimes','Aperçu DEMO-100 = 3000 ; aucun revenu net affirmé'],
+  ['DEMO-101 / L1 : quantity = 0','Rejet QUANTITY_NON_POSITIVE ; aucun total publié','Référent métier confirme si zéro doit être rejeté'],
+  ['Même clé répétée ou en-tête différent','Lot bloqué ; aucune publication partielle','Responsable systèmes corrige la source / version'],
+  ['Lot envoyé deux fois sans changement','Aucune ligne supplémentaire après reprise','Exploitation vérifie la réception avant relance'],
+  ['Fichier incomplet, devise non prévue ou réponse perdue','État indéterminé ou rejet explicite ; jamais succès déduit','Conserver le lot source ; traiter le problème avant publication']
+ ]});
+ note(d,'retail-controls','retail-order-failures','Échec & preuve attendue · avant toute mise en service',
+  'Pour le CSV affiché, l’aperçu attendu comporte deux lignes acceptables et un rejet ; le lot reste bloqué dans la politique proposée. Une validation future devrait fournir le lot exact, la version des règles, les clés acceptées/rejetées et la décision humaine. Ces résultats sont des attentes calculées à la lecture, pas un journal d’exécution. Le référent exploitation doit décider où conserver les rejets, qui est averti et quand arrêter les reprises. Ne pas effacer ni modifier silencieusement la ligne fautive.','synthetic');
+ note(d,'retail-responsibilities','retail-order-ownership','Questions de validation · responsables non attribués',
+  'Métier : approuver le grain, les exclusions et le traitement de quantity = 0. Systèmes : confirmer le format réel disponible depuis la boutique, le transport, les droits et les versions ; ne pas supposer que le CSV proposé existe déjà. Définitions : approuver unités, devise, clés et règle de calcul. Exploitation : choisir le traitement des lots incomplets, conflits et reprises. Pour chaque rôle, demander un nom, un périmètre et une décision explicite ; aucun accord n’est enregistré ici.','synthetic');
+ note(d,'retail-decide','retail-order-decision','Revue de changement · décision préparée',
+  'Livrables proposés pour la revue : exemple CSV, dictionnaire, alternative de message API, pseudo-code et matrice d’acceptation présents dans ce projet. Décisions ouvertes : choisir fichier ou API selon les capacités réellement documentées ; approuver le blocage du lot en cas de rejet ; attribuer les quatre rôles. Avant adoption, comparer un échantillon autorisé au contrat et faire revoir les écarts. Retour arrière à concevoir : suspendre la publication du nouveau format et conserver le dernier lot accepté selon une politique approuvée. Aucun déploiement, test ou accord n’est annoncé.','synthetic');
 
  for(const e of d.edges){e.basis='planned';e.speed='slow';}
  d.story=[
