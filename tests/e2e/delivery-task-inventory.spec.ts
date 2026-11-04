@@ -15,7 +15,12 @@ async function open(page:Page) {
   }
   await page.getByText('Dock panels',{exact:true}).click();await page.getByLabel('Main dock panel',{exact:true}).selectOption('work');await page.getByText('Dock panels',{exact:true}).click();
   const panel=w.getByRole('region',{name:'Delivery evidence',exact:true});await panel.getByLabel('Load delivery plan',{exact:true}).setInputFiles(upload('plan.json',JSON.stringify(plan)));
-  const summary=panel.locator('summary').filter({hasText:'PM task correspondence'});if(await summary.count())await summary.click();
+  // Wait for the async plan import before checking the responsive disclosure.
+  // Compact sections start open; an unconditional click would close this one.
+  const loader=panel.getByLabel('Load PM task snapshot',{exact:true});await expect(loader).toBeAttached();
+  const disclosure=panel.locator('details.dc-evidence-section').filter({has:page.locator('summary').filter({hasText:'PM task correspondence'})});
+  if(await disclosure.count() && !(await disclosure.evaluate(el=>(el as HTMLDetailsElement).open)))await disclosure.locator(':scope > summary').click();
+  await expect(loader).toBeVisible();
   return panel;
 }
 for(const width of [1440,390])test.describe(`PM task inventory ${width}`,()=>{
