@@ -54,7 +54,7 @@ test('decision review: review and acceptance are explicit human actions, one rev
  const c=planner(accepted.present).choices![0];
  assert.deepEqual([c.status,c.chosenOptionId,c.decidedBy,c.decidedAt,c.suggestedBy],['accepted','warehouse','Julian','2026-10-17','claude']);
  assert.equal(accepted.present.revision,d.revision+1);assert.equal(choiceReview(accepted.present,'store-choice').state,'current','accepting reviews against the facts it was decided on');
- assert.deepEqual(undo(accepted).present,d,'one Undo restores the candidate');
+ assert.deepEqual({...undo(accepted).present,revision:d.revision},d,'one Undo restores the candidate');assert.equal(undo(accepted).present.revision,accepted.present.revision+1,'Undo never lowers the revision');
  // An accepted decision is never rewritten by the accept action.
  assert.throws(()=>acceptChoice(accepted.present,'store-choice','lakehouse',{decidedBy:'Someone',decidedAt:'2026-10-18'}),/already an accepted decision.*not rewritten silently/);
  // Re-reviewing an accepted decision keeps who decided and when.

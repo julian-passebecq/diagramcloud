@@ -45,6 +45,20 @@ test('Mermaid escapes pipe characters in labels',()=>{const d=clone(total);d.edg
 test('stable IDs have bounded safe syntax',()=>{assert.throws(()=>nodeSchema.parse({id:'<script>',label:'Bad'}));assert.throws(()=>nodeSchema.parse({id:'a'.repeat(90),label:'Bad'}));});
 
 
+/** Content of a document apart from its revision (Undo and Redo restore content under a new revision). */
+function sameContent(doc:ReturnType<typeof validateDocument>){const {revision:_revision,...rest}=doc;return rest;}
+test('undo and redo only raise the revision, so a patch written for an undone state stays stale after the next edit',()=>{
+ const a=validateDocument({...clone(total),revision:5}),node=a.nodes[0].id,b=clone(a);b.nodes[0].label='Synthetic B';
+ const h1=commitHistory({past:[],present:a,future:[]},b);assert.equal(h1.present.revision,6);
+ const forB={format:'diagramcloud.patch',version:1,target:'project',targetId:a.id,baseRevision:h1.present.revision,summary:'Written for B',operations:[{op:'replace',path:`/nodes/@${node}/label`,value:'Written for B'}]};
+ const back=undo(h1);assert.equal(back.present.nodes[0].label,a.nodes[0].label);assert.equal(back.present.revision,7,'undo never lowers or reuses a revision');
+ const c=clone(back.present);c.nodes[0].label='Synthetic C';const h2=commitHistory(back,c);
+ assert.ok(h2.present.revision>Math.max(a.revision,h1.present.revision,back.present.revision),'the next edit gets a revision never used before');
+ assert.throws(()=>applyDocumentPatch(h2.present,forB),/Stale patch/);
+ const again=redo(undo(h2));assert.ok(again.present.revision>undo(h2).present.revision);assert.equal(again.present.nodes[0].label,'Synthetic C');
+ assert.equal(redo(h2),h2,'nothing to redo is a no-op');assert.equal(undo({past:[],present:a,future:[]}).present,a,'nothing to undo is a no-op');
+});
+
 function componentReuseProject(){return validateDocument(documentSchema.parse({schemaVersion:1,id:'synthetic-reuse-unit',revision:7,title:'Synthetic canonical reuse',rootViewId:'root',
  nodes:[{id:'left-portal',label:'Left',childViewId:'left'},{id:'right-portal',label:'Right',childViewId:'right'},{id:'shared',label:'Same label',summary:'Canonical authored explanation',blockIds:['example'],sourceIds:['source']},{id:'other',label:'Same label'},{id:'private',label:'SYNTHETIC_REUSE_PRIVATE',visibility:'private'}],
  edges:[{id:'native-link',source:'shared',target:'other',kind:'dependency',basis:'planned',quantity:{value:0,unit:'items/day',provenance:'synthetic'}}],
@@ -53,7 +67,7 @@ function componentReuseProject(){return validateDocument(documentSchema.parse({s
 test('component reuse adds only exact existing membership and authored position, with one ordinary Undo and no fact clones',()=>{
  const input=componentReuseProject(),raw=JSON.stringify(input),point={x:123.5,y:-40.25},out=addExistingComponentToView(input,'right','shared',point),expected=clone(input),right=expected.views.find(view=>view.id==='right')!;right.nodeIds.push('shared');right.positions.shared={...point};
  assert.deepEqual(out,expected);assert.equal(out.revision,input.revision);assert.equal(out.nodes.filter(node=>node.id==='shared').length,1);assert.equal(JSON.stringify(input),raw);assert.equal(out.views.find(view=>view.id==='right')!.edgeIds.length,0,'incident edges are not implicitly added');
- const h:History={past:[],present:input,future:[]},committed=commitHistory(h,out);assert.equal(committed.past.length,1);assert.equal(committed.present.revision,input.revision+1);assert.deepEqual(undo(committed).present,input);assert.deepEqual(redo(undo(committed)).present,committed.present);
+ const h:History={past:[],present:input,future:[]},committed=commitHistory(h,out);assert.equal(committed.past.length,1);assert.equal(committed.present.revision,input.revision+1);assert.deepEqual(sameContent(undo(committed).present),sameContent(input));assert.equal(undo(committed).present.revision,committed.present.revision+1);assert.deepEqual(sameContent(redo(undo(committed)).present),sameContent(committed.present));assert.equal(redo(undo(committed)).present.revision,committed.present.revision+2);
  point.x=999;out.nodes.find(node=>node.id==='shared')!.summary='Caller copy only';assert.equal(input.nodes.find(node=>node.id==='shared')!.summary,'Canonical authored explanation');assert.equal(out.views.find(view=>view.id==='right')!.positions.shared.x,123.5);
 });
 test('already present component reuse is an exact no-op rather than a new position, revision or history candidate',()=>{
@@ -77,7 +91,7 @@ test('one-view removal changes only exact view membership position and incident 
  input=applyDocumentPatch(input,observationPatch(input,{id:'fixture-not-observed',nodeId:'shared',sourceApp:'synthetic-fixture',authority:'Synthetic unit fixture only',observedAt:'2026-10-15T00:00:00Z',sourceRevision:'fixture-1',claim:'not-observed',summary:'Synthetic fixture: no runtime verification is asserted.'})).result;
  const raw=JSON.stringify(input),out=removeComponentFromView(input,'right','shared'),expected=clone(input),view=expected.views.find(view=>view.id==='right')!;view.nodeIds=view.nodeIds.filter(id=>id!=='shared');view.edgeIds=[];delete view.positions.shared;
  assert.deepEqual(out,expected);assert.equal(out.revision,input.revision);assert.equal(JSON.stringify(input),raw);assert.deepEqual(out.observations,input.observations);assert.equal(out.observations[0].reviewedAt,undefined);assert.equal(out.observations[0].shareable,false);assert.equal(out.edges[0].quantity!.value,0);assert.equal(out.edges[0].quantity!.provenance,'synthetic');
- const history:History={past:[],present:input,future:[]},h=commitHistory(history,out);assert.equal(h.past.length,1);assert.deepEqual(undo(h).present,input);assert.deepEqual(redo(undo(h)).present,h.present);
+ const history:History={past:[],present:input,future:[]},h=commitHistory(history,out);assert.equal(h.past.length,1);assert.deepEqual(sameContent(undo(h).present),sameContent(input));assert.deepEqual(sameContent(redo(undo(h)).present),sameContent(h.present));
 });
 test('one-view removal has exact no-op identity and constant atomic refusal for unknown or invalid scope',()=>{
  const input=componentRemovalProject(),raw=JSON.stringify(input);assert.equal(removeComponentFromView(input,'root','shared'),input);
