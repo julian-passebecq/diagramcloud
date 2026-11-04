@@ -68,7 +68,7 @@ The gallery now starts with **Foil · cloud**, **Retail · opérations**, the in
 
 The anonymous retail example has five linked views: whole system, file/API exchanges, proposed workflow, responsibilities and future AI. The same metadata and control components appear across views with one identity. The model is entirely authored and illustrative: no client records, live connections, operational dates or measured outcomes. Open **Fichiers & interfaces** from its overview to keep the parent while exploring the exchange view; switch to **Edit** to adapt it and use the ordinary history/save/export paths.
 
-A trusted local DataPass host may build with `VITE_DATAPASS_COMPARISON=1` to show a companion `/comparison` link. It opens a new tab and transfers no project data. Normal standalone builds omit the link. This adds navigation only; comparison is not yet bound to the active editor project.
+A trusted local DataPass host may build with `VITE_DATAPASS_COMPARISON=1` to expose **Compare this project**. It sends a frozen, audience-permitted semantic projection of the active Project, selected variants or retained evolution history to the same-origin native Rust host. Before/after and A/B/C reviews can be saved and reopened with recomputation; selection never applies an alternative. Coverage and unavailable source freshness stay explicit. Author review bundles are private backups, separate from public exports. Illustrative retail/agentic packs and source-bound Hop explanations use this same workspace. Normal standalone builds omit this host feature. The older `/comparison` link remains an independent companion in a new tab and does not transfer active project data.
 
 ## The grammar
 
