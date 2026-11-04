@@ -39,3 +39,12 @@ test('all returned state is detached, no shared default objects',()=>{
  const a=defaultWorkbenchLayout(),b=defaultWorkbenchLayout();a.panels.sidebarCollapsed=true;assert.equal(b.panels.sidebarCollapsed,false);
  const copy=validateWorkbenchLayout(b);copy.panels.sidebarWidth=420;assert.equal(b.panels.sidebarWidth,null);
 });
+
+test('density defaults to comfortable, normalises legacy records in memory only and refuses unknown values whole',async()=>{
+ const {defaultWorkbenchLayout:fresh,validateWorkbenchLayout:check,WORKBENCH_DENSITIES}=await import('../src/core/workbenchLayout');
+ assert.deepEqual([...WORKBENCH_DENSITIES],['comfortable','compact']);assert.equal(fresh().density,'comfortable');
+ const {density,...legacy}=fresh(),raw=JSON.stringify(legacy);const read=check(JSON.parse(raw));assert.equal(read.density,'comfortable');assert.equal(JSON.stringify(legacy),raw);assert(!('density' in legacy));
+ assert.equal(check({...fresh(),density:'compact'}).density,'compact');
+ for(const bad of ['dense','Compact','',null,1,true,{value:'compact'}])assert.throws(()=>check({...fresh(),density:bad}),/Invalid workbench layout/);
+ assert.throws(()=>check({...fresh(),density:'compact',spacing:'tight'}),/Invalid workbench layout/);
+});

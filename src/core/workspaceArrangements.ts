@@ -1,5 +1,7 @@
 import {validateWorkbenchLayout,type WorkbenchLayout} from './workbenchLayout';
-/** Explicit browser preferences, never Project content, camera, route, permission or Undo. */
+/** Explicit browser preferences, never Project content, camera, route, permission or Undo.
+ * A saved layout carries panel sizes, floating placements (Explorer, companion, bottom panel) and density; records written
+ * before 1.34 (no density, no floating Explorer) are read as comfortable and docked in memory and never rewritten on read. */
 export type ArrangementScope={projectId:string;audience:'author'|'public';hostId:string};
 export type ArrangementStorage=Pick<Storage,'getItem'|'setItem'|'removeItem'>;
 export type WorkspaceArrangement={name:string;layout:WorkbenchLayout};

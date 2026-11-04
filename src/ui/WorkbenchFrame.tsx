@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {defaultWorkbenchLayout,fitWorkbenchLayout,fitFloatingRect,type FloatingPane,type FloatingRect,selectWorkbenchPane,setWorkbenchPreset,validateWorkbenchLayout,type WorkbenchLayout,type WorkbenchPane,type WorkbenchPreset} from '../core/workbenchLayout';
+import {defaultWorkbenchLayout,fitWorkbenchLayout,fitFloatingRect,FLOATING_MIN_WIDTH,type WorkbenchDensity,type FloatingPane,type FloatingRect,selectWorkbenchPane,setWorkbenchPreset,validateWorkbenchLayout,type WorkbenchLayout,type WorkbenchPane,type WorkbenchPreset} from '../core/workbenchLayout';
 import {WorkspaceArrangements} from './WorkspaceArrangements';
 import {arrangementScopeKey,type ArrangementScope,type ArrangementStorage} from '../core/workspaceArrangements';
 
@@ -25,7 +25,8 @@ const present=(slot:React.ReactNode)=>slot!==undefined&&slot!==null&&slot!==fals
  * invalidate private pins and bind async callbacks to its current project/audience epoch.
  *
  * Presets affect physical layout only. "Present" never publishes or changes an Edit capability.
- * Direct separator resizing keeps keyboard range controls. Floating placements stay within this frame; no cross-device synchronization.
+ * Direct separator resizing keeps keyboard range controls. Explorer, companion and bottom panel can float within this frame
+ * (no separate browser window, no docking tree); no cross-device synchronization. Density changes pane chrome only.
  */
 export class WorkbenchFrame extends React.Component<WorkbenchFrameProps,{area:{top:number;width:number;height:number}}>{
  state={area:{top:0,width:0,height:0}};
@@ -53,7 +54,7 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps,{area:{t
   event.preventDefault();event.stopPropagation();const next={...rect},step=event.shiftKey?1:10;
   if(event.key==='Home'||event.key==='End'){
    if(action==='move'){next.x=event.key==='Home'?0:this.state.area.width;next.y=event.key==='Home'?0:this.state.area.height;}
-   else {next.width=event.key==='Home'?260:this.state.area.width;next.height=event.key==='Home'?180:this.state.area.height;}
+   else {next.width=event.key==='Home'?FLOATING_MIN_WIDTH[pane]:this.state.area.width;next.height=event.key==='Home'?180:this.state.area.height;}
   }else{const horizontal=event.key==='ArrowLeft'||event.key==='ArrowRight',key=action==='move'?(horizontal?'x':'y'):(horizontal?'width':'height');next[key]+=(event.key==='ArrowLeft'||event.key==='ArrowUp'?-step:step);}
   this.setFloating(pane,fitFloatingRect(next,this.state.area.width,this.state.area.height,pane));
  };
@@ -135,15 +136,18 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps,{area:{t
   const scope=this.scope();
   const resizeHandle=(kind:'explorer'|'companion'|'dock')=>{const compare=kind==='companion'&&layout.preset==='compare',value=kind==='dock'?layout.dockHeight:kind==='explorer'?layout.panels.sidebarWidth??300:compare?layout.companionPercent:layout.panels.detailsWidth??360;return <div key={kind} className={`wb-resize wb-resize-${kind}`} role="separator" tabIndex={0} aria-label={`Resize ${kind==='dock'?'bottom panel':kind}`} aria-orientation={kind==='dock'?'horizontal':'vertical'} aria-controls={id(kind)} aria-valuemin={kind==='dock'?140:kind==='explorer'?220:compare?30:260} aria-valuemax={kind==='dock'?360:kind==='explorer'?420:compare?70:480} aria-valuenow={value} aria-valuetext={`${value}${compare?' percent':' pixels'} requested`} onKeyDown={event=>this.resizeKey(event,kind)} onPointerDown={event=>this.beginResize(event,kind,fit.primary+fit.companion)} onPointerMove={this.moveResize} onPointerUp={()=>{this.drag=null;}} onPointerCancel={()=>{const drag=this.drag;this.drag=null;if(drag&&drag.scope===this.scope())change(drag.layout);}} onLostPointerCapture={()=>{this.drag=null;}}/>;};
   const floatingStyle=(name:FloatingPane):React.CSSProperties|undefined=>{const rect=this.floatingRect(name);return fit.floating[name]&&rect?{left:rect.x+8,top:rect.y+this.state.area.top,width:rect.width,height:rect.height}:undefined;};
-  const floatControl=(name:FloatingPane,action:'move'|'resize')=><button type="button" className={`wb-native wb-float-${action}`} hidden={!fit.floating[name]} aria-label={`${action==='move'?'Move':'Resize'} floating ${name==='dock'?'bottom panel':name}`} aria-describedby={`${id('float-help')} ${id(name+'-placement')}`} onKeyDown={event=>this.floatKey(event,name,action)} onPointerDown={event=>this.beginFloat(event,name,action)} onPointerMove={this.moveFloat} onPointerUp={()=>{this.floatDrag=null;}} onPointerCancel={this.cancelFloat} onLostPointerCapture={()=>{this.floatDrag=null;}}>{action==='move'?'Move':'Resize ↘'}</button>;
-  const floatHeader=(name:FloatingPane,title:string)=><div className="wb-pane-heading"><h2>{title}</h2><span id={id(name+'-placement')} className="wb-sr-only" aria-live="polite">{fit.floating[name]&&(()=>{const r=this.floatingRect(name)!;return `${title}: position ${r.x}, ${r.y}; size ${r.width} by ${r.height} pixels.`;})()}</span><span className="wb-pane-tools" hidden={fit.compact||layout.preset==='present'}>{floatControl(name,'move')}<button type="button" className="wb-native" aria-label={`${fit.floating[name]?'Dock':'Float'} ${name==='dock'?'bottom panel':name}`} aria-controls={id(name)} onClick={()=>{
+  const floatControl=(name:FloatingPane,action:'move'|'resize')=><button type="button" className={`wb-native wb-float-${action}`} hidden={!fit.floating[name]} aria-label={`${action==='move'?'Move':'Resize'} floating ${paneName(name)}`} aria-describedby={`${id('float-help')} ${id(name+'-placement')}`} onKeyDown={event=>this.floatKey(event,name,action)} onPointerDown={event=>this.beginFloat(event,name,action)} onPointerMove={this.moveFloat} onPointerUp={()=>{this.floatDrag=null;}} onPointerCancel={this.cancelFloat} onLostPointerCapture={()=>{this.floatDrag=null;}}>{action==='move'?'Move':'Resize ↘'}</button>;
+  const paneName=(name:FloatingPane)=>name==='dock'?'bottom panel':name;
+  // First Float request per pane; later placements come from the saved request, clamped to measured space.
+  const floatDefault=(name:FloatingPane):FloatingRect=>name==='explorer'?{x:16,y:16,width:320,height:Math.max(180,Math.min(560,this.state.area.height-fit.dock-24))}:name==='companion'?{x:this.state.area.width-400,y:16,width:380,height:Math.max(180,Math.min(480,this.state.area.height-fit.dock-24))}:{x:40,y:120,width:720,height:300};
+  const floatHeader=(name:FloatingPane,title:string)=><div className="wb-pane-heading"><h2>{title}</h2><span id={id(name+'-placement')} className="wb-sr-only" aria-live="polite">{fit.floating[name]&&(()=>{const r=this.floatingRect(name)!;return `${title}: position ${r.x}, ${r.y}; size ${r.width} by ${r.height} pixels.`;})()}</span><span className="wb-pane-tools" hidden={fit.compact||layout.preset==='present'}>{floatControl(name,'move')}<button type="button" className="wb-native" aria-label={`${fit.floating[name]?'Dock':'Float'} ${paneName(name)}`} aria-controls={id(name)} onClick={()=>{
    this.floatDrag=null;
-   const rect=fit.floating[name]?null:fitFloatingRect({x:name==='companion'?this.state.area.width-400:40,y:name==='companion'?16:120,width:name==='companion'?380:720,height:name==='companion'?Math.max(180,Math.min(480,this.state.area.height-fit.dock-24)):300},this.state.area.width,this.state.area.height,name);
+   const rect=fit.floating[name]?null:fitFloatingRect(floatDefault(name),this.state.area.width,this.state.area.height,name);
    if(rect&&(rect.width<120||rect.height<120))return;
    this.setFloating(name,rect);
   }}>{fit.floating[name]?'Dock':'Float'}</button></span></div>;
   const region=(name:WorkbenchPane)=>({id:id(name),tabIndex:-1,'data-wb-region':name,hidden:!fit.visible[name]});
-  return <div ref={el=>{this.root=el;}} className="workbench-frame" data-preset={layout.preset} data-compact={String(fit.compact)} data-side={layout.panels.sidebarSide} style={css} onKeyDownCapture={this.cycle}>
+  return <div ref={el=>{this.root=el;}} className="workbench-frame" data-preset={layout.preset} data-density={layout.density} data-compact={String(fit.compact)} data-side={layout.panels.sidebarSide} style={css} onKeyDownCapture={this.cycle}>
    <span id={id('float-help')} className="wb-sr-only">Drag, or use arrow keys. Shift moves one pixel. Home and End use the bounds. Escape cancels a drag. Dock returns the pane to its original position.</span>
    <header className="wb-header">
     <div className="wb-heading"><h1>{p.title}</h1>{p.scopeCaption&&<span>{p.scopeCaption}</span>}</div>
@@ -160,6 +164,7 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps,{area:{t
      <details className="wb-layout" onToggle={this.positionLayout} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();this.closeLayout(event.currentTarget);}}}><summary className="wb-native">Layout</summary><div className="wb-layout-fields">
       <button type="button" className="wb-native wb-close-layout" onClick={event=>this.closeLayout(event.currentTarget)}>Close layout settings</button>
       <label>Explorer side <select className="wb-native" aria-label="Explorer side" value={layout.panels.sidebarSide} onChange={e=>change({...layout,panels:{...layout.panels,sidebarSide:e.target.value as 'left'|'right'}})}><option value="left">Left</option><option value="right">Right</option></select></label>
+      <label>Density <select className="wb-native" aria-label="Workspace density" value={layout.density} onChange={e=>change({...layout,density:e.target.value as WorkbenchDensity})}><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>
       <label>Explorer width <input className="wb-native" aria-label="Requested desktop explorer width" type="range" min={220} max={420} step={10} value={layout.panels.sidebarWidth??300} onChange={e=>change({...layout,panels:{...layout.panels,sidebarWidth:Number(e.target.value)}})}/></label>
       <label>Companion width <input className="wb-native" aria-label="Requested desktop companion width" type="range" min={260} max={480} step={10} value={layout.panels.detailsWidth??360} onChange={e=>change({...layout,panels:{...layout.panels,detailsWidth:Number(e.target.value)}})}/></label>
       <label>Compare split <input className="wb-native" aria-label="Requested desktop comparison percentage" type="range" min={30} max={70} step={5} value={layout.companionPercent} onChange={e=>change({...layout,companionPercent:Number(e.target.value)})}/></label>
@@ -176,10 +181,10 @@ export class WorkbenchFrame extends React.Component<WorkbenchFrameProps,{area:{t
     </nav>}
    </header>
    <div className="wb-body" hidden={fit.compact&&fit.active==='dock'}>
-    <aside {...region('explorer')} className="wb-explorer wb-region" aria-label="Explorer"><h2>Explorer</h2>{p.explorer}</aside>
+    <aside {...region('explorer')} className="wb-explorer wb-region" data-floating={String(fit.floating.explorer)} style={floatingStyle('explorer')} aria-label="Explorer">{floatHeader('explorer','Explorer')}<div className="wb-pane-content">{p.explorer}</div>{floatControl('explorer','resize')}</aside>
     <section {...region('primary')} className="wb-primary wb-region" aria-label={p.primaryTitle??'Architecture view'}><h2>{p.primaryTitle??'Architecture view'}</h2>{p.orientation}{p.primary}</section>
     <aside {...region('companion')} className="wb-companion wb-region" data-floating={String(fit.floating.companion)} style={floatingStyle('companion')} aria-label={p.companionTitle??'Context and explanation'}>{floatHeader('companion',p.companionTitle??'Context and explanation')}<div className="wb-pane-content">{p.companion}</div>{floatControl('companion','resize')}</aside>
-    {!fit.compact&&fit.visible.explorer&&resizeHandle('explorer')}
+    {!fit.compact&&fit.visible.explorer&&!fit.floating.explorer&&resizeHandle('explorer')}
     {!fit.compact&&fit.visible.companion&&!fit.floating.companion&&resizeHandle('companion')}
     <nav id={id('rail')} className="wb-rail wb-region" hidden={!fit.rail} aria-label="Semantic navigation" data-wb-region="rail" tabIndex={-1}>{p.rail}</nav>
    </div>

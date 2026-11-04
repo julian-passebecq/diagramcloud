@@ -205,3 +205,23 @@
 .wb-float-move{cursor:move}
 .wb-float-resize{cursor:nwse-resize;align-self:flex-end;flex-shrink:0;margin:3px}
 .wb-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* Compact density: tighter pane chrome, tab rows and dock headers only. Content, canvas zoom and routes are unchanged;
+   controls keep at least a 26px target (WCAG 2.2 target-size minimum is 24px). */
+.workbench-frame[data-density=compact] .wb-header{padding:4px 8px;gap:4px}
+.workbench-frame[data-density=compact] .wb-controls,.workbench-frame[data-density=compact] .wb-compact-nav{gap:3px}
+.workbench-frame[data-density=compact] button.wb-native,.workbench-frame[data-density=compact] select.wb-native,.workbench-frame[data-density=compact] summary.wb-native{min-height:28px;padding:2px 7px}
+.workbench-frame[data-density=compact] .wb-body{padding:4px 6px;gap:4px}
+.workbench-frame[data-density=compact] .wb-explorer,.workbench-frame[data-density=compact] .wb-primary,.workbench-frame[data-density=compact] .wb-companion{padding:6px}
+.workbench-frame[data-density=compact] .wb-pane-heading{margin-bottom:3px;gap:3px}
+.workbench-frame[data-density=compact] .wb-pane-heading h2,.workbench-frame[data-density=compact] .wb-region>h2{font-size:12px;margin-bottom:3px}
+.workbench-frame[data-density=compact] .wb-pane-tools{gap:3px}
+.workbench-frame[data-density=compact] .wb-bottom{margin:0 6px 4px}
+.workbench-frame[data-density=compact] .wb-bottom>.wb-pane-heading{padding:2px 6px;margin:0}
+.workbench-frame[data-density=compact] .wb-map,.workbench-frame[data-density=compact] .wb-activity{padding:4px 8px}
+.workbench-frame[data-density=compact] .wb-map-toggle{margin-bottom:3px}
+.workbench-frame[data-density=compact] .side-tabs,.workbench-frame[data-density=compact] [role=tablist]{gap:2px;padding-bottom:4px}
+.workbench-frame[data-density=compact] .side-tabs button,.workbench-frame[data-density=compact] .pi-tabs button,.workbench-frame[data-density=compact] [role=tablist]>[role=tab]{min-height:26px;padding:2px 5px;font-size:11px;line-height:1.2}
+.workbench-frame[data-density=compact] .wb-status{padding:2px 8px}
+.workbench-frame[data-density=compact] .wb-rail{padding:3px;gap:3px}
+.workbench-frame[data-density=compact][data-compact=true] .wb-bottom{margin:6px}
