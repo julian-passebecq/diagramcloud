@@ -51,7 +51,8 @@ export function compareView(beforeInput:Project,afterInput:Project,viewId:string
  for(const id of new Set([...bn.keys(),...an.keys()])){const a=bn.get(id),b=an.get(id);
   const ev:EvidenceDelta={before:obsOf(a),after:obsOf(b),...(a?.observation?{beforeClaim:a.observation.claim}:{}),...(b?.observation?{afterClaim:b.observation.claim}:{})};evidence.set(id,ev);
   if(!a){components.set(id,'added');push('architecture','ADDED','component',id,`${b!.label} (${b!.kind})`);
-   push('evidence','UNKNOWN','component',id,`${b!.label}: no observation. Drawing a new element does not implement or verify it.`);continue;}
+   if(b!.observation)push('evidence','OBSERVATION IN VIEW','component',id,`${b!.label}: supplied observation ("${b!.observation.claim}") is in view. This comparison does not create or verify the claim.`);
+   else push('evidence','UNKNOWN','component',id,`${b!.label}: no observation. Drawing a new element does not implement or verify it.`);continue;}
   if(!b){components.set(id,'removed');push('architecture','REMOVED','component',id,a.label);
    if(a.observation)push('evidence','OBSERVATION OUT OF VIEW','component',id,`${a.label}: its observation ("${a.observation.claim}") still stands; the component is only absent from this state of the view.`);continue;}
   const changed=sig(a)!==sig(b),moved=Math.abs(a.position.x-b.position.x)>MOVE||Math.abs(a.position.y-b.position.y)>MOVE;
