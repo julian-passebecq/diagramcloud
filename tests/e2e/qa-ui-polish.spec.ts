@@ -68,3 +68,13 @@ test('lesson at 390x844: the diagram source choice never widens the page',async(
  expect(box.x+box.width).toBeLessThanOrEqual(390);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
+
+for(const width of [1280,1440])test(`V3 Explore at ${width}: context scope tabs keep whole labels (Alternatives never breaks mid-word)`,async({page})=>{
+ await page.setViewportSize({width,height:900});
+ await page.goto('/?workspace=v3');
+ await expect(page.getByText('Local workspace ready',{exact:true})).toBeVisible();
+ const tabs=page.getByRole('tablist',{name:'Context scope'});
+ await expect(tabs.getByRole('tab',{name:'Alternatives',exact:true})).toBeVisible();
+ const metrics=await tabs.getByRole('tab').evaluateAll(list=>list.map(t=>{const s=getComputedStyle(t),line=parseFloat(s.lineHeight)||parseFloat(s.fontSize)*1.3;const pad=parseFloat(s.paddingTop)+parseFloat(s.paddingBottom)+parseFloat(s.borderTopWidth)+parseFloat(s.borderBottomWidth);return {label:t.textContent,lines:Math.round((t.getBoundingClientRect().height-pad)/line),overflow:t.scrollWidth>t.clientWidth+1};}));
+ for(const m of metrics){expect(m.lines,JSON.stringify(m)).toBeLessThanOrEqual(1);expect(m.overflow,JSON.stringify(m)).toBe(false);}
+});

@@ -108,16 +108,7 @@ export function CompanionPane({project,publicMode,anchor,pinned,onOpen,editMode=
      {shownTab==='questions'&&!publicMode&&<QuestionAnswersPanel key={`${doc.id}:${content.node.id}`} project={doc} nodeId={content.node.id} editMode={editMode} onPropose={onPropose}/>}
      {shownTab==='contract'&&<><h4>Declared inputs and outputs</h4>{content.contract.length?content.contract.map(b=><Evidence key={b.id} block={b} doc={doc}/>):<p>No input or output evidence attached to this component.</p>}</>}
     </>}
-    {shownTab==='concepts'&&content&&<section aria-label="Related concepts" className="companion-concepts">
-     <p className="micro">Concepts from the learning catalogue that a stored mapping links to this component. A shared name, tag or icon is never a mapping; nothing here is inferred. A mapping explains the component; it does not verify it.</p>
-     <ul aria-label="Mapped concepts">{concepts.map(r=><li key={r.id} data-concept-id={r.conceptId}>
-      {onLesson&&r.title?<button type="button" aria-label={'Open lesson '+r.title} onClick={()=>onLesson(r.conceptId)}>{r.title}</button>:<strong>{r.title??r.conceptId}</strong>}
-      <small className="companion-concept-state">{MAPPING_STATE_LABELS[r.state]} · lesson rev {r.contentRevision}{r.currentRevision&&r.currentRevision!==r.contentRevision?' (now '+r.currentRevision+')':''}{r.reviewedBy?' · reviewed by '+r.reviewedBy:''}</small>
-      {r.staleReasons.length>0&&<p className="micro">{r.staleReasons.join(' ')} Not rebound automatically.</p>}
-      {r.evidence.length>0&&<p className="micro">Cites: {r.evidence.map(e=>e.title).join(', ')}</p>}
-     </li>)}</ul>
-     {!onLesson&&<p className="micro">Read-only list: lessons open from the Learning catalogue.</p>}
-    </section>}
+    {shownTab==='concepts'&&content&&<CompanionConcepts concepts={concepts} onLesson={onLesson}/>}
     {shownTab==='evidence'&&content&&<>{content.evidence.map(b=><Evidence key={b.id} block={b} doc={doc}/>)}{content.sources.length>0&&<><h4>Cited sources</h4><ul>{content.sources.map(s=><li key={s.id}>{s.title} <span className="stable-id">{s.id}</span></li>)}</ul></>}</>}
     {shownTab==='related'&&<>
      <fieldset className="companion-filters"><legend>Related-context filters</legend>
@@ -146,5 +137,19 @@ export function CompanionPane({project,publicMode,anchor,pinned,onOpen,editMode=
     </>}
    </div>
   </>}
+ </section>;
+}
+
+/** The Concepts tab: stored mappings only. With onLesson each titled concept opens its lesson; without it the list is read-only. */
+export function CompanionConcepts({concepts,onLesson}:{concepts:ReturnType<typeof companionConcepts>;onLesson?:(conceptId:string)=>void}){
+ return <section aria-label="Related concepts" className="companion-concepts">
+  <p className="micro">Concepts from the learning catalogue that a stored mapping links to this component. A shared name, tag or icon is never a mapping; nothing here is inferred. A mapping explains the component; it does not verify it.</p>
+  <ul aria-label="Mapped concepts">{concepts.map(r=><li key={r.id} data-concept-id={r.conceptId}>
+   {onLesson&&r.title?<button type="button" aria-label={'Open lesson '+r.title} onClick={()=>onLesson(r.conceptId)}>{r.title}</button>:<strong>{r.title??r.conceptId}</strong>}
+   <small className="companion-concept-state">{MAPPING_STATE_LABELS[r.state]} · lesson rev {r.contentRevision}{r.currentRevision&&r.currentRevision!==r.contentRevision?' (now '+r.currentRevision+')':''}{r.reviewedBy?' · reviewed by '+r.reviewedBy:''}</small>
+   {r.staleReasons.length>0&&<p className="micro">{r.staleReasons.join(' ')} Not rebound automatically.</p>}
+   {r.evidence.length>0&&<p className="micro">Cites: {r.evidence.map(e=>e.title).join(', ')}</p>}
+  </li>)}</ul>
+  {!onLesson&&<p className="micro">Read-only list: lessons open from the Learning catalogue.</p>}
  </section>;
 }

@@ -15,3 +15,4 @@
 .explanation-existing p, .explanation-effects li, .explanation-revise-note { overflow-wrap: anywhere; }
 .explanation-existing .toolbar { flex-wrap: wrap; }
 .explanation-request input[readonly] { background: var(--colorNeutralBackground3, #f3f3f3); }
+.explanation-request .required-mark { font-weight: 600; font-size: 11px; color: var(--muted, #68788f); }
