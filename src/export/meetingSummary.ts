@@ -4,6 +4,8 @@ import {overviewProjection} from './projectOverview';
 import {validatePublicationBrief, type PublicationBrief} from '../intelligence/publicationBrief';
 import {publicationPages, scopePublicationSvg} from './publicationPages';
 import {designSvg} from './design';
+import {viewHasOmissions} from './design/context';
+import {PUBLIC_OMISSION_NOTICE} from '../core/viewspec';
 import {xml} from './diagram';
 
 /** Meeting-summary limits. A brief beyond them is refused; the full native handbook covers the rest. */
@@ -78,10 +80,13 @@ export type MeetingSummaryModel = {
   sources: Project['sources'];
   highlights: Project['nodes'];
   story: Project['story'];
+  /** True when a selected view has private or unreachable members the public cut does not show. Every format then
+   * prints the one uncounted PUBLIC_OMISSION_NOTICE for that view; it never says what or how many. */
+  omitted: Record<string, boolean>;
 };
 
 export function meetingSummaryModel(input: Project, briefInput: PublicationBrief): MeetingSummaryModel {
-  const p = overviewProjection(validateDocument(input), true), brief = validatePublicationBrief(briefInput, p);
+  const full = validateDocument(input), p = overviewProjection(full, true), brief = validatePublicationBrief(briefInput, p);
   if (brief.viewIds.length > MEETING_SUMMARY_LIMITS.views) throw new Error('Meeting summary supports at most six selected views; use the full native handbook for more.');
   if (!(MEETING_SUMMARY_PROFILES as readonly string[]).includes(brief.profile)) throw new Error('Meeting summary supports design or business profiles; use the native full publication for other profiles.');
   const paper = brief.paper === 'letter' ? 'letter' : 'A4';
@@ -94,7 +99,8 @@ export function meetingSummaryModel(input: Project, briefInput: PublicationBrief
   const highlights = nodes.filter(n => !n.childViewId).slice(0, 6);
   const story = brief.storyIndices.map(i => p.story[i]);
   const dense = Object.fromEntries(views.map(v => [v.id, publicationPages(p, v.id, brief.viewIds, {paper: brief.paper, profile: 'design'}).dense]));
-  return {project: p, brief, paper, views, dense, nodes, blocks, sources, highlights, story};
+  const omitted = Object.fromEntries(views.map(v => [v.id, viewHasOmissions(v, full)]));
+  return {project: p, brief, paper, views, dense, nodes, blocks, sources, highlights, story, omitted};
 }
 
 /** Concise publication recipe over existing Project and PublicationBrief contracts.
@@ -114,7 +120,7 @@ export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief,
     // Do not reduce an unreadable poster until its primary labels disappear.
     const figure = brief.profile === 'business' ? ''
       : plan.dense ? paragraph('This view exceeds the readable summary budget. The full handbook supplies paginated figures; the complete selected component list is below.')
-      : `<div class="figure">${scopePublicationSvg(designSvg(p, v.id, {type: v.design?.type ?? 'architecture', theme: 'light', now: options.now ?? new Date()}), 'meeting-' + index)}</div>`;
+      : `<div class="figure">${scopePublicationSvg(designSvg(p, v.id, {type: v.design?.type ?? 'architecture', theme: 'light', now: options.now ?? new Date(), omissionBase: input}), 'meeting-' + index)}</div>`;
     const component = (n: Project['nodes'][number]) => {
       const links = brief.detail !== 'overview' && n.blockIds.length
         ? `<p>${n.blockIds.filter(id => blockIds.has(id)).map(id => `<a href="#block-${xml(id)}">${xml(p.blocks.find(b => b.id === id)?.title ?? id)}</a>`).join(' / ')}</p>`
@@ -122,7 +128,7 @@ export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief,
       return `<article id="node-${index}-${xml(n.id)}"><h3>${xml(n.label)}</h3>${paragraph(n.summary || 'Meaning not supplied.')}<small>Source basis: ${xml(n.basis ?? 'unknown')}. Design status: ${xml(n.status)}; not runtime evidence.</small>${links}</article>`;
     };
     const grid = brief.detail === 'overview' && !plan.dense ? '' : `<div class="component-grid">${members.map(component).join('')}</div>`;
-    return `<section class="view-page" id="view-${xml(v.id)}" tabindex="-1"><small>SELECTED VIEW ${index + 1} / ${views.length}</small><h2>${xml(v.title)}</h2>${paragraph(v.description ?? '')}${figure}${grid}</section>`;
+    return `<section class="view-page" id="view-${xml(v.id)}" tabindex="-1"><small>SELECTED VIEW ${index + 1} / ${views.length}</small><h2>${xml(v.title)}</h2>${paragraph(v.description ?? '')}${model.omitted[v.id] ? `<p class="omission">${xml(PUBLIC_OMISSION_NOTICE)}</p>` : ''}${figure}${grid}</section>`;
   }).join('');
 
   const style = `

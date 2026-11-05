@@ -2,6 +2,7 @@ import type PptxGenJS from 'pptxgenjs';
 import type {EvidenceBlock, Project} from '../core/model';
 import type {PublicationBrief} from '../intelligence/publicationBrief';
 import {TRANSFORM_LABEL} from '../core/transform';
+import {PUBLIC_OMISSION_NOTICE} from '../core/viewspec';
 import {addArchitectureSlides} from './pptx';
 import {noIcons, type IconData} from './iconData';
 import {wrapLines} from './text';
@@ -121,12 +122,14 @@ export async function buildMeetingSummaryDeck(PptxCtor: typeof PptxGenJS, input:
       s.addNotes(model.highlights.map(n => `${n.label}\n${n.summary}`).join('\n\n'));
     } else if (entry.kind === 'view') {
       const v = model.views.find(x => x.id === entry.viewId)!, index = model.views.indexOf(v);
+      // The one uncounted notice, in the slide subtitle, when the public cut of this view leaves members out.
+      const described = model.omitted[v.id] ? [v.description, PUBLIC_OMISSION_NOTICE].filter(Boolean).join(' ') : v.description;
       if (entry.figure) {
         // Native editable figure: the public projection holding only this view and the summary's sources, without drilldown links.
-        const figure: Project = {...p, rootViewId: v.id, views: [v], sources: model.sources, story: [], nodes: p.nodes.map(({childViewId: _drop, ...n}) => n)};
+        const figure: Project = {...p, rootViewId: v.id, views: [{...v, description: described}], sources: model.sources, story: [], nodes: p.nodes.map(({childViewId: _drop, ...n}) => n)};
         await addArchitectureSlides(pptx, figure, {cover: false, evidence: false, sources: false, realization: false, firstViewSlide: viewSlide(v.id), icons: options.icons ?? noIcons});
       } else {
-        const s = frame(`SELECTED VIEW ${index + 1} / ${model.views.length}`, v.title, v.description ?? '');
+        const s = frame(`SELECTED VIEW ${index + 1} / ${model.views.length}`, v.title, described ?? '');
         const reason = model.dense[v.id] ? 'This view exceeds the readable summary budget. The full handbook supplies paginated figures; the complete selected component list follows.'
           : 'Business profile: text and tables, no graph.';
         body(s, reason, 2.2, .8, {color: MUTED});
