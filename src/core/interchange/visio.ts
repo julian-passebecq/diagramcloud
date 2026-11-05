@@ -1,6 +1,6 @@
 import {documentFromGraph,inferKind,inferProvider,plainLabel,type GraphEdge,type GraphNode,type GraphPage,type ImportResult} from './graph';
 import {parseXml,type XmlElement} from './xml';
-import {zipEntries,zipText} from './zip';
+import {partReader,zipEntries,type PartReader} from './zip';
 
 /**
  * Visio adapter for .vsdx (and macro-enabled .vsdm / template .vstx) packages: Office Open XML with one XML part per
@@ -36,12 +36,12 @@ function invisibleGeometry(el:XmlElement|undefined):boolean{
  return geo.every(g=>{const c=cellsOf(g);return c.get('NoFill')===1&&c.get('NoLine')===1||c.get('NoShow')===1;});
 }
 
-async function readMasters(bytes:Uint8Array,entries:ReturnType<typeof zipEntries>):Promise<Map<string,Master>>{
- const list=await zipText(bytes,entries,'visio/masters/masters.xml'),out=new Map<string,Master>();if(!list)return out;
- const rels=relsOf(await zipText(bytes,entries,'visio/masters/_rels/masters.xml.rels'));
+async function readMasters(read:PartReader):Promise<Map<string,Master>>{
+ const list=await read.text('visio/masters/masters.xml'),out=new Map<string,Master>();if(!list)return out;
+ const rels=relsOf(await read.text('visio/masters/_rels/masters.xml.rels'));
  for(const m of [...walkAll(parseXml(list))].filter(e=>e.name==='Master')){
   const rid=child(m,'Rel')?.attrs['r:id'],target=rid?rels.get(rid):undefined,master:Master={id:m.attrs.ID,name:m.attrs.NameU??m.attrs.Name??'',shapes:new Map()};
-  const xml=target?await zipText(bytes,entries,resolvePart('visio/masters',target)):undefined;
+  const xml=target?await read.text(resolvePart('visio/masters',target)):undefined;
   if(xml){const shapes=child(child(parseXml(xml),'MasterContents'),'Shapes');for(const s of walkAll(shapes??{name:'',attrs:{},children:[],text:''}))if(s.name==='Shape'&&s.attrs.ID)master.shapes.set(s.attrs.ID,s);
    master.top=shapes?.children.find(c=>c.name==='Shape');}
   out.set(master.id,master);
@@ -151,6 +151,12 @@ function pageGraph(title:string,contents:XmlElement,pageHeight:number,masters:Ma
  return {title,nodes,edges,groups:[...groups]};
 }
 
+/** Foreground pages read from one package; the document keeps fewer views, so the rest are only counted. */
+export const MAX_VISIO_PAGES=160;
+/** Uncompressed Visio parts one import may read in total (masters and pages, each part counted once). */
+const MAX_PACKAGE_MIB=64;
+const TOO_LARGE=(fileName:string)=>`${fileName} expands to more than ${MAX_PACKAGE_MIB} MiB of Visio parts. Nothing was imported.`;
+
 export const VISIO_ACCEPT='.vsdx,.vsdm,.vstx,.vstm';
 export const isVisioFile=(name:string)=>/\.(vsdx|vsdm|vstx|vstm|vsd|vdx|vss|vssx)$/i.test(name);
 
@@ -160,18 +166,23 @@ export async function visioPages(bytes:Uint8Array,fileName='diagram.vsdx'):Promi
  if(/^\s*(<\?xml[^>]*>\s*)?<VisioDocument/.test(new TextDecoder().decode(bytes.subarray(0,400))))throw new Error(`${fileName} is a Visio 2003 XML drawing (.vdx). Open it in Visio and save it as a .vsdx drawing, then import that file.`);
  let entries:ReturnType<typeof zipEntries>;
  try{entries=zipEntries(bytes);}catch{throw new Error(`${fileName} is not a Visio drawing: a .vsdx file is a ZIP package.`);}
- const index=await zipText(bytes,entries,'visio/pages/pages.xml');
+ const read=partReader(bytes,entries,MAX_PACKAGE_MIB*1024*1024,TOO_LARGE(fileName));
+ const index=await read.text('visio/pages/pages.xml');
  if(!index)throw new Error(entries.has('visio/masters/masters.xml')?`${fileName} has no pages: it looks like a Visio stencil. Import a drawing (.vsdx) instead.`:`${fileName} is not a Visio drawing (no visio/pages/pages.xml).`);
- const rels=relsOf(await zipText(bytes,entries,'visio/pages/_rels/pages.xml.rels')),masters=await readMasters(bytes,entries);
- const lost=new Map<string,number>(),pages:GraphPage[]=[];
+ const rels=relsOf(await read.text('visio/pages/_rels/pages.xml.rels')),masters=await readMasters(read);
+ // A page part shared by several pages is read and parsed once (the reader caches its text, this map its tree).
+ const lost=new Map<string,number>(),pages:GraphPage[]=[],parsed=new Map<string,XmlElement|undefined>();let skipped=0;
  for(const [i,p] of [...walkAll(parseXml(index))].filter(e=>e.name==='Page').entries()){
   if(p.attrs.Background==='1'){lost.set('background page(s) not imported',(lost.get('background page(s) not imported')??0)+1);continue;}
-  const rid=child(p,'Rel')?.attrs['r:id'],target=rid?rels.get(rid):undefined,xml=target?await zipText(bytes,entries,resolvePart('visio/pages',target)):undefined;
-  if(!xml)continue;
+  if(pages.length>=MAX_VISIO_PAGES){skipped++;continue;}
+  const rid=child(p,'Rel')?.attrs['r:id'],target=rid?rels.get(rid):undefined,part=target?resolvePart('visio/pages',target):undefined;
+  if(!part)continue;
+  if(!parsed.has(part)){const xml=await read.text(part);parsed.set(part,xml?child(parseXml(xml),'PageContents'):undefined);}
+  const contents=parsed.get(part);if(!contents)continue;
   const height=cellsOf(child(p,'PageSheet')).get('PageHeight')??11;
-  const contents=child(parseXml(xml),'PageContents');if(!contents)continue;
   pages.push(pageGraph(p.attrs.Name??p.attrs.NameU??`Page ${i+1}`,contents,height,masters,lost));
  }
+ if(skipped)lost.set(`foreground page(s) beyond the first ${MAX_VISIO_PAGES} not read`,skipped);
  if(!pages.length)throw new Error(`No pages found in ${fileName}.`);
  return {pages,lost};
 }
