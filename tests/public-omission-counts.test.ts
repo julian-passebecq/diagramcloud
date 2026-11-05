@@ -21,6 +21,12 @@ import {intelligenceReportHtml} from '../src/export/intelligenceReport';
 import {howItWorksFacts} from '../src/export/howItWorks';
 import {queryProject,renderPublicView,renderPublicArtifact} from '../src/intelligence/context';
 import {prepareViewer,REACT_VIEWER_API_VERSION,type ViewerInput} from '../src/react/viewerBoundary';
+import JSZip from 'jszip';import PptxGenJS from 'pptxgenjs';
+import {meetingSummaryHtml} from '../src/export/meetingSummary';
+import {buildMeetingSummaryDeck} from '../src/export/meetingSummaryPptx';
+import {linkedReadingHtml} from '../src/export/linkedReadingHtml';
+import {linkedReadingKey,type LinkedReadingOptions} from '../src/core/linkedReading';
+import type {PublicationBrief} from '../src/intelligence/publicationBrief';
 
 /**
  * AC25, strict reading: a public copy's omissions stay unnamed and uncounted. Two authoring documents that differ only
@@ -110,4 +116,41 @@ test('public omission counts: a public figure says some content is not shown, un
   assert.equal(author.nodes.length,five.views.find(v=>v.id===viewId)!.nodeIds.length,`${p.id}: author spec keeps private cards`);
   assert.ok(!author.omissions.includes(PUBLIC_OMISSION_NOTICE));
  }
+});
+
+/** Formats that render from an already-redacted copy (meeting summary HTML and PPTX, linked reading): the notice is
+ * computed against the authoring document, printed once per view, uncounted, and absent when nothing is hidden. */
+const READING_KEY=/^[a-z][a-z0-9_.-]{0,79}$/;
+const briefOf=(d:Project,profile:'design'|'business'):PublicationBrief=>({format:'diagramcloud.publication-brief/1',title:'Omission check',audience:'Reviewer',
+ viewIds:publicDocument(d).views.filter(v=>v.nodeIds.length).slice(0,6).map(v=>v.id),detail:'standard',paper:'A4',profile,storyIndices:[]});
+const readingOf=(d:Project):LinkedReadingOptions=>({projectId:d.id,sourceKey:linkedReadingKey(d),
+ chapters:publicDocument(d).views.filter(v=>v.nodeIds.length&&READING_KEY.test(v.id)).slice(0,3).map((v,k)=>({id:`c${k}`,leftViewId:v.id,rightViewId:v.id,leftDesign:'architecture' as const,rightDesign:'status' as const}))});
+async function deckText(d:Project,brief:PublicationBrief):Promise<string>{
+ const {pptx}=await buildMeetingSummaryDeck(PptxGenJS,d,brief),zip=await JSZip.loadAsync(await pptx.write({outputType:'nodebuffer'}) as Buffer);
+ // Slides and notes only: document properties carry the write time.
+ const names=Object.keys(zip.files).filter(n=>/^ppt\/(slides|notesSlides)\/[a-zA-Z]+\d+\.xml$/.test(n)).sort();
+ return (await Promise.all(names.map(async n=>`${n}\n${await zip.file(n)!.async('string')}`))).join('\n');
+}
+async function redactedOutputs(d:Project):Promise<[string,string][]>{
+ const out:[string,string][]=[];
+ for(const profile of ['design','business'] as const){const brief=briefOf(d,profile);
+  out.push([`meeting html ${profile}`,meetingSummaryHtml(d,brief,{now:NOW})],[`meeting pptx ${profile}`,await deckText(d,brief)]);}
+ const reading=readingOf(d);if(reading.chapters.length)out.push(['linked reading',linkedReadingHtml(d,reading,{now:NOW})]);
+ return out;
+}
+
+test('public omission counts: meeting summary (HTML, PPTX) and linked reading print the generic notice, uncounted',async()=>{
+ let compared=0;
+ for(const {p,one,five} of cases){
+  const a=await redactedOutputs(one),b=await redactedOutputs(five),none=await redactedOutputs(p);
+  assert.deepEqual(a.map(([k])=>k),b.map(([k])=>k),`${p.id}: same outputs`);
+  for(let i=0;i<a.length;i++){
+   assert.equal(a[i][1],b[i][1],`${p.id}: ${a[i][0]} depends on the number of private items`);compared++;
+   assert.ok(a[i][1].includes(PUBLIC_OMISSION_NOTICE),`${p.id}: ${a[i][0]} says some content is not shown`);
+   assert.doesNotMatch(a[i][1],COUNTED,`${p.id}: ${a[i][0]} counts private items`);
+   assert.doesNotMatch(a[i][1],/PRIVATE_|zz-private/,`${p.id}: ${a[i][0]} leaks a private item`);
+   assert.ok(!none[i][1].includes(PUBLIC_OMISSION_NOTICE),`${p.id}: ${none[i][0]} has no notice without private content`);
+  }
+ }
+ assert.ok(compared>=cases.length*4,`compared ${compared} outputs`);
 });
