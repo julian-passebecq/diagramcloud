@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "cockpit": {
+      "type": "stdio",
+      "command": "${LOCALAPPDATA}/Programs/cockpit-v3/cockpit-v3.exe",
+      "args": [
+        "mcp"
+      ]
+    }
+  }
+}
