@@ -229,8 +229,9 @@ for(const width of [1440,390])test.describe(`companion concepts and detour retur
   await expect(mapped.getByRole('listitem')).toHaveCount(3);
   await expect(mapped.locator(`[data-concept-id="${conceptA.id}"]`)).toContainText('Reviewed by the author');
   await expect(mapped.locator(`[data-concept-id="${conceptB.id}"]`)).toContainText('Suggested · candidate, not evidence');
-  // Without an onLesson host handler the tab is a read-only list.
-  await expect(mapped.getByRole('button')).toHaveCount(0);await expect(companion(page)).toContainText('Read-only list');
+  // The App wires onLesson (QA polish 2026-11-05): each titled concept opens its lesson. The read-only list without a host
+  // handler is now checked on the component itself (tests/explanation-request-errors.test.ts, CompanionConcepts).
+  await expect(mapped.getByRole('button')).toHaveCount(3);await expect(companion(page)).not.toContainText('Read-only list');
 
   // Choose a question, then set filters on Related and open a detour from there.
   await companionTabs(page).getByRole('tab',{name:'Questions',exact:true}).click();
@@ -280,6 +281,18 @@ for(const width of [1440,390])test.describe(`companion concepts and detour retur
   await expect(companion(page).getByTestId('companion-return-refused')).toHaveText('Return unavailable. This navigation target is unavailable in the current permitted context.');
   await expect(companion(page).getByRole('button',{name:'Return to Orders',exact:true})).toHaveCount(0);
   await companion(page).getByRole('button',{name:'End detour here',exact:true}).click();await expect(companion(page).getByTestId('companion-detour')).toHaveCount(0);
+  expect(errors).toEqual([]);
+ });
+ test('concept-to-lesson open: a related concept opens its catalogue lesson and changes nothing',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await openReading(page);const before=await current(page);
+  const panes=workspace(page).getByRole('navigation',{name:'Workspace panes'});const pane=async(name:string)=>{if(await panes.isVisible())await panes.getByRole('button',{name,exact:true}).click();};
+  await card(page,'root','Orders').click();await pane('Explanation / compare');
+  await companionTabs(page).getByRole('tab',{name:'Concepts',exact:true}).click();
+  await companion(page).getByRole('list',{name:'Mapped concepts'}).getByRole('button',{name:'Open lesson '+conceptA.title,exact:true}).click();
+  await expect(page.getByRole('article',{name:'Lesson: '+conceptA.title,exact:true})).toBeVisible();
+  expect(await current(page)).toEqual(before);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
   expect(errors).toEqual([]);
  });
 });

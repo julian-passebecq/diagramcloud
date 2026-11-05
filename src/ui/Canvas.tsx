@@ -42,7 +42,7 @@ function ViewDetailsEditor({projectId,revision,view,context,onApply}:{projectId:
  useEffect(()=>{setDraft(current=>current?.identity===identity?current:null);setError('');},[identity]);
  useEffect(()=>{if(draft)titleInput.current?.focus();},[draft?.identity]);
  const cancel=()=>{setDraft(null);setError('');opener.current?.focus();};
- return <div style={{padding:'0 20px 16px',minWidth:0}}><button ref={opener} type="button" aria-expanded={!!draft} onClick={()=>{setError('');setDraft({identity,title:view.title,description:view.description});}}>Edit view details</button>{draft&&<form aria-label="Edit view details" noValidate onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();cancel();}}} onSubmit={event=>{
+ return <div className="view-inline-edit" style={{padding:'0 20px 16px',minWidth:0}}><button ref={opener} type="button" aria-expanded={!!draft} onClick={()=>{setError('');setDraft({identity,title:view.title,description:view.description});}}>Edit view details</button>{draft&&<form aria-label="Edit view details" noValidate onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();cancel();}}} onSubmit={event=>{
   event.preventDefault();if(!mounted.current)return;
   const fields=viewSchema.pick({title:true,description:true}).safeParse({title:draft.title,description:draft.description});
   if(!fields.success||!draft.title.trim()){setError('Enter a nonblank title of 1–160 characters and a description of at most 2000 characters.');return;}
@@ -60,7 +60,7 @@ function ViewMembershipEditor({project,view,context,onApply,placement}:{project:
  useEffect(()=>{setSaved(current=>current?.identity===identity?current:null);setError('');},[identity]);
  useEffect(()=>{if(draft)select.current?.focus();},[draft?.identity]);
  const cancel=()=>{setSaved(null);setError('');opener.current?.focus();};
- return <div style={{padding:'0 20px 16px',minWidth:0}}><button ref={opener} type="button" aria-expanded={!!draft} onClick={()=>{setError('');setSaved({identity,nodeId:''});}}>Reuse existing component</button>{!choices.length&&<p className="micro">All existing components already belong to this view.</p>}{draft&&<form aria-label="Reuse existing component" onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();cancel();}}} onSubmit={event=>{
+ return <div className="view-inline-edit" style={{padding:'0 20px 16px',minWidth:0}}><button ref={opener} type="button" aria-expanded={!!draft} onClick={()=>{setError('');setSaved({identity,nodeId:''});}}>Reuse existing component</button>{!choices.length&&<p className="micro">All existing components already belong to this view.</p>}{draft&&<form aria-label="Reuse existing component" onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();cancel();}}} onSubmit={event=>{
   event.preventDefault();if(!alive.current)return;
   const position=placement();
   if(!choices.some(node=>node.id===draft.nodeId)||!position){setError(VIEW_MEMBERSHIP_UNAVAILABLE);return;}

@@ -203,3 +203,21 @@ test('deleted prerequisite stays unresolved after adding and moving an unrelated
  await form.getByRole('button',{name:'Review explanation',exact:true}).click();await expect(form.getByRole('alert')).toContainText('Step prerequisite is missing');
  const retained=form.getByRole('group',{name:'Step 2 (step-2)',exact:true});await expect(retained.getByLabel('Step 2 missing prerequisite step-1',{exact:true})).toBeChecked();expect(await stored(page,before.id)).toEqual(before);
 });
+
+test('an incomplete request marks its required fields and is refused with one sentence per field, never filled in',async({page})=>{
+ const before=await openProject(page);
+ await page.getByRole('button',{name:'Author explanation',exact:true}).click();
+ const form=page.getByRole('dialog',{name:'Author an explanation',exact:true});
+ const question=form.getByLabel('Question to explain',{exact:true});
+ await expect(question).toBeVisible();await expect(question).toHaveAttribute('aria-required','true');
+ for(const name of ['Walkthrough ID','Explanation title','Step 1 title','Step 1 narration'])await expect(form.getByLabel(name,{exact:true})).toHaveAttribute('aria-required','true');
+ await expect(form.locator('label',{hasText:'Question to explain (required)'})).toBeVisible();
+ await form.getByRole('button',{name:'Review explanation',exact:true}).click();
+ const alert=form.getByRole('alert');
+ await expect(alert).toContainText('Review refused; nothing was changed.');
+ for(const line of ['Title is required.','Question to explain is required.','Step 1 title is required.','Step 1 narration is required.'])await expect(alert).toContainText(line);
+ await expect(alert).not.toContainText('"code"');expect((await alert.textContent())!.trimStart().startsWith('[')).toBe(false);
+ await expect(question).toHaveValue('');await expect(form.getByLabel('Explanation title',{exact:true})).toHaveValue('');
+ await expect(page.getByRole('region',{name:'Proposed changes',exact:true})).toHaveCount(0);
+ expect(await stored(page,before.id)).toEqual(before);
+});
