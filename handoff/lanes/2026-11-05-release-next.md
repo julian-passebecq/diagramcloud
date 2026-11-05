@@ -21,3 +21,10 @@ Prepared the source release after 1.34.0 on branch `release/diagramcloud-next` f
 ## Next steps
 
 - Finalizer: rebase on main after the lanes merge, resolve PENDING (one patch), open the release PR, merge on green (dispatch).
+
+## Finalized
+
+- Finalizer merged `origin/main` (with #152-#155) into the branch; all four lanes merged, so the release stays 1.35.0 and nothing moved to "Not in this release".
+- Each PENDING entry replaced by its PR number, merge SHA, tests and limits from the merged PR body; #155 (wave-4 findings) added. AGENTS.md: the two closed 1.34.0 limits removed, the 1.34.0 "#145; not in project overview HTML" note updated, the 1.35.0 paragraph rewritten from the merged PRs with their limits. ROADMAP "clicking the figure does nothing yet" replaced by the remaining per-container expansion and arrow-key gap. RELEASE.md: 1.35.0 gate additions and history row with PR numbers. V3_WORKSPACE: UX38 confirmed by #154.
+- Verified low findings not fixed are listed in the notes ("Not in this release") and in the overnight-lead Wave 4 section.
+- Gates: `npm run check`, `npm test`, `npm run build` locally; full browser suite in the release PR's CI.

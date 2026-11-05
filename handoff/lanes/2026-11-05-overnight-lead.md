@@ -53,3 +53,40 @@ The 1.34.0 source release PR (this lane's last PR) confirms every PENDING item o
 - Stabilise `quota failure retains keyboard focus` (one patch).
 - Apply the #148 file-size limits to the CLI and MCP inputs (dispatch).
 - Remove stale worktree branches and `D:/PROJ/npmci-wf3.log` after the lanes are archived (one patch, by the lead).
+
+## Wave 4
+
+### PRs and SHAs
+
+- #152 lesson-figure-interaction, `04cd247c35a434b53ef6ad54a38c9c7bd2566edb`: lesson figure components are buttons sharing one selection with the list; Open inside / Back drill by explicit childViewId.
+- #153 cli-mcp-input-limits, `e14a49fe3f1a6ecd3cd94d1d9ad3c562cc8ddcb7`: CLI and MCP inputs size-checked before reading with the App's limits (`src/core/inputLimits.ts`).
+- #154 post-1-34-polish, `a474742e84cfcfd37c54f5707ca766051b640f9b`: "Meeting summary (HTML, PDF, PowerPoint)" menu label, omission notice printed once, quota-focus test fixed (it was a real `check()` misuse, not flakiness).
+- #155 fix-wave4-findings, `eb212001e52faffb9b70d7962d118fae7b947506`: the four verified medium findings below.
+- Release PR "Release 1.35.0 (source)" from `release/diagramcloud-next`: notes `docs/release-1.35/RELEASE_NOTES.md`, every PENDING entry confirmed against its merged PR, nothing dropped.
+
+### How verified
+
+- Each lane: builder gates (tsc, unit, build, targeted Playwright on ports 26810-26845) and an independent verify agent; every PR merged on green `validate` and Vercel checks after merging `origin/main` into it (`gh pr view` reads MERGED).
+- Release branch: `origin/main` merged in, `npm run check`, `npm test`, `npm run build` locally; full Chromium suite in the release PR's CI.
+
+### Problems
+
+- Local branch deletes failed on every merge because other workflow worktrees still had them checked out (harmless).
+- #153 and #155 conflicted with or lagged main and were refreshed by merging `origin/main` (no conflicts).
+- Lane reports of verify passes were not added after merge, to avoid another ~30 min CI cycle.
+
+### Verified findings
+
+Fixed by #155 (medium): Mermaid `a & b & …` lists quadratic (`src/core/interchange/mermaid.ts`); draw.io deep parent chains quadratic with a stack overflow (`src/core/interchange/drawio.ts`); meeting summary PPTX wrote XML-forbidden control characters (`src/export/meetingSummaryPptx.ts`); MCP propose_mapping suggestions arrived stale (`src/intelligence/learning/query.ts`).
+
+Not fixed (low): an empty Mermaid file stages a raw JSON parse error (`src/app/stageImport.ts`); a draw.io file with a DOCTYPE shows a JSON error (`looksLikeDrawio`, `src/core/interchange/drawio.ts`); the meeting summary Paper option reads "letter" next to "A4" (`src/ui/MeetingSummaryDialog.tsx`; the menu-card half was fixed by #154).
+
+### Next steps
+
+- Empty-file and DOCTYPE draw.io refusals with a format-specific message instead of the JSON parser (one patch).
+- Label the Paper option "Letter" (one patch).
+- Editable PowerPoint (`pptx.ts`) speaker notes repeat each view description (one patch).
+- App.tsx / ProjectStart.tsx size literals to the shared constants without moving cited lines (one patch).
+- Test the package:candidate 1 MiB evidence limit in a clean temporary repository (one patch).
+- draw.io frame detection quadratic on flat pages of many labelled, unreferenced boxes (one patch).
+- Lesson figure per-container expansion (dispatch) and arrow-key navigation between figure buttons (one patch).

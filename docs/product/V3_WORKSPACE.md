@@ -1,6 +1,6 @@
 # DiagramCloud V3 workspace: adoption report (W0)
 
-Current integrated baseline: 1.35.0 source in preparation (5 November 2026; [notes](../release-1.35/RELEASE_NOTES.md), entries PENDING; no package, deployment or tag claimed), on top of 1.34.0 ([notes](../release-1.34/RELEASE_NOTES.md)). Rows below carry their dated status; the 1.34.0 section at the end updates UX31, UX32 and UX38. Earlier 1.30/1.31 sections below are retained history. This page records how the V3 handoff was adopted into this repository. It is a status and boundary page for the existing [roadmap](../ROADMAP.md), not a second backlog. The V3 mission rows UX01-UX25 live in the [V3 handoff entrypoint](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/workstreams/diagramcloud-v3-handoff-20261018/START.md); this page adds UX26-UX30 below and never restates or reinterprets UX01-UX25.
+Current integrated baseline: 1.35.0 source (5 November 2026; [notes](../release-1.35/RELEASE_NOTES.md), #152-#155; no package, deployment or tag claimed), on top of 1.34.0 ([notes](../release-1.34/RELEASE_NOTES.md)). Rows below carry their dated status; the 1.34.0 section at the end updates UX31, UX32 and UX38. Earlier 1.30/1.31 sections below are retained history. This page records how the V3 handoff was adopted into this repository. It is a status and boundary page for the existing [roadmap](../ROADMAP.md), not a second backlog. The V3 mission rows UX01-UX25 live in the [V3 handoff entrypoint](https://github.com/julian-passebecq/galaxy-prompt-spec/blob/main/workstreams/diagramcloud-v3-handoff-20261018/START.md); this page adds UX26-UX30 below and never restates or reinterprets UX01-UX25.
 
 ## Source cut
 
@@ -205,6 +205,6 @@ Merged: #133 (whole-project gallery and retail example), #134 (OBSERVATION IN VI
 
 Still open after 1.34.0: UX29 and UX30 are partial; no cross-project correspondence in linked views, no separate browser windows or docking trees, no token forecast, queue or dispatch, no AI execution of explanations.
 
-## 1.35.0 source (prepared 5 November 2026, PENDING)
+## 1.35.0 source (5 November 2026)
 
-PENDING until their PRs merge: lesson-figure-interaction (lesson figure components focusable and selectable, optional drill in/out), cli-mcp-input-limits (CLI and MCP refuse over-limit inputs like the App) and post-1-34-polish (UX38: the export menu reads "Meeting summary" and the design-profile summary prints the omission notice once per view page). No acceptance ID is added or renumbered. The finalizer confirms or drops each line from the merged PR and switches to 1.34.1 if lesson-figure-interaction does not merge. Details: [1.35.0 notes](../release-1.35/RELEASE_NOTES.md).
+Merged: #152 (lesson figure components are buttons sharing one selection with the list and a Selected component panel; Open inside / Back drill by explicit childViewId, depth scene-wide), #153 (CLI and MCP refuse over-limit inputs like the App) and #154 (UX38 confirmed: the export menu reads "Meeting summary (HTML, PDF, PowerPoint)" and the meeting summary prints the omission notice once per view in both profiles and the PPTX), plus #155 (wave-4 parser, PPTX and mapping fixes). No acceptance ID is added or renumbered. Details: [1.35.0 notes](../release-1.35/RELEASE_NOTES.md).
