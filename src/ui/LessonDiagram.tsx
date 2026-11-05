@@ -42,7 +42,7 @@ export function LessonDiagram({entry,depth}:{entry:LearningEntry;depth:SemanticD
   </li>;};
  const label=depthLabel(state.depth);
  return <section aria-label="Lesson diagram" style={{minWidth:0}}><h5>Lesson diagram</h5>
-  {diagrams.length>1&&<label>Diagram <select aria-label="Lesson diagram source" value={diagram.id} onChange={e=>{setChosen(e.target.value);setHighlight(null);}}>{diagrams.map(d=><option key={d.id} value={d.id}>{d.title}</option>)}</select></label>}
+  {diagrams.length>1&&<label className="lesson-diagram-source">Diagram <select aria-label="Lesson diagram source" value={diagram.id} onChange={e=>{setChosen(e.target.value);setHighlight(null);}}>{diagrams.map(d=><option key={d.id} value={d.id}>{d.title}</option>)}</select></label>}
   <p className="micro">{diagram.title} · {diagram.kind==='journey'?'adoption journey':'synthetic lesson example'}. {diagram.why} Declarations only: no deployment, observed execution or owner project.</p>
   <div role="toolbar" aria-label="Lesson diagram camera">
    <button type="button" disabled={state.zoom<=ZOOM_LIMITS.min} onClick={()=>dispatch({type:'zoom',zoom:state.zoom-ZOOM_LIMITS.step})}>Zoom out</button>{' '}

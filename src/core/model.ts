@@ -291,5 +291,23 @@ export function validateDocument(input:unknown):Project {
 }
 export function parseDocument(raw:string):Project{if(new TextEncoder().encode(raw).byteLength>MAX_DOCUMENT_BYTES)throw new Error('Document exceeds the 12 MiB import limit');return validateDocument(JSON.parse(raw));}
 export function clone<T>(value:T):T{return structuredClone(value);}
-export function errorMessage(error:unknown):string{return error instanceof Error?error.message:String(error);}
+export function errorMessage(error:unknown):string{const issues=validationIssues(error);return issues?formatIssues(issues):error instanceof Error?error.message:String(error);}
 export const newId=(prefix:string)=>`${prefix}-${crypto.randomUUID().slice(0,12)}`;
+/** At most this many validation issues are listed; the rest are counted. */
+export const MAX_LISTED_ISSUES=12;
+type Issue={path:(string|number)[];message:string};
+const isIssue=(v:unknown):v is Issue=>!!v&&typeof v==='object'&&Array.isArray((v as Issue).path)&&typeof (v as Issue).message==='string';
+/** The issues of a schema refusal: a ZodError, or an Error whose message is the raw JSON array of issues. Null for any other error. */
+export function validationIssues(error:unknown):Issue[]|null{
+ if(error instanceof z.ZodError)return error.issues.length?error.issues:null;
+ if(!(error instanceof Error)||!error.message.trimStart().startsWith('['))return null;
+ try{const parsed:unknown=JSON.parse(error.message);return Array.isArray(parsed)&&parsed.length&&parsed.every(isIssue)?parsed:null;}catch{return null;}
+}
+/** A field path as a reader writes it: nodes[3].label; the whole document when the path is empty. */
+export function issuePath(path:(string|number)[]):string{return path.reduce<string>((out,p)=>typeof p==='number'?out+'['+p+']':out?out+'.'+p:String(p),'')||'(document)';}
+/** One readable line per issue, "path: message", listing at most MAX_LISTED_ISSUES and counting the rest. */
+export function formatIssues(issues:Issue[]):string{
+ const lines=issues.slice(0,MAX_LISTED_ISSUES).map(i=>issuePath(i.path)+': '+i.message);
+ if(issues.length>MAX_LISTED_ISSUES)lines.push(`… and ${issues.length-MAX_LISTED_ISSUES} more issue${issues.length-MAX_LISTED_ISSUES===1?'':'s'}.`);
+ return lines.join(String.fromCharCode(10));
+}
