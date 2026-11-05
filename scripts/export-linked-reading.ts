@@ -2,14 +2,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {parseDocument} from '../src/core/model';
+import {parseDocument} from '../src/core/model';import {CLI_WORDING,DOCUMENT_INPUT,MAX_READING_OPTIONS_BYTES,inputLimitMessage,type InputLimit} from '../src/core/inputLimits';
 import {prepareLinkedReading,type LinkedReadingOptions} from '../src/core/linkedReading';
 import {linkedReadingHtml} from '../src/export/linkedReadingHtml';
 async function plainPath(file:string){let current=path.parse(file).root;for(const part of file.slice(current.length).split(path.sep).filter(Boolean)){current=path.join(current,part);if((await fs.lstat(current)).isSymbolicLink())throw Error('Symbolic links are not accepted.');}}
-async function readBounded(file:string,max:number){await plainPath(file);const handle=await fs.open(file,'r');try{const s=await handle.stat();if(!s.isFile()||s.size>max)throw Error('Input is not a bounded regular file.');const bytes=Buffer.alloc(max+1);const {bytesRead}=await handle.read(bytes,0,bytes.length,0);if(bytesRead>max)throw Error('Input exceeds byte limit.');const b=bytes.subarray(0,bytesRead),text=b.toString('utf8');if(!Buffer.from(text).equals(b))throw Error('Input must be UTF-8.');return text;}finally{await handle.close();}}
+async function readBounded(file:string,limit:InputLimit){const max=limit.bytes;await plainPath(file);const handle=await fs.open(file,'r');try{const s=await handle.stat();if(!s.isFile())throw Error('Input is not a bounded regular file.');if(s.size>max)throw Error('Input is not a bounded regular file: '+inputLimitMessage(file,s.size,limit,CLI_WORDING));const bytes=Buffer.alloc(max+1);const {bytesRead}=await handle.read(bytes,0,bytes.length,0);if(bytesRead>max)throw Error('Input is not a bounded regular file: '+inputLimitMessage(file,bytesRead,limit,CLI_WORDING));const b=bytes.subarray(0,bytesRead),text=b.toString('utf8');if(!Buffer.from(text).equals(b))throw Error('Input must be UTF-8.');return text;}finally{await handle.close();}}
 export async function exportLinkedReading(projectFile:string,readingFile:string,outputDir:string,now?:Date){
  const p=path.resolve(projectFile),r=path.resolve(readingFile),out=path.resolve(outputDir);await plainPath(path.dirname(out));
- const project=parseDocument(await readBounded(p,12*1024*1024));const options=JSON.parse(await readBounded(r,64*1024)) as LinkedReadingOptions;prepareLinkedReading(project,options);
+ const project=parseDocument(await readBounded(p,DOCUMENT_INPUT));const options=JSON.parse(await readBounded(r,{kind:'linked-reading options file',bytes:MAX_READING_OPTIONS_BYTES})) as LinkedReadingOptions;prepareLinkedReading(project,options);
  // Render and validate before creating output. Existing directories refuse with EEXIST.
  const html=linkedReadingHtml(project,options,{now});await fs.mkdir(out);const target=path.join(out,'linked-reading.html');await fs.writeFile(target,html,{flag:'wx'});return target;
 }

@@ -4,12 +4,14 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {parseDocument} from '../src/core/model';
 import {prepareExplanationWalkthrough} from '../src/intelligence/explanationWalkthrough';
+import {EXPLANATION_REQUEST_FILE_LIMIT,InputLimitError,formatBytes,type InputLimit} from '../src/core/inputLimits';
 
-const LIMIT=4*1024*1024;
+/** The App's explanation request limit (4 MiB), applied to both inputs. */
+const LIMIT=EXPLANATION_REQUEST_FILE_LIMIT,INPUT:InputLimit={kind:'selected explanation file',bytes:LIMIT};
 async function readRegular(file:string):Promise<string>{
  const handle=await fs.open(file,'r');
- try{const stat=await handle.stat();if(!stat.isFile()||stat.size>LIMIT)throw new Error('Choose a regular input file of at most 4 MiB.');
-  const bytes=await handle.readFile();if(bytes.length>LIMIT)throw new Error('Input grew beyond 4 MiB.');
+ try{const stat=await handle.stat();if(!stat.isFile())throw new Error(`Choose a regular input file of at most ${formatBytes(LIMIT)}.`);if(stat.size>LIMIT)throw new InputLimitError(file,stat.size,INPUT);
+  const bytes=await handle.readFile();if(bytes.length>LIMIT)throw new InputLimitError(file,bytes.length,INPUT);
   const text=bytes.toString('utf8');if(!Buffer.from(text).equals(bytes))throw new Error('Input must be exact UTF-8.');return text;
  }finally{await handle.close();}
 }
