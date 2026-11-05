@@ -6,6 +6,7 @@ import {PUBLIC_OMISSION_NOTICE} from '../core/viewspec';
 import {addArchitectureSlides} from './pptx';
 import {noIcons, type IconData} from './iconData';
 import {wrapLines} from './text';
+import {xmlSafe} from './xmlText';
 import {meetingSummaryModel, MEETING_SUMMARY_FIDELITY_NOTE, type MeetingSummaryModel} from './meetingSummary';
 
 type Pptx = InstanceType<typeof PptxGenJS>;
@@ -18,6 +19,12 @@ export const MEETING_SUMMARY_SYNTHETIC_LABEL = 'Synthetic example data, not a me
 const FOOTER = 'DiagramCloud meeting summary · public content only · not a backup, approval or runtime result';
 const COMPONENT_ROWS = 5, TABLE_ROWS = 12, TEXT_LINES = 18, CODE_LINES = 23, SOURCE_ROWS = 8, STORY_PER_SLIDE = 3;
 const INK = '172C48', BODY = '243B58', MUTED = '536780', LABEL = '58718F', SYNTHETIC = '7A4A00', FONT = 'Aptos';
+/** The deck's slides in order (pptxgenjs exposes them through an untyped `slides` getter). */
+function deckSlides(pptx: Pptx): Slide[] {
+  const slides = (pptx as unknown as {slides?: Slide[]}).slides;
+  if (!Array.isArray(slides)) throw new Error('This PowerPoint library version does not list its slides; the meeting summary deck cannot place its notice.');
+  return slides;
+}
 
 /** One planned slide. The plan is computed before any slide is drawn, so slide numbers and links are deterministic. */
 export type MeetingSlide =
@@ -72,7 +79,9 @@ export function planMeetingSummaryDeck(model: MeetingSummaryModel): MeetingSlide
  * the contents slide links every selected view instead. It never changes the source document.
  */
 export async function buildMeetingSummaryDeck(PptxCtor: typeof PptxGenJS, input: Project, brief: PublicationBrief, options: {icons?: IconData} = {}): Promise<{pptx: Pptx; slides: number; plan: MeetingSlide[]}> {
-  const model = meetingSummaryModel(input, brief), plan = planMeetingSummaryDeck(model), p = model.project;
+  // pptxgenjs escapes only < > & and quotes: every text the deck writes (cover, findings, evidence, sources, notes)
+  // goes through xmlSafe so XML-forbidden control characters never reach a slide or notes part.
+  const model = xmlSafe(meetingSummaryModel(input, brief)), plan = planMeetingSummaryDeck(model), p = model.project;
   const slideOf = (match: (s: MeetingSlide) => boolean) => plan.findIndex(match) + 1;
   const viewSlide = (id: string) => slideOf(s => s.kind === 'view' && s.viewId === id);
   const blockSlide = (id: string) => slideOf(s => s.kind === 'evidence' && s.blockId === id);
@@ -122,12 +131,15 @@ export async function buildMeetingSummaryDeck(PptxCtor: typeof PptxGenJS, input:
       s.addNotes(model.highlights.map(n => `${n.label}\n${n.summary}`).join('\n\n'));
     } else if (entry.kind === 'view') {
       const v = model.views.find(x => x.id === entry.viewId)!, index = model.views.indexOf(v);
-      // The one uncounted notice, in the slide subtitle, when the public cut of this view leaves members out.
+      // The one uncounted notice when the public cut of this view leaves members out. A figure slide repeats its
+      // description in the speaker notes, so there the notice is its own line on the slide, never part of the description.
       const described = model.omitted[v.id] ? [v.description, PUBLIC_OMISSION_NOTICE].filter(Boolean).join(' ') : v.description;
       if (entry.figure) {
         // Native editable figure: the public projection holding only this view and the summary's sources, without drilldown links.
-        const figure: Project = {...p, rootViewId: v.id, views: [{...v, description: described}], sources: model.sources, story: [], nodes: p.nodes.map(({childViewId: _drop, ...n}) => n)};
+        const figure: Project = {...p, rootViewId: v.id, views: [v], sources: model.sources, story: [], nodes: p.nodes.map(({childViewId: _drop, ...n}) => n)};
+        const first = deckSlides(pptx).length;
         await addArchitectureSlides(pptx, figure, {cover: false, evidence: false, sources: false, realization: false, firstViewSlide: viewSlide(v.id), icons: options.icons ?? noIcons});
+        if (model.omitted[v.id]) deckSlides(pptx)[first].addText(PUBLIC_OMISSION_NOTICE, {x: .6, y: 2.03, w: 12.1, h: .16, fontSize: 10, color: MUTED, fontFace: FONT, margin: 0});
       } else {
         const s = frame(`SELECTED VIEW ${index + 1} / ${model.views.length}`, v.title, described ?? '');
         const reason = model.dense[v.id] ? 'This view exceeds the readable summary budget. The full handbook supplies paginated figures; the complete selected component list follows.'

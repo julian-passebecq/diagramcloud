@@ -228,7 +228,7 @@ test('Synthetic commerce: join 42 to 70, stage evidence, meeting summary',async(
  // Export & share > Meeting summary: the overview view, offline HTML.
  await page.getByRole('tab',{name:'Explore',exact:true}).click();
  await page.getByRole('button',{name:'Export & share',exact:true}).click();
- await page.getByRole('button',{name:/^Meeting summary \(HTML\)/}).click();
+ await page.getByRole('button',{name:/^Meeting summary \(HTML, PDF, PowerPoint\)/}).click();
  const form=page.getByRole('form',{name:'Meeting summary'});await expect(form).toBeVisible();
  await expect(form.getByRole('checkbox',{name:'Business question and data path',exact:true})).toBeChecked();
  await form.getByLabel('Audience',{exact:true}).fill('Synthetic business owner and data engineer');

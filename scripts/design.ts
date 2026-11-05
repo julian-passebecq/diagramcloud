@@ -7,7 +7,7 @@
  * --pdf also prints book.pdf (A4 landscape, one figure per page) and one figure-sized <project>.<view>.<type>.pdf per view
  * with Playwright's chromium, offline (any non-file request aborts the run); needs `npx playwright install chromium`.
  */
-import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
+import {mkdirSync,writeFileSync} from 'node:fs';
 const fail=(e:unknown)=>{process.stderr.write(`design: ${e instanceof Error?e.message.split('\n')[0]:String(e)}\n`);process.exit(1);};
 process.on('uncaughtException',fail);process.on('unhandledRejection',fail);
 import {join,resolve} from 'node:path';
@@ -20,6 +20,8 @@ import {designSvg,resolveDesignType} from '../src/export/design';
 import {deltaSvg} from '../src/export/design/delta';
 import {designBookHtml} from '../src/export/design/book';
 import {xml} from '../src/export/diagram';
+import {readBoundedText} from './lib/boundedInput';
+import {DOCUMENT_INPUT,MAX_BRIEF_BYTES} from '../src/core/inputLimits';
 
 const args=process.argv.slice(2),flag=(n:string)=>{const i=args.indexOf(n);return i>=0?args.splice(i,2)[1]:undefined;},sw=(n:string)=>{const i=args.indexOf(n);if(i>=0)args.splice(i,1);return i>=0;};
 const pdf=sw('--pdf');
@@ -27,11 +29,12 @@ const deltaPath=flag('--delta'),briefPath=flag('--brief'),out=resolve(flag('--ou
 if(type&&!DESIGN_TYPES.includes(type))throw new Error(`--type is one of ${DESIGN_TYPES.join(', ')}`);
 if(theme&&!DESIGN_THEMES.includes(theme))throw new Error(`--theme is one of ${DESIGN_THEMES.join(', ')}`);
 if(!args[0])throw new Error('Usage: npm run design -- <diagramcloud.json> [--brief brief.json] [--out folder] [--type …] [--theme …]');
-let doc=parseDocument(readFileSync(resolve(args[0]),'utf8'));
-if(briefPath){const r=applyDesignBrief(doc,parseDesignBrief(readFileSync(resolve(briefPath),'utf8')),{fileName:briefPath});doc=r.document;
+// Every selected file is size-checked before it is read whole, and all are read before the output folder is created.
+let doc=parseDocument(readBoundedText(args[0],DOCUMENT_INPUT));
+const earlier=deltaPath?parseDocument(readBoundedText(deltaPath,DOCUMENT_INPUT)):undefined;
+if(briefPath){const r=applyDesignBrief(doc,parseDesignBrief(readBoundedText(briefPath,{kind:'design brief',bytes:MAX_BRIEF_BYTES})),{fileName:briefPath});doc=r.document;
  process.stderr.write([`Brief ${briefPath}:`,...r.report.kept.map(k=>`  ${k}`),...r.report.lost.map(l=>`  skipped: ${l}`)].join('\n')+'\n');}
 mkdirSync(out,{recursive:true});
-const earlier=deltaPath?parseDocument(readFileSync(resolve(deltaPath),'utf8')):undefined;
 const now=new Date(),rows:string[]=[],svgs:{file:string;svg:string}[]=[];
 for(const v of publicDocument(doc).views){
  const t=resolveDesignType(doc,v.id,type),file=`${doc.id}.${v.id}.${t}.svg`;

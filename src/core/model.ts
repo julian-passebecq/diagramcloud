@@ -123,7 +123,7 @@ export const observationSchema=z.object({id,nodeId:id,sourceApp:z.string().regex
 export const MAPPING_STATES=['suggested','source-declared','reviewed','rejected'] as const;
 export const MAPPING_ORIGINS=['author','ai','imported','source'] as const;
 export const learningMappingSchema=z.object({id,conceptId:z.string().regex(/^[a-z][a-z0-9-]{0,60}$/,'Use the catalogue concept ID'),contentRevision:z.string().min(1).max(80),
- target:z.object({projectId:id,kind:z.enum(['node','view']),id,projectRevision:z.number().int().nonnegative(),fingerprint:z.string().regex(/^[0-9a-f]{16}$/,'A target fingerprint is 16 hexadecimal characters')}).strict(),
+ target:z.object({projectId:id,kind:z.enum(['node','view']),id,projectRevision:z.number().int().nonnegative(),fingerprint:z.string().regex(/^[0-9a-f]{16}$/,'A target fingerprint is 16 hexadecimal characters'),fingerprintBasis:z.literal('public').optional()}).strict(),
  evidence:z.object({sourceIds:refs,blockIds:refs}).strict().default({sourceIds:[],blockIds:[]}),
  state:z.enum(MAPPING_STATES).default('suggested'),origin:z.enum(MAPPING_ORIGINS).default('author'),suggestedBy:z.string().min(1).max(160).optional(),reviewedBy:z.string().min(1).max(160).optional(),reviewedAt:instant.optional(),note:z.string().max(500).optional(),visibility}).strict();
 export type LearningMapping=z.infer<typeof learningMappingSchema>;

@@ -117,10 +117,11 @@ export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief,
   const viewPages = views.map((v, index) => {
     const plan = {dense: model.dense[v.id]};
     const members = v.nodeIds.map(id => p.nodes.find(n => n.id === id)!);
-    // Do not reduce an unreadable poster until its primary labels disappear.
+    // Do not reduce an unreadable poster until its primary labels disappear. The figure is drawn from the public copy
+    // without omissionBase: the view page already prints the one uncounted notice below its description.
     const figure = brief.profile === 'business' ? ''
       : plan.dense ? paragraph('This view exceeds the readable summary budget. The full handbook supplies paginated figures; the complete selected component list is below.')
-      : `<div class="figure">${scopePublicationSvg(designSvg(p, v.id, {type: v.design?.type ?? 'architecture', theme: 'light', now: options.now ?? new Date(), omissionBase: input}), 'meeting-' + index)}</div>`;
+      : `<div class="figure">${scopePublicationSvg(designSvg(p, v.id, {type: v.design?.type ?? 'architecture', theme: 'light', now: options.now ?? new Date()}), 'meeting-' + index)}</div>`;
     const component = (n: Project['nodes'][number]) => {
       const links = brief.detail !== 'overview' && n.blockIds.length
         ? `<p>${n.blockIds.filter(id => blockIds.has(id)).map(id => `<a href="#block-${xml(id)}">${xml(p.blocks.find(b => b.id === id)?.title ?? id)}</a>`).join(' / ')}</p>`

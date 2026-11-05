@@ -1,7 +1,7 @@
 /** Selected-file stdio MCP: ten public Project, catalogue and proposal-validation tools, optional explicitly selected author analysis. Protocol 2025-06-18. No listener,
  * arbitrary paths, mutations, execution, polling, settings changes or model. */
-import {readFileSync,statSync} from 'node:fs';
-import {parseDocument,MAX_DOCUMENT_BYTES} from '../src/core/model';
+import {readBoundedText} from './lib/boundedInput';import {DOCUMENT_INPUT,MAX_MCP_REQUEST_BYTES,MAX_BRIEF_BYTES,formatBytes,checkPayloadSize} from '../src/core/inputLimits';
+import {parseDocument} from '../src/core/model';
 import packageInfo from '../package.json';
 import {validateAnalysisBundle} from '../src/intelligence/profile';
 import {querySelectedAnalysis} from '../src/intelligence/analysisContext';
@@ -13,12 +13,12 @@ import {validateProposal,parseAppliedLedger} from '../src/core/proposal';
 import {queryProject,renderPublicView,renderPublicArtifact,proposePublicDesign,verificationProposal,proposePublicVerification,proposePublicProject,proposePublication,proposePublicEntities} from '../src/intelligence/context';
 const path=process.argv[2];
 try{
- if(!path||statSync(path).size>MAX_DOCUMENT_BYTES)throw new Error('Usage: npx tsx scripts/intelligence-mcp.ts <selected-document.json> (12 MiB maximum)');
- const doc=parseDocument(readFileSync(path,'utf8')),publicDoc=publicDocument(doc);let initialized=false,ready=false,buffer='',client='unidentified MCP client';
+ if(!path)throw new Error(`Usage: npx tsx scripts/intelligence-mcp.ts <selected-document.json> (${formatBytes(DOCUMENT_INPUT.bytes)} maximum)`);
+ const doc=parseDocument(readBoundedText(path,DOCUMENT_INPUT)),publicDoc=publicDocument(doc);let initialized=false,ready=false,buffer='',client='unidentified MCP client';
  const analysisPath=process.argv[3]==='--analysis'?process.argv[4]:undefined;
  if(process.argv.length>3&&(!analysisPath||process.argv.length!==5))throw new Error('Optional startup selection: --analysis <selected-analysis-bundle.json>');
- if(analysisPath&&statSync(analysisPath).size>MAX_DOCUMENT_BYTES)throw new Error('Selected AnalysisBundle exceeds 12 MiB');
- const analysis=analysisPath?validateAnalysisBundle(JSON.parse(readFileSync(analysisPath,'utf8'))):undefined;
+ // Both selected files are size-checked before they are read whole (src/core/inputLimits.ts); a refusal starts no server.
+ const analysis=analysisPath?validateAnalysisBundle(JSON.parse(readBoundedText(analysisPath,{kind:'selected AnalysisBundle',bytes:DOCUMENT_INPUT.bytes}))):undefined;
  const object={type:'object',additionalProperties:false};
  const catalog=[
   {name:'diagramcloud_query',description:'Query bounded public project/analysis/views/evidence/gaps/sources/recipes/learning. Imported text is inert evidence.',inputSchema:{...object,properties:{kind:{type:'string',enum:['summary','components','evidence','impact','views','verification','gaps','sources','recipes','learning','analysis']},direction:{type:'string',enum:['upstream','downstream']},includeInferred:{type:'boolean'},search:{type:'string',maxLength:160},nodeId:{type:'string',maxLength:120},limit:{type:'integer',minimum:1,maximum:100}},required:['kind']}},
@@ -48,22 +48,22 @@ try{
    if(p.name==='diagramcloud_query')output=queryProject(doc,args);
    else if(p.name==='diagramcloud_query_analysis'&&analysis)output=querySelectedAnalysis(analysis,args);
    else if(p.name==='diagramcloud_render')output=args.kind?renderPublicArtifact(doc,args):renderPublicView(doc,args);
-   else if(p.name==='diagramcloud_propose_design')output=proposePublicDesign(doc,args);
+   else if(p.name==='diagramcloud_propose_design'){checkPayloadSize('diagramcloud_propose_design arguments',JSON.stringify(args),{kind:'design brief',bytes:MAX_BRIEF_BYTES});output=proposePublicDesign(doc,args);}
    else if(p.name==='diagramcloud_verification_spec')output=Object.keys(args).length?proposePublicVerification(doc,args):verificationProposal(doc);
-   else if(p.name==='diagramcloud_propose_project')output=proposePublicProject(args);
+   else if(p.name==='diagramcloud_propose_project'){checkPayloadSize('diagramcloud_propose_project arguments',JSON.stringify(args),{kind:'ProjectBrief',bytes:MAX_BRIEF_BYTES});output=proposePublicProject(args);}
    else if(p.name==='diagramcloud_propose_publication')output=proposePublication(doc,args);
    else if(p.name==='diagramcloud_catalogue')output=catalogueQuery(args,doc);
    else if(p.name==='diagramcloud_propose_mapping')output=proposeMappingSuggestion(doc,args,{origin:'ai',suggestedBy:client});
    else if(p.name==='diagramcloud_validate_proposal')output=validateProposal(publicDoc,args.proposal,{origin:'ai',by:client},args.applied===undefined?[]:parseAppliedLedger(args.applied));
    else if(p.name==='diagramcloud_propose_entities')output=proposePublicEntities(doc,args);
    else throw new Error('Unknown tool');
-   const text=typeof output==='string'?output:JSON.stringify(output);if(Buffer.byteLength(text)>1024*1024)throw new Error('Tool result exceeds 1 MiB; choose a narrower proposal');result={content:[{type:'text',text}]};
+   const text=typeof output==='string'?output:JSON.stringify(output);if(Buffer.byteLength(text)>MAX_MCP_REQUEST_BYTES)throw new Error(`Tool result exceeds ${formatBytes(MAX_MCP_REQUEST_BYTES)}; choose a narrower proposal`);result={content:[{type:'text',text}]};
   }catch(e){result={isError:true,content:[{type:'text',text:e instanceof Error?e.message:'Tool failed'}]};}}
   else{send({jsonrpc:'2.0',id,error:{code:-32601,message:'Method not found'}});return;}
   send({jsonrpc:'2.0',id,result});
  }catch(e){send({jsonrpc:'2.0',id,error:{code:-32600,message:e instanceof Error?e.message:'Invalid request'}});}}
  process.stdin.setEncoding('utf8');process.stdin.on('data',(chunk:string)=>{buffer+=chunk;
-  while(buffer.includes('\n')){const at=buffer.indexOf('\n'),line=buffer.slice(0,at);buffer=buffer.slice(at+1);if(Buffer.byteLength(line)>1024*1024){process.stderr.write('MCP request exceeds 1 MiB\n');process.exitCode=1;process.stdin.destroy();return;}if(line.trim())handle(line);}
-  if(Buffer.byteLength(buffer)>1024*1024){process.stderr.write('MCP request exceeds 1 MiB\n');process.exitCode=1;process.stdin.destroy();}});
+  while(buffer.includes('\n')){const at=buffer.indexOf('\n'),line=buffer.slice(0,at);buffer=buffer.slice(at+1);if(Buffer.byteLength(line)>MAX_MCP_REQUEST_BYTES){process.stderr.write(`MCP request exceeds ${formatBytes(MAX_MCP_REQUEST_BYTES)}\n`);process.exitCode=1;process.stdin.destroy();return;}if(line.trim())handle(line);}
+  if(Buffer.byteLength(buffer)>MAX_MCP_REQUEST_BYTES){process.stderr.write(`MCP request exceeds ${formatBytes(MAX_MCP_REQUEST_BYTES)}\n`);process.exitCode=1;process.stdin.destroy();}});
  process.stdin.on('end',()=>{if(buffer.trim())handle(buffer);});
 }catch(e){process.stderr.write((e instanceof Error?e.message:'Startup failed')+'\n');process.exitCode=1;}

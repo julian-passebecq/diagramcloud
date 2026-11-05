@@ -16,6 +16,8 @@ import {resolve,join,relative,dirname,sep} from 'node:path';
 import {platform,arch} from 'node:os';
 import {bundleClients} from './lib/bundleClients';
 import {assertPackageBuildIdentity} from './lib/packageBuildIdentity';
+import {readBoundedText} from './lib/boundedInput';
+import {MAX_EVIDENCE_FILE_BYTES,formatBytes} from '../src/core/inputLimits';
 const git=(...args:string[])=>execFileSync('git',args,{encoding:'utf8'}).trim();
 // Git Bash puts its GNU tar first on PATH, which reads "D:\\..." as a remote host.
 // On Windows use the system bsdtar, and pass workspace-relative paths everywhere.
@@ -30,8 +32,8 @@ if(git('status','--porcelain','--untracked-files=all').length)throw new Error('C
 type Evidence={synthetic?:boolean;sourceSha:string;ci:{sourceSha:string;url:string;conclusion:string};checks:{id:string;status:'PASS'|'FAIL'|'NOT_RUN';evidenceRefs:string[];inspectedBy?:string;method?:string}[]};
 const dryRun=args.includes('--dry-run'),evidencePath=flag('--evidence');
 if(dryRun&&evidencePath)throw new Error('--dry-run writes its own synthetic evidence; do not pass --evidence');
-if(!dryRun&&(!evidencePath||statSync(evidencePath).size>1024*1024))throw new Error('--evidence is required (1 MiB maximum), or use --dry-run');
-const evidence:Evidence=dryRun?{synthetic:true,sourceSha,ci:{sourceSha,url:'none (dry run)',conclusion:'not-run'},checks:[]}:JSON.parse(readFileSync(evidencePath!,'utf8')) as Evidence;
+if(!dryRun&&!evidencePath)throw new Error(`--evidence is required (${formatBytes(MAX_EVIDENCE_FILE_BYTES)} maximum), or use --dry-run`);
+const evidence:Evidence=dryRun?{synthetic:true,sourceSha,ci:{sourceSha,url:'none (dry run)',conclusion:'not-run'},checks:[]}:JSON.parse(readBoundedText(evidencePath!,{kind:'packaging evidence file',bytes:MAX_EVIDENCE_FILE_BYTES})) as Evidence;
 if(!dryRun&&evidence.synthetic!==undefined)throw new Error('Synthetic evidence is for --dry-run only');
 if(!dryRun&&(evidence.sourceSha!==sourceSha||evidence.ci?.sourceSha!==sourceSha||evidence.ci.conclusion!=='success'||!/^https:\/\/github.com\/julian-passebecq\/diagramcloud\/actions\/runs\/\d+$/.test(evidence.ci.url)))throw new Error('Successful exact-head CI and matching host evidence required');
 if(!dryRun)for(const required of ['typecheck','unit','build','browser','real-atlas-quality','pptx-zip','pptx-visual','bundled-cli'])if(!evidence.checks.some(c=>c.id===required&&c.status==='PASS'&&c.evidenceRefs.length))throw new Error('Missing qualification evidence: '+required);

@@ -19,11 +19,14 @@ const ID=String.raw`[\p{L}\p{N}_](?:[\p{L}\p{N}_.]|-(?![-.>=]))*`;
 /** Connections kept while parsing: more than the import keeps (so its own limit message still shows), never a cross product of any size. */
 const EDGE_PARSE_CAP=MAX_EDGES*4;
 
+/** Sticky (anchored at lastIndex 0) and compiled once, rather than once per node reference. */
+const NODE_ID=new RegExp(`\\s*(${ID})`,'uy'),AMP=/\s*&\s*/y;
+
 type Parsed={nodes:Map<string,GraphNode>;edges:GraphEdge[];groups:string[];lost:Map<string,number>;direction:'LR'|'TB';title?:string};
 
 /** Read one node reference at the start of `s`: `id`, `id[label]`, `id@{ shape: cyl, label: "x" }`, `id:::class`… */
 function readNode(s:string,p:Parsed,group:string|undefined):{key:string;rest:string}|undefined{
- const m=s.match(new RegExp(`^\\s*(${ID})`,'u'));if(!m)return undefined;
+ NODE_ID.lastIndex=0;const m=NODE_ID.exec(s);if(!m)return undefined;
  const key=m[1];let rest=s.slice(m[0].length),label:string|undefined,kind:ProjectNode['kind']|undefined;
  if(rest.startsWith('@{')){const end=rest.indexOf('}');const body=rest.slice(2,end<0?undefined:end);rest=end<0?'':rest.slice(end+1);
   const shape=body.match(/shape\s*:\s*"?([\w-]+)/)?.[1];const l=body.match(/label\s*:\s*"((?:[^"\\]|\\.)*)"/)?.[1]??body.match(/label\s*:\s*([^,}]+)/)?.[1];
@@ -45,8 +48,9 @@ function readNode(s:string,p:Parsed,group:string|undefined):{key:string;rest:str
 }
 /** A list of node references joined by `&`. */
 function readNodes(s:string,p:Parsed,group:string|undefined):{keys:string[];rest:string}|undefined{
- const keys:string[]=[];let rest=s;
- for(;;){const n=readNode(rest,p,group);if(!n)return keys.length?{keys,rest}:undefined;if(!keys.includes(n.key))keys.push(n.key);rest=n.rest;const amp=rest.match(/^\s*&\s*/);if(!amp)return {keys,rest};rest=rest.slice(amp[0].length);}
+ // A Set keeps each reference O(1), so a list of hundreds of thousands of `&` refs stays linear (it was quadratic).
+ const keys:string[]=[],seen=new Set<string>();let rest=s;
+ for(;;){const n=readNode(rest,p,group);if(!n)return keys.length?{keys,rest}:undefined;if(!seen.has(n.key)){seen.add(n.key);keys.push(n.key);}rest=n.rest;AMP.lastIndex=0;const amp=AMP.exec(rest);if(!amp)return {keys,rest};rest=rest.slice(amp[0].length);}
 }
 /** A link at the start of `s`, with its label in either Mermaid form (`-->|text|` or `-- text -->`). */
 function readLink(s:string):{label:string;kind:ProjectEdge['kind'];reverse:boolean;rest:string}|undefined{
@@ -109,12 +113,23 @@ function parseArchitecture(lines:string[],p:Parsed){
 
 export const looksLikeMermaid=(raw:string)=>/^\s*(---[\s\S]*?---\s*)?(%%[^\n]*\n\s*)*(flowchart|graph|architecture-beta|sequenceDiagram|classDiagram|erDiagram|stateDiagram|gantt|journey|pie|mindmap|timeline|C4\w+|gitGraph|quadrantChart|sankey|xychart|block-beta|requirementDiagram)\b/.test(raw)||/```mermaid/.test(raw);
 
+/**
+ * Split a line at each `;` followed by an even number of `"` (outside a quoted label), in one pass: the lookahead
+ * regex this replaces rescanned the rest of the line at every `;`, which was quadratic on a long `a;b;c…` line.
+ */
+function splitStatements(line:string):string[]{
+ let after=0;for(let i=0;i<line.length;i++)if(line.charCodeAt(i)===34)after++;
+ const out:string[]=[];let start=0;
+ for(let i=0;i<line.length;i++){const c=line.charCodeAt(i);if(c===34)after--;else if(c===59&&after%2===0){out.push(line.slice(start,i));start=i+1;}}
+ out.push(line.slice(start));return out;
+}
+
 export function importMermaid(raw:string,fileName:string,options:{idSuffix?:string;now?:Date}={}):ImportResult{
  // A Markdown file: take the first ```mermaid block.
  let src=raw.replace(/^\uFEFF/,'');const fence=src.match(/```mermaid\s*\n([\s\S]*?)```/);if(fence)src=fence[1];
  let title:string|undefined;
  const front=src.match(/^\s*---\s*\n([\s\S]*?)\n\s*---\s*\n/);if(front){title=front[1].match(/^\s*title\s*:\s*(.+)$/m)?.[1]?.trim().replace(/^["']|["']$/g,'');src=src.slice(front[0].length);}
- const lines=src.replace(/%%\{[\s\S]*?\}%%/g,'').split(/\r?\n/).map(l=>l.replace(/%%.*$/,'')).flatMap(l=>l.split(/;(?=(?:[^"]*"[^"]*")*[^"]*$)/));
+ const lines=src.replace(/%%\{[\s\S]*?\}%%/g,'').split(/\r?\n/).map(l=>l.replace(/%%.*$/,'')).flatMap(splitStatements);
  const head=lines.findIndex(l=>l.trim());if(head<0)throw new Error('This Mermaid text is empty.');
  const header=lines[head].trim(),type=header.split(/\s+/)[0];
  const p:Parsed={nodes:new Map(),edges:[],groups:[],lost:new Map(),direction:'LR',title};

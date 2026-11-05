@@ -1,7 +1,7 @@
 /** Small local CLI. Read a validated Project or compile a new ProjectBrief candidate.
  * No network, execution of analyzed code, remote upload or overwrite by default.
  */
-import {readFileSync, mkdirSync, writeFileSync, statSync} from 'node:fs';
+import {mkdirSync, writeFileSync} from 'node:fs';import {readBoundedText} from './lib/boundedInput';import {DOCUMENT_INPUT,MAX_BRIEF_BYTES,type InputLimit} from '../src/core/inputLimits';
 import {resolve, join} from 'node:path';
 import {documentSchema,parseDocument} from '../src/core/model';
 import {ICON_REGISTRY} from '../src/core/icons';
@@ -40,12 +40,12 @@ try {
   if (!mode || !['inspect', 'brief', 'docs', 'graph', 'analyze', 'delivery', 'query', 'evolution','profile','bundle','deep','verification-spec','verification-receipt','cockpit','entity-proposal','cross-repository','publication','catalogue','suggest-mapping','validate-proposal'].includes(mode)) fail('Usage: npm run intelligence -- inspect|brief|docs|graph|analyze|delivery|query|evolution|profile|bundle|deep|verification-spec|verification-receipt|cockpit|entity-proposal|cross-repository|publication|catalogue|suggest-mapping|validate-proposal --input <file.json> --out <new-directory> [--current <document.json>]');
   const path = value('--input') || (mode === 'catalogue' ? undefined : fail('--input is required'));
   const directory = value('--out') || fail('--out is required (use a new directory)');
-  const limit = mode === 'brief' ? 512 * 1024 : mode === 'graph' ? GRAPH_SNAPSHOT_MAX_BYTES : mode === 'docs' ? DOCUMENT_LIMITS.totalBytes * 2 : 12 * 1024 * 1024;
-  if (path && statSync(path).size > limit) fail('Input exceeds the supported byte budget');
-  const raw = path ? readFileSync(path, 'utf8') : '';
+  const limit: InputLimit = mode === 'brief' ? {kind: 'ProjectBrief', bytes: MAX_BRIEF_BYTES} : mode === 'graph' ? {kind: 'GraphSnapshot', bytes: GRAPH_SNAPSHOT_MAX_BYTES} : mode === 'docs' ? {kind: 'selected document set', bytes: DOCUMENT_LIMITS.totalBytes * 2} : DOCUMENT_INPUT;
+  // Every selected file is size-checked before it is read whole (src/core/inputLimits.ts) and read before the output directory exists.
+  const raw = path ? readBoundedText(path, limit) : '';
   const output: Record<string, string> = {};
   let refused = '';
-  const selectedJson=(flag:string)=>{const path=value(flag)||fail(flag+' is required');if(statSync(path).size>12*1024*1024)fail('Selected input exceeds 12 MiB');return JSON.parse(readFileSync(path,'utf8'));};
+  const selectedJson=(flag:string)=>{const path=value(flag)||fail(flag+' is required');return JSON.parse(readBoundedText(path,DOCUMENT_INPUT));};
   const current=()=>parseDocument(JSON.stringify(selectedJson('--current')));
   const list=(flag:string)=>value(flag)?.split(',').filter(Boolean)??[];
   if(mode==='catalogue'){
@@ -84,8 +84,8 @@ try {
   }else if(mode==='publication'){
     const project=parseDocument(raw),safe=publicDocument(project),snapshot=await createPublication(project,{title:value('--title')||safe.title,audience:value('--audience')||'',viewIds:value('--views')?.split(',')??safe.views.map(v=>v.id),...(value('--brief')?selectedJson('--brief'):{})});output['publication.public.json']=JSON.stringify(snapshot,null,2);output['handbook.public.html']=technicalManualHtml(project,{viewIds:snapshot.viewIds,brief:snapshot.brief});output['fidelity.public.json']=JSON.stringify(publicationFidelity(project,snapshot.brief),null,2);
   }else if (mode === 'evolution') {
-    const currentPath=value('--current')||fail('evolution requires --current <document.json>');if(statSync(currentPath).size>12*1024*1024)fail('Current document exceeds budget');
-    const before=parseDocument(raw),after=parseDocument(readFileSync(currentPath,'utf8'));if(secretInText(JSON.stringify([before,after])))fail('Sensitive evolution input refused');
+    const currentPath=value('--current')||fail('evolution requires --current <document.json>');
+    const before=parseDocument(raw),after=parseDocument(readBoundedText(currentPath,DOCUMENT_INPUT));if(secretInText(JSON.stringify([before,after])))fail('Sensitive evolution input refused');
     output['evolution.private.json']=JSON.stringify(semanticEvolution(before,after),null,2);
   } else if (mode === 'analyze') {
     const selected:unknown=JSON.parse(raw);if(!Array.isArray(selected)||!selected.every(f=>f&&typeof f.path==='string'&&typeof f.text==='string'))fail('analyze input is a selected array of {path,text}');
@@ -93,8 +93,8 @@ try {
     output['project.candidate.json']=JSON.stringify(extendWithDomainFacts(seed,report),null,2);output['analyzers.json']=JSON.stringify(report,null,2);
     if(value('--repository-id')&&value('--revision'))output['repository-analysis.private.json']=JSON.stringify(repositoryAnalysis(report,value('--repository-id')!,value('--revision')!),null,2);
   } else if (mode === 'delivery') {
-    const currentPath=value('--current')||fail('delivery requires --current <document.json>');if(statSync(currentPath).size>12*1024*1024)fail('Current document exceeds budget');
-    const out=previewDeliveryBrief(parseDocument(readFileSync(currentPath,'utf8')),JSON.parse(raw));output['proposal.patch.json']=JSON.stringify(out.patch,null,2);output['project.candidate.json']=JSON.stringify(out.document,null,2);
+    const currentPath=value('--current')||fail('delivery requires --current <document.json>');
+    const out=previewDeliveryBrief(parseDocument(readBoundedText(currentPath,DOCUMENT_INPUT)),JSON.parse(raw));output['proposal.patch.json']=JSON.stringify(out.patch,null,2);output['project.candidate.json']=JSON.stringify(out.document,null,2);
   } else if (mode === 'query') {
     const project=parseDocument(raw);output['context.public.json']=JSON.stringify(queryProject(project,{kind:value('--kind')||'summary',...(value('--node')?{nodeId:value('--node')}:{})}),null,2);output['verification.proposed.json']=JSON.stringify(verificationProposal(project),null,2);output['report.public.html']=intelligenceReportHtml(project);
   } else if (mode === 'docs') {
@@ -104,7 +104,7 @@ try {
   } else {
     const candidate = mode === 'brief' ? compileProjectBrief(parseProjectBrief(raw)) : mode === 'graph' ? compileGraphSnapshot(JSON.parse(raw)) : null;
     let project = candidate?.document || parseDocument(raw);
-    if(mode==='graph'&&candidate&&value('--current')){const currentPath=value('--current')!;if(statSync(currentPath).size>12*1024*1024)fail('Current document exceeds budget');const current=parseDocument(readFileSync(currentPath,'utf8')),proposal=previewGraphReimport(current,JSON.parse(raw),current.revision);candidate.document=proposal.document;output['proposal.patch.json']=JSON.stringify(proposal.patch,null,2);output['comparison.json']=JSON.stringify(proposal.delta,null,2);}
+    if(mode==='graph'&&candidate&&value('--current')){const currentPath=value('--current')!;const current=parseDocument(readBoundedText(currentPath,DOCUMENT_INPUT)),proposal=previewGraphReimport(current,JSON.parse(raw),current.revision);candidate.document=proposal.document;output['proposal.patch.json']=JSON.stringify(proposal.patch,null,2);output['comparison.json']=JSON.stringify(proposal.delta,null,2);}
     if (candidate) {
       project=candidate.document;output['project.candidate.json'] = JSON.stringify(project, null, 2);
       if ('manifest' in candidate && candidate.manifest) output['project-manifest.private.json'] = JSON.stringify(candidate.manifest, null, 2);
