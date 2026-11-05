@@ -42,9 +42,33 @@ export function zipEntries(bytes:Uint8Array):Map<string,ZipEntry>{
  return out;
 }
 
+const findEntry=(entries:Map<string,ZipEntry>,name:string)=>entries.get(name)??[...entries.values()].find(x=>x.name.toLowerCase()===name.toLowerCase());
+
+/** Uncompressed bytes one package import may read in total, across every part. */
+export const MAX_PACKAGE_INFLATED=64*1024*1024;
+
+/**
+ * Reads parts of one package with one shared budget: each part is read (and inflated) at most once, its text is
+ * cached for later references, and the declared sizes of every part read draw from `limit` before any inflation,
+ * so the total work of an import is bounded however many pages point to the same part.
+ */
+export function partReader(bytes:Uint8Array,entries:Map<string,ZipEntry>,limit=MAX_PACKAGE_INFLATED,message=`The package expands to more than ${limit/1024/1024} MiB of parts.`){
+ const cache=new Map<string,Promise<string|undefined>>();let used=0;
+ return {
+  get used(){return used;},
+  text(name:string):Promise<string|undefined>{
+   const e=findEntry(entries,name);if(!e)return Promise.resolve(undefined);
+   const hit=cache.get(e.name);if(hit)return hit;
+   if(used+e.size>limit)return Promise.reject(new InflateLimitError(message));
+   used+=e.size;const read=zipText(bytes,entries,e.name);cache.set(e.name,read);return read;
+  },
+ };
+}
+export type PartReader=ReturnType<typeof partReader>;
+
 /** The text of one entry, or undefined when the package has no such entry. */
 export async function zipText(bytes:Uint8Array,entries:Map<string,ZipEntry>,name:string):Promise<string|undefined>{
- const e=entries.get(name)??[...entries.values()].find(x=>x.name.toLowerCase()===name.toLowerCase());if(!e)return undefined;
+ const e=findEntry(entries,name);if(!e)return undefined;
  if(e.size>MAX_ENTRY||e.compressedSize>MAX_ENTRY)throw new Error(`The package part ${name} is too large.`);
  const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
  if(view.getUint32(e.offset,true)!==0x04034b50)throw new Error(`The package part ${name} is damaged.`);
