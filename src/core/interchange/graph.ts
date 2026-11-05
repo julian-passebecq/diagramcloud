@@ -19,6 +19,8 @@ export type ImportResult={document:Project;report:ImportReport};
 export const FORMAT_LABEL:Record<ImportFormat,string>={drawio:'draw.io',mermaid:'Mermaid',visio:'Visio',repository:'Repository',atlas:'Project atlas','design-brief':'Design brief'};
 const ID=/^[a-z][a-z0-9_.-]{0,79}$/;
 export const MAX_EDGES=1500;
+/** Connections one view may hold: the validator's per-view `edgeIds` limit (`refs` in src/core/model.ts). */
+export const MAX_VIEW_EDGES=1000;
 const MAX_NODES=500,MAX_VIEWS=79,COL=300,ROW=180;
 /** Card size on the canvas and in exports (NODE_WIDTH/NODE_HEIGHT in src/export/scene.ts). */
 const NODE_WIDTH=220,NODE_HEIGHT=100;
@@ -120,7 +122,7 @@ export function documentFromGraph(pages:GraphPage[],options:{format:ImportFormat
   summary:`Imported from ${FORMAT_LABEL[options.format]} (${options.fileName}). Review labels, component types and visibility before publishing.`,
   provenance:`Imported from the ${FORMAT_LABEL[options.format]} file “${options.fileName}” on ${(options.now??new Date()).toISOString().slice(0,10)}. Boxes, labels, connections and groups were kept; styles, colours and vendor artwork were not. Component types and providers were inferred from labels and shapes.`,
   nodes:[],edges:[],views:[{id:'overview',title}]});
- let nodeCount=0,edgeCount=0,truncated=0,selfLoops=0,dangling=0;const groups=new Set<string>();const explicit=new Set<string>();let repeated=0;
+ let nodeCount=0,edgeCount=0,truncated=0,selfLoops=0,dangling=0,totalCapped=false;const viewCapped:string[]=[];const groups=new Set<string>();const explicit=new Set<string>();let repeated=0;
  const pageViews=usable.map((page,pi)=>{
   const viewId=usable.length===1?'overview':unique(slug(page.title||`page-${pi+1}`,'page'),viewIds);
   const keyToId=new Map<string,string>(),members:string[]=[],edges:string[]=[];
@@ -138,7 +140,8 @@ export function documentFromGraph(pages:GraphPage[],options:{format:ImportFormat
   for(const e of page.edges){
    const s=keyToId.get(e.source),t=keyToId.get(e.target);
    if(!s||!t){dangling++;continue;}if(s===t){selfLoops++;continue;}
-   if(edgeCount>=MAX_EDGES)break;
+   if(edgeCount>=MAX_EDGES){totalCapped=true;break;}
+   if(edges.length>=MAX_VIEW_EDGES){viewCapped.push(clip(page.title||title,160));break;}
    const id=unique(`${viewId}-e${edges.length+1}`.slice(0,80),edgeIds);edges.push(id);edgeCount++;
    doc.edges.push({id,source:s,target:t,label:clip(e.label?.trim()??'',160),kind:e.kind??'batch',speed:'medium',...(e.quantity?{quantity:e.quantity}:{}),visibility:'public'});
   }
@@ -171,9 +174,10 @@ export function documentFromGraph(pages:GraphPage[],options:{format:ImportFormat
   doc.views=[{id:'overview',title,description:`${usable.length} pages imported from ${options.fileName}. Open a page to see its diagram.`,nodeIds:pageNodes,edgeIds:[],positions:Object.fromEntries(pageNodes.map((id,i)=>[id,{x:(i%3)*COL,y:Math.floor(i/3)*ROW}])),visibility:'public'},...views];
   kept.push(`${usable.length} pages, each as a view opened from the root “Pages” cards.`);
  }
- const total=usable.reduce((a,p)=>a+p.nodes.length,0),totalEdges=usable.reduce((a,p)=>a+p.edges.length,0);
+ const total=usable.reduce((a,p)=>a+p.nodes.length,0);
  if(total-repeated>nodeCount)lost.push(`Only the first ${MAX_NODES} boxes were imported (of ${total}).`);
- if(totalEdges-dangling-selfLoops>edgeCount)lost.push(`Only the first ${MAX_EDGES} connections were imported.`);
+ for(const page of viewCapped)lost.push(`Only the first ${MAX_VIEW_EDGES} connections of “${page}” were imported: one view holds at most ${MAX_VIEW_EDGES} connections.`);
+ if(totalCapped)lost.push(`Only the first ${MAX_EDGES} connections were imported.`);
  if(dangling)lost.push(`${dangling} connection(s) without a box at both ends were dropped.`);
  if(selfLoops)lost.push(`${selfLoops} self-connection(s) were dropped.`);
  if(truncated)lost.push(`${truncated} label(s) longer than 160 characters were shortened.`);
