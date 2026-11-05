@@ -1,9 +1,15 @@
 import type {DesignTheme,DesignType,Project,ProjectView} from '../../core/model';
 import {publicDocument} from '../../core/operations';
-import {viewSpec,PERSPECTIVE_LABEL,type ViewSpec} from '../../core/viewspec';
+import {viewSpec,PERSPECTIVE_LABEL,PUBLIC_OMISSION_NOTICE,type ViewSpec} from '../../core/viewspec';
 import {tokensFor,slugOf,type Tokens} from './kit';
 
-export type DesignOptions={type?:DesignType;theme?:DesignTheme;now?:Date};
+/**
+ * omissionBase: the authoring document an already-redacted input was projected from (meeting summary, linked reading).
+ * viewSpec only sees what is missing by comparing against its own input, so a renderer given a public copy is told
+ * where that copy came from. The figure then prints the one uncounted PUBLIC_OMISSION_NOTICE; nothing is drawn from
+ * the base, which is read for view membership sizes only.
+ */
+export type DesignOptions={type?:DesignType;theme?:DesignTheme;now?:Date;omissionBase?:Project};
 export type DesignContext={input:Project;doc:Project;view:ProjectView;spec:ViewSpec;theme:DesignTheme;t:Tokens;editorial:boolean;focal:Set<string>;focalReason:'hint'|'auto'|'none';slug:string;now:Date;purpose:string};
 
 /**
@@ -14,7 +20,7 @@ export type DesignContext={input:Project;doc:Project;view:ProjectView;spec:ViewS
  */
 export function designContext(input:Project,viewId:string,type:string,options:DesignOptions={}):DesignContext{
  const doc=publicDocument(input),id=doc.views.some(v=>v.id===viewId)?viewId:doc.rootViewId,view=doc.views.find(v=>v.id===id)!;
- const now=options.now??new Date(),spec=viewSpec(input,id,{now}),theme=options.theme??view.design?.theme??'light';
+ const now=options.now??new Date(),spec=withOmissionBase(viewSpec(input,id,{now}),view,options.omissionBase),theme=options.theme??view.design?.theme??'light';
  let focal=new Set((view.design?.focal??[]).filter(f=>view.nodeIds.includes(f))),focalReason:DesignContext['focalReason']=focal.size?'hint':'none';
  if(!focal.size){
   const degree=new Map(spec.nodes.map(n=>[n.id,0]));for(const e of spec.edges){degree.set(e.from,(degree.get(e.from)??0)+1);degree.set(e.to,(degree.get(e.to)??0)+1);}
@@ -22,6 +28,16 @@ export function designContext(input:Project,viewId:string,type:string,options:De
   if(ranked.length&&ranked[0][1]>=3&&(ranked.length<2||ranked[0][1]>ranked[1][1])){focal=new Set([ranked[0][0]]);focalReason='auto';}
  }
  return {input,doc,view,spec,theme,t:tokensFor(theme),editorial:theme==='editorial',focal,focalReason,slug:slugOf(`${id}-${type}`),now,purpose:view.design?.caption||spec.purpose||spec.projectTitle};
+}
+
+/** True when the base holds members of this view that the public copy does not show. Never says which or how many. */
+export function viewHasOmissions(view:ProjectView,base:Project|undefined):boolean{
+ const full=base?.views.find(v=>v.id===view.id);
+ return !!full&&(full.nodeIds.length>view.nodeIds.length||full.edgeIds.length>view.edgeIds.length);
+}
+function withOmissionBase(spec:ViewSpec,view:ProjectView,base:Project|undefined):ViewSpec{
+ if(spec.omissions.includes(PUBLIC_OMISSION_NOTICE)||!viewHasOmissions(view,base))return spec;
+ return {...spec,omissions:[PUBLIC_OMISSION_NOTICE,...spec.omissions]};
 }
 
 export const eyebrowOf=(c:DesignContext,what:string)=>`${c.spec.projectTitle} · ${PERSPECTIVE_LABEL[c.spec.perspective]} · ${what}`;
