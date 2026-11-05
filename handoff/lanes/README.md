@@ -21,3 +21,4 @@ One line per lane report file in this folder, by date: date · lane (report) · 
 - 2026-11-05 · [release-1-34-0](2026-11-05-release-1-34-0.md) · 1.34.0 source release docs and version (no package, deployment or tag); PENDING items confirmed by the finalizer, all merged.
 - 2026-11-05 · [source-refresh-return-context](2026-11-05-source-refresh-return-context.md) · atlas rescan reviewed as a source refresh summary (uncertain, never removed), return to the permitted view after Apply or Cancel, legacy picker cancellable.
 - 2026-11-05 · [fix-wave4-findings](2026-11-05-fix-wave4-findings.md) · linear Mermaid & lists and ; splits, linear draw.io parent chains (no stack overflow), meeting PPTX xmlSafe, MCP mapping suggestions fingerprinted on the public basis so they no longer arrive stale.
+- 2026-11-05 · [fix-wave4-findings-verify](2026-11-05-fix-wave4-findings-verify.md) · independent verification of PR #155: all green, no defect found.
