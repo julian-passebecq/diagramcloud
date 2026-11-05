@@ -84,9 +84,13 @@ function pageGraph(title:string,cells:Cell[],lost:Map<string,number>):GraphPage{
  const byId=new Map(cells.map(c=>[c.id,c])),count=(k:string,n=1)=>lost.set(k,(lost.get(k)??0)+n);
  // A parent chain that comes back to a cell already on it (a cell that is its own parent, A in B in A) would make
  // every ancestor walk below endless: the cell that closes the cycle is detached to the page and reported.
+ // One pass with three states (on the current walk, done), so a deep parent chain costs O(n), not O(n·depth).
+ const walked=new Map<Cell,1|2>();
  for(const c of cells){
-  const seen=new Set<Cell>([c]);
-  for(let p:Cell=c;p.parent!==undefined;){const n=byId.get(p.parent);if(!n)break;if(seen.has(n)){p.parent=undefined;count('cell(s) with a cyclic parent detached to the page');break;}seen.add(n);p=n;}
+  if(walked.has(c))continue;
+  const path:Cell[]=[c];walked.set(c,1);
+  for(let p:Cell=c;p.parent!==undefined;){const n=byId.get(p.parent);if(!n)break;const state=walked.get(n);if(state===2)break;if(state===1){p.parent=undefined;count('cell(s) with a cyclic parent detached to the page');break;}walked.set(n,1);path.push(n);p=n;}
+  for(const p of path)walked.set(p,2);
  }
  const children=new Map<string,Cell[]>();for(const c of cells)if(c.parent)(children.get(c.parent)??children.set(c.parent,[]).get(c.parent)!).push(c);
  const isVertex=(id?:string)=>!!id&&!!byId.get(id)?.vertex,isEdge=(id?:string)=>!!id&&!!byId.get(id)?.edge;
@@ -96,18 +100,37 @@ function pageGraph(title:string,cells:Cell[],lost:Map<string,number>):GraphPage{
  const isPlainGroup=(c:Cell)=>/(^|;)group(;|$)/.test(c.style)&&referenced.has(c.id);
  const containers=new Set(vertices.filter(c=>!isTable(c)&&!isPlainGroup(c)&&(isGroupStyle(c)||(children.get(c.id)??[]).some(k=>k.vertex))).map(c=>c.id));
  // A vertex inside a non-container vertex (e.g. a label or icon placed on a box, table rows) belongs to that box.
- const owner=(id:string):string=>{let c=byId.get(id);while(c&&isVertex(c.parent)&&!containers.has(c.parent!))c=byId.get(c.parent!);return c?.id??id;};
- const abs=(c:Cell):{x:number;y:number}=>{const p=c.parent&&isVertex(c.parent)?abs(byId.get(c.parent)!):{x:0,y:0};return {x:p.x+c.x,y:p.y+c.y};};
+ // Ancestor-derived values are memoised per cell and computed without recursion, so a chain of nested cells costs
+ // O(n) and never overflows the call stack. Owner is first asked after the frames below join `containers`.
+ const ownerMemo=new Map<Cell,string>();
+ const owner=(id:string):string=>{const start=byId.get(id);if(!start)return id;const path:Cell[]=[];let c=start,found:string|undefined;
+  for(;;){const m=ownerMemo.get(c);if(m!==undefined){found=m;break;}path.push(c);if(!(isVertex(c.parent)&&!containers.has(c.parent!)))break;c=byId.get(c.parent!)!;}
+  const result=found??c.id;for(const p of path)ownerMemo.set(p,result);return result;};
+ const absMemo=new Map<Cell,{x:number;y:number}>();
+ const abs=(c:Cell):{x:number;y:number}=>{const path:Cell[]=[];let p:Cell|undefined=c,base={x:0,y:0};
+  while(p){const m=absMemo.get(p);if(m){base=m;break;}path.push(p);p=p.parent&&isVertex(p.parent)?byId.get(p.parent):undefined;}
+  for(let i=path.length-1;i>=0;i--){base={x:base.x+path[i].x,y:base.y+path[i].y};absMemo.set(path[i],base);}
+  return base;};
  // A labelled box drawn behind two or more other shapes, without connectors of its own, is a visual frame (a VNet,
  // a region, a subscription): a group, not a component. The smallest enclosing frame names the group.
  const box=(c:Cell)=>{const p=abs(c);return {x:p.x,y:p.y,r:p.x+c.w,b:p.y+c.h};};
  const inside=(a:Cell,f:Cell)=>{const A=box(a),F=box(f);return a!==f&&A.x>=F.x&&A.y>=F.y&&A.r<=F.r&&A.b<=F.b&&a.w*a.h<f.w*f.h;};
  const frames=vertices.filter(f=>!referenced.has(f.id)&&!containers.has(f.id)&&!isText(f)&&!isTable(f)&&plainLabel(f.value)&&vertices.filter(v=>inside(v,f)).length>=2);
  frames.forEach(f=>containers.add(f.id));
- const groupOf=(c:Cell):string|undefined=>{let p=c.parent?byId.get(c.parent):undefined;while(p){if(containers.has(p.id)){const l=plainLabel(p.value);if(l)return l;}p=p.parent?byId.get(p.parent):undefined;}
+ // The label of the nearest labelled container among a cell and its ancestors ('' when none), memoised per cell.
+ const containerMemo=new Map<Cell,string>();
+ const containerLabel=(start:Cell|undefined):string=>{const path:Cell[]=[];let p=start,found='';
+  while(p){const m=containerMemo.get(p);if(m!==undefined){found=m;break;}path.push(p);if(containers.has(p.id)){const l=plainLabel(p.value);if(l){found=l;break;}}p=p.parent?byId.get(p.parent):undefined;}
+  for(const q of path)containerMemo.set(q,found);return found;};
+ const groupOf=(c:Cell):string|undefined=>{const l=containerLabel(c.parent?byId.get(c.parent):undefined);if(l)return l;
   const around=frames.filter(f=>inside(c,f)).sort((a,b)=>a.w*a.h-b.w*b.h)[0];return around?plainLabel(around.value):undefined;};
  // %name% placeholders resolve from the cell's own properties, then its ancestors' (draw.io placeholders=1).
- const resolve=(c:Cell,text:string)=>text.replace(/%([A-Za-z0-9_]+)%/g,(m,k:string)=>{for(let p:Cell|undefined=c;p;p=p.parent?byId.get(p.parent):undefined)if(p.data[k]!==undefined)return p.data[k];return m;});
+ // Memoised per property name and cell, so a deep chain of placeholder labels stays linear.
+ const propMemo=new Map<string,Map<Cell,string|null>>();
+ const inherited=(start:Cell,k:string):string|undefined=>{const memo=propMemo.get(k)??propMemo.set(k,new Map()).get(k)!;const path:Cell[]=[];let p:Cell|undefined=start,found:string|null=null;
+  while(p){const m=memo.get(p);if(m!==undefined){found=m;break;}path.push(p);if(Object.prototype.hasOwnProperty.call(p.data,k)&&p.data[k]!==undefined){found=p.data[k];break;}p=p.parent?byId.get(p.parent):undefined;}
+  for(const q of path)memo.set(q,found);return found??undefined;};
+ const resolve=(c:Cell,text:string)=>text.replace(/%([A-Za-z0-9_]+)%/g,(m,k:string)=>inherited(c,k)??m);
  const ownLabel=(c:Cell)=>plainLabel(resolve(c,c.data.c4Name??c.value));
  const labelOf=(c:Cell)=>ownLabel(c)||(children.get(c.id)??[]).filter(k=>k.vertex&&!containers.has(k.id)).map(k=>ownLabel(k)).find(Boolean)||stencilName(c.style)||(children.get(c.id)??[]).map(k=>stencilName(k.style)).find(Boolean)||(referenced.has(c.id)?stencilName(c.style,false):'');
  const nodes:GraphNode[]=[],nodeIds=new Set<string>(),groups=new Set<string>();

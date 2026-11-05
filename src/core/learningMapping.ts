@@ -27,7 +27,7 @@ export function publicLearningMappings(input:Project,out:Project,keep:{nodes:Set
   const evidence={sourceIds:m.evidence.sourceIds.filter(id=>keep.sources.has(id)),blockIds:m.evidence.blockIds.filter(id=>keep.blocks.has(id))};
   if(!evidence.sourceIds.length&&!evidence.blockIds.length)return [];
   const fingerprint=targetFingerprint(out,m.target);if(!fingerprint)return [];
-  const {note:_note,suggestedBy:_suggestedBy,...rest}=m;
-  return [{...rest,...(m.origin==='ai'?{suggestedBy:'ai'}:{}),target:{...m.target,fingerprint},evidence}];
+  const {note:_note,suggestedBy:_suggestedBy,...rest}=m,{fingerprintBasis:_basis,...target}=m.target;
+  return [{...rest,...(m.origin==='ai'?{suggestedBy:'ai'}:{}),target:{...target,fingerprint},evidence}];
  });
 }

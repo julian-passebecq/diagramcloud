@@ -6,6 +6,7 @@ import {PUBLIC_OMISSION_NOTICE} from '../core/viewspec';
 import {addArchitectureSlides} from './pptx';
 import {noIcons, type IconData} from './iconData';
 import {wrapLines} from './text';
+import {xmlSafe} from './xmlText';
 import {meetingSummaryModel, MEETING_SUMMARY_FIDELITY_NOTE, type MeetingSummaryModel} from './meetingSummary';
 
 type Pptx = InstanceType<typeof PptxGenJS>;
@@ -78,7 +79,9 @@ export function planMeetingSummaryDeck(model: MeetingSummaryModel): MeetingSlide
  * the contents slide links every selected view instead. It never changes the source document.
  */
 export async function buildMeetingSummaryDeck(PptxCtor: typeof PptxGenJS, input: Project, brief: PublicationBrief, options: {icons?: IconData} = {}): Promise<{pptx: Pptx; slides: number; plan: MeetingSlide[]}> {
-  const model = meetingSummaryModel(input, brief), plan = planMeetingSummaryDeck(model), p = model.project;
+  // pptxgenjs escapes only < > & and quotes: every text the deck writes (cover, findings, evidence, sources, notes)
+  // goes through xmlSafe so XML-forbidden control characters never reach a slide or notes part.
+  const model = xmlSafe(meetingSummaryModel(input, brief)), plan = planMeetingSummaryDeck(model), p = model.project;
   const slideOf = (match: (s: MeetingSlide) => boolean) => plan.findIndex(match) + 1;
   const viewSlide = (id: string) => slideOf(s => s.kind === 'view' && s.viewId === id);
   const blockSlide = (id: string) => slideOf(s => s.kind === 'evidence' && s.blockId === id);
