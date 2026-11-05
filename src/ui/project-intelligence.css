@@ -7,3 +7,6 @@
 /* Companion sections wrap as complete controls; the DOM order and roving keyboard tabs stay unchanged. */
 .companion-pane>.pi-tabs{flex-wrap:wrap;gap:6px}
 .companion-pane>.pi-tabs>[role=tab]{min-width:max-content;white-space:nowrap;overflow-wrap:normal;word-break:normal;margin:0}
+
+/* Readiness purpose badge: words only, never a percentage or progress bar. */
+.readiness-badge{margin:10px 0;padding:10px 12px;border:1px solid #8995a580;border-left-width:4px;border-radius:8px;min-width:0;overflow-wrap:anywhere}.readiness-badge.complete{border-left-color:#2e8b57}.readiness-badge.open{border-left-color:#c77700}.readiness-badge p{margin:4px 0}.readiness-badge-links{list-style:none;padding-left:0;margin:6px 0 0;display:flex;flex-wrap:wrap;gap:6px}.readiness-badge-links button{max-width:100%;white-space:normal;text-align:left}[data-testid=project-readiness] li[tabindex="-1"]:focus{outline:2px solid #3688c8;outline-offset:2px}

@@ -6,6 +6,7 @@ import {addWorkspaceSlides,workspaceGroups,type BackLink,type DeckGroup} from '.
 import {PROVENANCE_NOTE,clip} from '../experience/render';
 import {addArchitectureSlides,realizationRows,type ScreenLink} from './pptx';
 import {noIcons,type IconData} from './iconData';
+import {xmlSafe} from './diagram';
 
 /**
  * One deck for a whole project (or one scope): cover, linked contents, architecture views, one section per
@@ -124,7 +125,8 @@ function realizationSlides(pptx:Pptx,rows:string[][],number:string){
 }
 
 /** Builds the deck and returns it with the section map (also used by tests). */
-export async function buildDeck(PptxCtor:typeof PptxGenJS,plan:DeckPlan,icons:IconData=noIcons):Promise<{pptx:Pptx;sections:DeckSection[];slides:number;links:DeckLinks}>{
+export async function buildDeck(PptxCtor:typeof PptxGenJS,input:DeckPlan,icons:IconData=noIcons):Promise<{pptx:Pptx;sections:DeckSection[];slides:number;links:DeckLinks}>{
+ const plan=xmlSafe(input);
  const pptx=new PptxCtor();
  pptx.layout='LAYOUT_WIDE';pptx.title=plan.title;pptx.subject=plan.subtitle;pptx.author=plan.author||'DiagramCloud';pptx.company='DiagramCloud';
  const views=plan.architecture?.views.length??0,screens=plan.groups.reduce((n,g)=>n+g.screens.length,0);
