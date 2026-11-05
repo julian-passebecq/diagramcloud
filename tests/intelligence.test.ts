@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type {Project} from '../src/core/model';
-import {projectReadiness} from '../src/intelligence/readiness';
+import {completeForPurpose, projectReadiness, purposeBadge, readinessDownload, PURPOSE_BADGE_NOTICE} from '../src/intelligence/readiness';
+import {PURPOSES} from '../src/intelligence/types';
 import {planAssets, assetChecklistCsv} from '../src/intelligence/assets';
 import {mapDocuments, readCsv, wantedDocument} from '../src/intelligence/documents';
 
@@ -93,4 +94,37 @@ test('unsafe paths and rejected text are not mapped; invalid CSV leaves no parti
   assert.equal(map.documents.find(d => d.path === 'sources.csv')!.records.length, 0);
   assert.ok(map.diagnostics.some(d => d.code === 'invalid'));
   assert.throws(() => mapDocuments([{path: 'same.md', text: 'a'}, {path: 'same.md', text: 'b'}], safe));
+});
+
+test('purpose badge says complete or names the open required gaps, never a percentage', () => {
+  const project = sample(), before = JSON.stringify(project);
+  const complete = purposeBadge(projectReadiness(project, {purpose: 'understand'}));
+  assert.equal(complete.complete, true);
+  assert.equal(complete.text, 'Complete for understand');
+  assert.deepEqual(complete.requiredGaps, []);
+  assert.equal(complete.notice, PURPOSE_BADGE_NOTICE);
+  const portfolio = purposeBadge(projectReadiness(project, {purpose: 'portfolio'}));
+  assert.equal(portfolio.complete, false);
+  assert.deepEqual(portfolio.requiredGaps.map(g => g.id), ['business-purpose', 'contribution']);
+  assert.equal(portfolio.text, '2 required gaps open for portfolio');
+  const presentation = purposeBadge(projectReadiness(project, {purpose: 'presentation'}));
+  assert.equal(presentation.text, '1 required gap open for presentation');
+  for (const purpose of PURPOSES) {
+    const report = projectReadiness(project, {purpose}), badge = purposeBadge(report);
+    const {format: _f, version: _v, text: _t, notice: _n, requiredGaps: _r, ...rest} = badge;
+    assert.deepEqual(rest, completeForPurpose(report), 'the badge adds wording only, no new rule');
+    assert.ok(!/%|percent|\d+\s*\/\s*\d+|\bof\s+\d+/i.test(badge.text), `no percentage or ratio in "${badge.text}"`);
+    assert.match(badge.notice, /not a completeness percentage, runtime certificate or review/i);
+  }
+  assert.equal(JSON.stringify(project), before);
+});
+
+test('readiness JSON download carries the same purpose badge as the panel', () => {
+  const report = projectReadiness(sample(), {purpose: 'portfolio'});
+  const file = JSON.parse(JSON.stringify(readinessDownload(report)));
+  assert.equal(file.format, 'diagramcloud.readiness');
+  assert.deepEqual(file.purposeBadge, purposeBadge(report));
+  assert.equal(file.purposeBadge.text, '2 required gaps open for portfolio');
+  assert.deepEqual(file.gaps, report.gaps);
+  assert.equal('purposeBadge' in report, false, 'the report itself is not changed');
 });

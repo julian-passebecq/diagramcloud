@@ -2,7 +2,7 @@ import {publicDocument} from '../core/operations';
 import type {Project,ProjectNode} from '../core/model';
 import {CLAIM_LABEL,presentedObservation} from '../core/realization';
 import {buildScene} from './scene';
-
+import {xmlChars} from './xmlText';
 /**
  * draw.io / diagrams.net export: one page per public view (root first, then each drilldown), boxes at their canvas
  * positions, the shared orthogonal routes as fixed waypoints, connection labels, and drilldown cards as page links.
@@ -15,7 +15,7 @@ const STROKE='#9aa9bb',INK='#16263d',EDGE='#45556d';
 /** A connection quantity as style keys (URI-encoded, since a style value cannot hold ; or =), so importing the file back keeps it. */
 const quantityStyle=(q:Project['edges'][number]['quantity'])=>q?`dcQuantity=${q.value};dcUnit=${encodeURIComponent(q.unit)};dcProvenance=${q.provenance};${q.note?`dcQuantityNote=${encodeURIComponent(q.note)};`:''}`:'';
 /** XML attribute value: draw.io reads plain text labels (html=0), so only XML escaping applies. */
-const attr=(s:string)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\r?\n/g,'&#10;').replace(/\t/g,'&#9;');
+const attr=(s:string)=>xmlChars(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\r?\n/g,'&#10;').replace(/\t/g,'&#9;');
 const round=(n:number)=>Math.round(n*100)/100;
 
 function nodeStyle(n:ProjectNode):string{

@@ -3,6 +3,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {validateDocument,type Project} from '../../src/core/model';
 import {prepareExplanationFiles} from '../../scripts/prepare-explanation';
+import {EXPLANATION_DETAILS_COLUMNS,explanationDetailsRows} from '../../src/core/explanationDetails';
+import {suggestMapping,reviewMapping} from '../../src/intelligence/learning/mappings';
+import {learningCatalogue} from '../../src/intelligence/learning/catalogue';
 
 /**
  * V3 companion pane, walkthrough import and focused export (UX31-UX33), in the real App.
@@ -178,6 +181,138 @@ test.describe('390 x 844',()=>{
   await tabTo(page,back);await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/node=wrapper/);await expect(companion(page).getByTestId('companion-detour')).toHaveCount(0);
   expect(await page.evaluate(()=>document.activeElement!==document.body)).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  expect(errors).toEqual([]);
+ });
+});
+
+/* 1.34.0: related concepts and a detour Return that restores the reading state. Synthetic fixture with stored mappings. */
+const [conceptA,conceptB,conceptC]=learningCatalogue;
+function readingFixture():Project{
+ const base=validateDocument({schemaVersion:1,id:'companion-reading',title:'Synthetic companion reading',rootViewId:'root',
+  sources:[{id:'pub-src',title:'Synthetic public reference',location:'supplied:synthetic-example'},{id:'priv-src',title:'PRIVATE reference',location:'supplied:synthetic-example',visibility:'private'}],
+  blocks:[{id:'details',title:'Questions',type:'table',columns:EXPLANATION_DETAILS_COLUMNS,provenance:'synthetic',
+   rows:explanationDetailsRows({focusQuestion:'Why validate orders?',sourceCut:'synthetic cut',prerequisites:[],questions:['Who handles failure?','Where is the error kept?']})}],
+  nodes:[{id:'orders',label:'Orders',summary:'Synthetic order intake',blockIds:['details'],sourceIds:['pub-src']},{id:'checks',label:'Checks'},{id:'stage',label:'Stage',childViewId:'detail'},
+   {id:'store',label:'Store'},{id:'hidden',label:'PRIVATE ledger',visibility:'private'},{id:'plain',label:'Orders validation pattern'}],
+  edges:[{id:'oc',source:'orders',target:'checks',kind:'control'},{id:'cs',source:'checks',target:'store',kind:'batch'},{id:'oh',source:'orders',target:'hidden',kind:'dependency',visibility:'private'}],
+  views:[{id:'root',title:'Root',nodeIds:['orders','checks','stage','plain','hidden'],edgeIds:['oc','oh']},{id:'detail',title:'Detail',nodeIds:['checks','store'],edgeIds:['cs']}]});
+ const by={origin:'author' as const,suggestedBy:'Synthetic author'},review={reviewedBy:'Synthetic reviewer',reviewedAt:'2026-11-04T00:00:00Z'};
+ let d=suggestMapping(base,{conceptId:conceptA.id,target:{kind:'node',id:'orders'}},by);
+ d=reviewMapping(d,d.learningMappings!.at(-1)!.id,{...review,evidence:{sourceIds:['pub-src'],blockIds:[]}});
+ d=suggestMapping(d,{conceptId:conceptB.id,target:{kind:'node',id:'orders'}},{origin:'ai',suggestedBy:'synthetic agent'});
+ d=suggestMapping(d,{conceptId:conceptC.id,target:{kind:'node',id:'orders'},visibility:'private'},by);
+ return reviewMapping(d,d.learningMappings!.at(-1)!.id,{...review,evidence:{sourceIds:['priv-src'],blockIds:[]}});
+}
+async function openReading(page:Page){
+ await page.goto('/?workspace=v3');await expect(page.getByText('Local workspace ready',{exact:true})).toBeVisible();
+ await importText(page,JSON.stringify(readingFixture()));
+ await page.getByRole('button',{name:'Apply imported document',exact:true}).click();await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();
+}
+const companionTabs=(page:Page)=>companion(page).getByRole('tablist',{name:'Companion sections'});
+const questionChoice=(page:Page,name:string)=>companion(page).getByRole('group',{name:'Selected question'}).getByRole('radio',{name,exact:true});
+
+for(const width of [1440,390])test.describe(`companion concepts and detour return ${width}`,()=>{
+ test.use({viewport:{width,height:width===390?844:1000},reducedMotion:'reduce'});
+ test('Concepts tab from stored mappings only; Return restores tab, filters and question; audience change drops the detour; a removed origin refuses Return',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await openReading(page);
+  const panes=workspace(page).getByRole('navigation',{name:'Workspace panes'});const pane=async(name:string)=>{if(await panes.isVisible())await panes.getByRole('button',{name,exact:true}).click();};
+  await card(page,'root','Orders validation pattern').click();await pane('Explanation / compare');
+  // A shared word is never a mapping: the look-alike component has no Concepts tab.
+  await expect(anchor(page)).toContainText('About Orders validation pattern');await expect(companionTabs(page).getByRole('tab',{name:'Concepts',exact:true})).toHaveCount(0);
+  await pane('View');await card(page,'root','Orders').click();await pane('Explanation / compare');
+  await expect(anchor(page)).toContainText('About Orders');
+  await expect(companionTabs(page).getByRole('tab')).toHaveText(['Explanation','Contract','Questions','Related','Concepts','Evidence']);
+  await companionTabs(page).getByRole('tab',{name:'Concepts',exact:true}).click();
+  const mapped=companion(page).getByRole('list',{name:'Mapped concepts'});
+  await expect(mapped.getByRole('listitem')).toHaveCount(3);
+  await expect(mapped.locator(`[data-concept-id="${conceptA.id}"]`)).toContainText('Reviewed by the author');
+  await expect(mapped.locator(`[data-concept-id="${conceptB.id}"]`)).toContainText('Suggested · candidate, not evidence');
+  // Without an onLesson host handler the tab is a read-only list.
+  await expect(mapped.getByRole('button')).toHaveCount(0);await expect(companion(page)).toContainText('Read-only list');
+
+  // Choose a question, then set filters on Related and open a detour from there.
+  await companionTabs(page).getByRole('tab',{name:'Questions',exact:true}).click();
+  await questionChoice(page,'Follow-up 1: Who handles failure?').check();
+  await expect(companion(page).getByRole('status',{name:'Selected question'})).toHaveText('Selected: Who handles failure?');
+  await companionTabs(page).getByRole('tab',{name:'Related',exact:true}).click();
+  await companion(page).getByLabel('Scope',{exact:true}).selectOption('project');await companion(page).getByLabel('Depth',{exact:true}).selectOption('2');
+  const related=companion(page).getByRole('list',{name:'Related components'});
+  await related.getByRole('button',{name:'Open Store as a detour',exact:true}).click();
+  await expect(page).toHaveURL(/node=store/);await pane('Explanation / compare');
+  const detour=companion(page).getByTestId('companion-detour');
+  await expect(detour).toContainText('You opened Store as a detour from Orders.');await expect(detour).toContainText('Return restores its Related tab, filters and selected question.');
+  // Wander during the detour: another tab, another question, other filters.
+  await companionTabs(page).getByRole('tab',{name:'Questions',exact:true}).click();await questionChoice(page,'Focus: Why validate orders?').check();
+  await companionTabs(page).getByRole('tab',{name:'Related',exact:true}).click();await companion(page).getByLabel('Depth',{exact:true}).selectOption('0');
+  await companionTabs(page).getByRole('tab',{name:'Evidence',exact:true}).click();
+  await detour.getByRole('button',{name:'Return to Orders',exact:true}).click();
+  await expect(page).toHaveURL(/node=orders/);await pane('Explanation / compare');
+  await expect(companion(page).getByTestId('companion-detour')).toHaveCount(0);
+  await expect(companionTabs(page).getByRole('tab',{name:'Related',exact:true})).toHaveAttribute('aria-selected','true');
+  await expect(companion(page).getByLabel('Depth',{exact:true})).toHaveValue('2');await expect(companion(page).getByLabel('Scope',{exact:true})).toHaveValue('project');
+  await companionTabs(page).getByRole('tab',{name:'Questions',exact:true}).click();
+  await expect(questionChoice(page,'Follow-up 1: Who handles failure?')).toBeChecked();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+
+  // An audience change never carries an author detour into the public reading, and no private label appears.
+  await companionTabs(page).getByRole('tab',{name:'Related',exact:true}).click();
+  await related.getByRole('button',{name:'Open Store as a detour',exact:true}).click();await expect(page).toHaveURL(/node=store/);
+  await page.getByRole('tab',{name:'Portfolio',exact:true}).click();await pane('Explanation / compare');
+  await expect(companion(page)).toContainText('Public projection.');
+  await expect(companion(page).getByRole('button',{name:'Return to Orders',exact:true})).toHaveCount(0);
+  const body=await page.locator('body').innerText();
+  for(const hidden of ['PRIVATE ledger','PRIVATE reference',conceptC.title,'Suggested · candidate'])expect(body).not.toContain(hidden);
+  await page.getByRole('tab',{name:'Explore',exact:true}).click();
+
+  // The origin component is removed during a detour: Return is refused with the generic message, never rebound.
+  await pane('View');await card(page,'root','Orders').click();await pane('Explanation / compare');
+  await companionTabs(page).getByRole('tab',{name:'Related',exact:true}).click();
+  await companion(page).getByLabel('Scope',{exact:true}).selectOption('project');await companion(page).getByLabel('Depth',{exact:true}).selectOption('2');
+  await related.getByRole('button',{name:'Open Store as a detour',exact:true}).click();await expect(page).toHaveURL(/node=store/);
+  const doc=await current(page),gone=new Set(['oc','oh']);
+  const removed={...doc,nodes:doc.nodes.filter(n=>n.id!=='orders'),edges:doc.edges.filter(e=>!gone.has(e.id)),blocks:[],sources:doc.sources,
+   views:doc.views.map(v=>({...v,nodeIds:v.nodeIds.filter(id=>id!=='orders'),edgeIds:(v.edgeIds??[]).filter(id=>!gone.has(id))}))};
+  delete removed.learningMappings;
+  await importText(page,JSON.stringify(removed));await page.getByRole('button',{name:'Apply imported document',exact:true}).click();await expect(page.getByText('Saved locally',{exact:true})).toBeVisible();
+  await pane('Explanation / compare');
+  await expect(companion(page).getByTestId('companion-return-refused')).toHaveText('Return unavailable. This navigation target is unavailable in the current permitted context.');
+  await expect(companion(page).getByRole('button',{name:'Return to Orders',exact:true})).toHaveCount(0);
+  await companion(page).getByRole('button',{name:'End detour here',exact:true}).click();await expect(companion(page).getByTestId('companion-detour')).toHaveCount(0);
+  expect(errors).toEqual([]);
+ });
+});
+
+test.describe('companion question and return by keyboard at 390 x 844',()=>{
+ test.use({viewport:{width:390,height:844},reducedMotion:'reduce'});
+ test('choose a question, open a related detour and Return to the same tab and question by keyboard',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await openReading(page);
+  await card(page,'root','Orders').click();await page.mouse.move(0,0);
+  const panes=workspace(page).getByRole('navigation',{name:'Workspace panes'});await expect(panes).toBeVisible();
+  await page.getByRole('button',{name:'V3 workspace',exact:true}).focus();
+  await tabTo(page,panes.getByRole('button',{name:'Explanation / compare',exact:true}));await page.keyboard.press('Enter');
+  await expect(anchor(page)).toContainText('About Orders');
+  await tabTo(page,companionTabs(page).getByRole('tab',{selected:true}));
+  await page.keyboard.press('Home');await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');
+  await expect(companionTabs(page).getByRole('tab',{name:'Questions',exact:true})).toBeFocused();
+  const focusChoice=questionChoice(page,'Focus: Why validate orders?');await tabTo(page,focusChoice);
+  await page.keyboard.press('ArrowDown');await page.keyboard.press('ArrowDown');
+  await expect(questionChoice(page,'Follow-up 2: Where is the error kept?')).toBeChecked();
+  await tabTo(page,companionTabs(page).getByRole('tab',{name:'Questions',exact:true}),true);await page.keyboard.press('ArrowRight');
+  await expect(companionTabs(page).getByRole('tab',{name:'Related',exact:true})).toBeFocused();
+  await tabTo(page,companion(page).getByRole('list',{name:'Related components'}).getByRole('button',{name:'Open Checks as a detour',exact:true}));await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/node=checks/);await expect(card(page,'root','Checks')).toBeFocused();
+  await tabTo(page,panes.getByRole('button',{name:'Explanation / compare',exact:true}),true);await page.keyboard.press('Enter');
+  await tabTo(page,companion(page).getByTestId('companion-detour').getByRole('button',{name:'Return to Orders',exact:true}));await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/node=orders/);
+  expect(await page.evaluate(()=>document.activeElement!==document.body)).toBe(true);
+  await panes.getByRole('button',{name:'Explanation / compare',exact:true}).focus();await page.keyboard.press('Enter');
+  await expect(companionTabs(page).getByRole('tab',{name:'Related',exact:true})).toHaveAttribute('aria-selected','true');
+  await tabTo(page,companionTabs(page).getByRole('tab',{selected:true}));await page.keyboard.press('ArrowLeft');
+  await expect(companionTabs(page).getByRole('tab',{name:'Questions',exact:true})).toBeFocused();
+  await expect(questionChoice(page,'Follow-up 2: Where is the error kept?')).toBeChecked();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   expect(errors).toEqual([]);
  });

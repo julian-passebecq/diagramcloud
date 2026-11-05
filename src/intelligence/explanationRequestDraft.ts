@@ -1,6 +1,6 @@
 import {validateDocument,type Project} from '../core/model';
 import {applyDocumentPatch,type Patch} from '../core/patch';
-import {prepareExplanationWalkthrough,walkthroughFingerprint,type ExplanationWalkthrough} from './explanationWalkthrough';
+import {prepareExplanationWalkthrough,walkthroughFingerprint,readExplanationWalkthrough,reviseExplanationWalkthrough,removeExplanationWalkthrough,type ExplanationWalkthrough,type WalkthroughRemoval} from './explanationWalkthrough';
 
 export type ExplanationBasis=Readonly<{projectId:string;revision:number;fingerprint:string}>;
 export type ExplanationDraft=Pick<ExplanationWalkthrough,'id'|'title'|'question'|'sourceIds'|'steps'>;
@@ -39,6 +39,23 @@ export function explanationRequest(basis:ExplanationBasis,draft:ExplanationDraft
 export function prepareExplanationDraft(project:Project,basis:ExplanationBasis,draft:ExplanationDraft){
  if(!explanationSourceMatches(project,basis))throw new Error(EXPLANATION_SOURCE_CHANGED);
  return prepareExplanationWalkthrough(project,explanationRequest(basis,draft));
+}
+
+/** Reopen an applied walkthrough as a form draft bound to the current full source. Refuses rather than guesses (see readExplanationWalkthrough). */
+export function startExplanationRevision(project:Project,walkthroughId:string):{basis:ExplanationBasis;draft:ExplanationDraft}{
+ const {request}=readExplanationWalkthrough(project,walkthroughId),basis=explanationBasis(project);
+ const {id,title,question,sourceIds,steps}=structuredClone(request);
+ return {basis,draft:{id,title,question,sourceIds,steps}};
+}
+/** Review a revised draft: one replace patch over exactly that walkthrough's generated content. The walkthrough ID cannot change here. */
+export function prepareExplanationRevision(project:Project,basis:ExplanationBasis,draft:ExplanationDraft,walkthroughId:string){
+ if(!explanationSourceMatches(project,basis))throw new Error(EXPLANATION_SOURCE_CHANGED);
+ if(draft.id!==walkthroughId)throw new Error(`A revision keeps its walkthrough ID (${walkthroughId}). Author a new explanation for another ID; nothing was applied.`);
+ return reviseExplanationWalkthrough(project,explanationRequest(basis,draft));
+}
+/** Review the removal of one applied walkthrough, bound to the current full source. */
+export function prepareExplanationRemoval(project:Project,walkthroughId:string):{basis:ExplanationBasis;result:WalkthroughRemoval}{
+ return {basis:explanationBasis(project),result:removeExplanationWalkthrough(project,walkthroughId)};
 }
 
 /** The effect boundary repeats the full-source guard, then uses the ordinary patch validator. */

@@ -12,7 +12,10 @@ export const MEETING_SUMMARY_PROFILES = ['design', 'business'] as const;
 export const MEETING_SUMMARY_DETAILS = ['overview', 'standard', 'full'] as const;
 export const MEETING_SUMMARY_PAPERS = ['A4', 'letter'] as const;
 /** Shown wherever a meeting summary is offered: what browser print gives, and what it is not. */
-export const MEETING_SUMMARY_FIDELITY_NOTE = 'Browser print gives the PDF. The PDF is a snapshot, not a backup: keep the Project JSON as the editable model. No PPTX is produced here.';
+export const MEETING_SUMMARY_FIDELITY_NOTE = 'Browser print gives the PDF, on A4 or Letter from the summary print stylesheet. The PDF is a snapshot, not a backup: keep the Project JSON as the editable model. The PPTX is editable native shapes, text and tables from the same public brief: no live panes, no animation, and not a backup either.';
+/** Formats offered for one meeting brief; all read the same public model. */
+export const MEETING_SUMMARY_FORMATS = ['html', 'pdf', 'pptx'] as const;
+export type MeetingSummaryFormat = typeof MEETING_SUMMARY_FORMATS[number];
 
 const paragraph = (value: string) => `<p>${xml(value)}</p>`;
 
@@ -58,13 +61,26 @@ export function meetingBriefChoices(project: Project): {views: {id: string; titl
   return {views: reachablePublicViews(safe).map(v => ({id: v.id, title: v.title})), storyCount: safe.story.length, profiles: MEETING_SUMMARY_PROFILES};
 }
 
-/** Concise publication recipe over existing Project and PublicationBrief contracts.
- * Read-only HTML with internal glossary links and A4 or letter print CSS. It never executes code,
- * calls a provider, implies lossless PDF/PPTX interactivity, or changes the source document.
- * Public captions backed by private sources are suppressed by the existing overview projection.
- * A private and an unknown view are refused with the same reason.
- */
-export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief, options: {now?: Date} = {}): string {
+/** The shared public model behind every meeting-summary format (HTML, browser-print PDF, PPTX).
+ * Built from the overview projection (publicDocument plus suppression of public captions backed by private sources),
+ * after the brief is validated against it: a private and an unknown view are refused with the same reason, a brief
+ * with more than six views or an unsupported profile is refused. Every format reads only this model. */
+export type MeetingSummaryModel = {
+  /** Public projection the summary reads; never the authoring document. */
+  project: Project;
+  brief: PublicationBrief;
+  paper: 'A4' | 'letter';
+  views: Project['views'];
+  /** True when a view exceeds the readable summary budget: no figure, the complete component list instead. */
+  dense: Record<string, boolean>;
+  nodes: Project['nodes'];
+  blocks: EvidenceBlock[];
+  sources: Project['sources'];
+  highlights: Project['nodes'];
+  story: Project['story'];
+};
+
+export function meetingSummaryModel(input: Project, briefInput: PublicationBrief): MeetingSummaryModel {
   const p = overviewProjection(validateDocument(input), true), brief = validatePublicationBrief(briefInput, p);
   if (brief.viewIds.length > MEETING_SUMMARY_LIMITS.views) throw new Error('Meeting summary supports at most six selected views; use the full native handbook for more.');
   if (!(MEETING_SUMMARY_PROFILES as readonly string[]).includes(brief.profile)) throw new Error('Meeting summary supports design or business profiles; use the native full publication for other profiles.');
@@ -76,10 +92,24 @@ export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief,
   const sourceIds = new Set([...nodes.flatMap(n => n.sourceIds), ...blocks.flatMap(b => b.sourceIds)]);
   const sources = p.sources.filter(s => sourceIds.has(s.id));
   const highlights = nodes.filter(n => !n.childViewId).slice(0, 6);
-  const selectedStory = brief.storyIndices.map(i => p.story[i]);
+  const story = brief.storyIndices.map(i => p.story[i]);
+  const dense = Object.fromEntries(views.map(v => [v.id, publicationPages(p, v.id, brief.viewIds, {paper: brief.paper, profile: 'design'}).dense]));
+  return {project: p, brief, paper, views, dense, nodes, blocks, sources, highlights, story};
+}
+
+/** Concise publication recipe over existing Project and PublicationBrief contracts.
+ * Read-only HTML with internal glossary links and A4 or letter print CSS (the print-qualified PDF is this page printed
+ * by the browser). It never executes code, calls a provider, implies lossless PDF/PPTX interactivity, or changes the
+ * source document. Public captions backed by private sources are suppressed by the existing overview projection.
+ * A private and an unknown view are refused with the same reason.
+ */
+export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief, options: {now?: Date} = {}): string {
+  const model = meetingSummaryModel(input, briefInput);
+  const {project: p, brief, paper, views, blocks, sources, highlights} = model, selectedStory = model.story;
+  const blockIds = new Set(blocks.map(b => b.id));
 
   const viewPages = views.map((v, index) => {
-    const plan = publicationPages(p, v.id, brief.viewIds, {paper: brief.paper, profile: 'design'});
+    const plan = {dense: model.dense[v.id]};
     const members = v.nodeIds.map(id => p.nodes.find(n => n.id === id)!);
     // Do not reduce an unreadable poster until its primary labels disappear.
     const figure = brief.profile === 'business' ? ''

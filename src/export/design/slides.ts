@@ -2,6 +2,7 @@ import type PptxGenJS from 'pptxgenjs';
 import type {DesignTheme,DesignType,Project} from '../../core/model';
 import {publicDocument} from '../../core/operations';
 import {orderedViews} from '../drawio';
+import {xmlSafe} from '../diagram';
 import {DESIGN_TYPE_LABEL,designSvg,resolveDesignType} from './index';
 
 /** Rasterises one figure (an SVG string) to a PNG data URL; the browser passes pngFromSvg, tests pass a stub. */
@@ -21,7 +22,7 @@ export function figureSize(svg:string):{w:number;h:number}{
  * its notes. Pictures, not native shapes: the editable architecture deck stays the "Editable PowerPoint" export.
  */
 export async function buildDesignDeck(PptxCtor:typeof PptxGenJS,input:Project,options:DesignDeckOptions):Promise<{pptx:PptxGenJS;slides:number}>{
- const now=options.now??new Date(),d=publicDocument(input),views=orderedViews(d);
+ const now=options.now??new Date(),d=xmlSafe(publicDocument(input)),views=orderedViews(d);
  if(!views.length)throw new Error('Nothing public to export yet: no public view.');
  if(views.length+1>MAX_SLIDES)throw new Error(`This deck would have ${views.length+1} slides (limit ${MAX_SLIDES}).`);
  const pptx=new PptxCtor();pptx.layout='LAYOUT_WIDE';pptx.title=`${d.title} · Figures`;pptx.subject='Diagram Design figures';pptx.author='DiagramCloud';pptx.company='DiagramCloud';

@@ -95,3 +95,26 @@ export function completeForPurpose(report: ReadinessReport): PurposeCompleteness
 export function projectCompleteFor(project: Project, purpose: Purpose, input: Partial<Omit<AnalysisOptions, 'purpose'>> = {}): PurposeCompleteness {
   return completeForPurpose(projectReadiness(project, {...input, purpose}));
 }
+
+/** Says what the purpose badge is not. Shown with the badge and copied into the readiness JSON download. */
+export const PURPOSE_BADGE_NOTICE = 'Not a completeness percentage, runtime certificate or review.';
+export type PurposeBadge = PurposeCompleteness & {
+  format: 'diagramcloud.purpose-badge'; version: 1;
+  /** "Complete for <purpose>" or "N required gap(s) open for <purpose>"; never a number out of a total. */
+  text: string; notice: string;
+  /** The required gaps the badge links to, in report order. */
+  requiredGaps: {id: string; title: string}[];
+};
+/** Presentation of completeForPurpose for the readiness panel: wording only, no new rule. */
+export function purposeBadge(report: ReadinessReport): PurposeBadge {
+  const completeness = completeForPurpose(report);
+  const requiredGaps = report.gaps.filter(g => g.state === 'missing-required').map(g => ({id: g.id, title: g.title}));
+  const n = requiredGaps.length;
+  const text = completeness.complete ? `Complete for ${completeness.purpose}`
+    : `${n} required ${n === 1 ? 'gap' : 'gaps'} open for ${completeness.purpose}`;
+  return {format: 'diagramcloud.purpose-badge', version: 1, ...completeness, text, notice: PURPOSE_BADGE_NOTICE, requiredGaps};
+}
+/** The readiness JSON download: the report plus its purpose badge, so the file says the same as the panel. */
+export function readinessDownload(report: ReadinessReport): ReadinessReport & {purposeBadge: PurposeBadge} {
+  return {...report, purposeBadge: purposeBadge(report)};
+}
