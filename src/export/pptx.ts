@@ -75,8 +75,10 @@ export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:Architectu
    put(n.provider);
    // The box title opens the deeper view; without one it opens the task screen. The SCREEN link, on the footer row, always opens the screen.
    const screenLink=screen?{slide:screen.slide,tooltip:`Task screen: ${caption(screen.title,80,1)}`}:undefined;
-   put(n.label,{hyperlink:n.childViewId?{slide:slideNumbers.get(n.childViewId)}:screenLink});
-   put(n.summary);put(n.footer);
+   // Only a child view that is a slide of this (public) deck is linked; anything else gets no link and no hint.
+   const childSlide=n.childViewId?slideNumbers.get(n.childViewId):undefined,childLink=childSlide?{slide:childSlide,tooltip:`Open subdiagram (slide ${childSlide})`}:undefined;
+   put(n.label,{hyperlink:childLink??screenLink});
+   put(n.summary);put(n.footer,childLink?{hyperlink:childLink}:{});
    if(n.realization){const r=n.realization;slide.addShape(shape.roundRect,{x:X(r.x),y:Y(r.y),w:r.w*scale,h:r.h*scale,rectRadius:4*scale,line:{color:r.stroke,width:.75},fill:{color:r.fill}});put(r.text);}
    if(screen)slide.addText([{text:'SCREEN ›',options:{hyperlink:screenLink}}],{x:X(n.x+n.w-NODE_PAD-60),y:Y(n.footer.y)-.905*pt(10)/72,w:60*scale,h:pt(12.5)/72+.02,fontFace:SCENE_FONT,fontSize:pt(10),bold:true,color:'1F6FB2',align:'right',valign:'top',margin:0,wrap:false});
   }
