@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom/client';
 import '@xyflow/react/dist/style.css';
 // Styles for components that node tests import directly (Node cannot load .css).
 import './ui/ideaWorkspace.css';
+import './ui/lessonFigure.css';
 import './ui/interviewPractice.css';
 import './ui/readingWayfinder.css';
 import './ui/explanationRequest.css';
