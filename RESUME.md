@@ -1,8 +1,12 @@
-# Current continuation - 27 October 2026
+# Current continuation - 5 November 2026
 
-Source version: `1.33.1` (patch release of #118, #119, #120 and #122; [notes](docs/release-1.33/RELEASE_NOTES-1.33.1.md)). Read [the roadmap](docs/ROADMAP.md) for selected scope and [release verification](docs/RELEASE.md) for release gates. This file is the resumable source checkpoint, not an installed-release claim.
+Source version: `1.34.0` (source release of #133-#147; [notes](docs/release-1.34/RELEASE_NOTES.md)). Read [the roadmap](docs/ROADMAP.md) for selected scope and [release verification](docs/RELEASE.md) for release gates. This file is the resumable source checkpoint, not an installed-release claim.
 
-## Now - reliability release delivered; explanation source merged separately
+## Now - 1.34.0 source checkpoint
+
+**Prepared 5 November 2026 on branch `release/diagramcloud-1.34.0`:** version 1.34.0 collects the merged source #133, #134, #135, #137, #139, #140, #141, #142, #146 and #147 (whole-project gallery, connected workspace panes and source-bound answers, spatial lesson figures, bounded imports, monotonic revisions, public-boundary fixes, floating Explorer and density, PPTX drilldown links, source refresh summary and return context). It also holds the readiness purpose badge (#136), companion concepts and detour Return (#138), meeting summary PDF and PPTX (#143), revise and remove of applied explanations (#144), XML-safe exports (#145), import hardening follow-ups (#148), the public omission notice in the meeting summary (#149) and QA UI polish (#150), all confirmed merged in the [1.34.0 notes](docs/release-1.34/RELEASE_NOTES.md). This is a source release only: no package, deployment or tag is claimed, and the last recorded private package stays `diagramcloud/1.33.1-0892f9d`. Exact-head CI of the release pull request is the qualification record.
+
+## Previous - reliability release delivered; explanation source merged separately
 
 **Verified 23 October 2026:** the previous release closure is complete. PR #125 and #126 are merged. The immutable private package is `diagramcloud/1.33.1-0892f9d`, source `0892f9df2c29ab8313c2cb4f60c59061c57478cc`, recorded by [PR #128](https://github.com/julian-passebecq/diagramcloud/pull/128). Its native receipt records 14 authenticated re-download hashes matched and anonymous access refused. The 23 October review read that receipt and confirmed the vault was private; it did not re-download the vault package.
 

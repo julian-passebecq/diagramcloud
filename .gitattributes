@@ -10,3 +10,5 @@ tests/fixtures/delivery-evidence/linked-*.json -text
 README_HISTORY_20261021.md text eol=lf
 docs/ROADMAP_HISTORY_20261021.md text eol=lf
 RESUME_HISTORY_20261021.md text eol=lf
+# Lane reports are appended by many PRs at once: keep every line from both sides on a merge.
+handoff/lanes/README.md merge=union
