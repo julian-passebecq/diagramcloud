@@ -45,6 +45,7 @@ export function AtlasPanel({doc,readOnly,busy,onRescan,onAdd,onLens}:{doc:Projec
   {other&&<section aria-label="Snapshot comparison"><h4>Changes between {when(other.capturedAt<snap.capturedAt?other.capturedAt:snap.capturedAt)} and {when(other.capturedAt<snap.capturedAt?snap.capturedAt:other.capturedAt)}</h4>
    <ul className="atlas-changes">{changes.map(c=><li key={c.id} data-change={c.change}><b>{c.title}</b>: {CHANGE_LABEL[c.change]}{c.change==='revision-changed'?` (${short(c.from)} → ${short(c.to)})`:''}</li>)}</ul>
    <p className="micro">Component-level differences are shown by the review when a rescan is applied (same IDs, changed content).</p></section>}
+  {!readOnly&&<p className="micro" data-testid="atlas-refresh-note">A rescan is reviewed as a source refresh: new, changed, uncertain (not established by the scan, never removed) and unavailable sources, and the authored evidence it keeps. After Apply or Cancel you return to the view you were reading, if it is still permitted.</p>}
   {lens.length>0&&<section aria-label="Observed by Lens" className="atlas-lens"><h4>Observed by Lens · {when(lensAt)} UTC</h4>
    <p className="micro">Pointers to what Lens observed (Git heads, exact-head CI, requests, agent sessions). They are not components, never change a design status, and never reach public exports.</p>
    <ul>{snap.repositories.filter(r=>lens.some(x=>lensRepositoryOf(x.id)===r.id)).map(r=><li key={r.id} data-testid={`lens-${r.id}`}><b>{r.title}</b>

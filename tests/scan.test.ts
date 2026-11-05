@@ -124,3 +124,19 @@ test('folder picker: files under a sub-folder with its own .git are left out, th
  assert.deepEqual(nestedRepositoryPrefixes(paths),['tools/other','vendor2/lib']);
  assert.deepEqual(outsideNestedRepositories(paths.map(path=>({path}))).map(x=>x.path),['.git/HEAD','package.json','src/a.ts','vendor2/keep.ts']);
 });
+
+test('legacy folder picker: a cancelled scan rejects with AbortError and produces no candidate',async()=>{
+ const {scanPickedFolder}=await import('../src/core/scan');
+ const picked=()=>files().map(f=>new File([f.text],`repo-shop/${f.path}`));
+ // The App's legacy picker registers this signal with its analysis job (1.29 limit lifted).
+ const before=new AbortController();before.abort();
+ await assert.rejects(scanPickedFolder(picked(),new Date('2026-11-05T00:00:00Z'),before.signal),(e:unknown)=>e instanceof DOMException&&e.name==='AbortError');
+ const during=new AbortController();let candidate:unknown=null;
+ const run=scanPickedFolder(picked(),new Date('2026-11-05T00:00:00Z'),during.signal).then(out=>{candidate=out;});
+ during.abort();
+ await assert.rejects(run,(e:unknown)=>e instanceof DOMException&&e.name==='AbortError');
+ assert.equal(candidate,null);
+ // Not cancelled: the same selection scans normally.
+ const out=await scanPickedFolder(picked(),new Date('2026-11-05T00:00:00Z'),new AbortController().signal);
+ assert.ok(out.read>0);assert.doesNotThrow(()=>validateDocument(out.document));
+});

@@ -1,0 +1,8 @@
+services:
+  api:
+    image: node:20
+    depends_on: [db, queue]
+  db:
+    image: postgres:16
+  queue:
+    image: rabbitmq:3
