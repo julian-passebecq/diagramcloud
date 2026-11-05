@@ -9,7 +9,7 @@ import type {Project} from './model';
  * It validates only; it never applies, reviews, publishes, executes or launches anything. The supported proposal
  * kind is a `diagramcloud.patch` targeting the open project. Its origin comes from the calling path, never from the
  * payload: the dialog and CLI are `imported`, MCP is `ai` (with the client name), and `author` only when a person
- * names themself explicitly. A non-author proposal cannot review itself (observations, concept mappings, choices),
+ * names themself explicitly. A non-author proposal cannot review itself (observations, concept mappings, choices, a decision's review basis or compatibility evidence),
  * cannot relabel who suggested something, and cannot be applied twice: replay is detected by a digest of its
  * target and operations, so relabelling the base revision of an applied proposal does not make it new.
  */
@@ -90,7 +90,7 @@ function reviewClaims(current:Project,result:Project):ProposalReason[]{
  for(const c of allChoices(result)){const was=choices.get(c.id);
   if(c.status==='accepted'&&was?.status!=='accepted')self(`Choice ${c.id}: a proposal cannot accept a choice; a person decides it in Edit mode.`);
   else if((c.decidedBy!==was?.decidedBy||c.decidedAt!==was?.decidedAt)&&(c.decidedBy||c.decidedAt))self(`Choice ${c.id}: a proposal cannot record who decided; a person decides it in Edit mode.`);
-  if(was&&(c.origin!==was.origin||c.suggestedBy!==was.suggestedBy))relabel(`Choice ${c.id}: a proposal cannot change who suggested it (origin ${String(was.origin)} stays ${String(was.origin)}).`);}
+  if(was&&(c.origin!==was.origin||c.suggestedBy!==was.suggestedBy))relabel(`Choice ${c.id}: a proposal cannot change who suggested it (origin ${String(was.origin)} stays ${String(was.origin)}).`);out.push(...decisionClaims(c,was));}
  const variants=byId(current.variants as unknown as Keyed[]|undefined);
  for(const v of result.variants??[]){const was=variants.get(v.id) as NonNullable<Project['variants']>[number]|undefined;
   if(was&&(v.origin!==was.origin||v.suggestedBy!==was.suggestedBy))relabel(`Variant ${v.id}: a proposal cannot change who suggested it (origin ${was.origin} stays ${was.origin}).`);}
@@ -130,4 +130,18 @@ export function parseAppliedLedger(value:unknown):AppliedProposal[]{
  const digest=/^sha256:[a-f0-9]{64}$/;
  return rows.map((r,n)=>{if(!isObj(r)||typeof r.digest!=='string'||!digest.test(r.digest)||typeof r.contentDigest!=='string'||!digest.test(r.contentDigest)||typeof r.projectId!=='string'||!Number.isInteger(r.baseRevision))throw new Error(`Applied-proposal ledger row ${n+1} needs digest, contentDigest (sha256:<64 hex>), projectId and an integer baseRevision`);
   return {digest:r.digest,contentDigest:r.contentDigest,projectId:r.projectId,baseRevision:r.baseRevision as number,...(Number.isInteger(r.appliedRevision)?{appliedRevision:r.appliedRevision as number}:{})};});
+}
+
+/**
+ * A decision's review basis and its options' compatibility evidence are recorded by a named person in Edit mode. Recording or
+ * rewriting either is a self-review claim; removing either only lowers trust and stays allowed.
+ */
+function decisionClaims(c:Keyed,was:Keyed|undefined):ProposalReason[]{
+ const out:ProposalReason[]=[],self=(message:string)=>out.push({code:'self-review',message});
+ if(c.reviewBasis!==undefined&&!same(c.reviewBasis,was?.reviewBasis))self(`Choice ${c.id}: a proposal cannot record a review basis; a person reviews the decision in Edit mode.`);
+ type Opt={id:string;compatibility?:{requirementId:string}[]};
+ const wasOpts=new Map(((was?.options as Opt[]|undefined)??[]).map(o=>[o.id,o] as const));
+ for(const o of (c.options as Opt[]|undefined)??[]){const prior=new Map((wasOpts.get(o.id)?.compatibility??[]).map(e=>[e.requirementId,canon(e)] as const));
+  for(const e of o.compatibility??[])if(prior.get(e.requirementId)!==canon(e))self(`Choice ${c.id} option ${o.id}: a proposal cannot record compatibility evidence for ${e.requirementId}; a named person records it in Edit mode.`);}
+ return out;
 }

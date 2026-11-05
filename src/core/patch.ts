@@ -7,7 +7,7 @@ import {validatePack,type ExperiencePack} from '../experience/model';
  * was written against; a stale base, another target, an ID change or a failing `test` refuses the whole patch.
  * Operations apply to a copy, and the result must pass validateDocument / validatePack, so nothing is mutated
  * unless the full result is valid. Extension: a path segment `@<id>` addresses an array item by its stable ID
- * (`/nodes/@checks/label`), so patches do not depend on array positions.
+ * (`/nodes/@checks/label`), so patches do not depend on array positions, and `add` at `<member>/-` creates an absent array member.
  */
 export const PATCH_FORMAT='diagramcloud.patch';
 export const MAX_PATCH_OPS=500;
@@ -64,7 +64,7 @@ function get(doc:Json,path:string):Json{
  if(!Object.hasOwn(parent,key))throw new Error(`${path}: does not exist`);return parent[key];
 }
 function add(doc:Json,path:string,value:Json){
- const {parent,key}=locate(doc,path);
+ if(createdByAppend(doc,path,value))return;const {parent,key}=locate(doc,path);
  if(Array.isArray(parent))parent.splice(indexIn(parent,key,path,true),0,value);else parent[key]=value;
 }
 function remove(doc:Json,path:string):Json{
@@ -131,4 +131,14 @@ export function applyPackPatch(current:ExperiencePack,input:unknown):PatchResult
 export function patchTemplate(target:Patch['target'],id:string,revision:number,example:{path:string;value:unknown}):Patch{
  return {format:PATCH_FORMAT,version:1,target,targetId:id,baseRevision:revision,summary:'Describe the edit in one sentence',
   operations:[{op:'test',path:example.path,value:example.value},{op:'replace',path:example.path,value:example.value}]};
+}
+/**
+ * Extension: appending with `-` to an absent array member of an object creates that array, so an append never has to
+ * choose between `/x/-` and `/x` (which would replace an existing array the writer cannot see).
+ */
+function createdByAppend(doc:Json,path:string,value:Json):boolean{
+ if(!path.endsWith('/-')||path.length<=2)return false;
+ const {parent:owner,key:member}=locate(doc,path.slice(0,-2));
+ if(!isObj(owner)||Object.hasOwn(owner,member))return false;
+ owner[member]=[value];return true;
 }
