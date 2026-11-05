@@ -22,7 +22,11 @@ Extends R4-AC-12 (semantic depth). A lesson diagram shows each depth scene as a 
 - **Camera zoom:** sizes the figure only. The SVG width is `min(zoom × 100%, zoom × figure width px)` inside its own scroll box. Zoom never changes depth, the environment, the list or the page width.
 - **Declared environment:** when an environment is chosen, components with a declared instance in it get a "declared in X" tag on the figure. This is a declaration, never a deployment or an observation.
 - **Reduced motion:** highlight changes use no transition, and scrolling the figure to a highlighted component is instant. Without a browser (server render), motion counts as reduced.
-- The figure is `role="img"` with a summary label. Its components are not focusable. The list is the keyboard path.
+- The drawing is `role="img"` with a summary label. Each drawn component also has a real `<button>` laid over it (accessible name = component label, `aria-pressed` when selected, visible focus ring), in scene order, reached by Tab.
+- **Selection** (`src/intelligence/learning/figureInteraction.ts`): click, Enter or Space selects a component; pressing it again clears the selection. One selection is shared by the figure, the list (each row has a "Select … in the figure" button and is marked `data-selected`) and the "Selected component" panel, which shows the same facts as the list row (kind, declared instance, summary and evidence at Detail, the components inside it). A component that is not in the current scene is never shown as selected.
+- **Open inside:** offered only when `drillTarget(scene, nodeId)` finds the component in `scene.collapsed` and the scene is below Detail. It moves the diagram one semantic depth deeper (the same `explore` depth action), so its view opens through explicit `childViewId` drilldown, bounded at two levels, never revisiting a view. At Detail a collapsed component says it is beyond the two-level bound.
+- **Back:** "Back to <depth>" returns to the depth the drill started from and reselects the drilled component; focus moves to Back after a drill and to the component's figure button after Back. The lesson's own depth radio and explanation do not move; changing the lesson depth or the diagram source clears the trail.
+- Selection and drill never change zoom, environment, perspective, variant, run or audience, and never create a document revision.
 
 ## Never
 
@@ -39,6 +43,8 @@ Extends R4-AC-12 (semantic depth). A lesson diagram shows each depth scene as a 
   - no dependency edge becomes a container;
   - the highlight mapping;
   - a figure renders for every depth.
+- `tests/lesson-figure-interaction.test.ts` checks the selection and drill reducer, the two-level bound, that drilling moves only the depth, and that each drawn component renders as a named button.
+- `tests/e2e/lesson-figure-interaction.spec.ts` checks click selection shared by figure, list and panel, Open inside and Back (focus, lesson depth unchanged, document unchanged), and a Tab/Enter/Space-only walk at 390x844 without horizontal scroll.
 - `tests/e2e/learning-depth-playback.spec.ts` checks, at 1440 px:
   - a figure and frames are present for each depth;
   - the environment tag appears;

@@ -1,0 +1,6 @@
+.lesson-figure-hit{position:absolute;margin:0;padding:0;border:0;border-radius:12px;background:transparent;cursor:pointer}
+.lesson-figure-hit:hover{background:rgba(37,99,235,.06)}
+.lesson-figure-hit:focus-visible{outline:3px solid #2563eb;outline-offset:-3px;background:rgba(37,99,235,.08)}
+.lesson-figure-detail{border:1px solid var(--border,#cbd5e1);border-radius:8px;padding:8px 10px;margin:8px 0;min-width:0;overflow-wrap:anywhere}
+.lesson-figure-detail h6{margin:0 0 4px;font-size:13px}
+.lesson-figure-detail button,.lesson-figure-back button{min-height:32px}
