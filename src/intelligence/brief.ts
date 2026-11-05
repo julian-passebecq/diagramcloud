@@ -2,7 +2,7 @@ import {z} from 'zod';
 import {documentSchema, validateDocument, type Project} from '../core/model';
 import {manifestRepositorySchema, validateManifest, type ProjectManifest} from '../core/atlas/manifest';
 import {secretFindings} from '../core/secrets';
-import {validatePack} from '../experience/model';
+import {validatePack} from '../experience/model';import {MAX_BRIEF_BYTES} from '../core/inputLimits';
 
 const id = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/);
 const title = z.string().min(1).max(160);
@@ -25,7 +25,7 @@ export const projectBriefSchema = z.object({
 export type ProjectBrief = z.infer<typeof projectBriefSchema>;
 
 export function parseProjectBrief(raw: string): ProjectBrief {
-  if (new TextEncoder().encode(raw).byteLength > 512 * 1024) throw new Error('ProjectBrief exceeds 512 KiB');
+  if (new TextEncoder().encode(raw).byteLength > MAX_BRIEF_BYTES) throw new Error('ProjectBrief exceeds 512 KiB');
   return validateProjectBrief(JSON.parse(raw));
 }
 export function validateProjectBrief(input: unknown): ProjectBrief {
