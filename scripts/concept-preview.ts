@@ -3,7 +3,7 @@ import {mkdirSync,readFileSync,writeFileSync,openSync,closeSync,fstatSync} from 
 import {resolve,join} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
-import {parseDocument,MAX_DOCUMENT_BYTES} from '../src/core/model';
+import {parseDocument} from '../src/core/model';import {DOCUMENT_INPUT,InputLimitError} from '../src/core/inputLimits';
 import {prepareConceptPreview} from '../src/interop/conceptPreview';
 
 const usage='Usage: npm run concept:preview -- <document.json> --view <id> --audience <public|author> --out <NEW-directory> [--now <ISO-time>]';
@@ -23,7 +23,7 @@ export async function runConceptPreview(args:string[]):Promise<{files:number;aud
  let document:ReturnType<typeof parseDocument>,inputSha256:string;
  // Check and read the same descriptor; paths in document content are never followed.
  const fd=openSync(resolve(input),'r');
- try{const stat=fstatSync(fd);if(!stat.isFile()||stat.size>MAX_DOCUMENT_BYTES)throw new Error('Selected document is not a supported bounded file.');const bytes=readFileSync(fd);inputSha256=createHash('sha256').update(bytes).digest('hex');document=parseDocument(bytes.toString('utf8'));}finally{closeSync(fd);}
+ try{const stat=fstatSync(fd);if(!stat.isFile())throw new Error('Selected document is not a supported bounded file.');if(stat.size>DOCUMENT_INPUT.bytes)throw new InputLimitError(input,stat.size,DOCUMENT_INPUT);const bytes=readFileSync(fd);if(bytes.length>DOCUMENT_INPUT.bytes)throw new InputLimitError(input,bytes.length,DOCUMENT_INPUT);inputSha256=createHash('sha256').update(bytes).digest('hex');document=parseDocument(bytes.toString('utf8'));}finally{closeSync(fd);}
  const packet=await prepareConceptPreview(document,{projectId:document.id,baseRevision:document.revision,viewId},{audience,now});
  const files:{name:string;data:string}[]=[
   {name:'preview.concept.json',data:JSON.stringify(packet.projection.spec,null,2)+'\n'},
