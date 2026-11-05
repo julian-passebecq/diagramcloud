@@ -1,6 +1,7 @@
 import {clone, type Project} from '../core/model';
 import {publicDocument} from '../core/operations';
 import {projectReadiness} from '../intelligence/readiness';
+import {xmlChars} from './xmlText';
 
 /** Public facts first; captions backed by a private source are not public context. */
 export function overviewProjection(input: Project, publicMode = false): Project {
@@ -16,7 +17,7 @@ export function overviewFacts(input: Project, publicMode = false) {
   const components = (nodes.length ? nodes : project.nodes).slice(0, 5);
   return {project, components, omitted: Math.max(0, nodes.length - components.length), report: projectReadiness(project, {purpose: 'project'})};
 }
-const esc = (s: string) => s.replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]!));
+const esc = (s: string) => xmlChars(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]!));
 /** Semantic, self-contained public business sheet; no scripts or remote assets. */
 export function projectOverviewHtml(input: Project): string {
   const {project: p, components, omitted, report} = overviewFacts(input, true);

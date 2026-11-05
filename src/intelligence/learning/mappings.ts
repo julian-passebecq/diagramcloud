@@ -2,7 +2,7 @@ import {z} from 'zod';
 import {clone,learningMappingSchema,sameAgent,validateDocument,type LearningMapping,type Project} from '../../core/model';
 import {publicDocument} from '../../core/operations';
 import {pathTo} from '../../core/viewspec';
-import {targetFingerprint} from '../../core/learningMapping';
+import {targetFingerprint} from '../../core/learningMapping';import {currentTargetFingerprint} from './mappingBasis';
 import {learningCatalogue,type LearningEntry} from './catalogue';
 /**
  * Concept -> real instance associations. A mapping is stored in the project (`learningMappings`), saved, undone and exported
@@ -23,8 +23,8 @@ export function mappingStatus(project:Project,mapping:LearningMapping,catalogue:
  if(!concept)reasons.push(`Concept ${mapping.conceptId} is not in this catalogue version.`);
  else if(concept.editorial.contentRevision!==mapping.contentRevision)reasons.push(`Lesson content changed from revision ${mapping.contentRevision} to ${concept.editorial.contentRevision}.`);
  if(mapping.target.projectId!==project.id)reasons.push(`Mapped in project ${mapping.target.projectId}, not this project.`);
- const fingerprint=targetFingerprint(project,mapping.target);
- if(!fingerprint)reasons.push(`The mapped ${mapping.target.kind} ${mapping.target.id} no longer exists here.`);
+ const {fingerprint,missing}=currentTargetFingerprint(project,mapping);
+ if(!fingerprint)reasons.push(missing);
  else if(fingerprint!==mapping.target.fingerprint)reasons.push(`The evidence of ${mapping.target.kind} ${mapping.target.id} changed since document revision ${mapping.target.projectRevision}.`);
  const sources=new Set(project.sources.map(s=>s.id)),blocks=new Set(project.blocks.map(b=>b.id));
  for(const id of mapping.evidence.sourceIds)if(!sources.has(id))reasons.push(`Cited source ${id} is no longer in this project.`);
@@ -101,7 +101,7 @@ export function reviewMapping(input:Project,mappingId:string,{reviewedBy,reviewe
  const cited=evidence??m.evidence,sources=new Set(d.sources.map(s=>s.id)),blocks=new Set(d.blocks.map(b=>b.id));
  const kept={sourceIds:cited.sourceIds.filter(id=>sources.has(id)),blockIds:cited.blockIds.filter(id=>blocks.has(id))};
  if(!kept.sourceIds.length&&!kept.blockIds.length)throw new Error('A reviewed mapping cites at least one project source or evidence block; a shared name, tag or icon is not evidence');
- Object.assign(m,{state:'reviewed',contentRevision:concept.editorial.contentRevision,target:{...m.target,projectId:d.id,projectRevision:d.revision,fingerprint},evidence:kept,reviewedBy:reviewer,reviewedAt});
+ const {fingerprintBasis:_basis,...bound}=m.target;Object.assign(m,{state:'reviewed',contentRevision:concept.editorial.contentRevision,target:{...bound,projectId:d.id,projectRevision:d.revision,fingerprint},evidence:kept,reviewedBy:reviewer,reviewedAt});
  return validateDocument(d);
 }
 /** Explicit rejection in Edit mode. A rejected mapping is kept (so the same candidate is not proposed again) but never shown as an instance. */
