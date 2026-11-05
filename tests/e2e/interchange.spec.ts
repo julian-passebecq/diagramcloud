@@ -100,6 +100,19 @@ test('Visio .vsdx: converted on selection with its report, applied as a new proj
  expect(errors).toEqual([]);
 });
 
+test('import files above their documented size limit are refused before reading, and nothing is staged',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await openImport(page);
+ const dialog=page.getByRole('dialog',{name:'JSON / AI workspace'}),editor=dialog.getByLabel('Project JSON'),before=await editor.inputValue();
+ await page.getByLabel('Import document').setInputFiles({name:'huge.vsdx',mimeType:'application/vnd.ms-visio.drawing',buffer:Buffer.alloc(17*1024*1024)});
+ await expect(dialog.getByRole('alert')).toContainText('huge.vsdx is 17 MiB: a Visio drawing is imported up to 16 MiB. Nothing was read or imported.');
+ await page.getByLabel('Import document').setInputFiles({name:'huge.mmd',mimeType:'text/plain',buffer:Buffer.alloc(13*1024*1024,0x20)});
+ await expect(dialog.getByRole('alert')).toContainText('a Mermaid diagram is imported up to 12 MiB');
+ expect(await editor.inputValue()).toBe(before);
+ await expect(dialog.getByRole('button',{name:'Apply imported document',exact:true})).toBeDisabled();
+ expect(errors).toEqual([]);
+});
+
 test('draw.io export: every public view as a page, and the file imports back with the same components',async({page})=>{
  await page.goto('/');
  await page.locator('.project-card').filter({hasText:'AWS serverless web application'}).click();

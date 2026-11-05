@@ -4,6 +4,8 @@ import {overviewProjection} from './projectOverview';
 import {validatePublicationBrief, type PublicationBrief} from '../intelligence/publicationBrief';
 import {publicationPages, scopePublicationSvg} from './publicationPages';
 import {designSvg} from './design';
+import {viewHasOmissions} from './design/context';
+import {PUBLIC_OMISSION_NOTICE} from '../core/viewspec';
 import {xml} from './diagram';
 
 /** Meeting-summary limits. A brief beyond them is refused; the full native handbook covers the rest. */
@@ -12,7 +14,10 @@ export const MEETING_SUMMARY_PROFILES = ['design', 'business'] as const;
 export const MEETING_SUMMARY_DETAILS = ['overview', 'standard', 'full'] as const;
 export const MEETING_SUMMARY_PAPERS = ['A4', 'letter'] as const;
 /** Shown wherever a meeting summary is offered: what browser print gives, and what it is not. */
-export const MEETING_SUMMARY_FIDELITY_NOTE = 'Browser print gives the PDF. The PDF is a snapshot, not a backup: keep the Project JSON as the editable model. No PPTX is produced here.';
+export const MEETING_SUMMARY_FIDELITY_NOTE = 'Browser print gives the PDF, on A4 or Letter from the summary print stylesheet. The PDF is a snapshot, not a backup: keep the Project JSON as the editable model. The PPTX is editable native shapes, text and tables from the same public brief: no live panes, no animation, and not a backup either.';
+/** Formats offered for one meeting brief; all read the same public model. */
+export const MEETING_SUMMARY_FORMATS = ['html', 'pdf', 'pptx'] as const;
+export type MeetingSummaryFormat = typeof MEETING_SUMMARY_FORMATS[number];
 
 const paragraph = (value: string) => `<p>${xml(value)}</p>`;
 
@@ -58,14 +63,30 @@ export function meetingBriefChoices(project: Project): {views: {id: string; titl
   return {views: reachablePublicViews(safe).map(v => ({id: v.id, title: v.title})), storyCount: safe.story.length, profiles: MEETING_SUMMARY_PROFILES};
 }
 
-/** Concise publication recipe over existing Project and PublicationBrief contracts.
- * Read-only HTML with internal glossary links and A4 or letter print CSS. It never executes code,
- * calls a provider, implies lossless PDF/PPTX interactivity, or changes the source document.
- * Public captions backed by private sources are suppressed by the existing overview projection.
- * A private and an unknown view are refused with the same reason.
- */
-export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief, options: {now?: Date} = {}): string {
-  const p = overviewProjection(validateDocument(input), true), brief = validatePublicationBrief(briefInput, p);
+/** The shared public model behind every meeting-summary format (HTML, browser-print PDF, PPTX).
+ * Built from the overview projection (publicDocument plus suppression of public captions backed by private sources),
+ * after the brief is validated against it: a private and an unknown view are refused with the same reason, a brief
+ * with more than six views or an unsupported profile is refused. Every format reads only this model. */
+export type MeetingSummaryModel = {
+  /** Public projection the summary reads; never the authoring document. */
+  project: Project;
+  brief: PublicationBrief;
+  paper: 'A4' | 'letter';
+  views: Project['views'];
+  /** True when a view exceeds the readable summary budget: no figure, the complete component list instead. */
+  dense: Record<string, boolean>;
+  nodes: Project['nodes'];
+  blocks: EvidenceBlock[];
+  sources: Project['sources'];
+  highlights: Project['nodes'];
+  story: Project['story'];
+  /** True when a selected view has private or unreachable members the public cut does not show. Every format then
+   * prints the one uncounted PUBLIC_OMISSION_NOTICE for that view; it never says what or how many. */
+  omitted: Record<string, boolean>;
+};
+
+export function meetingSummaryModel(input: Project, briefInput: PublicationBrief): MeetingSummaryModel {
+  const full = validateDocument(input), p = overviewProjection(full, true), brief = validatePublicationBrief(briefInput, p);
   if (brief.viewIds.length > MEETING_SUMMARY_LIMITS.views) throw new Error('Meeting summary supports at most six selected views; use the full native handbook for more.');
   if (!(MEETING_SUMMARY_PROFILES as readonly string[]).includes(brief.profile)) throw new Error('Meeting summary supports design or business profiles; use the native full publication for other profiles.');
   const paper = brief.paper === 'letter' ? 'letter' : 'A4';
@@ -76,15 +97,30 @@ export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief,
   const sourceIds = new Set([...nodes.flatMap(n => n.sourceIds), ...blocks.flatMap(b => b.sourceIds)]);
   const sources = p.sources.filter(s => sourceIds.has(s.id));
   const highlights = nodes.filter(n => !n.childViewId).slice(0, 6);
-  const selectedStory = brief.storyIndices.map(i => p.story[i]);
+  const story = brief.storyIndices.map(i => p.story[i]);
+  const dense = Object.fromEntries(views.map(v => [v.id, publicationPages(p, v.id, brief.viewIds, {paper: brief.paper, profile: 'design'}).dense]));
+  const omitted = Object.fromEntries(views.map(v => [v.id, viewHasOmissions(v, full)]));
+  return {project: p, brief, paper, views, dense, nodes, blocks, sources, highlights, story, omitted};
+}
+
+/** Concise publication recipe over existing Project and PublicationBrief contracts.
+ * Read-only HTML with internal glossary links and A4 or letter print CSS (the print-qualified PDF is this page printed
+ * by the browser). It never executes code, calls a provider, implies lossless PDF/PPTX interactivity, or changes the
+ * source document. Public captions backed by private sources are suppressed by the existing overview projection.
+ * A private and an unknown view are refused with the same reason.
+ */
+export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief, options: {now?: Date} = {}): string {
+  const model = meetingSummaryModel(input, briefInput);
+  const {project: p, brief, paper, views, blocks, sources, highlights} = model, selectedStory = model.story;
+  const blockIds = new Set(blocks.map(b => b.id));
 
   const viewPages = views.map((v, index) => {
-    const plan = publicationPages(p, v.id, brief.viewIds, {paper: brief.paper, profile: 'design'});
+    const plan = {dense: model.dense[v.id]};
     const members = v.nodeIds.map(id => p.nodes.find(n => n.id === id)!);
     // Do not reduce an unreadable poster until its primary labels disappear.
     const figure = brief.profile === 'business' ? ''
       : plan.dense ? paragraph('This view exceeds the readable summary budget. The full handbook supplies paginated figures; the complete selected component list is below.')
-      : `<div class="figure">${scopePublicationSvg(designSvg(p, v.id, {type: v.design?.type ?? 'architecture', theme: 'light', now: options.now ?? new Date()}), 'meeting-' + index)}</div>`;
+      : `<div class="figure">${scopePublicationSvg(designSvg(p, v.id, {type: v.design?.type ?? 'architecture', theme: 'light', now: options.now ?? new Date(), omissionBase: input}), 'meeting-' + index)}</div>`;
     const component = (n: Project['nodes'][number]) => {
       const links = brief.detail !== 'overview' && n.blockIds.length
         ? `<p>${n.blockIds.filter(id => blockIds.has(id)).map(id => `<a href="#block-${xml(id)}">${xml(p.blocks.find(b => b.id === id)?.title ?? id)}</a>`).join(' / ')}</p>`
@@ -92,7 +128,7 @@ export function meetingSummaryHtml(input: Project, briefInput: PublicationBrief,
       return `<article id="node-${index}-${xml(n.id)}"><h3>${xml(n.label)}</h3>${paragraph(n.summary || 'Meaning not supplied.')}<small>Source basis: ${xml(n.basis ?? 'unknown')}. Design status: ${xml(n.status)}; not runtime evidence.</small>${links}</article>`;
     };
     const grid = brief.detail === 'overview' && !plan.dense ? '' : `<div class="component-grid">${members.map(component).join('')}</div>`;
-    return `<section class="view-page" id="view-${xml(v.id)}" tabindex="-1"><small>SELECTED VIEW ${index + 1} / ${views.length}</small><h2>${xml(v.title)}</h2>${paragraph(v.description ?? '')}${figure}${grid}</section>`;
+    return `<section class="view-page" id="view-${xml(v.id)}" tabindex="-1"><small>SELECTED VIEW ${index + 1} / ${views.length}</small><h2>${xml(v.title)}</h2>${paragraph(v.description ?? '')}${model.omitted[v.id] ? `<p class="omission">${xml(PUBLIC_OMISSION_NOTICE)}</p>` : ''}${figure}${grid}</section>`;
   }).join('');
 
   const style = `

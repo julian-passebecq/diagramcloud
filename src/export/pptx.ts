@@ -1,6 +1,6 @@
 import {publicDocument} from '../core/operations';
 import type {Project,EvidenceBlock} from '../core/model';
-import {iconCredit} from './diagram';
+import {iconCredit,xmlSafe} from './diagram';
 import {wrapLines,caption} from './text';
 import {NODE_PAD,SCENE_FONT,buildScene,type SceneText} from './scene';
 import {textWidth} from './measure';
@@ -22,7 +22,7 @@ export type ArchitectureParts={cover:boolean;evidence:boolean;sources:boolean;re
 
 /** Native editable objects, not screenshots. Exported code is display-only. */
 export async function exportPptx(input:Project,icons:IconData=noIcons):Promise<void>{
- const d=publicDocument(input),attached=new Set(d.nodes.flatMap(n=>n.blockIds)),blocks=d.blocks.filter(b=>attached.has(b.id));
+ const d=xmlSafe(publicDocument(input)),attached=new Set(d.nodes.flatMap(n=>n.blockIds)),blocks=d.blocks.filter(b=>attached.has(b.id));
  const estimate=2+d.views.length+blocks.reduce((sum,b)=>sum+(b.type==='table'?Math.max(1,Math.ceil(b.rows.length/12)):b.type==='image'?1:Math.max(1,Math.ceil(wrapLines(textOf(b),95,b.type==='code').length/(b.type==='code'?23:18)))),0);
  if(estimate>180)throw new Error('This project would create more than 180 slides. Export a smaller public project or use HTML.');
  const {default:PptxGenJS}=await import('pptxgenjs');const pptx=new PptxGenJS();
@@ -32,7 +32,8 @@ export async function exportPptx(input:Project,icons:IconData=noIcons):Promise<v
 }
 
 /** Architecture slides into an existing deck. `d` must already be publicDocument output; view links assume views are consecutive from firstViewSlide. */
-export async function addArchitectureSlides(pptx:Pptx,d:Project,parts:ArchitectureParts):Promise<void>{
+export async function addArchitectureSlides(pptx:Pptx,input:Project,parts:ArchitectureParts):Promise<void>{
+ const d=xmlSafe(input);
  const attached=new Set(d.nodes.flatMap(n=>n.blockIds)),blocks=parts.evidence?d.blocks.filter(b=>attached.has(b.id)):[];
  const width=40/3,shape=pptx.ShapeType,icons=parts.icons??noIcons;
  const sourceNotes='[Sources]\n'+d.sources.map(s=>`${s.title}\n${s.location}${s.url?'\n'+s.url:''}`).join('\n\n')+'\n[/Sources]';

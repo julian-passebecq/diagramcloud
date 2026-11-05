@@ -18,11 +18,12 @@ export function namespaceReadingSvg(svg:string,prefix:string):string{
 }
 export function linkedReadingHtml(input:Project,options:LinkedReadingOptions,renderOptions:{now?:Date}={}):string{
  const prepared=prepareLinkedReading(input,options),d=prepared.document;
- // No input is relabelled public. Native designSvg performs its normal public projection.
+ // No input is relabelled public. Native designSvg performs its normal public projection; the authoring input is
+ // passed only as omissionBase, so a figure says (uncounted) that private or unreachable content is not shown.
  const figures:Record<string,{svg:string;nodeIds:string[]}>={};
  for(const [ci,c]of prepared.chapters.entries())for(const side of ['left','right']as const)for(const theme of DESIGN_THEMES){
   const viewId=side==='left'?c.leftViewId:c.rightViewId,type=side==='left'?c.leftDesign:c.rightDesign;
-  const svg=namespaceReadingSvg(designSvg({...d,rootViewId:viewId},viewId,{type,theme,now:renderOptions.now??new Date()}),`r-${ci}-${side}-${theme}`);
+  const svg=namespaceReadingSvg(designSvg({...d,rootViewId:viewId},viewId,{type,theme,now:renderOptions.now??new Date(),omissionBase:input}),`r-${ci}-${side}-${theme}`);
   const nodeIds=[...new Set([...svg.matchAll(/data-node-id="([^"]+)"/g)].map(m=>m[1]))].filter(id=>d.nodes.some(n=>n.id===id));
   figures[`${ci}:${side}:${theme}`]={svg,nodeIds};
  }
