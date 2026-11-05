@@ -5,18 +5,22 @@
  * read, no git commands, no network) and keeps its own revision. With --previous, the earlier snapshots are kept and
  * the revision vector is compared; stale or missing sources are always listed.
  */
-import {existsSync,readFileSync,statSync,writeFileSync} from 'node:fs';
+import {existsSync,statSync,writeFileSync} from 'node:fs';
 import {dirname,resolve} from 'node:path';
 import {parseManifest,documentFromAtlas,compareSnapshots,staleRepositories,type AtlasScan} from '../src/core/atlas';
 import {scanRepository} from '../src/core/scan';
 import {parseDocument} from '../src/core/model';
 import {readRepository} from './lib/readRepo';
+import {readBoundedText} from './lib/boundedInput';
+import {DOCUMENT_INPUT,MAX_DOCUMENT_BYTES} from '../src/core/inputLimits';
 import {attachGalaxyImportProvenance} from '../src/core/atlas/compose';
 
 const args=process.argv.slice(2),flag=(n:string)=>{const i=args.indexOf(n);return i>=0?args.splice(i,2)[1]:undefined;};
 const captureIndex=args.indexOf('--capture-galaxy-provenance'),captureGalaxy=captureIndex>=0;if(captureGalaxy)args.splice(captureIndex,1);
 const out=flag('--out'),previousPath=flag('--previous'),staleDays=Number(flag('--stale-days')??30),manifestPath=resolve(args[0]??'project.manifest.json');
-const manifestRaw=readFileSync(manifestPath,'utf8'),{manifest,source,notes=[]}=parseManifest(manifestRaw);
+// Both selected files are size-checked before they are read whole and before any repository is scanned or output written.
+const manifestRaw=readBoundedText(manifestPath,{kind:'project manifest',bytes:MAX_DOCUMENT_BYTES}),{manifest,source,notes=[]}=parseManifest(manifestRaw);
+const previous=previousPath?parseDocument(readBoundedText(previousPath,DOCUMENT_INPUT)):undefined;
 // A DataPass project file lives in .datapass/: its repository paths are relative to the project folder.
 const base=source==='datapass'&&dirname(manifestPath).endsWith('.datapass')?dirname(dirname(manifestPath)):dirname(manifestPath);
 const scans:Record<string,AtlasScan>={};
@@ -26,7 +30,6 @@ for(const r of manifest.repositories){
  if(!existsSync(folder)||!statSync(folder).isDirectory()){scans[r.id]={missing:true};continue;}
  try{scans[r.id]={model:scanRepository(readRepository(folder),{name:r.title})};}catch(e){scans[r.id]={error:e instanceof Error?e.message:String(e)};}
 }
-const previous=previousPath?parseDocument(readFileSync(previousPath,'utf8')):undefined;
 let {document,report}=documentFromAtlas(manifest,scans,{previous,fileName:manifestPath.split(/[\/]/).pop()});
 let captureOutcome:string|undefined;
 if(captureGalaxy){const captured=await attachGalaxyImportProvenance(document,manifestRaw);document=captured.document;captureOutcome=captured.message;}

@@ -5,13 +5,13 @@ import {openSync,readFileSync,fstatSync,closeSync,statSync} from 'node:fs';
 import {stat} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {parseDocument,MAX_DOCUMENT_BYTES,type Project} from '../src/core/model';
+import {parseDocument,type Project} from '../src/core/model';import {DOCUMENT_INPUT,InputLimitError,MAX_CONCEPT_VIEWER_BYTES as VIEWER_MAX_BYTES,MAX_CONCEPT_PACKET_BYTES as PACKET_MAX_BYTES,type InputLimit} from '../src/core/inputLimits';
 import {conceptHostPage,prepareConceptHostPacket} from '../src/interop/conceptHost';
 import type {ConceptPreview} from '../src/interop/conceptPreview';
 
-const VIEWER_MAX_BYTES=8*1024*1024,PACKET_MAX_BYTES=32*1024*1024;
-function selectedBytes(path:string,max:number):Buffer{
- const fd=openSync(resolve(path),'r');try{const stat=fstatSync(fd);if(!stat.isFile()||stat.size>max)throw new Error('Selected file exceeds its bounded profile.');const bytes=readFileSync(fd);if(bytes.length>max)throw new Error('Selected file exceeds its bounded profile.');return bytes;}finally{closeSync(fd);}
+const VIEWER:InputLimit={kind:'owner viewer',bytes:VIEWER_MAX_BYTES},PACKET:InputLimit={kind:'preview packet',bytes:PACKET_MAX_BYTES};
+function selectedBytes(path:string,limit:InputLimit):Buffer{
+ const fd=openSync(resolve(path),'r');try{const stat=fstatSync(fd);if(!stat.isFile())throw new Error('Selected file is not a regular file.');if(stat.size>limit.bytes)throw new InputLimitError(path,stat.size,limit);const bytes=readFileSync(fd);if(bytes.length>limit.bytes)throw new InputLimitError(path,bytes.length,limit);return bytes;}finally{closeSync(fd);}
 }
 /**
  * `packet` is the last packet prepared successfully. `regenerate` rebuilds it from a newly selected document (and
@@ -97,14 +97,14 @@ export async function runConceptHost(args:string[],options:{watch?:boolean;inter
  const path=resolve(input);
  // The baseline precedes the first read: a save between the two is seen as a change, never folded into the baseline.
  let last=options.watch?fileKey(path,statSync):'';
- const document=parseDocument(selectedBytes(input,MAX_DOCUMENT_BYTES).toString('utf8'));
- const packet=values.has('--packet')?JSON.parse(selectedBytes(values.get('--packet')!,PACKET_MAX_BYTES).toString('utf8')):undefined;
- const host=await startConceptHost({document,viewId,audience,viewerHtml:selectedBytes(viewer,VIEWER_MAX_BYTES),viewerSha256,packet,port:values.has('--port')?Number(values.get('--port')):0,diagramcloudOrigin:values.get('--diagramcloud-origin')});
+ const document=parseDocument(selectedBytes(input,DOCUMENT_INPUT).toString('utf8'));
+ const packet=values.has('--packet')?JSON.parse(selectedBytes(values.get('--packet')!,PACKET).toString('utf8')):undefined;
+ const host=await startConceptHost({document,viewId,audience,viewerHtml:selectedBytes(viewer,VIEWER),viewerSha256,packet,port:values.has('--port')?Number(values.get('--port')):0,diagramcloudOrigin:values.get('--diagramcloud-origin')});
  if(!options.watch)return host;
  let queue=Promise.resolve(),waiters:((result:RegenerationResult)=>void)[]=[];
  const reload=()=>{queue=queue.then(async()=>{
   let document:Project|undefined,selected:unknown;
-  try{document=parseDocument(selectedBytes(input,MAX_DOCUMENT_BYTES).toString('utf8'));selected=values.has('--packet')?JSON.parse(selectedBytes(values.get('--packet')!,PACKET_MAX_BYTES).toString('utf8')):undefined;}catch{document=undefined;}
+  try{document=parseDocument(selectedBytes(input,DOCUMENT_INPUT).toString('utf8'));selected=values.has('--packet')?JSON.parse(selectedBytes(values.get('--packet')!,PACKET).toString('utf8')):undefined;}catch{document=undefined;}
   const result=await host.regenerate({document:document as Project,packet:selected});
   process.stderr.write(result.ok?`Regenerated preview packet for revision ${result.packet.baseRevision}.\n`:`${result.reason}\n`);
   const done=waiters;waiters=[];for(const resolveWaiter of done)resolveWaiter(result);
