@@ -8,14 +8,18 @@ import {documentSchema,type Project} from '../src/core/model';
 import {applyDocumentPatch,type Patch} from '../src/core/patch';
 import {commitHistory,undo} from '../src/core/operations';
 import {targetFingerprint} from '../src/core/learningMapping';
+import {choiceFingerprint} from '../src/core/decisionReview';
 import {validateProposal,proposalDigests,sha256Hex,isProviderRequest,parseAppliedLedger,PROVIDER_LAUNCH_MESSAGE,type AppliedProposal,type ProposalReason} from '../src/core/proposal';
 import {stageImportText,createProposalLedger,recordAppliedProposal,PROPOSAL_LEDGER_KEY} from '../src/app/stageImport';
 
 // Synthetic, public-only fixture: every path (manual, CLI, MCP over the public projection) sees the same facts.
 const doc=():Project=>documentSchema.parse({schemaVersion:1,id:'synthetic-proposal',title:'Synthetic proposal parity',revision:4,rootViewId:'root',
- nodes:[{id:'app',label:'Synthetic app',choices:[{id:'store',title:'Store',goal:'Pick a store',options:[{id:'a',label:'A'},{id:'b',label:'B'}],recommendedOptionId:'a',origin:'ai',suggestedBy:'synthetic-agent'}]},{id:'db',label:'Synthetic store'}],
+ nodes:[{id:'app',label:'Synthetic app',choices:[{id:'store',title:'Store',goal:'Pick a store',options:[{id:'a',label:'A'},{id:'b',label:'B'}],recommendedOptionId:'a',origin:'ai',suggestedBy:'synthetic-agent'},
+  {id:'queue',title:'Queue',goal:'Pick a queue',options:[{id:'q1',label:'Q1'},{id:'q2',label:'Q2'}],chosenOptionId:'q1',status:'accepted',decidedBy:'Synthetic Person',decidedAt:'2026-10-16',sourceIds:['src']}]},{id:'db',label:'Synthetic store'}],
+ sources:[{id:'src',title:'Synthetic source'}],
  edges:[{id:'e1',source:'app',target:'db'}],views:[{id:'root',title:'Root',nodeIds:['app','db'],edgeIds:['e1']}]});
 const patch=(ops:Patch['operations'],over:Partial<Patch>={}):Patch=>({format:'diagramcloud.patch',version:1,target:'project',targetId:'synthetic-proposal',baseRevision:4,summary:'Synthetic',operations:ops,...over});
+const queuePrint=()=>{const d=doc();return choiceFingerprint(d,{kind:'node',id:'app'},d.nodes[0].choices!.find(c=>c.id==='queue')!)!;};
 const rename=patch([{op:'test',path:'/nodes/@app/label',value:'Synthetic app'},{op:'replace',path:'/nodes/@app/label',value:'Renamed app'}]);
 const applied:AppliedProposal[]=[{...proposalDigests(rename),projectId:'synthetic-proposal',baseRevision:4,appliedRevision:5}];
 const cases:{name:string;payload:unknown;applied?:AppliedProposal[];codes:string[]}[]=[
@@ -25,6 +29,8 @@ const cases:{name:string;payload:unknown;applied?:AppliedProposal[];codes:string
  {name:'replay',payload:rename,applied,codes:['replay']},
  {name:'replay relabelled to a later revision',payload:{...rename,baseRevision:9},applied,codes:['stale-revision','replay']},
  {name:'self-review: accept a choice',payload:patch([{op:'replace',path:'/nodes/@app/choices/@store/status',value:'accepted'},{op:'add',path:'/nodes/@app/choices/@store/chosenOptionId',value:'a'},{op:'add',path:'/nodes/@app/choices/@store/decidedBy',value:'Synthetic Person'},{op:'add',path:'/nodes/@app/choices/@store/decidedAt',value:'2026-10-17'}]),codes:['self-review']},
+ {name:'self-review: record a review basis',payload:patch([{op:'add',path:'/nodes/@app/choices/@queue/reviewBasis',value:{revision:4,fingerprint:queuePrint()}}]),codes:['self-review']},
+ {name:'self-review: record compatibility evidence',payload:patch([{op:'add',path:'/nodes/@app/choices/@queue/options/@q2/compatibility',value:[{requirementId:'assumption:0',verdict:'satisfied',sourceIds:['src'],blockIds:[],recordedBy:'Synthetic Person',recordedAt:'2026-11-04'}]}]),codes:['self-review']},
  {name:'origin relabel',payload:patch([{op:'replace',path:'/nodes/@app/choices/@store/origin',value:'author'}]),codes:['origin-relabel']},
  {name:'not applicable',payload:patch([{op:'replace',path:'/nodes/@missing/label',value:'x'}]),codes:['not-applicable']},
  {name:'malformed',payload:{...rename,operations:[]},codes:['malformed']},
@@ -67,6 +73,22 @@ test('proposal origin: the calling path sets it; only an explicitly named author
  const asAuthor=validateProposal(doc(),accept,{origin:'author',by:'Synthetic Person'});assert.equal(asAuthor.valid,true);assert.equal(asAuthor.origin,'author');
  // A payload cannot claim its own origin: an origin field is not part of the envelope.
  assert.deepEqual(validateProposal(doc(),{...rename,origin:'author'},{origin:'ai',by:'x'}).reasons.map(r=>r.code),['malformed']);
+});
+
+test('a proposal cannot review a decision or record compatibility evidence for a person; removing either is allowed',()=>{
+ const basis=cases.find(c=>c.name==='self-review: record a review basis')!.payload,compat=cases.find(c=>c.name==='self-review: record compatibility evidence')!.payload;
+ for(const payload of [basis,compat]){
+  for(const origin of ['imported','ai'] as const){const v=validateProposal(doc(),payload,{origin,by:'synthetic-agent'});assert.equal(v.valid,false);assert.deepEqual(v.reasons.map(r=>r.code),['self-review']);}
+  assert.equal(validateProposal(doc(),payload,{origin:'author',by:'Synthetic Person'}).valid,true);
+ }
+ // Starting from a reviewed decision with recorded evidence: rewriting either is a claim, removing either only lowers trust.
+ const reviewed=applyDocumentPatch(doc(),{...(basis as Patch),operations:[...(basis as Patch).operations,...(compat as Patch).operations]}).result;
+ const on=(ops:Patch['operations'])=>validateProposal(reviewed,patch(ops,{baseRevision:reviewed.revision}),{origin:'ai',by:'synthetic-agent'}).reasons.map(r=>r.code);
+ assert.deepEqual(on([{op:'replace',path:'/nodes/@app/choices/@queue/reviewBasis/revision',value:0}]),['self-review']);
+ assert.deepEqual(on([{op:'replace',path:'/nodes/@app/choices/@queue/options/@q2/compatibility/0/recordedBy',value:'Somebody else'}]),['self-review']);
+ assert.deepEqual(on([{op:'remove',path:'/nodes/@app/choices/@queue/reviewBasis'}]),[]);
+ assert.deepEqual(on([{op:'remove',path:'/nodes/@app/choices/@queue/options/@q2/compatibility'}]),[]);
+ assert.deepEqual(on([{op:'replace',path:'/nodes/@app/choices/@queue/options/@q1/summary',value:'Reworded'}]),[],'an unrelated edit of a reviewed decision is not a claim');
 });
 
 test('no self-review for every supported proposal kind: observations, concept mappings, choices and suggestion origins',()=>{

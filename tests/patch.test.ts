@@ -34,6 +34,9 @@ test('RFC 6902 semantics: index paths, add/remove/replace/move/copy/test, escape
  assert.throws(()=>applyOperations(doc,[{op:'replace',path:'/o/missing',value:1}]),/does not exist \(use add\)/);
  assert.throws(()=>applyOperations(doc,[{op:'remove',path:'/a/3'}]),/index 3 is out of range/);
  assert.throws(()=>applyOperations(doc,[{op:'move',from:'/o',path:'/o/inner'}]),/into itself/);
+ // Extension: an append with `-` creates an absent array member, so a writer never replaces an array it cannot see.
+ assert.deepEqual(applyOperations(doc,[{op:'add',path:'/o/fresh/-',value:'a'}]).o,{'x/y':1,'t~n':2,fresh:['a']});
+ assert.throws(()=>applyOperations(doc,[{op:'add',path:'/missing/x/-',value:1}]),/\/missing: does not exist/);
 });
 
 test('guards: stale base, other project, wrong target, ids, identity fields, prototype keys',()=>{

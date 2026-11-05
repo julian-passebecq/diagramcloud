@@ -71,10 +71,13 @@ export function proposeMappingSuggestion(project:Project,request:unknown,by:Sugg
  const target=r.target,inPublic=target.kind==='node'?pub.nodes.some(n=>n.id===target.id):pub.views.some(v=>v.id===target.id);
  if(!inPublic)throw new Error('Target unavailable in public projection');
  if(r.evidence&&(!r.evidence.sourceIds.every(id=>pub.sources.some(s=>s.id===id))||!r.evidence.blockIds.every(id=>pub.blocks.some(b=>b.id===id))))throw new Error('Cited evidence unavailable in public projection');
- const next=suggestMapping(doc,{conceptId:entry.id,target,...(r.evidence?{evidence:r.evidence}:{}),...(r.note?{note:r.note}:{}),...(r.visibility?{visibility:r.visibility}:{})},by),mapping=next.learningMappings!.at(-1)!;
- const operations:Operation[]=[{op:'test',path:'/revision',value:doc.revision},doc.learningMappings?{op:'add',path:'/learningMappings/-',value:mapping}:{op:'add',path:'/learningMappings',value:[mapping]}];
- const patch:Patch={format:'diagramcloud.patch',version:1,target:'project',targetId:doc.id,baseRevision:doc.revision,summary:`Suggested concept mapping ${entry.id} -> ${target.kind} ${target.id} (origin ${by.origin}); ${CANDIDATE_LABEL}; the author reviews or rejects it in Edit mode`,operations};
- applyDocumentPatch(doc,patch);
+ // Built from the public projection only, so the reply (duplicate check, mapping ID, patch shape) never depends on a private,
+ // suggested or rejected mapping. A pair that only a hidden mapping holds gets an ordinary patch; the author's import review
+ // then refuses the duplicate without mutation. `/learningMappings/-` appends, and creates the array when it is absent.
+ const next=suggestMapping(pub,{conceptId:entry.id,target,...(r.evidence?{evidence:r.evidence}:{}),...(r.note?{note:r.note}:{}),...(r.visibility?{visibility:r.visibility}:{})},by),mapping=next.learningMappings!.at(-1)!;
+ const operations:Operation[]=[{op:'test',path:'/revision',value:pub.revision},{op:'add',path:'/learningMappings/-',value:mapping}];
+ const patch:Patch={format:'diagramcloud.patch',version:1,target:'project',targetId:pub.id,baseRevision:pub.revision,summary:`Suggested concept mapping ${entry.id} -> ${target.kind} ${target.id} (origin ${by.origin}); ${CANDIDATE_LABEL}; the author reviews or rejects it in Edit mode`,operations};
+ applyDocumentPatch(pub,patch);
  return bounded({format:'diagramcloud.proposal/1',state:'REQUIRES_AUTHOR_REVIEW',mappingState:'suggested',origin:by.origin,suggestedBy:mapping.suggestedBy,patch,
   note:'Apply through the ordinary reviewed JSON import. The mapping arrives suggested, never reviewed; only a person other than the suggester reviews it in Edit mode, citing project evidence.'});
 }

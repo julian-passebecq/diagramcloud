@@ -64,7 +64,8 @@ function fromGalaxy(g:z.infer<typeof galaxySchema>,captureBindings=false):{manif
   const repo=a.repo?.trim(),gitlab=!!repo&&/gitlab/i.test(repo),name=repo?.replace(/^gitlab:\s*/i,'').replace(/\s*\(.*\)$/,'').trim();
   const host=!repo?'local' as const:gitlab?'gitlab' as const:/^[\w.-]+\/[\w.-]+$/.test(name!)?'github' as const:'other' as const;
   return {id,title:a.name.slice(0,160),...(a.what?{purpose:a.what.slice(0,500)}:{}),role:a.hub?'platform' as const:'application' as const,host,
-   locator:(host==='github'?`https://github.com/${name}`:name||a.path||a.id).slice(0,500),...(a.branch?{ref:a.branch.slice(0,200)}:{}),...(a.path?{path:a.path}:{})};});
+   // A local app is located by its Galaxy ID, never its filesystem path: the locator reaches the public snapshot and facts.
+   locator:(host==='github'?`https://github.com/${name}`:name||a.id).slice(0,500),...(a.branch?{ref:a.branch.slice(0,200)}:{}),...(a.path?{path:a.path}:{})};});
  const relationships:ManifestRelationship[]=[];
  for(const c of g.connections){const from=ids.get(c.from),to=ids.get(c.to);
   if(!from||!to){notes.push(`Connection ${c.from} → ${c.to}: unknown app, not drawn.`);continue;}
