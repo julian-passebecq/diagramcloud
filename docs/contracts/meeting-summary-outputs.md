@@ -39,4 +39,4 @@ Shown in the dialog (`MEETING_SUMMARY_FIDELITY_NOTE`): browser print gives the P
 
 ## Limits
 
-The App's export menu button is still labelled "Meeting summary (HTML)" (its text lives in `src/App.tsx`, outside this package). PDF output is whatever the person's browser prints; only Chromium is qualified, and a person reading a printed copy is not recorded. The PPTX was checked as a ZIP and by its XML, not opened in PowerPoint and inspected visually. No PDF or PPTX is produced by the CLI or MCP.
+The App's export menu button reads "Meeting summary (HTML, PDF, PowerPoint)" (since the post-1.34 polish lane). PDF output is whatever the person's browser prints; only Chromium is qualified, and a person reading a printed copy is not recorded. The PPTX was checked as a ZIP and by its XML, not opened in PowerPoint and inspected visually. No PDF or PPTX is produced by the CLI or MCP.
