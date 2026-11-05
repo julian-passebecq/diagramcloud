@@ -154,3 +154,29 @@ test('public omission counts: meeting summary (HTML, PPTX) and linked reading pr
  }
  assert.ok(compared>=cases.length*4,`compared ${compared} outputs`);
 });
+
+const occurrences=(text:string)=>text.split(PUBLIC_OMISSION_NOTICE).length-1;
+/** Meeting summary, one selected view per output: the notice appears exactly once (HTML and PPTX, design and business
+ * profiles; the design figure and the PPTX speaker notes never repeat it), byte-identical for 1 and 5 private items,
+ * and absent when nothing is hidden. With several selected views it appears once per view. */
+test('public omission counts: the meeting summary prints the notice exactly once per output, never twice',async()=>{
+ let checked=0;
+ for(const {p,one,five} of cases){
+  const viewIds=publicDocument(one).views.filter(v=>v.nodeIds.length).map(v=>v.id).slice(0,6);
+  for(const profile of ['design','business'] as const){
+   const single=(d:Project):PublicationBrief=>({...briefOf(d,profile),viewIds:[viewIds[0]]});
+   const outputs=async(d:Project,brief:PublicationBrief):Promise<[string,string][]>=>[[`html ${profile}`,meetingSummaryHtml(d,brief,{now:NOW})],[`pptx ${profile}`,await deckText(d,brief)]];
+   const a=await outputs(one,single(one)),b=await outputs(five,single(five)),none=await outputs(p,single(p));
+   const all=await outputs(one,briefOf(one,profile));
+   for(let i=0;i<a.length;i++){
+    assert.equal(occurrences(a[i][1]),1,`${p.id}: ${a[i][0]} prints the notice once (1 private item)`);
+    assert.equal(occurrences(b[i][1]),1,`${p.id}: ${b[i][0]} prints the notice once (5 private items)`);
+    assert.equal(a[i][1],b[i][1],`${p.id}: ${a[i][0]} depends on the number of private items`);
+    assert.equal(occurrences(none[i][1]),0,`${p.id}: ${none[i][0]} has no notice without private content`);
+    assert.equal(occurrences(all[i][1]),viewIds.length,`${p.id}: ${all[i][0]} prints one notice per selected view`);
+    checked++;
+   }
+  }
+ }
+ assert.ok(checked>=cases.length*4,`checked ${checked} outputs`);
+});
