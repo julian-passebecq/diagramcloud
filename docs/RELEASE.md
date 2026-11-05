@@ -6,7 +6,7 @@ How a DiagramCloud revision is qualified, and the record of qualified releases. 
 
 | Dimension | Where | Current |
 |---|---|---|
-| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.34.0 |
+| Product version (semver) | `package.json`, header badge, handshake `product_version` | 1.35.0 |
 | Document schema | `schemaVersion` in `src/core/model.ts` | 1 |
 | Galaxy maturity | handshake `galaxy_level` | G0 (standalone) |
 | Release qualification | `release/verification-receipt.json` (`galaxy.verification-receipt/1`) | per commit, see the record below |
@@ -50,6 +50,7 @@ On the deployed URL for the exact commit: the gallery loads; TotalEnergies drill
 
 | Version | Commit | CI run | Receipt level | Deployment | Notes |
 |---|---|---|---|---|---|
+| 1.35.0 (PENDING) | head of the `release/diagramcloud-next` PR; no tag | linked from the PR (exact-head CI) | per the CI receipt of that head; no private package recorded | none claimed (source release) | [1.35.0 notes](release-1.35/RELEASE_NOTES.md): PENDING lesson-figure-interaction, cli-mcp-input-limits, post-1-34-polish (and fix-wave4-findings if it exists); becomes 1.34.1 without lesson-figure-interaction; Chromium only |
 | 1.34.0 | head of the `release/diagramcloud-1.34.0` PR; no tag | linked from the PR (exact-head CI) | per the CI receipt of that head; no private package recorded | none claimed (source release) | [1.34.0 notes](release-1.34/RELEASE_NOTES.md): whole-project gallery (#133), observed components in comparisons (#134), connected workspace panes and source-bound answers (#135), spatial lesson figures (#137), import bounds (#139), monotonic revisions (#140), public-boundary fixes (#141), floating Explorer and density (#142), PPTX drilldown link (#146), source refresh summary (#147), readiness badge (#136), companion concepts and Return (#138), meeting summary PDF/PPTX (#143), explanation revise/remove (#144), XML-safe exports (#145), import hardening (#148), omission notice (#149), QA UI polish (#150); installed VSIX not re-run; Chromium only |
 | 1.33.1 (successor) | `0892f9d` (PR #125, #126); no tag | 39869462768 (main) | exact-head CI, private package receipt in `outcome.json` `privatePackages` (diagramcloud/1.33.1-0892f9d) | Vercel production from `main`; four deployed cases PASS at 1440/390 on `0892f9d` (PR #127) | [closure record](release-1.33/RELEASE_CLOSURE_20261022.md): recovery and authoring-backup boundaries (#125), Vercel build source identity (#126); same version string as 1.33.1-1ee51db, different source and package; installed VSIX not re-run; PPTX export code unchanged; Chromium only |
 | 1.33.1 | `1ee51db` (PR #123); no tag | 39721881018 (main) | exact-head CI, private package receipt in `outcome.json` `privatePackages` (diagramcloud/1.33.1-1ee51db) | Vercel production from `main`; not verified separately | [1.33.1 notes](release-1.33/RELEASE_NOTES-1.33.1.md): storage recovery and persistence patch (#118, #119, #120) and current entry documents (#122); installed VSIX in VS Code 1.143.0 7/7; PPTX export code unchanged; Chromium only |

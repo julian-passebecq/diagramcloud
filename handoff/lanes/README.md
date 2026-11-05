@@ -19,4 +19,5 @@ One line per lane report file in this folder, by date: date · lane (report) · 
 - 2026-11-05 · [pptx-drilldown-crlf-verify](2026-11-05-pptx-drilldown-crlf-verify.md) · Independent check of PR #146: tsc, tests, build green, no leak.
 - 2026-11-05 · [qa-ui-polish](2026-11-05-qa-ui-polish.md) · readable 'path: message' refusals (JSON drawer, explanation Review by field), one-row header at 1440, whole-word context tabs, lesson source fits 390, related concept opens its lesson.
 - 2026-11-05 · [release-1-34-0](2026-11-05-release-1-34-0.md) · 1.34.0 source release docs and version (no package, deployment or tag); PENDING items confirmed by the finalizer, all merged.
+- 2026-11-05 · [release-next](2026-11-05-release-next.md) · next source release after 1.34.0 drafted as 1.35.0 (1.34.1 without lesson-figure-interaction); every lane entry PENDING.
 - 2026-11-05 · [source-refresh-return-context](2026-11-05-source-refresh-return-context.md) · atlas rescan reviewed as a source refresh summary (uncertain, never removed), return to the permitted view after Apply or Cancel, legacy picker cancellable.
