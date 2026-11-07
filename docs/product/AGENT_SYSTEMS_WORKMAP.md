@@ -15,7 +15,7 @@ The memory design distinguishes original transcripts/source archive, small notes
 
 ## Qualification status — 7 November 2026
 
-This is a draft source candidate. Six unit cases and three browser cases are authored but **unrun**. The native dependency installation stopped with EACCES while fetching a locked package; TypeScript checking, build, canonical document validation and browser acceptance remain unqualified. Source syntax and whitespace checks do not replace those gates. The ordinary release checks in AGENTS.md and the source-linked CI results are required before calling this change complete. No package, deployment, installed client or successful private-document import is claimed.
+This is a draft source candidate. Local preparation authored six unit cases and three browser cases but did not execute them on the native host: dependency installation stopped with EACCES while fetching a locked package. Source syntax and whitespace checks do not replace TypeScript, canonical validation, build or browser checks. The first hosted CI for ccea8c6af2ce5496163d4cc594660ffb5106332c installed dependencies but failed TypeScript with TS2741 because the view design omitted required focal IDs; later gates were skipped. The design now explicitly supplies an empty focal list. Read the exact PR head's CI result for its separate qualification outcome. The ordinary release checks in AGENTS.md still apply. Native visual acceptance, package, deployment, installed clients and successful private-document import are not claimed.
 
 ## Import a private design and export deliberately
 

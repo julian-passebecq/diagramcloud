@@ -16,7 +16,7 @@ export function agentSystemsWorkmap():Project {
   view(d,id,title,description,ids,links.map(([a,b,label])=>[a,b,label,'dependency']));
   const v=d.views.find(v=>v.id===id)!;v.perspective=perspective;
   v.positions=Object.fromEntries(ids.map((id,i)=>[id,{x:(i%3)*360,y:Math.floor(i/3)*260}]));
-  v.design={type:'architecture',theme:'light',caption:'Illustrative design · no execution · results UNKNOWN'};
+  v.design={type:'architecture',focal:[],theme:'light',caption:'Illustrative design · no execution · results UNKNOWN'};
  };
 
  add('aim','Goals & boundaries','control','Proposed: explain work, preserve source context and make missing evidence visible.');
