@@ -1,0 +1,26 @@
+# Agents · mémoire & travail
+
+`agent-systems-workmap` is an original illustrative **Reference / Work map** in the existing DiagramCloud gallery. It complements the small skills/tools/approval teaching fixture in `examples/pro-expressiveness/agent-context.base.json` with a whole-project design. It is not an inspected installation, Anthropic integration or Anthropic-supported template.
+
+## Open and explore
+
+1. Run the existing app (`npm ci`, `npm run dev`), then choose **Agents · mémoire & travail** in the gallery's whole-project entry. The normal gallery's **Systems & work** filter also lists it (Reference category, Work map tag). Direct local route: `?workspace=v3&project=agent-systems-workmap&view=overview`.
+2. Open **Current assessment**: the baseline subjects are UNKNOWN / to verify. Open **Proposed target** separately: every target component is planned, with idle design status. Neither is a scan or observed result.
+3. Open **Memory layers**, **Presentation profiles**, **Work categories**, **Factory viewpoint** or **Evidence to establish**. The overview stays above the child diagram. Select leaf cards to read their synthetic checklists and artifact requirements. Shared IDs refer to the same component across views.
+4. Use **Present** for the authored story. Its steps are presentation order, not timing or a run. **Edit** uses the existing component/evidence editors, history and local save. No new editor or document format is involved.
+
+The memory design distinguishes original transcripts/source archive, small notes, derived representations/indexes and bounded injected context. Search and originals are conceptual foundations; access is not verified. Consolidation is a proposed reviewable workflow, not scheduled work or implemented self-learning. The short source-derived explanation cites [The components of agent memory](https://www.anthropic.com/research/components-of-agent-memory) (Anthropic, November 6, 2026) only for this layering motivation, checking notes against originals and task-dependent wiki usefulness. The design, verification tables and work categories are original synthetic content; no article benchmarks, images or actual transcripts are included.
+
+**Direct Claude Code** and **Optional host / T3** are presentation/workflow design options around the same canonical project and memory. Looking at either invokes no provider, installs nothing, forks no model and changes no instructions or permissions. This example implements no T3 integration. The factory view distinguishes project, repository/worktree, machine/runner, agent/model and requirements for observed receipts. CPU, GPU, temperature, rate, count, activity and ETA remain UNKNOWN. No telemetry collector, scheduler, observation or execution receipt is provided.
+
+## Qualification status — 7 November 2026
+
+This is a draft source candidate. Six unit cases and three browser cases are authored but **unrun**. The native dependency installation stopped with EACCES while fetching a locked package; TypeScript checking, build, canonical document validation and browser acceptance remain unqualified. Source syntax and whitespace checks do not replace those gates. The ordinary release checks in AGENTS.md and the source-linked CI results are required before calling this change complete. No package, deployment, installed client or successful private-document import is claimed.
+
+## Import a private design and export deliberately
+
+Prepare private project data outside this public repository; never add real inputs to samples, tests or documentation. Use a distinct project ID, preserve stable component IDs, mark sensitive nodes, views, blocks and sources private, and retain source/proposed distinctions. Visibility is not encryption or secret detection.
+
+In the app choose **JSON / AI**, paste the canonical Project JSON into **Project JSON**, choose **Validate JSON**, inspect the change preview and explicitly choose **Apply imported document**. Validation/review alone changes nothing. Invalid references and recursive child views are refused. Same-project imports must match the current revision. Use the existing file import route if preferred; no special work-map importer exists. Observations still require the existing reviewed patch workflow and human review; synthetic checklists cannot establish them.
+
+Choose **Export & share → Authoring JSON** for a full backup (including private data). **Interactive HTML** and **SVG diagram** use the public projection; HTML supports offline drilldown. Review the public content before sharing, because a sensitive sentence marked public remains public. Imported private designs and their backups belong outside this public repository. The focused browser tests cover gallery, import review, parent-retained navigation, offline HTML and mobile keyboard access; they do not establish installed Claude Code/T3/VSIX behavior or manual UI acceptance.
