@@ -30,6 +30,13 @@ export function MacroProjectEntry({onProject, onCreate, className, comparisonAva
         <span className="macro-entry-copy"><strong>Retail · opérations</strong><small>Boutique, caisse, API et fichiers.<span className="macro-entry-example">Exemple fictif</span></small></span>
         <span className="macro-entry-arrow" aria-hidden="true">↗</span>
       </button>
+      <button type="button" className="macro-entry-card" onClick={() => onProject('agent-systems-workmap')}>
+        <span className="macro-entry-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="3" width="8" height="5" rx="1"/><rect x="2" y="16" width="8" height="5" rx="1"/><rect x="14" y="16" width="8" height="5" rx="1"/><path d="M12 8v4M6 16v-4h12v4"/></svg>
+        </span>
+        <span className="macro-entry-copy"><strong>Agents · mémoire & travail</strong><small>Contexte partagé, profils et preuves à établir.<span className="macro-entry-example">Conception illustrative</span></small></span>
+        <span className="macro-entry-arrow" aria-hidden="true">↗</span>
+      </button>
     </div>
     <a className="macro-entry-catalogue" href="?catalogue" target="_blank" rel="noopener" title="Ouvrir le catalogue général dans un nouvel onglet">
       <span className="macro-entry-copy"><strong>Catalogue général</strong><small>Concepts, architectures et IA</small></span>

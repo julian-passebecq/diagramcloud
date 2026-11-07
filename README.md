@@ -72,6 +72,8 @@ A trusted local DataPass host may build with `VITE_DATAPASS_COMPARISON=1` to exp
 
 ## The grammar
 
+The **Agents · mémoire & travail** whole-project entry adds an original illustrative agent-system work map under **Systems & work**: unknown baseline, planned target, memory layers, optional presentation profiles and evidence requirements. See [entry, import and export steps](docs/product/AGENT_SYSTEMS_WORKMAP.md). It contains no inspected installation, telemetry or execution receipts.
+
 One validated Project owns components, connections, views, evidence, sources and story steps. Views reuse stable identities and own their memberships and positions. The domain is independent of the canvas library.
 
 **Designed** is intent. **Observed/verified** is a dated, source-backed claim. **Presented** means explicitly reviewed and selected for sharing. These are different states. Synthetic evidence stays synthetic and cannot establish an observed result. See [the realization contract](docs/contracts/realization-overlay.md).
