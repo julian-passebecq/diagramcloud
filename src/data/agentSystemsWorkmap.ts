@@ -1,4 +1,5 @@
 import type {Project,ProjectNode,ProjectView} from '../core/model';
+import {layeredLayout} from '../core/layout';
 import {block,node,note,project,validateDocument,view} from './builders';
 
 /** Original illustrative design. No installation inventory, execution or private input. */
@@ -15,7 +16,7 @@ export function agentSystemsWorkmap():Project {
  const map=(id:string,title:string,description:string,ids:string[],links:[string,string,string][],perspective:ProjectView['perspective']='agents')=>{
   view(d,id,title,description,ids,links.map(([a,b,label])=>[a,b,label,'dependency']));
   const v=d.views.find(v=>v.id===id)!;v.perspective=perspective;
-  v.positions=Object.fromEntries(ids.map((id,i)=>[id,{x:(i%3)*360,y:Math.floor(i/3)*260}]));
+  v.positions=layeredLayout(d,id);
   v.design={type:'architecture',focal:[],theme:'light',caption:'Illustrative design · no execution · results UNKNOWN'};
  };
 

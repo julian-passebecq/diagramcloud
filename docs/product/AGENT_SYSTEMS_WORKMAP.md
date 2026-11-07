@@ -17,6 +17,8 @@ The memory design distinguishes original transcripts/source archive, small notes
 
 This is a draft source candidate. Local preparation authored six unit cases and three browser cases but did not execute them on the native host: dependency installation stopped with EACCES while fetching a locked package. Source syntax and whitespace checks do not replace TypeScript, canonical validation, build or browser checks. The first hosted CI for ccea8c6af2ce5496163d4cc594660ffb5106332c installed dependencies but failed TypeScript with TS2741 because the view design omitted required focal IDs; later gates were skipped. The design now explicitly supplies an empty focal list. Read the exact PR head's CI result for its separate qualification outcome. The ordinary release checks in AGENTS.md still apply. Native visual acceptance, package, deployment, installed clients and successful private-document import are not claimed.
 
+The next hosted run at e9125d1afeb509e5116b7b154a4c890ac26181f4 passed TypeScript and all six new sample cases, but the full unit suite reported two aggregate export-geometry failures (2,329 passed, 2 failed, 3 skipped). This candidate now reuses the existing deterministic layered layout for its views. Geometry assertions retain their thresholds and report the offending view/edges for diagnosis. Later gates still require a passing exact-source run.
+
 ## Import a private design and export deliberately
 
 Prepare private project data outside this public repository; never add real inputs to samples, tests or documentation. Use a distinct project ID, preserve stable component IDs, mark sensitive nodes, views, blocks and sources private, and retain source/proposed distinctions. Visibility is not encryption or secret detection.
