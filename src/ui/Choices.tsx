@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Button} from '@fluentui/react-components';
 import {errorMessage,type Choice,type Project} from '../core/model';
-import {acceptChoice,choiceReview,recordCompatibility,removeCompatibility,reviewChoice,type ChoiceOwner} from '../core/decisionReview';
+import {acceptChoice,choiceReview,citedObservations,optionSlotState,OPTION_SLOT_LABELS,recordCompatibility,removeCompatibility,reviewChoice,type ChoiceOwner} from '../core/decisionReview';
 import {substitutionCheck,substitutionRequirements} from '../intelligence/learning/substitution';
 
 const ORIGIN:Record<Choice['origin'],string>={author:'Author',ai:'AI recommendation',imported:'Imported record'};
@@ -21,7 +21,7 @@ function ChoiceCard({c,edit,doc,owner,onCommit,onError}:{c:Choice}&Omit<Props,'c
  const option=(id?:string)=>c.options.find(o=>o.id===id)?.label??id;
  const list=(title:string,rows:string[])=>rows.length>0&&<><h4>{title}</h4><ul>{rows.map((r,i)=><li key={i}>{r}</li>)}</ul></>;
  const review=doc?choiceReview(doc,c.id):undefined,selectedId=c.status==='accepted'?c.chosenOptionId:c.recommendedOptionId;
- const alternatives=c.options.filter(o=>o.id!==selectedId);
+ const alternatives=c.options.filter(o=>o.id!==selectedId),cited=doc?citedObservations(doc,c):(c.observationIds??[]).map(id=>({id,state:'missing' as const,observation:undefined}));
  const node=owner?.kind==='node'?doc?.nodes.find(n=>n.id===owner.id):undefined;
  const run=(f:()=>Project)=>{try{onCommit?.(f());}catch(e){onError?.(errorMessage(e));}};
  return <section className="choice-card" data-choice-status={c.status} data-review-state={review?.state} aria-label={`Choice ${c.title}`}>
@@ -29,7 +29,10 @@ function ChoiceCard({c,edit,doc,owner,onCommit,onError}:{c:Choice}&Omit<Props,'c
   <p className="micro">{ORIGIN[c.origin]}{c.status==='accepted'&&<> · decided by {c.decidedBy} on {c.decidedAt}</>} · <span className="stable-id">{c.id}</span>{c.visibility==='private'&&' · Private'}</p>
   {review&&<div className={`choice-review ${review.state}`} role="status" aria-label={`Review state of ${c.title}`}><b>{review.label}</b>{review.reviewedRevision!==undefined&&review.state==='current'&&<span className="muted"> · reviewed at revision {review.reviewedRevision}</span>}{review.reasons.map((r,i)=><p key={i} className="micro">{r}</p>)}</div>}
   <p><b>Goal:</b> {c.goal}</p>
-  <h4>Options</h4><ul>{c.options.map(o=><li key={o.id}>{o.label}{o.summary&&<span className="muted"> · {o.summary}</span>}{c.status==='accepted'&&o.id===c.chosenOptionId&&<b> · chosen</b>}{o.id===c.recommendedOptionId&&<span className="muted"> · recommended{c.status==='candidate'?', not chosen':''}</span>}</li>)}</ul>
+  <h4>Options</h4><ul aria-label={`Options of ${c.title}`}>{c.options.map(o=>{const slot=optionSlotState(c,o);return <li key={o.id} data-option-slot={slot} aria-label={`${o.label}: ${OPTION_SLOT_LABELS[slot]}`}><span className={`chip slot-${slot}`}>{OPTION_SLOT_LABELS[slot]}</span> {o.label}{o.summary&&<span className="muted"> · {o.summary}</span>}{slot==='adopted'&&<b> · chosen on {c.decidedAt}</b>}{o.id===c.recommendedOptionId&&<span className="muted"> · recommended{c.status==='candidate'?', not chosen':''}</span>}
+   {o.rejection&&<p className="micro" data-rejection="">Rejected on {o.rejection.decidedAt}{o.rejection.decidedBy&&<> by {o.rejection.decidedBy}</>}: {o.rejection.reason}</p>}
+   {o.testPlan&&<p className="micro" data-test-plan="">Test plan (planned, not a result): {o.testPlan}</p>}</li>;})}</ul>
+  {cited.length>0&&<section aria-label={`Observations cited by ${c.title}`}><h4>Cited experiment observations</h4><ul>{cited.map(x=><li key={x.id} data-observation-state={x.state}>{x.observation?<>{x.state==='reviewed'?'Observed':'Awaiting review'} {x.observation.observedAt.slice(0,10)} · {x.observation.summary}{x.state==='awaiting-review'&&<span className="muted"> · not evidence until the author reviews it</span>}</>:<span className="muted">{x.id} · not available in this copy</span>}</li>)}</ul></section>}
   {list('Reasons',c.reasons)}{list('Tradeoffs',c.tradeoffs)}{list('Assumptions',c.assumptions)}
   {c.revisitWhen&&<p><b>Revisit when:</b> {c.revisitWhen}</p>}
   {c.status==='candidate'&&c.recommendedOptionId&&<p className="micro">“{option(c.recommendedOptionId)}” is recommended, not decided. Acceptance records who decided and when.</p>}

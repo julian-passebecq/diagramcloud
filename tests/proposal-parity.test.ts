@@ -31,6 +31,8 @@ const cases:{name:string;payload:unknown;applied?:AppliedProposal[];codes:string
  {name:'self-review: accept a choice',payload:patch([{op:'replace',path:'/nodes/@app/choices/@store/status',value:'accepted'},{op:'add',path:'/nodes/@app/choices/@store/chosenOptionId',value:'a'},{op:'add',path:'/nodes/@app/choices/@store/decidedBy',value:'Synthetic Person'},{op:'add',path:'/nodes/@app/choices/@store/decidedAt',value:'2026-10-17'}]),codes:['self-review']},
  {name:'self-review: record a review basis',payload:patch([{op:'add',path:'/nodes/@app/choices/@queue/reviewBasis',value:{revision:4,fingerprint:queuePrint()}}]),codes:['self-review']},
  {name:'self-review: record compatibility evidence',payload:patch([{op:'add',path:'/nodes/@app/choices/@queue/options/@q2/compatibility',value:[{requirementId:'assumption:0',verdict:'satisfied',sourceIds:['src'],blockIds:[],recordedBy:'Synthetic Person',recordedAt:'2026-11-04'}]}]),codes:['self-review']},
+ {name:'self-review: reject a candidate',payload:patch([{op:'add',path:'/nodes/@app/choices/@store/options/@b/rejection',value:{reason:'Synthetic reason',decidedAt:'2026-11-05',decidedBy:'Synthetic Person'}}]),codes:['self-review']},
+ {name:'valid test plan',payload:patch([{op:'add',path:'/nodes/@app/choices/@store/options/@b/testPlan',value:'Synthetic test plan'}]),codes:[]},
  {name:'origin relabel',payload:patch([{op:'replace',path:'/nodes/@app/choices/@store/origin',value:'author'}]),codes:['origin-relabel']},
  {name:'not applicable',payload:patch([{op:'replace',path:'/nodes/@missing/label',value:'x'}]),codes:['not-applicable']},
  {name:'malformed',payload:{...rename,operations:[]},codes:['malformed']},

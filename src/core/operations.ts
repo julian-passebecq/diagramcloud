@@ -53,6 +53,8 @@ export function publicDocument(input:Project):Project{
  // Only reviewed, public observations about kept components are Presented; everything else stays in the authoring document.
  d.observations=d.observations.filter(o=>o.visibility==='public'&&!!o.reviewedAt&&keptNodes.has(o.nodeId)).map(o=>({...o,blockIds:o.blockIds.filter(id=>blocks.has(id))}));const observations=new Set(d.observations.map(o=>o.id));
  if(d.delivery)for(const p of d.delivery.promotions)for(const g of p.gates)if(g.observationId&&!observations.has(g.observationId))delete g.observationId;
+ // A decision keeps only the experiment observations that are Presented; an emptied list disappears, so nothing says how many were dropped.
+ for(const c of [...d.nodes,...d.views].flatMap(owner=>owner.choices??[])){if(!c.observationIds)continue;const kept=c.observationIds.filter(id=>observations.has(id));if(kept.length)c.observationIds=kept;else delete c.observationIds;}
  // Atlas: only the active snapshot, only repositories whose component is public; runtime/context pointers stay in authoring JSON.
  if(d.atlas){const active=d.atlas.snapshots.find(s=>s.id===d.atlas!.activeSnapshotId)!;// A repository reaches public output through its public card, or, without a card, only when its author marked it public.
  const repositories=active.repositories.filter(r=>r.nodeId?keptNodes.has(r.nodeId):r.visibility==='public');

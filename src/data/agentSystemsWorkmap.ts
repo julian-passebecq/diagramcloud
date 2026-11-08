@@ -1,4 +1,4 @@
-import type {Project,ProjectNode,ProjectView} from '../core/model';
+import {choiceSchema,type Project,type ProjectNode,type ProjectView} from '../core/model';
 import {layeredLayout} from '../core/layout';
 import {block,node,note,project,validateDocument,view} from './builders';
 
@@ -134,6 +134,21 @@ export function agentSystemsWorkmap():Project {
   ]);
  explain('aim','design-boundary','Use the map to ask better questions',
   'Begin with the unknown baseline. Discuss the target as a proposal, select a useful work artifact and name what would establish its result. This original synthetic example contains no actual source archive, raw prompt, transcript, worker event, benchmark, receipt or private installation data.');
+ // Slot decisions: illustrative candidates per variable part. Test plans are Planned/designed; no experiment observation is supplied.
+ const slot=(owner:string,value:unknown)=>{const n=d.nodes.find(n=>n.id===owner)!;n.choices=[...(n.choices??[]),choiceSchema.parse(value)];};
+ slot('notes',{id:'memory-layer-slot',title:'Memory layer slot',goal:'Choose how project memory is kept between sessions while every claim keeps a pointer to its original.',
+  options:[
+   {id:'notes-with-pointers',label:'Small notes with source pointers',summary:'Concise claims, each citing its original.',testPlan:'Replay a fixed task set with and without notes; check each used note against its original.'},
+   {id:'full-transcripts',label:'Full transcripts in context',summary:'Inject whole original sessions.',rejection:{reason:'Illustrative: crowds out the task context and hides which claim was used.',decidedAt:'2026-11-01',decidedBy:'Illustrative author'}},
+   {id:'derived-index',label:'Derived index',summary:'Search over representations of the originals.',testPlan:'Compare retrieval with and without the index on the same questions; keep or discard per task.'}],
+  status:'accepted',chosenOptionId:'notes-with-pointers',decidedBy:'Illustrative author',decidedAt:'2026-11-02',origin:'author',
+  reasons:['Illustrative: notes stay small and every claim can be traced to its original.'],tradeoffs:['Notes need review against originals.'],revisitWhen:'An experiment observation about retrieval is reviewed.'});
+ slot('agent',{id:'model-per-role-slot',title:'Model per role slot',goal:'Choose which model serves each work category; nothing here selects or runs a model.',
+  options:[
+   {id:'one-model',label:'One model for every role',summary:'Simplest configuration.',testPlan:'Run the same review and implementation tasks; record outcomes as reviewed observations.'},
+   {id:'tiered-models',label:'Tiered models by role',summary:'A larger model for design and review, a smaller one for search.',testPlan:'Same tasks per role; compare review findings and rework on identical artifacts.'},
+   {id:'per-task-choice',label:'Chosen per task',summary:'Pick a model for each task.'}],
+  recommendedOptionId:'tiered-models',status:'candidate',origin:'author',assumptions:['Illustrative: roles are the work categories of this map.']});
  for(const edge of d.edges){edge.basis='planned';edge.speed='slow';}
  d.story=[
   ['Start with uncertainty','baseline','baseline-source','Separate assessment questions from installation facts. All baseline subjects are UNKNOWN.'],

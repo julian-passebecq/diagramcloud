@@ -9,7 +9,7 @@ import type {Project} from './model';
  * It validates only; it never applies, reviews, publishes, executes or launches anything. The supported proposal
  * kind is a `diagramcloud.patch` targeting the open project. Its origin comes from the calling path, never from the
  * payload: the dialog and CLI are `imported`, MCP is `ai` (with the client name), and `author` only when a person
- * names themself explicitly. A non-author proposal cannot review itself (observations, concept mappings, choices, a decision's review basis or compatibility evidence),
+ * names themself explicitly. A non-author proposal cannot review itself (observations, concept mappings, choices, a decision's review basis, compatibility evidence or a candidate's rejection),
  * cannot relabel who suggested something, and cannot be applied twice: replay is detected by a digest of its
  * target and operations, so relabelling the base revision of an applied proposal does not make it new.
  */
@@ -139,9 +139,11 @@ export function parseAppliedLedger(value:unknown):AppliedProposal[]{
 function decisionClaims(c:Keyed,was:Keyed|undefined):ProposalReason[]{
  const out:ProposalReason[]=[],self=(message:string)=>out.push({code:'self-review',message});
  if(c.reviewBasis!==undefined&&!same(c.reviewBasis,was?.reviewBasis))self(`Choice ${c.id}: a proposal cannot record a review basis; a person reviews the decision in Edit mode.`);
- type Opt={id:string;compatibility?:{requirementId:string}[]};
+ type Opt={id:string;compatibility?:{requirementId:string}[];rejection?:unknown};
  const wasOpts=new Map(((was?.options as Opt[]|undefined)??[]).map(o=>[o.id,o] as const));
- for(const o of (c.options as Opt[]|undefined)??[]){const prior=new Map((wasOpts.get(o.id)?.compatibility??[]).map(e=>[e.requirementId,canon(e)] as const));
+ for(const o of (c.options as Opt[]|undefined)??[]){
+  // Rejecting a candidate is a decision, like accepting one: a proposal may add a test plan or cite observations, never record a rejection.
+  if(o.rejection!==undefined&&!same(o.rejection,wasOpts.get(o.id)?.rejection))self(`Choice ${c.id} option ${o.id}: a proposal cannot reject a candidate; a person records the rejection in Edit mode.`);const prior=new Map((wasOpts.get(o.id)?.compatibility??[]).map(e=>[e.requirementId,canon(e)] as const));
   for(const e of o.compatibility??[])if(prior.get(e.requirementId)!==canon(e))self(`Choice ${c.id} option ${o.id}: a proposal cannot record compatibility evidence for ${e.requirementId}; a named person records it in Edit mode.`);}
  return out;
 }
