@@ -13,6 +13,23 @@ export const CHOICE_REVIEW_LABELS:Record<ChoiceReviewState,string>={
  'review-needed':'Review needed · supporting facts changed',
  'not-reviewed':'No review recorded · whether its facts changed is UNKNOWN'
 };
+/**
+ * Slot reading of one option. Adopted only when the choice is an accepted decision and this is its chosen option; a
+ * recorded rejection reads rejected; a test plan without either reads under test (Planned/designed, not a result); anything
+ * else is a candidate. A recommendation is never adopted.
+ */
+export type OptionSlotState='adopted'|'rejected'|'under-test'|'candidate';
+export const OPTION_SLOT_LABELS:Record<OptionSlotState,string>={adopted:'Adopted',rejected:'Rejected','under-test':'Under test',candidate:'Candidate'};
+export function optionSlotState(c:Choice,o:Choice['options'][number]):OptionSlotState{
+ if(c.status==='accepted'&&c.chosenOptionId===o.id)return 'adopted';
+ if(o.rejection)return 'rejected';
+ return o.testPlan?'under-test':'candidate';
+}
+export type CitedObservation={id:string;state:'reviewed'|'awaiting-review'|'missing';observation?:Project['observations'][number]};
+/** The observations a decision cites, as read in this document: reviewed ones count as evidence; an unreviewed one is awaiting review, never evidence. */
+export function citedObservations(doc:Project,c:Choice):CitedObservation[]{
+ return (c.observationIds??[]).map(id=>{const o=doc.observations.find(o=>o.id===id);return o?{id,state:o.reviewedAt?'reviewed':'awaiting-review',observation:o}:{id,state:'missing'};});
+}
 /** The choice and its owner (component or view), found by exact stable choice ID. */
 export function findChoice(doc:Project,choiceId:string):{owner:ChoiceOwner;choice:Choice}|undefined{
  for(const n of doc.nodes){const c=n.choices?.find(c=>c.id===choiceId);if(c)return {owner:{kind:'node',id:n.id},choice:c};}
@@ -22,15 +39,18 @@ export function findChoice(doc:Project,choiceId:string):{owner:ChoiceOwner;choic
 /**
  * Fingerprint of what a decision rests on: its owner's evidence (a component's kind, cited sources and evidence blocks, or a
  * view's membership), the decision's own cited sources, and its goal, options, reasons, tradeoffs, assumptions and selected
- * or recommended option. Who decided, when, origin, visibility and the review basis itself are not part of it.
+ * or recommended option, each option's test plan and rejection (reason and date), and the cited experiment observations
+ * (content and whether reviewed). Who decided, when, origin, visibility and the review basis itself are not part of it.
  */
 export function choiceFingerprint(doc:Project,owner:ChoiceOwner,choice:Choice):string|undefined{
  const ownerPrint=targetFingerprint(doc,owner);if(!ownerPrint)return undefined;
  const sources=[...choice.sourceIds].sort().map(id=>{const s=doc.sources.find(s=>s.id===id);return s?{id,title:s.title,location:s.location,url:s.url??null}:{id,missing:true};});
  // Recorded compatibility evidence is part of what the decision rests on; an option without any keeps its earlier print.
  const cite=(e:CompatibilityRecord)=>({...e,sourceIds:[...e.sourceIds].sort().map(id=>doc.sources.some(s=>s.id===id)?id:`${id}!missing`),blockIds:[...e.blockIds].sort().map(id=>{const b=doc.blocks.find(b=>b.id===id);return b?`${id}:${b.provenance}`:`${id}!missing`;})});
- const decision={goal:choice.goal,options:choice.options.map(o=>({id:o.id,label:o.label,summary:o.summary,...(o.compatibility?.length?{compatibility:o.compatibility.map(cite)}:{})})),reasons:choice.reasons,tradeoffs:choice.tradeoffs,assumptions:choice.assumptions,
-  chosenOptionId:choice.chosenOptionId??null,recommendedOptionId:choice.recommendedOptionId??null,revisitWhen:choice.revisitWhen??null};
+ // Slot fields (test plan, rejection, cited experiment observations) join the print only when present, so older decisions keep theirs.
+ const observed=(id:string)=>{const o=doc.observations.find(o=>o.id===id);return o?{id,nodeId:o.nodeId,observedAt:o.observedAt,claim:o.claim,summary:o.summary,reviewed:!!o.reviewedAt}:{id,missing:true};};
+ const decision={goal:choice.goal,options:choice.options.map(o=>({id:o.id,label:o.label,summary:o.summary,...(o.testPlan?{testPlan:o.testPlan}:{}),...(o.rejection?{rejection:{reason:o.rejection.reason,decidedAt:o.rejection.decidedAt}}:{}),...(o.compatibility?.length?{compatibility:o.compatibility.map(cite)}:{})})),reasons:choice.reasons,tradeoffs:choice.tradeoffs,assumptions:choice.assumptions,
+  chosenOptionId:choice.chosenOptionId??null,recommendedOptionId:choice.recommendedOptionId??null,revisitWhen:choice.revisitWhen??null,...(choice.observationIds?.length?{observations:[...choice.observationIds].sort().map(observed)}:{})};
  return fnv64(canonical({owner:{kind:owner.kind,id:owner.id,fingerprint:ownerPrint},choiceId:choice.id,sources,decision}));
 }
 export type ChoiceReview={state:ChoiceReviewState;label:string;reasons:string[];reviewedRevision?:number;currentRevision:number};
@@ -41,7 +61,7 @@ export function choiceReview(doc:Project,choiceId:string):ChoiceReview{
  const facts=owner.kind==='node'?'the component’s kind, cited sources or evidence blocks':'the view’s components or connections';
  const reasons=state==='current'?[]:state==='not-reviewed'
   ?['No review basis is recorded, so whether its supporting facts changed cannot be checked (UNKNOWN). Review it in Edit mode to record one.']
-  :[`Reviewed at document revision ${basis!.revision}; since then ${facts}, the decision’s cited sources, or its goal, options, reasons, tradeoffs or assumptions changed.`,'Nothing is re-bound automatically: review it again in Edit mode.'];
+  :[`Reviewed at document revision ${basis!.revision}; since then ${facts}, the decision’s cited sources or observations, or its goal, options (test plans, rejections), reasons, tradeoffs or assumptions changed.`,'Nothing is re-bound automatically: review it again in Edit mode.'];
  return {state,label:CHOICE_REVIEW_LABELS[state],reasons,...(basis?{reviewedRevision:basis.revision}:{}),currentRevision:doc.revision};
 }
 function reviewState(doc:Project,owner:ChoiceOwner,choice:Choice):ChoiceReviewState{

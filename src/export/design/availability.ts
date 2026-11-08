@@ -3,15 +3,23 @@ import {designContext,eyebrowOf,footerParts,type DesignContext,type DesignOption
 import {footerLine,header,lines,MONO,sansLines,svgDocument,txt} from './kit';
 import {comparisonOf,sankeyBands,scheduleOf} from './measures';
 import {xml} from '../diagram';
-import type {Project} from '../../core/model';
+import type {Choice,Project} from '../../core/model';
 
 /** Figures whose meaning depends on semantics a view may not supply: they are withheld, never drawn from guesses. */
-export type MeasuredFigure='sankey'|'timeline'|'sequence'|'gantt'|'comparison';
-export const MEASURED_FIGURES:MeasuredFigure[]=['sankey','timeline','sequence','gantt','comparison'];
+export type MeasuredFigure='sankey'|'timeline'|'sequence'|'gantt'|'comparison'|'decisions';
+export const MEASURED_FIGURES:MeasuredFigure[]=['sankey','timeline','sequence','gantt','comparison','decisions'];
 export const isMeasuredFigure=(type:string):type is MeasuredFigure=>(MEASURED_FIGURES as string[]).includes(type);
 export type FigureAvailability={type:MeasuredFigure;available:boolean;figure:string;missing:{input:string;reason:string;needs:string}[];fallback:string;schedule:{state:'supplied'|'partial'|'missing';reason:string;needs:string}};
 export const FALLBACK_FIGURE='Architecture (relationship diagram)';
-const FIGURE:Record<MeasuredFigure,string>={sankey:'Sankey flow figure',timeline:'Story timeline',sequence:'Sequence',gantt:'Scheduled timeline (Gantt)',comparison:'Baseline and current comparison'};
+const FIGURE:Record<MeasuredFigure,string>={sankey:'Sankey flow figure',timeline:'Story timeline',sequence:'Sequence',gantt:'Scheduled timeline (Gantt)',comparison:'Baseline and current comparison',decisions:'Slot decisions figure'};
+/** Public choices of a public view, in reading order: the view's own, then each public component's in view order. */
+export type SlotRow={choice:Choice;owner:{kind:'node'|'view';id:string;label:string}};
+export function slotChoices(c:DesignContext):SlotRow[]{
+ const view=c.view,rows:SlotRow[]=(view.choices??[]).map(choice=>({choice,owner:{kind:'view' as const,id:view.id,label:view.title}}));
+ for(const id of view.nodeIds){const n=c.doc.nodes.find(n=>n.id===id);if(n)for(const choice of n.choices??[])rows.push({choice,owner:{kind:'node',id,label:n.label}});}
+ return rows;
+}
+const SLOT_NEEDS='A public choice on a component of this view or on the view itself, its candidates as options. In the JSON, a component\'s "choices": [{"id": "memory-slot", "title": "Memory layer", "goal": "Pick the memory layer", "options": [{"id": "notes", "label": "Small notes", "testPlan": "Replay a fixed task set with and without notes"}, {"id": "index", "label": "Index"}], "visibility": "public"}]. An adoption is recorded by a person: status accepted with chosenOptionId, decidedBy and decidedAt.';
 const SCHEDULE_NEEDS='A schedule evidence block on a component of this view: items with a start and an end or an ISO 8601 duration, each supplied or declared as an estimate. In the JSON: {"type": "schedule", "timezone": "date-only", "items": [{"id": "build", "label": "Build", "nodeIds": ["etl"], "start": "2026-10-01", "end": "2026-10-05", "basis": "supplied"}]}.';
 const MEASURE_NEEDS='A metrics item with a "measure" for the baseline and one for the current reading: same metric, unit and scope, windows of the same length. In the JSON: "measure": {"metric": "p95 latency", "value": 420, "unit": "ms", "scope": "checkout API", "window": {"from": "2026-09-01", "to": "2026-09-07"}, "basis": "measured", "role": "baseline"}.';
 
@@ -42,6 +50,7 @@ export function figureAvailability(c:DesignContext,type:MeasuredFigure):FigureAv
  if(type==='comparison'){const k=comparisonOf(c);
   if(!k.readings)missing.push({input:'Baseline and current measures',reason:'No metrics item on a public component of this view carries a measure (metric, value, unit, scope, window, basis, role). A graph shape or node count is never a measurement.',needs:MEASURE_NEEDS});
   else if(!k.rows.length)missing.push({input:'Comparable baseline and current',reason:k.unavailable.slice(0,3).map(u=>`${u.metric}: ${u.reason}.`).join(' ')+(k.unavailable.length>3?` (${k.unavailable.length-3} more.)`:''),needs:'For each metric: one baseline and one current reading with the same unit and scope and windows of the same length.'});}
+ if(type==='decisions'&&!slotChoices(c).length)missing.push({input:'Public choices',reason:'Neither this view nor any of its public components carries a public choice: there is no slot to draw.',needs:SLOT_NEEDS});
  return {type,available:!missing.length,figure:FIGURE[type],missing,fallback:FALLBACK_FIGURE,schedule};
 }
 export const availabilityOf=(input:Project,viewId:string,type:MeasuredFigure)=>figureAvailability(designContext(input,viewId,type),type);
@@ -54,7 +63,7 @@ export function scheduleNote(a:FigureAvailability,x:number,y:number,width:number
  const ls=sansLines(a.schedule.state==='supplied'?`Scheduled timeline (Gantt) available as its own figure: ${a.schedule.reason} This order is not elapsed time.`:`Scheduled timeline (Gantt) withheld: ${a.schedule.reason} Needs: ${a.schedule.needs}`,width,10,4);
  return {svg:`<g ${a.schedule.state==='supplied'?'data-dd-schedule="supplied"':'data-dd-withheld="schedule"'}>${lines(ls,x,y,14,{size:10,fill:c.t.muted,italic:true})}</g>`,height:ls.length*14};
 }
-const INVENTED:Record<MeasuredFigure,string>={sankey:'amounts',timeline:'steps or dates',sequence:'messages',gantt:'dates or durations',comparison:'baselines, differences or percentages'};
+const INVENTED:Record<MeasuredFigure,string>={sankey:'amounts',timeline:'steps or dates',sequence:'messages',gantt:'dates or durations',comparison:'baselines, differences or percentages',decisions:'candidates, adoptions or experiment results'};
 
 /**
  * "What is missing to draw this": the figure is held back instead of drawn, naming each missing input, why it is missing,
@@ -71,6 +80,7 @@ export function withheldSvg(c:DesignContext,a:FigureAvailability,options:{label:
  if(a.type==='timeline'){const n=scheduleNote(a,M+16,y+18,W-32,c);out.push(n.svg);y+=8+n.height;}
  if(a.type==='sequence'){out.push(txt('Message order would be derived from the connections, not timing.',M+16,y+18,{size:10,fill:t.muted,italic:true}));y+=22;}
  if(a.type==='gantt'){out.push(txt('A story or step order is presentation order, never elapsed time.',M+16,y+18,{size:10,fill:t.muted,italic:true}));y+=22;}
+ if(a.type==='decisions'){out.push(txt('A candidate is never shown as adopted; an adoption is a person\'s recorded decision.',M+16,y+18,{size:10,fill:t.muted,italic:true}));y+=22;}
  if(a.type==='comparison'){out.push(txt('No money, time saving or performance is inferred from the diagram.',M+16,y+18,{size:10,fill:t.muted,italic:true}));y+=22;}
  const fb=sansLines(`Fallback: the ${a.fallback} shows the same public components and connections without inventing ${INVENTED[a.type]}.`,W-32,10,3);
  out.push(`<g data-dd-fallback="architecture">${lines(fb,M+16,y+22,14,{size:10,fill:t.ink})}</g>`);y+=22+(fb.length-1)*14+18;
