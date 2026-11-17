@@ -1,0 +1,26 @@
+# CI mirror of GitHub julian-passebecq/diagramcloud (GitHub stays canonical; results are not posted as GitHub checks).
+# Recipe: AGENTS.md of julian-passebecq/datapass-fleet-facade, section CI. Runs on the existing imac group runner
+# (shell executor, PowerShell, node in C:\Program Files\nodejs); msiold has no system node.js.
+# One job: the unit suite (npm test). A failing test fails the job.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH
+
+default:
+  tags: [local-windows, imac]
+  interruptible: true
+
+stages: [test]
+
+unit-tests:
+  stage: test
+  timeout: 45m
+  script:
+    - $ErrorActionPreference = 'Stop'
+    - $env:Path = 'C:\Program Files\nodejs;' + $env:Path
+    - node --version
+    - cmd /c 'npm ci --no-fund --no-audit'
+    - if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    - cmd /c 'npm test'
+    - if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
