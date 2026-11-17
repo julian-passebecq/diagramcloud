@@ -6,7 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
-import {existsSync,mkdtempSync,readdirSync,rmSync,writeFileSync} from 'node:fs';
+import {existsSync,mkdtempSync,readdirSync,realpathSync,rmSync,writeFileSync} from 'node:fs';
 import fs from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -20,7 +20,8 @@ import {prepareExplanationFiles} from '../scripts/prepare-explanation';
 import {runConceptHost} from '../scripts/concept-host';
 
 const REFUSED=/Nothing was read or written\./;
-function workspace(t:{after:(fn:()=>void)=>void}){const root=mkdtempSync(join(tmpdir(),'dc-input-limits-'));t.after(()=>rmSync(root,{recursive:true,force:true}));return root;}
+// macOS tmpdir traverses /var -> /private/var; fixtures must reach the intended file checks.
+function workspace(t:{after:(fn:()=>void)=>void}){const root=mkdtempSync(join(realpathSync(tmpdir()),'dc-input-limits-'));t.after(()=>rmSync(root,{recursive:true,force:true}));return root;}
 const doc=()=>validateDocument(documentSchema.parse({schemaVersion:1,id:'limit-test',title:'Synthetic limit input',rootViewId:'root',edges:[],
  nodes:[{id:'app',label:'Synthetic app'}],views:[{id:'root',title:'Root',nodeIds:['app']}]}));
 /** A valid JSON value padded with trailing whitespace to exactly `bytes` bytes. */
