@@ -1,7 +1,7 @@
 import {test,type TestContext} from 'node:test';
 import assert from 'node:assert/strict';
 import {execFileSync,spawnSync} from 'node:child_process';
-import {mkdtempSync,mkdirSync,writeFileSync,rmSync,existsSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync,existsSync,realpathSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 
@@ -11,7 +11,8 @@ const script=resolve('scripts/package-campaign.ts'),tsx=resolve('node_modules/ts
  * must be refused before any output or bundling. Nothing is published.
  */
 function fixture(t:TestContext,kind:'missing'|'stale'|'version'){
- const root=mkdtempSync(join(tmpdir(),'diagramcloud-package-preflight-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
+ // Match the child process cwd, which canonicalizes macOS /var to /private/var.
+ const root=mkdtempSync(join(realpathSync(tmpdir()),'diagramcloud-package-preflight-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
  const git=(...args:string[])=>execFileSync('git',args,{cwd:root,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
  writeFileSync(join(root,'package.json'),JSON.stringify({name:'synthetic-package-preflight',version:'1.33.1',type:'module'}));
  writeFileSync(join(root,'.gitignore'),'dist/\n.local/\n');
