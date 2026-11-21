@@ -117,3 +117,29 @@ export function rootTitle(text:string):string{
 
 /** R998: the deck outline copied as plain text: "n. file, title" per slide (just "n. file" without a title). */
 export const deckOutline=(slides:readonly {name:string;title:string}[])=>slides.map((s,i)=>`${i+1}. ${s.name}${s.title?`, ${s.title}`:''}`).join('\n');
+
+/** R1006: what happened to one file of diagrams/ in a live update. */
+export type LiveChange={kind:'added'|'updated'|'removed';name:string};
+/** R1006: the open diagram after a live update: kept as it was, redrawn from its new text, or gone from the folder. */
+export type OpenState='none'|'unchanged'|'updated'|'removed';
+export type LiveMerge={files:DiagramFile[];open:OpenState;changes:LiveChange[];log:string[]};
+
+/** R1006: "12:04:31" in local time, for the live log lines. */
+export const clockTime=(d:Date)=>[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+
+/** R1006: merges a live update of diagrams/ into the shell. old = the list shown now, next = the folder now (sorted by
+ *  diagramFiles), open = the selected file name. An unchanged file keeps its very object, so nothing redraws it;
+ *  a changed one is the new object, so the centre redraws it. One log line per change, removed first, then added, then updated. */
+export function mergeLive(old:readonly DiagramFile[],next:readonly DiagramFile[],open:string|null,time:string):LiveMerge{
+ const before=new Map(old.map(f=>[f.name,f]));const after=new Set(next.map(f=>f.name));
+ const files=next.map(f=>{const o=before.get(f.name);return o&&o.text===f.text?o:f;});
+ const changes:LiveChange[]=[
+  ...old.filter(f=>!after.has(f.name)).map(f=>({kind:'removed' as const,name:f.name})),
+  ...next.filter(f=>!before.has(f.name)).map(f=>({kind:'added' as const,name:f.name})),
+  ...next.filter(f=>{const o=before.get(f.name);return !!o&&o.text!==f.text;}).map(f=>({kind:'updated' as const,name:f.name})),
+ ];
+ const mine=open===null?undefined:changes.find(c=>c.name===open);
+ const state:OpenState=open===null?'none':mine?.kind==='removed'?'removed':mine?'updated':after.has(open)?'unchanged':'none';
+ const log=changes.map(c=>`${time} ${c.kind} diagrams/${c.name}${c.name===open&&c.kind!=='added'?` (the open diagram${c.kind==='removed'?': removed from the folder':': redrawn'})`:''}`);
+ return {files,open:state,changes,log};
+}

@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync,symlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,deckOrder,deckStep,deckKey,deckStatus,deckOutline,rootTitle,type El} from '../src/shell/shellModel';
+import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,deckOrder,deckStep,deckKey,deckStatus,deckOutline,rootTitle,mergeLive,clockTime,type El} from '../src/shell/shellModel';
 import {writeFromTemplate,diagramWriter} from '../src/shell/diagramWriter';
 import {keepHref,safeCss} from '../src/shell/sanitize';
+import {inDiagrams,liveDeletes} from '../src/shell/liveDeletes';
 
 test('shell pane sizes stay inside their limits', () => {
   for (const pane of ['left', 'right', 'bottom'] as const) {
@@ -290,4 +291,54 @@ test('R998: rootTitle reads the own title of the SVG, never a group title; the o
   assert.equal(rootTitle('<svg><!-- a - b -- c --><title>T</title></svg>'), 'T');
   assert.deepEqual(['architecture.svg', 'floor-plan-b.svg', 'floor-plan.svg'].map(n => rootTitle(readFileSync(`diagrams/${n}`, 'utf8'))),
     ['Sample architecture: six services', 'Sample floor plan B: small flat with a study', 'Sample floor plan: small flat']);
+});
+
+test('R1006 mergeLive: an added, changed and removed file each give one log line; unchanged files keep their object', () => {
+  const f = (name: string, text: string) => ({name, text, url: `/diagrams/${name}`});
+  const a = f('a.svg', '<svg>a</svg>'), b = f('b.svg', '<svg>b</svg>'), c = f('c.svg', '<svg>c</svg>');
+  const m = mergeLive([a, b, c], [f('a.svg', '<svg>a</svg>'), f('b.svg', '<svg>b2</svg>'), f('d.svg', '<svg>d</svg>')], 'a.svg', '12:04:31');
+  assert.deepEqual(m.files.map(x => x.name), ['a.svg', 'b.svg', 'd.svg']);
+  assert.equal(m.files[0], a); // same object: the open centre is not redrawn
+  assert.equal(m.files[1].text, '<svg>b2</svg>');
+  assert.equal(m.open, 'unchanged');
+  assert.deepEqual(m.changes, [{kind: 'removed', name: 'c.svg'}, {kind: 'added', name: 'd.svg'}, {kind: 'updated', name: 'b.svg'}]);
+  assert.deepEqual(m.log, ['12:04:31 removed diagrams/c.svg', '12:04:31 added diagrams/d.svg', '12:04:31 updated diagrams/b.svg']);
+});
+
+test('R1006 mergeLive: the open file updated is redrawn, deleted is named removed, back again is redrawn', () => {
+  const f = (name: string, text: string) => ({name, text, url: name});
+  const old = [f('floor-plan.svg', '<svg>1</svg>'), f('x.svg', '<svg/>')];
+  const up = mergeLive(old, [f('floor-plan.svg', '<svg>2</svg>'), old[1]], 'floor-plan.svg', '12:04:31');
+  assert.equal(up.open, 'updated');
+  assert.notEqual(up.files[0], old[0]);
+  assert.deepEqual(up.log, ['12:04:31 updated diagrams/floor-plan.svg (the open diagram: redrawn)']);
+  const gone = mergeLive(up.files, [old[1]], 'floor-plan.svg', '12:05:00');
+  assert.equal(gone.open, 'removed');
+  assert.deepEqual(gone.log, ['12:05:00 removed diagrams/floor-plan.svg (the open diagram: removed from the folder)']);
+  const back = mergeLive(gone.files, [f('floor-plan.svg', '<svg>3</svg>'), old[1]], 'floor-plan.svg', '12:06:00');
+  assert.equal(back.open, 'updated');
+  assert.deepEqual(back.log, ['12:06:00 added diagrams/floor-plan.svg']);
+  // No change: no line, the very same objects; nothing open: open is none.
+  const same = mergeLive(old, old.map(x => ({...x})), null, '12:07:00');
+  assert.deepEqual([same.changes, same.log, same.open], [[], [], 'none']);
+  assert.equal(same.files[1], old[1]);
+  assert.equal(mergeLive(old, old, 'never.svg', 't').open, 'none');
+});
+
+test('R1006 clockTime gives HH:MM:SS', () => {
+  assert.equal(clockTime(new Date(2026, 10, 21, 9, 4, 3)), '09:04:03');
+});
+
+test('R1006 liveDeletes: only a delete or create under diagrams/ drops an orphaned module, nothing else changes', () => {
+  const root = join(tmpdir(), 'dc-live');
+  assert.equal(inDiagrams(root, join(root, 'diagrams', 'a.svg')), true);
+  assert.equal(inDiagrams(root, join(root, 'diagrams-old', 'a.svg')), false);
+  assert.equal(inDiagrams(root, join(root, 'templates', 'a.svg')), false);
+  assert.equal(inDiagrams(root, join(root, 'diagrams', '..', 'src', 'a.ts')), false);
+  const hook = liveDeletes(root).hotUpdate as (o: {type: string; file: string; modules: {importers: Set<unknown>}[]}) => unknown;
+  const orphan = {importers: new Set()}, raw = {importers: new Set([1])};
+  assert.deepEqual(hook({type: 'delete', file: join(root, 'diagrams', 'a.svg'), modules: [raw, orphan]}), [raw]);
+  assert.equal(hook({type: 'update', file: join(root, 'diagrams', 'a.svg'), modules: [raw, orphan]}), undefined);
+  assert.deepEqual(hook({type: 'create', file: join(root, 'diagrams', 'a.svg'), modules: [orphan, raw]}), [raw]);
+  assert.equal(hook({type: 'delete', file: join(root, 'src', 'a.ts'), modules: [raw, orphan]}), undefined);
 });
