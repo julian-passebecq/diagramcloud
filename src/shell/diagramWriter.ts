@@ -1,6 +1,6 @@
 /** Dev-server side of "New from template" (R964): copies templates/<t>.svg to diagrams/<name>.svg, never outside diagrams/. */
 import {readdirSync,readFileSync,realpathSync,writeFileSync} from 'node:fs';
-import {join,resolve,sep} from 'node:path';
+import {basename,dirname,join,resolve,sep} from 'node:path';
 import type {Plugin} from 'vite';
 import {checkNewName} from './shellModel';
 
@@ -19,9 +19,13 @@ export const isLoopbackHost=(host:string|undefined)=>/^(localhost|127\.0\.0\.1|\
 /** True when the file a dev request is served from lies under diagrams/ or templates/ (any extension, any spelling):
  *  the path is decoded, normalised, /@fs/ followed and symlinks resolved, so the check is on what is served. */
 export function servesUserFile(root:string,url:string|undefined):boolean{
- let p=(url??'').split(/[?#]/)[0];try{p=decodeURIComponent(p);}catch{/* keep the raw path */}
+ let p=(url??'').split(/[?#]/)[0];
+ // A malformed percent-encoding cannot be judged: sandbox it rather than guess what Vite would serve (R990).
+ try{p=decodeURIComponent(p);}catch{return true;}
  p=p.replace(/\\/g,'/');
- const real=(f:string)=>{try{return realpathSync.native(f);}catch{return f;}};
+ // A file that does not exist (yet) is judged by its nearest existing folder, resolved like diagrams/ itself: a root
+ // reached through a link (macOS /var -> /private/var, a junction) otherwise compares two spellings of one place (R990).
+ const real=(f:string):string=>{try{return realpathSync.native(f);}catch{const up=dirname(f);return up===f?f:join(real(up),basename(f));}};
  const file=real(p.startsWith('/@fs/')?resolve(p.slice(4).replace(/^\/([A-Za-z]:)/,'$1')):resolve(root,'.'+p));
  const fold=(f:string)=>process.platform==='linux'?f:f.toLowerCase(); // Windows and macOS folders ignore case
  return ['diagrams','templates'].some(d=>{const dir=fold(real(resolve(root,d)));return fold(file)===dir||fold(file).startsWith(dir+sep);});

@@ -34,7 +34,7 @@ const get=(path:string)=>new Promise<{status:number;headers:Record<string,unknow
 
 const spellings=()=>{const fs='/@fs/'+root.replaceAll('\\','/').replace(/^\//,'');return ['/diagrams/p.svg','/%64iagrams/p.svg','/diagrams/p%2Esvg','/diagrams/p%2esvg',
  fs+'/diagrams/p.svg','/./diagrams/p.svg','/other/../diagrams/p.svg','/other/%2e%2e/diagrams/p.svg','/templates/t.svg','/%74emplates/t.svg',
- ...Object.keys(FILES).map(f=>'/diagrams/'+f),...(process.platform==='linux'?[]:['/diagrams/P.SVG','/DIAGRAMS/p.html'])];};
+ '/diagrams/p.html?/../../x','/diagrams/p.svg?a=/../../other/control.html',...Object.keys(FILES).map(f=>'/diagrams/'+f),...(process.platform==='linux'?[]:['/diagrams/P.SVG','/DIAGRAMS/p.html'])];};
 
 test('every spelling and markup extension of a diagrams/ file is served sandboxed and never sniffed', async () => {
  for(const path of spellings()){
@@ -45,6 +45,15 @@ test('every spelling and markup extension of a diagrams/ file is served sandboxe
  }
  // The control: a file outside diagrams/ and templates/ gets no sandbox, so the check above is not vacuous.
  expect((await get('/other/control.html')).headers['content-security-policy']).toBeUndefined();
+});
+
+test('a malformed percent-encoding under diagrams/ is refused or sandboxed, never served bare (R990)', async () => {
+ for(const path of ['/diagrams/%E0%A4%A.svg','/diagrams/p%.svg','/%E0%A4%A/../diagrams/p.svg','/diagrams/p.svg%']){
+  const r=await get(path);
+  if(r.status>=400)continue; // refused
+  expect(r.headers['content-security-policy'],path).toBe('sandbox');
+  expect(r.headers['x-content-type-options'],path).toBe('nosniff');
+ }
 });
 
 test('the real dev server (repo config) still shows the shell with its diagrams and groups', async ({page}) => {

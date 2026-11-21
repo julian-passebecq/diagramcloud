@@ -137,6 +137,47 @@ test('the <meta> CSP keeps the page base: a <base href> to another origin is ign
  expect(baseURI).not.toContain(OUTSIDE);
 });
 
+/** R990: an outside <audio> and <video> load (media-src) and a form posted outside (form-action). Returns the outside URLs asked for. */
+async function mediaAndForm(page:Page){
+ const outside:string[]=[];
+ await page.context().route(u=>u.hostname===OUTSIDE,r=>{outside.push(r.request().url());return r.abort();});
+ await page.goto('/shell.html');
+ await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
+ await page.evaluate(h=>{
+  for(const tag of ['audio','video'] as const){const m=document.createElement(tag);m.preload='auto';m.src=h+'/csp-'+tag+'.mp4';document.body.appendChild(m);m.load();}
+ },H);
+ await page.waitForTimeout(900);
+ // Last, as it leaves the page when it is allowed.
+ await page.evaluate(h=>{const f=document.createElement('form');f.method='get';f.action=h+'/csp-form';document.body.appendChild(f);f.submit();},H);
+ await page.waitForTimeout(900);
+ return outside.map(u=>u.replace(/^.*\/csp-([a-z]+).*$/,'$1')).sort();
+}
+
+test('the <meta> CSP in shell.html alone stops an outside <audio> or <video> load and a form submit', async ({page}) => {
+ expect(await mediaAndForm(page)).toEqual([]);
+});
+
+test('the control: without the <meta> CSP the same media loads and form submit do leave the page', async ({page}) => {
+ await withoutMetaCsp(page);
+ expect(await mediaAndForm(page)).toEqual(['audio','form','video']);
+});
+
+test('the vercel.json CSP alone keeps the page base: a <base href> to another origin is ignored', async ({page}) => {
+ await withoutMetaCsp(page,{'content-security-policy':vercelRule()});
+ await page.goto('/shell.html');
+ await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
+ const baseURI=await page.evaluate(h=>{const b=document.createElement('base');b.href=h+'/';document.head.prepend(b);return document.baseURI;},H);
+ expect(baseURI).not.toContain(OUTSIDE);
+});
+
+test('the control: without any CSP a <base href> to another origin does move the page base', async ({page}) => {
+ await withoutMetaCsp(page);
+ await page.goto('/shell.html');
+ await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
+ const baseURI=await page.evaluate(h=>{const b=document.createElement('base');b.href=h+'/';document.head.prepend(b);return document.baseURI;},H);
+ expect(baseURI).toContain(OUTSIDE);
+});
+
 test('the control: without any CSP the same loads do leave the page', async ({page}) => {
  await withoutMetaCsp(page);
  const load=await outsideLoads(page);

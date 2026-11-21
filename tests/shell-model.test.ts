@@ -4,7 +4,7 @@ import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync,
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,type El} from '../src/shell/shellModel';
-import {writeFromTemplate,diagramWriter} from '../src/shell/diagramWriter';
+import {writeFromTemplate,diagramWriter,servesUserFile} from '../src/shell/diagramWriter';
 import {keepHref,safeCss} from '../src/shell/sanitize';
 
 test('shell pane sizes stay inside their limits', () => {
@@ -205,7 +205,9 @@ test('R970: the dev server sandboxes every file it serves from diagrams/ or temp
     '/diagrams/p%2Esvg', '/diagrams/p%2esvg?import', '/diagrams/p.svg?raw', '/diagrams/p.svg#x', fs + '/diagrams/p.svg', fs + '/DIAGRAMS/p.svg',
     '/./diagrams/p.svg', '/src/../diagrams/p.svg', '/src/%2e%2e/diagrams/p.svg', '/diagrams\\p.svg', '/diagrams//p.svg', '/diagrams/%E0%A4%A.svg',
     '/diagrams/p.svgz', '/diagrams/p.html', '/diagrams/p.htm', '/diagrams/p.xhtml', '/diagrams/p.xml', '/diagrams/p.xht', '/diagrams/noext',
-    '/diagrams/wrong.txt', '/diagrams/x.svg.js', '/diagrams/', '/diagrams', ...(linked ? ['/outside-link.html'] : [])];
+    '/diagrams/wrong.txt', '/diagrams/x.svg.js', '/diagrams/', '/diagrams',
+    // R990 (D12): Vite serves the path before ? or #, so a query or hash that walks out of diagrams/ must not count
+    '/diagrams/p.html?/../../x', '/diagrams/p.html?a=/../../shell.html', '/diagrams/p.html#/../../x', '/diagrams/p.svg?import&/../../src/main.ts', ...(linked ? ['/outside-link.html'] : [])];
   if (process.platform === 'linux') served.splice(served.indexOf('/diagrams/P.SVG'), 1), served.splice(served.indexOf(fs + '/DIAGRAMS/p.svg'), 1);
   for (const url of served) {
     const set = headers(url);
@@ -214,6 +216,29 @@ test('R970: the dev server sandboxes every file it serves from diagrams/ or temp
   }
   for (const url of ['/shell.html', '/src/main.ts', '/diagrams-other/p.svg', '/diagramsx.svg', '/', '/@fs/' + tmpdir().replaceAll('\\', '/').replace(/^\//, '') + '/elsewhere.svg'])
     assert.equal(headers(url)['Content-Security-Policy'], undefined, url);
+});
+
+test('R990: a root reached through a link still sandboxes a missing or malformed diagrams/ path', () => {
+  const real = mkdtempSync(join(tmpdir(), 'dc-shell-real-'));
+  mkdirSync(join(real, 'diagrams')); mkdirSync(join(real, 'templates')); mkdirSync(join(real, 'src'));
+  writeFileSync(join(real, 'diagrams', 'p.svg'), '<svg/>'); writeFileSync(join(real, 'src', 'main.ts'), '');
+  const link = real + '-link'; // as macOS reaches its temp folder: /var is a link to /private/var
+  try { symlinkSync(real, link, process.platform === 'win32' ? 'junction' : 'dir'); } catch { return; /* no link right on this machine */ }
+  for (const url of ['/diagrams/p.svg', '/diagrams/missing.svg', '/diagrams/new/deeper.svg', '/diagrams/%E0%A4%A.svg', '/templates/missing.svg', '/diagrams/'])
+    assert.equal(servesUserFile(link, url), true, url);
+  for (const url of ['/src/main.ts', '/missing.svg', '/diagramsx/missing.svg'])
+    assert.equal(servesUserFile(link, url), false, url);
+});
+
+test('R990: the CSPs keep base-uri self, media-src without a wildcard and form-action none (vercel.json and the shell meta)', () => {
+  const directives = (csp: string) => Object.fromEntries(csp.split(';').map(d => d.trim().split(/\s+/)).filter(d => d[0]).map(([k, ...v]) => [k, v]));
+  const rule = JSON.parse(readFileSync('vercel.json', 'utf8')).headers.find((h: {source: string}) => new RegExp('^' + h.source + '$').test('/shell.html'));
+  const vercel = directives(rule.headers.find((h: {key: string}) => h.key === 'Content-Security-Policy').value);
+  const meta = directives(/<meta http-equiv="Content-Security-Policy" content="([^"]*)"/.exec(readFileSync('shell.html', 'utf8'))![1]);
+  for (const csp of [vercel, meta]) { assert.deepEqual(csp['base-uri'], ["'self'"]); assert.deepEqual(csp['form-action'], ["'none'"]); }
+  assert.deepEqual(meta['media-src'], ["'self'", 'data:', 'blob:']);
+  assert.equal(vercel['media-src'], undefined); // falls back to default-src 'self'
+  assert.deepEqual(vercel['default-src'], ["'self'"]);
 });
 
 test('R993: compareGroups marks the union of named groups A only, B only or both, matched by id', () => {
