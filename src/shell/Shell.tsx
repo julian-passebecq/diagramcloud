@@ -2,11 +2,11 @@ import * as React from 'react';
 import {sanitizeSvg,STAGE_CSS} from './sanitize';
 import {RIBBON_BUTTONS,DEFAULT_SIZES,clampSize,diagramFiles,diagramGroups,cannotShow,missingViewBox,byteSize,formatSize,checkNewName,checkGroupTitle,svgTitle,type PaneSizes,type DiagramGroup,type DiagramFile,type El} from './shellModel';
 
-// Every file of diagrams/ is bundled as text only: no diagram is ever served as an SVG page on the app origin (R970).
+// Every file of diagrams/ is bundled as text only: the build serves no diagram as a page, and the dev server answers /diagrams/ with CSP sandbox (R970).
 const FILES=diagramFiles(import.meta.glob<string>('/diagrams/*',{query:'?raw',import:'default',eager:true}),{});
 // The three starting points of "New from template" (templates/*.svg).
 const TEMPLATES=diagramFiles(import.meta.glob<string>('/templates/*.svg',{query:'?raw',import:'default',eager:true}),{});
-const where=(f:DiagramFile)=>f.url.startsWith('blob:')?`${f.name} (in this page only)`:`diagrams/${f.name}`;
+const where=(f:DiagramFile)=>f.pageOnly?`${f.name} (in this page only)`:`diagrams/${f.name}`;
 const hlOff=(root:ParentNode|null|undefined)=>root?.querySelectorAll('.sh-hl').forEach(e=>e.classList.remove('sh-hl'));
 /** Opens text as plain text in a new tab: shows the source, runs nothing (R970). */
 const openText=(text:string)=>{const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);};
@@ -67,8 +67,7 @@ export function Shell(){
    if(out&&!out.ok){note(out.error);return;}
    saved=!!out?.ok;
   }catch{/* no dev server: page-only below */}
-  const url=saved?`diagrams/${name}.svg`:URL.createObjectURL(new Blob([t.text],{type:'text/plain'}));
-  setAdded(a=>[...a,{name:`${name}.svg`,text:t.text,url}]);setSelected(`${name}.svg`);
+  setAdded(a=>[...a,{name:`${name}.svg`,text:t.text,url:`diagrams/${name}.svg`,pageOnly:!saved}]);setSelected(`${name}.svg`);
   note(saved?`Created diagrams/${name}.svg from the ${label.toLowerCase()} template.`:`${name}.svg lives in this page only: not saved to the diagrams/ folder yet (this page has no file access). Use Save as to download it.`);
  };
  // Change the selected group's <title> (and a label text that repeats it) in the shown SVG.

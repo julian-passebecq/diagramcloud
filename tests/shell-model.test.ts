@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,type El} from '../src/shell/shellModel';
 import {writeFromTemplate,diagramWriter} from '../src/shell/diagramWriter';
-import {keepHref,stripOutsideUrls} from '../src/shell/sanitize';
+import {keepHref,safeCss} from '../src/shell/sanitize';
 
 test('shell pane sizes stay inside their limits', () => {
   for (const pane of ['left', 'right', 'bottom'] as const) {
@@ -121,33 +121,73 @@ test('an SVG without a viewBox gets one from its width and height so Zoom to fit
   assert.equal(missingViewBox(null, null, null), null);
 });
 
-test('R970: only in-diagram and inline-image hrefs stay; outside CSS url(), @import and :host are removed', () => {
+test('R970: only in-diagram and inline-image hrefs stay; CSS is kept whole or refused whole, never rewritten', () => {
   for (const ok of ['#a', ' #x', 'data:image/png;base64,AA', 'DATA:image/svg+xml,<svg/>']) assert.equal(keepHref(ok), true, ok);
   for (const bad of ['https://x/y.png', '//x/y', 'javascript:alert(1)', 'data:text/html,<b>', 'foo.svg#a', '']) assert.equal(keepHref(bad), false, bad);
-  assert.equal(stripOutsideUrls('svg{background:url( "https://x/a.png" )}'), 'svg{background:url(#)}');
-  assert.equal(stripOutsideUrls('.a{fill:url(#grad)} .b{background:url(data:image/png;base64,AA)}'), '.a{fill:url(#grad)} .b{background:url(data:image/png;base64,AA)}');
-  assert.equal(stripOutsideUrls('@import url(https://x/c.css);:host{position:fixed}'), ':not(*){position:fixed}');
-  assert.doesNotMatch(stripOutsideUrls('a{background:u\\72l(https://x)}'), /\\/);
-  assert.doesNotMatch(stripOutsideUrls('a{background:image-set("https://x/a.png" 1x)}'), /image-set\(/);
+  for (const ok of ['.a{fill:url(#grad)} .b{background:url( "data:image/png;base64,AA==" )}', 'fill:red;stroke:#333', 'Kitchen · 12 m²', 'body{background:red}'])
+    assert.equal(safeCss(ok), ok, ok);
+  for (const bad of [
+    'svg{background:url(https://x/a.png)}',
+    '/* url(# */url(https://x/a.png)',                 // comment
+    '--x:"url(#";svg{background:url(https://x/a)}',    // string
+    'svg{background:url(https://x/a.png',              // unclosed at end of input
+    'svg{background:ur\l(https://x/a)}', '@im\port "https://x/c.css";', // escapes
+    '@im@import x;port "https://x/c.css";',           // reassembly after a removal
+    'svg{background:image-seimage(t("https://x/a.png" 1x)}', 'background:image-set("https://x/a.png" 1x)',
+    'background:-webkit-image-set("https://x/a.png" 1x)', '@font-face{src:src("https://x/f.woff")}',
+    '@import "https://x/c.css";', ':host{position:fixed}', 'svg{background:url(data:image/png,AA)}', 'url(data:text/html;base64,AA)',
+  ]) assert.equal(safeCss(bad), null, bad);
 });
 
-test('R970: POST /__shell/new answers only a page opened on localhost, never another Host', async () => {
+// Drives the writer plugin's middlewares with fake requests (no server, no port).
+function writerHarness() {
   const root = mkdtempSync(join(tmpdir(), 'dc-shell-host-'));
   mkdirSync(join(root, 'diagrams')); mkdirSync(join(root, 'templates'));
   writeFileSync(join(root, 'templates', 'flowchart.svg'), '<svg/>');
-  let handler: any;
-  (diagramWriter(root) as any).configureServer({middlewares: {use: (_p: string, h: any) => { handler = h; }}});
-  const post = (host: string, name: string) => new Promise<number>(done => {
-    const listeners: Record<string, (c?: string) => void> = {};
-    const req = {method: 'POST', headers: {host, 'content-type': 'application/json'}, on: (e: string, f: any) => { listeners[e] = f; }, destroy() {}};
-    const res = {statusCode: 0, setHeader() {}, end() { done(res.statusCode); }};
-    handler(req, res);
-    listeners.data?.(JSON.stringify({name, template: 'flowchart.svg'})); listeners.end?.();
-  });
+  const routes: Record<string, any> = {};
+  (diagramWriter(root) as any).configureServer({middlewares: {use: (p: string, h: any) => { routes[p] = h; }}});
+  const post = (name: string, {host = 'localhost:5173', peer = '127.0.0.1', origin, type = 'application/json'}: {host?: string; peer?: string; origin?: string; type?: string} = {}) =>
+    new Promise<number>(done => {
+      const listeners: Record<string, (c?: string) => void> = {};
+      const headers: Record<string, string> = {host, 'content-type': type}; if (origin !== undefined) headers.origin = origin;
+      const req = {method: 'POST', headers, socket: {remoteAddress: peer}, on: (e: string, f: any) => { listeners[e] = f; }, destroy() {}};
+      const res = {statusCode: 0, setHeader() {}, end() { done(res.statusCode); }};
+      routes['/__shell/new'](req, res);
+      listeners.data?.(JSON.stringify({name, template: 'flowchart.svg'})); listeners.end?.();
+    });
+  return {root, routes, post};
+}
+
+test('R970: POST /__shell/new answers only a page opened on localhost, never another Host', async () => {
+  const {root, post} = writerHarness();
   for (const host of ['evil.example', 'evil.example:5173', '192.168.1.20:5173', 'localhost.evil.example', ''])
-    assert.equal(await post(host, 'x'), 403, host);
+    assert.equal(await post('x', {host}), 403, host);
   assert.equal(existsSync(join(root, 'diagrams', 'x.svg')), false);
   for (const [host, name] of [['localhost:5173', 'a'], ['127.0.0.1:5173', 'b'], ['[::1]:5173', 'c']])
-    assert.equal(await post(host, name), 200, host);
+    assert.equal(await post(name, {host, origin: `http://${host}`}), 200, host);
   assert.deepEqual(readdirSync(join(root, 'diagrams')).sort(), ['a.svg', 'b.svg', 'c.svg']);
+});
+
+test('R970: POST /__shell/new refuses a peer that is not this machine', async () => {
+  const {root, post} = writerHarness();
+  for (const peer of ['192.168.1.20', '::ffff:10.0.0.2', '', '128.0.0.1']) assert.equal(await post('x', {peer}), 403, peer);
+  assert.equal(await post('ok6', {peer: '::1'}), 200);
+  assert.equal(await post('ok4', {peer: '::ffff:127.0.0.1'}), 200);
+  assert.deepEqual(readdirSync(join(root, 'diagrams')).sort(), ['ok4.svg', 'ok6.svg']);
+});
+
+test('R970: POST /__shell/new refuses an Origin that is not http://<Host>, and any type but exact application/json', async () => {
+  const {root, post} = writerHarness();
+  for (const origin of ['https://evil.example', 'http://localhost:9999', 'null', 'https://localhost:5173']) assert.equal(await post('x', {origin}), 403, origin);
+  for (const type of ['application/json-patch', 'application/jsonx', 'text/plain']) assert.equal(await post('x', {type}), 405, type);
+  assert.equal(existsSync(join(root, 'diagrams', 'x.svg')), false);
+});
+
+test('R970: the dev server answers diagrams/ and templates/ as sandboxed documents', () => {
+  const {routes} = writerHarness();
+  for (const dir of ['/diagrams/', '/templates/']) {
+    const set: Record<string, string> = {}; let passed = false;
+    routes[dir]({}, {setHeader: (k: string, v: string) => { set[k] = v; }}, () => { passed = true; });
+    assert.equal(set['Content-Security-Policy'], 'sandbox', dir); assert.equal(passed, true);
+  }
 });

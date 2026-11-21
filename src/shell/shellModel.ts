@@ -20,7 +20,7 @@ export const checkGroupTitle=(title:string)=>!title.trim()?'A group title cannot
 /** The diagram's own <title>, used as the template's name in the menu. */
 export const svgTitle=(text:string,fallback:string)=>/<title>([^<]+)<\/title>/.exec(text)?.[1].trim()||fallback;
 
-export type DiagramFile={name:string;text:string;url:string};
+export type DiagramFile={name:string;text:string;url:string;pageOnly?:boolean};
 
 /** Turns a Vite glob map ('/diagrams/x.svg' -> text) into a sorted file list. */
 export function diagramFiles(texts:Record<string,string>,urls:Record<string,string>):DiagramFile[]{

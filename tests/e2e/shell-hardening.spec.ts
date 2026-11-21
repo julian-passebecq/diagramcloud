@@ -1,16 +1,19 @@
 import {test,expect,type Page} from '@playwright/test';
+import {readFileSync} from 'node:fs';
 
-// R970: the three probes from the R958 review. The floor plan is bundled into the shell script, so each probe is put
-// into that bundled text on its way to the browser (no quotes or backticks, so it fits any JS string literal).
+// R970: probes from the R958 and PR #172 reviews. The floor plan is bundled into the shell script, so each probe is put
+// into that bundled text on its way to the browser, escaped so it fits any JS string literal.
 const OUTSIDE='probe.invalid';
-const PROBE='<style>body{background:red} svg{background-image:url(https://'+OUTSIDE+'/css.png)}</style>'
- +'<image href=https://'+OUTSIDE+'/img.png width=9 height=9 /><a id=probe-link xlink:href=https://'+OUTSIDE+'/a><text>link</text></a>';
+const H='https://'+OUTSIDE;
+const PROBE='<style>body{background:red} svg{background-image:url('+H+'/css.png)}</style>'
+ +'<image href='+H+'/img.png width=9 height=9 /><a id=probe-link xlink:href='+H+'/a><text>link</text></a>';
+const jsLiteral=(text:string)=>text.replace(/[\\"'`]/g,m=>'\\'+m);
 
-async function withProbe(page:Page){
+async function withProbe(page:Page,probe=PROBE){
  const outside:string[]=[];
  await page.context().route(u=>u.hostname===OUTSIDE,r=>{outside.push(r.request().url());return r.abort();});
  await page.route(/\/assets\/shell-[^/]*\.js$/,async r=>{
-  const body=(await (await r.fetch()).text()).replace('small flat</title>','small flat</title>'+PROBE);
+  const body=(await (await r.fetch()).text()).replace('small flat</title>','small flat</title>'+jsLiteral(probe));
   await r.fulfill({body,contentType:'text/javascript'});
  });
  await page.goto('/shell.html');
@@ -32,6 +35,69 @@ test('a diagram cannot fetch from outside: image href, link href and CSS url() a
  expect(outside).toEqual([]);
  await expect(page.locator('#probe-link')).not.toHaveAttribute('xlink:href',/./);
  await expect(page.locator('.sh-diagram image')).not.toHaveAttribute('href',/./);
+});
+
+// One probe per way around a rewriting filter (PR #172 review): each must reach no outside address.
+const BYPASSES:Record<string,string>={
+ 'CSS comment':'<style>/* url(# */svg{background-image:url('+H+'/comment.png)}</style>',
+ 'CSS string':'<style>svg{--x:"url(#";background-image:url('+H+'/string.png)}</style>',
+ 'unclosed url( at end of input':'<style>svg{background-image:url('+H+'/unclosed.png</style>',
+ 'backslash escape':'<style>svg{background-image:ur\\l('+H+'/escape.png)}</style>',
+ '@import reassembled after a removal':'<style>@im@import x;port "'+H+'/import.css";</style>',
+ 'image-set reassembled after a removal':'<style>svg{background-image:image-seimage(t("'+H+'/imageset.png" 1x)}</style>',
+ 'style attribute (comment, image-set)':'<rect x=120 width=50 height=50 style="filter:/* url(# */url('+H+'/attr-filter.svg#f);mask-image:image-set(\''+H+'/attr-mask.png\' 1x);cursor:/* url(# */url('+H+'/attr-cur.png),auto"/>',
+};
+for(const [family,probe] of Object.entries(BYPASSES))test(`no outside fetch through a ${family}`,async ({page}) => {
+ const outside=await withProbe(page,probe);
+ const box=await page.locator('main.sh-canvas').boundingBox();
+ if(box)await page.mouse.move(box.x+box.width/2,box.y+box.height/2); // cursor rules load on hover
+ await page.waitForTimeout(700);
+ expect(outside).toEqual([]);
+});
+
+test('a diagram cannot paint over the shell: position:fixed stays inside the canvas', async ({page}) => {
+ await withProbe(page,'<style>svg{position:fixed!important;left:0;top:0;width:100vw!important;height:100vh!important;z-index:2147483647}</style>');
+ const top=await page.evaluate(()=>{const b=[...document.querySelectorAll('.sh-tools button')].find(x=>x.textContent==='Open raw file')!;
+  const r=b.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===b;});
+ expect(top).toBe(true);
+});
+
+test('the shell works under the Content-Security-Policy that vercel.json sends for shell.html', async ({page}) => {
+ const rule=JSON.parse(readFileSync('vercel.json','utf8')).headers.find((h:{source:string})=>h.source.startsWith('/shell'));
+ const csp=rule.headers.find((h:{key:string})=>h.key==='Content-Security-Policy').value;
+ const violations:string[]=[];page.on('console',m=>{if(/Content Security Policy/i.test(m.text()))violations.push(m.text());});
+ await page.route(/\/shell\.html$/,async r=>{const res=await r.fetch();await r.fulfill({response:res,headers:{...res.headers(),'content-security-policy':csp}});});
+ await page.goto('/shell.html');
+ await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
+ await page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'Database'}).click();
+ await expect(page.locator('#database')).toHaveClass(/sh-hl/);
+ expect(violations).toEqual([]);
+});
+
+/** Records every blob URL the page revokes, under a fake clock. */
+async function watchRevokes(page:Page){
+ await page.clock.install();
+ await page.addInitScript(()=>{const w=window as any;w.__revoked=[];const o=URL.revokeObjectURL;URL.revokeObjectURL=(u:string)=>{w.__revoked.push(u);o.call(URL,u);};
+  const c=URL.createObjectURL;w.__created=[];URL.createObjectURL=(b:Blob)=>{const u=c.call(URL,b);w.__created.push(u);return u;};});
+ const lists=()=>page.evaluate(()=>({created:(window as any).__created as string[],revoked:(window as any).__revoked as string[]}));
+ return lists;
+}
+
+test('Open raw file and Save as free their blob URL after 60 s', async ({page}) => {
+ const lists=await watchRevokes(page);
+ await page.goto('/shell.html');
+ const popup=page.waitForEvent('popup');
+ await page.getByRole('button',{name:'Open raw file'}).click();
+ await popup;
+ const download=page.waitForEvent('download');
+ await page.getByRole('button',{name:'Save as'}).click();
+ await download;
+ const {created}=await lists();
+ expect(created).toHaveLength(2);
+ await page.clock.runFor(59000);
+ expect((await lists()).revoked).toEqual([]);
+ await page.clock.runFor(2000);
+ expect((await lists()).revoked.sort()).toEqual([...created].sort());
 });
 
 test('Open raw file shows the source as plain text and runs nothing from it', async ({page}) => {
