@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" font-family="system-ui,sans-serif" font-size="14">
+  <title>Sample floor plan B: small flat with a study</title>
+  <rect width="640" height="420" fill="#fdfcf9"/>
+  <g fill="#fff" stroke="#3a3f45" stroke-width="4">
+    <g id="living-room"><title>Living room</title><rect x="260" y="20" width="360" height="220"/><text x="440" y="135" text-anchor="middle" stroke="none" fill="#3a3f45">Living room · 26 m²</text></g>
+    <g id="kitchen"><title>Kitchen</title><rect x="20" y="20" width="240" height="140"/><text x="140" y="95" text-anchor="middle" stroke="none" fill="#3a3f45">Kitchen · 11 m²</text></g>
+    <g id="bathroom"><title>Bathroom</title><rect x="20" y="160" width="240" height="80"/><text x="140" y="205" text-anchor="middle" stroke="none" fill="#3a3f45">Bathroom · 6 m²</text></g>
+    <g id="bedroom"><title>Bedroom</title><rect x="20" y="240" width="320" height="160"/><text x="180" y="325" text-anchor="middle" stroke="none" fill="#3a3f45">Bedroom · 15 m²</text></g>
+    <g id="study"><title>Study</title><rect x="340" y="240" width="280" height="160"/><text x="480" y="325" text-anchor="middle" stroke="none" fill="#3a3f45">Study · 10 m²</text></g>
+  </g>
+  <g id="doors" stroke="#fdfcf9" stroke-width="6"><title>Doors</title><path d="M260 60V110"/><path d="M340 300V350"/><path d="M400 240H450"/><path d="M150 240H200"/><path d="M540 400H600"/></g>
+</svg>

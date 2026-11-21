@@ -17,7 +17,7 @@ test('New from template lists three, refuses a taken name, shows a floor plan, a
   page.once('dialog',d=>d.accept('floor-plan'));
   await menu.getByRole('menuitem',{name:'Floor plan'}).click();
   await expect(out).toContainText('diagrams/floor-plan.svg already exists');
-  await expect(tree.getByRole('button')).toHaveText(['architecture.svg','floor-plan.svg']);
+  await expect(tree.getByRole('button')).toHaveText(['architecture.svg','floor-plan-b.svg','floor-plan.svg']);
 
   await page.getByRole('button',{name:'New from template'}).click();
   page.once('dialog',d=>d.accept('../my flat'));
