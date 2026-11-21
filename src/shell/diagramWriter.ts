@@ -1,5 +1,5 @@
 /** Dev-server side of "New from template" (R964): copies templates/<t>.svg to diagrams/<name>.svg, never outside diagrams/. */
-import {readdirSync,readFileSync,writeFileSync} from 'node:fs';
+import {readdirSync,readFileSync,realpathSync,writeFileSync} from 'node:fs';
 import {join,resolve,sep} from 'node:path';
 import type {Plugin} from 'vite';
 import {checkNewName} from './shellModel';
@@ -16,10 +16,15 @@ export function writeFromTemplate(root:string,name:string,template:string):strin
 
 /** True when the Host header names this machine: localhost, 127.0.0.1 or [::1], with or without a port. */
 export const isLoopbackHost=(host:string|undefined)=>/^(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?$/i.test(host??'');
-/** True when a request path, once decoded, names an .svg file (any route, any spelling). */
-export function isSvgPath(url:string|undefined):boolean{
- let p=url??'';try{p=decodeURIComponent(p);}catch{/* keep the raw path */}
- return /\.svg(?:[?#]|$)/i.test(p);
+/** True when the file a dev request is served from lies under diagrams/ or templates/ (any extension, any spelling):
+ *  the path is decoded, normalised, /@fs/ followed and symlinks resolved, so the check is on what is served. */
+export function servesUserFile(root:string,url:string|undefined):boolean{
+ let p=(url??'').split(/[?#]/)[0];try{p=decodeURIComponent(p);}catch{/* keep the raw path */}
+ p=p.replace(/\\/g,'/');
+ const real=(f:string)=>{try{return realpathSync.native(f);}catch{return f;}};
+ const file=real(p.startsWith('/@fs/')?resolve(p.slice(4).replace(/^\/([A-Za-z]:)/,'$1')):resolve(root,'.'+p));
+ const fold=(f:string)=>process.platform==='linux'?f:f.toLowerCase(); // Windows and macOS folders ignore case
+ return ['diagrams','templates'].some(d=>{const dir=fold(real(resolve(root,d)));return fold(file)===dir||fold(file).startsWith(dir+sep);});
 }
 /** True when the TCP peer is this machine (IPv4, IPv6 or IPv4-mapped loopback). */
 export const isLoopbackPeer=(addr:string|undefined)=>/^(127\.\d+\.\d+\.\d+|::1|::ffff:127\.\d+\.\d+\.\d+)$/i.test(addr??'');
@@ -27,9 +32,9 @@ export const isLoopbackPeer=(addr:string|undefined)=>/^(127\.\d+\.\d+\.\d+|::1|:
 /** POST /__shell/new {name, template} while `npm run dev` runs, from a page on localhost only. A built or previewed page has no such route. */
 export function diagramWriter(root=process.cwd()):Plugin{
  return {name:'diagramcloud-shell-writer',apply:'serve',configureServer(server){
-  // Opened directly in the dev server, any SVG is a sandboxed document: its own script never runs. Keyed on the
-  // decoded path, so /%64iagrams/x.svg or /@fs/<root>/diagrams/x.svg is sandboxed too.
-  server.middlewares.use((req,res,next)=>{if(isSvgPath(req.url))res.setHeader('Content-Security-Policy','sandbox');next();});
+  // Every file served from diagrams/ or templates/, however it is asked for, is a sandboxed document that is never
+  // sniffed: its own script never runs in the dev origin. The shell still reads the text (a module import is not a document).
+  server.middlewares.use((req,res,next)=>{if(servesUserFile(root,req.url)){res.setHeader('Content-Security-Policy','sandbox');res.setHeader('X-Content-Type-Options','nosniff');}next();});
   server.middlewares.use('/__shell/new',(req,res)=>{
    const reply=(code:number,body:object)=>{res.statusCode=code;res.setHeader('content-type','application/json');res.end(JSON.stringify(body));};
    // A JSON content type forces a CORS preflight, so another site cannot post here.

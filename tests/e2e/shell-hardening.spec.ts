@@ -94,7 +94,7 @@ test('a diagram cannot paint over the shell: position:fixed stays inside the can
 
 const vercelRule=()=>{const rule=JSON.parse(readFileSync('vercel.json','utf8')).headers.find((h:{source:string})=>new RegExp('^'+h.source+'$').test('/shell.html'));
  return rule.headers.find((h:{key:string})=>h.key==='Content-Security-Policy').value as string;};
-/** Adds an outside image and an outside style sheet to the diagram's shadow root from the page itself: only a CSP stops them. */
+/** Adds an outside image, style sheet, font, object, embed, fetch and frame to the diagram's shadow root from the page itself: only a CSP stops them. */
 async function outsideLoads(page:Page){
  const outside:string[]=[];
  await page.context().route(u=>u.hostname===OUTSIDE,r=>{outside.push(r.request().url());return r.abort();});
@@ -102,13 +102,20 @@ async function outsideLoads(page:Page){
   await page.evaluate(h=>{const sr=document.querySelector('.sh-diagram')!.shadowRoot!;
    const i=document.createElement('img');i.src=h+'/csp-img.png';sr.appendChild(i);
    const l=document.createElement('link');l.rel='stylesheet';l.href=h+'/csp-sheet.css';sr.appendChild(l);
+   // In the document, not the shadow root: Chromium ignores @font-face inside a shadow root.
+   const f=document.createElement('style');f.textContent='@font-face{font-family:csp-probe;src:url('+h+'/csp-font.woff)}';document.head.appendChild(f);
+   const t=document.createElement('span');t.style.fontFamily='csp-probe';t.textContent='x';document.body.appendChild(t);
+   const o=document.createElement('object');o.data=h+'/csp-object.png';o.type='image/png';document.body.appendChild(o);
+   const e=document.createElement('embed');e.src=h+'/csp-embed.svg';e.type='image/svg+xml';document.body.appendChild(e);
+   fetch(h+'/csp-fetch.json').catch(()=>{});
+   const fr=document.createElement('iframe');fr.src=h+'/csp-frame.html';document.body.appendChild(fr);
    },H);
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(900);
   return outside;
  };
 }
 
-test('the vercel.json CSP for /shell.html alone stops outside images and style sheets', async ({page}) => {
+test('the vercel.json CSP for /shell.html alone stops outside images, style sheets, fonts, objects, fetches and frames', async ({page}) => {
  await withoutMetaCsp(page,{'content-security-policy':vercelRule()});
  const load=await outsideLoads(page);
  await page.goto('/shell.html');
@@ -116,11 +123,18 @@ test('the vercel.json CSP for /shell.html alone stops outside images and style s
  expect(await load()).toEqual([]);
 });
 
-test('the <meta> CSP in shell.html alone stops outside images and style sheets, on any host', async ({page}) => {
+test('the <meta> CSP in shell.html alone stops outside images, style sheets, fonts, objects, fetches and frames, on any host', async ({page}) => {
  const load=await outsideLoads(page);
  await page.goto('/shell.html');
  await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
  expect(await load()).toEqual([]);
+});
+
+test('the <meta> CSP keeps the page base: a <base href> to another origin is ignored', async ({page}) => {
+ await page.goto('/shell.html');
+ await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
+ const baseURI=await page.evaluate(h=>{const b=document.createElement('base');b.href=h+'/';document.head.prepend(b);return document.baseURI;},H);
+ expect(baseURI).not.toContain(OUTSIDE);
 });
 
 test('the control: without any CSP the same loads do leave the page', async ({page}) => {
@@ -128,7 +142,8 @@ test('the control: without any CSP the same loads do leave the page', async ({pa
  const load=await outsideLoads(page);
  await page.goto('/shell.html');
  await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
- expect((await load()).length).toBe(2);
+ const got=(await load()).map(u=>u.replace(/^.*\/csp-([a-z]+)\..*$/,'$1')).sort();
+ expect(got).toEqual(['embed','fetch','font','frame','img','object','sheet']);
 });
 
 test('the shell works under both CSPs: highlight, Save as and Open raw file', async ({page}) => {

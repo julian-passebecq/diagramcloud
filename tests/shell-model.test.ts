@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync} from 'node:fs';
+import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync,symlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,type El} from '../src/shell/shellModel';
@@ -186,16 +186,32 @@ test('R970: POST /__shell/new refuses an Origin that is not http://<Host>, and a
   assert.equal(existsSync(join(root, 'diagrams', 'x.svg')), false);
 });
 
-test('R970: the dev server answers every SVG as a sandboxed document, whatever the path spelling', () => {
-  const {routes} = writerHarness();
-  const csp = (url: string) => {
+test('R970: the dev server sandboxes every file it serves from diagrams/ or templates/, however it is asked for', () => {
+  const {root, routes} = writerHarness();
+  for (const f of ['p.svg', 'p.svgz', 'p.html', 'p.htm', 'p.xhtml', 'p.xml', 'p.xht', 'noext', 'wrong.txt', 'x.svg.js'])
+    writeFileSync(join(root, 'diagrams', f), '<svg xmlns="http://www.w3.org/2000/svg"><script>document.title="ran"</script></svg>');
+  mkdirSync(join(root, 'src')); writeFileSync(join(root, 'src', 'main.ts'), ''); writeFileSync(join(root, 'shell.html'), '');
+  mkdirSync(join(root, 'diagrams-other')); writeFileSync(join(root, 'diagrams-other', 'p.svg'), '<svg/>');
+  let linked = false; // a symlink outside diagrams/ that points into it is judged by its target
+  try { symlinkSync(join(root, 'diagrams', 'p.html'), join(root, 'outside-link.html')); linked = true; } catch { /* no symlink right on this machine */ }
+  const headers = (url: string) => {
     const set: Record<string, string> = {}; let passed = false;
     routes['*']({url}, {setHeader: (k: string, v: string) => { set[k] = v; }}, () => { passed = true; });
     assert.equal(passed, true, url);
-    return set['Content-Security-Policy'];
+    return set;
   };
-  for (const url of ['/diagrams/x.svg', '/templates/flowchart.svg', '/%64iagrams/x.svg', '/%74emplates/x.svg', '/@fs/C:/repo/diagrams/x.svg',
-    '/./diagrams/x.svg', '/src/../diagrams/x.svg', '/diagrams/x.SVG?t=1', '/diagrams/x%2esvg', '/diagrams/%E0%A4%A.svg'])
-    assert.equal(csp(url), 'sandbox', url);
-  for (const url of ['/shell.html', '/src/shell/main.tsx', '/diagrams/x.svg.js']) assert.equal(csp(url), undefined, url);
+  const fs = '/@fs/' + root.replaceAll('\\', '/').replace(/^\//, '');
+  const served = ['/diagrams/p.svg', '/diagrams/P.SVG', '/templates/flowchart.svg', '/%64iagrams/p.svg', '/%74emplates/flowchart.svg',
+    '/diagrams/p%2Esvg', '/diagrams/p%2esvg?import', '/diagrams/p.svg?raw', '/diagrams/p.svg#x', fs + '/diagrams/p.svg', fs + '/DIAGRAMS/p.svg',
+    '/./diagrams/p.svg', '/src/../diagrams/p.svg', '/src/%2e%2e/diagrams/p.svg', '/diagrams\\p.svg', '/diagrams//p.svg', '/diagrams/%E0%A4%A.svg',
+    '/diagrams/p.svgz', '/diagrams/p.html', '/diagrams/p.htm', '/diagrams/p.xhtml', '/diagrams/p.xml', '/diagrams/p.xht', '/diagrams/noext',
+    '/diagrams/wrong.txt', '/diagrams/x.svg.js', '/diagrams/', '/diagrams', ...(linked ? ['/outside-link.html'] : [])];
+  if (process.platform === 'linux') served.splice(served.indexOf('/diagrams/P.SVG'), 1), served.splice(served.indexOf(fs + '/DIAGRAMS/p.svg'), 1);
+  for (const url of served) {
+    const set = headers(url);
+    assert.equal(set['Content-Security-Policy'], 'sandbox', url);
+    assert.equal(set['X-Content-Type-Options'], 'nosniff', url);
+  }
+  for (const url of ['/shell.html', '/src/main.ts', '/diagrams-other/p.svg', '/diagramsx.svg', '/', '/@fs/' + tmpdir().replaceAll('\\', '/').replace(/^\//, '') + '/elsewhere.svg'])
+    assert.equal(headers(url)['Content-Security-Policy'], undefined, url);
 });
