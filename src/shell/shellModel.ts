@@ -36,6 +36,14 @@ export function cannotShow(file:DiagramFile):string|null{
  return null;
 }
 
+/** viewBox to add so Zoom to fit can scale an SVG that has none: from its own width and height (px or unitless), else null. */
+export function missingViewBox(viewBox:string|null,width:string|null,height:string|null):string|null{
+ if(viewBox?.trim())return null;
+ const n=(v:string|null)=>{const m=/^\s*([\d.]+)\s*(px)?\s*$/.exec(v??'');const x=m?Number(m[1]):NaN;return x>0?x:null;};
+ const w=n(width),h=n(height);
+ return w&&h?`0 0 ${w} ${h}`:null;
+}
+
 /** Minimal element shape, so the group walk runs on a real DOM and in Node tests alike. */
 export type El={tagName:string;getAttribute(name:string):string|null;children:ArrayLike<El>;textContent:string|null};
 export type DiagramGroup={id:string;label:string;el:El};

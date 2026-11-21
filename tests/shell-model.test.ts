@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,type El} from '../src/shell/shellModel';
+import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,type El} from '../src/shell/shellModel';
 import {writeFromTemplate} from '../src/shell/diagramWriter';
 
 test('shell pane sizes stay inside their limits', () => {
@@ -105,4 +105,12 @@ test('the three templates are original, safe and list their parts in the navigat
     const groups = [...text.matchAll(/<g id="([^"]+)"><title>([^<]+)<\/title>|<g id="([^"]+)"[^>]*>\s*<title>([^<]+)<\/title>/g)].map(m => m[2] ?? m[4]);
     assert.deepEqual(groups, want[name], name);
   }
+});
+
+test('an SVG without a viewBox gets one from its width and height so Zoom to fit scales it', () => {
+  assert.equal(missingViewBox(null, '300', '200'), '0 0 300 200');
+  assert.equal(missingViewBox('', '300px', '200px'), '0 0 300 200');
+  assert.equal(missingViewBox('0 0 10 10', '300', '200'), null);
+  assert.equal(missingViewBox(null, '50%', '200'), null);
+  assert.equal(missingViewBox(null, null, null), null);
 });

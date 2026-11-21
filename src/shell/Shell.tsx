@@ -1,6 +1,6 @@
 import * as React from 'react';
 import DOMPurify from 'dompurify';
-import {RIBBON_BUTTONS,DEFAULT_SIZES,clampSize,diagramFiles,diagramGroups,cannotShow,byteSize,formatSize,checkNewName,checkGroupTitle,svgTitle,type PaneSizes,type DiagramGroup,type DiagramFile,type El} from './shellModel';
+import {RIBBON_BUTTONS,DEFAULT_SIZES,clampSize,diagramFiles,diagramGroups,cannotShow,missingViewBox,byteSize,formatSize,checkNewName,checkGroupTitle,svgTitle,type PaneSizes,type DiagramGroup,type DiagramFile,type El} from './shellModel';
 
 // Every file of diagrams/ is bundled as text (to draw it) and as a URL (to open the raw file).
 const FILES=diagramFiles(
@@ -37,6 +37,9 @@ export function Shell(){
   box.innerHTML=DOMPurify.sanitize(edited.current.get(file.name)??file.text,{USE_PROFILES:{svg:true,svgFilters:true}});
   const svg=box.querySelector('svg');
   if(!svg){note(`${file.name} cannot be shown: the SVG did not survive parsing or sanitising.`);return;}
+  if(!svg.getAttribute('viewBox')){const b=svg.getBBox();// fallback without width/height: the drawing's own bounds
+   const vb=missingViewBox(null,svg.getAttribute('width'),svg.getAttribute('height'))??(b.width>0&&b.height>0?`${b.x} ${b.y} ${b.width} ${b.height}`:null);
+   if(vb)svg.setAttribute('viewBox',vb);}
   setGroups(diagramGroups(svg as unknown as El));
   note(`Showing ${where(file)} (${formatSize(byteSize(file.text))}).`);
  },[file]);
