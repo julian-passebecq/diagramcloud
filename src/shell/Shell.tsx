@@ -48,6 +48,7 @@ export function Shell(){
  const [picks,setPicks]=React.useState<string[]>([]);
  const [deck,setDeck]=React.useState<string[]|null>(null);
  const [slide,setSlide]=React.useState(0);
+ const canvas=React.useRef<HTMLElement>(null);
  const stageB=()=>{const h=hostB.current;return h?h.shadowRoot??h.attachShadow({mode:'open'}):null;};
  const textOf=(f:DiagramFile)=>edited.current.get(f.name)??f.text;
  // The diagram lives in a shadow root, so its own <style> styles the diagram and never the shell's panes (R970).
@@ -97,7 +98,12 @@ export function Shell(){
  onKey.current=e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(deck){
-   if((e.target as Element|null)?.closest?.('[role=separator],input,textarea,select'))return; // a splitter keeps its arrows
+   const t=e.target as Element|null;
+   if(t?.closest?.('input,textarea,select'))return;
+   // A focused splitter keeps only the arrows it resizes with (side splitters Left/Right); Esc and Space still drive the deck.
+   if(t?.closest?.('[role=separator][aria-orientation=vertical]')&&(e.key==='ArrowLeft'||e.key==='ArrowRight'))return;
+   // Space on a focused button presses that button (Copy deck outline, a slide in the list).
+   if(e.key===' '&&t?.closest?.('button'))return;
    const act=deckKey(e.key);if(!act)return;
    e.preventDefault();
    if(act==='exit')exitPresent();else setSlide(i=>deckStep(i,deck.length,act==='next'?1:-1));
@@ -114,13 +120,16 @@ export function Shell(){
   if(!ok.length){note('Present needs at least one diagram that can be shown.');return;}
   setPicker(false);setMenu(false);setCompareB(null);hlOff(stage());setActive(null);
   setDeck(ok);setSlide(0);
+  canvas.current?.focus({preventScroll:true}); // off the Present button, so Space moves the deck at once
   note(`Present: ${ok.length} slide(s) ${picks.length?'picked in the tree':'from diagrams/'}, in tree order. Right arrow or Space = next, Left = previous, Esc = leave.`);
  };
  const exitPresent=()=>{setDeck(null);note(`Left Present: showing ${file?where(file):'nothing'}.`);};
  const outline=()=>deckOutline((deck??[]).map(n=>{const f=files.find(x=>x.name===n);return {name:n,title:f?rootTitle(textOf(f)):''};}));
  const copyOutline=()=>{
   const text=outline();
-  navigator.clipboard?.writeText(text).then(()=>note(`Copied the deck outline (${deck?.length??0} slide(s)) to the clipboard.`),()=>note('Could not copy: the browser refused clipboard access. Select the slide list in Navigation instead.'));
+  const refused=()=>note('Could not copy: the browser refused clipboard access. Select the slide list in Navigation instead.');
+  if(!navigator.clipboard){refused();return;}
+  navigator.clipboard.writeText(text).then(()=>note(`Copied the deck outline (${deck?.length??0} slide(s)) to the clipboard.`),refused);
  };
  const clickTree=(e:React.MouseEvent,name:string)=>{
   if(e.ctrlKey||e.metaKey){
@@ -232,7 +241,7 @@ export function Shell(){
    {!files.length&&<p className="sh-muted">Add an .svg file to diagrams/.</p>}
   </nav>
   <Splitter dir="col" column={2} label="Resize explorer" onDelta={d=>resize('left',d)}/>
-  <main className={`sh-canvas${fit||deck?' fit':''}${split?' compare':''}${deck?' present':''}`} aria-label="Diagram">
+  <main className={`sh-canvas${fit||deck?' fit':''}${split?' compare':''}${deck?' present':''}`} aria-label="Diagram" ref={canvas} tabIndex={-1}>
    <section className="sh-stage" aria-label={deck&&slideName?`Slide ${slide+1}: ${slideName}`:comparing?`Option A: ${file?.name}`:undefined}>
     {comparing&&<h3 className="sh-stage-label"><b>A</b> {file?.name}</h3>}
     <div ref={host} className={`sh-diagram${fit||comparing||deck?' fit':''}`}/>

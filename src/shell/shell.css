@@ -60,3 +60,4 @@ button:disabled{opacity:.5;cursor:default}
 .sh-deckbar{position:sticky;top:-8px;z-index:1;background:var(--sh-pane);padding:4px 0;display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13px}
 .sh-deckbar p{margin:0;font-weight:600}
 .sh-deckbar button{border-color:var(--sh-line);background:var(--sh-bg)}
+.sh-canvas:focus{outline:none} /* R998: Present moves focus here so Space drives the deck */

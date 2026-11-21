@@ -60,6 +60,47 @@ test('Present over three picked diagrams: arrows and Space move, the navigation 
   expect(errors).toEqual([]);
 });
 
+// PR 178 review: a splitter takes focus on pointer-down; Esc, Space and the deck arrows must still work after a resize.
+test('Present after dragging a splitter: arrows and Space move the deck, Esc leaves; Space on Copy deck outline presses it',async({page,context})=>{
+  await context.grantPermissions(['clipboard-read','clipboard-write']);
+  await page.goto('/shell.html');
+  await page.getByRole('button',{name:'Present',exact:true}).click();
+  const status=page.getByRole('contentinfo',{name:'Output'}).getByRole('status');
+  await expect(status).toHaveText('slide 1 of 3: architecture.svg');
+  for(const name of ['Resize bottom pane','Resize navigation']){
+    const sep=page.getByRole('separator',{name});
+    const box=(await sep.boundingBox())!;
+    await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();
+    await page.mouse.move(box.x+box.width/2-20,box.y+box.height/2-20);await page.mouse.up();
+    await expect(sep).toBeFocused();
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press(' ');
+    if(name==='Resize bottom pane'){
+      await expect(status).toHaveText('slide 3 of 3: floor-plan.svg'); // the bottom splitter only uses Up/Down
+      await page.keyboard.press('ArrowLeft');
+      await expect(status).toHaveText('slide 2 of 3: floor-plan-b.svg');
+    }else{
+      await expect(status).toHaveText('slide 3 of 3: floor-plan.svg'); // a side splitter keeps Left/Right; Space still moves (stays on the last)
+    }
+  }
+  await page.getByRole('button',{name:'Copy deck outline'}).focus();
+  await page.keyboard.press(' ');
+  await expect(page.getByRole('contentinfo',{name:'Output'})).toContainText('Copied the deck outline (3 slide(s)) to the clipboard.');
+  await expect(status).toHaveText('slide 3 of 3: floor-plan.svg');
+  await page.getByRole('separator',{name:'Resize explorer'}).focus();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button',{name:'Present',exact:true})).toBeVisible();
+  await expect(status).toHaveCount(0);
+});
+
+test('Copy deck outline without a clipboard says so in Output',async({page})=>{
+  await page.addInitScript(()=>Object.defineProperty(navigator,'clipboard',{value:undefined}));
+  await page.goto('/shell.html');
+  await page.getByRole('button',{name:'Present',exact:true}).click();
+  await page.getByRole('button',{name:'Copy deck outline'}).click();
+  await expect(page.getByRole('contentinfo',{name:'Output'})).toContainText('Could not copy: the browser refused clipboard access.');
+});
+
 test('Present with nothing picked shows every diagram in diagrams/, in tree order',async({page})=>{
   await page.goto('/shell.html');
   await page.getByRole('button',{name:'Present',exact:true}).click();

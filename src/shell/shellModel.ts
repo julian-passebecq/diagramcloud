@@ -110,7 +110,8 @@ export const deckStatus=(index:number,count:number,name:string)=>`slide ${index+
 
 /** R998: the SVG's own <title>: the root element's first child (after blanks and comments), never a group's title; '' when none. */
 export function rootTitle(text:string):string{
- const m=/^(?:\s|<\?xml[\s\S]*?\?>|<!--[\s\S]*?-->|<!DOCTYPE[^>]*>)*<svg(?:\s[^>]*)?>(?:\s|<!--[\s\S]*?-->)*<title>([^<]*)<\/title>/i.exec(text);
+ // Each alternative is unambiguous (a comment body can never contain "-->", a prolog never "?>"), so no backtracking blow-up.
+ const m=/^(?:\s|<\?xml(?:[^?]|\?(?!>))*\?>|<!--(?:[^-]|-(?!->))*-->|<!DOCTYPE[^>]*>)*<svg(?:\s[^>]*)?>(?:\s|<!--(?:[^-]|-(?!->))*-->)*<title>([^<]*)<\/title>/i.exec(text);
  return m?.[1].trim().replace(/\s+/g,' ')??'';
 }
 

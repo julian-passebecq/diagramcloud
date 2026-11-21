@@ -279,6 +279,15 @@ test('R998: rootTitle reads the own title of the SVG, never a group title; the o
   assert.equal(rootTitle('not svg'), '');
   assert.equal(deckOutline([{name: 'a.svg', title: 'Plan A'}, {name: 'b.svg', title: ''}]), '1. a.svg, Plan A\n2. b.svg');
   assert.equal(deckOutline([]), '');
+  // PR 178 review: consecutive comments never backtrack exponentially (the old pattern froze the tab at about 30).
+  const many = '<!-- c -->'.repeat(40);
+  for (const text of [`<svg>${many}<title>T</title></svg>`, `<svg>${many}<rect/></svg>`, `${many}<svg>${many}`, `<svg>${many}<!-- open`, `<?xml ${'?'.repeat(40)}`]) {
+    const t0 = performance.now();
+    rootTitle(text);
+    assert.ok(performance.now() - t0 < 50, `${text.slice(0, 30)}... took ${performance.now() - t0} ms`);
+  }
+  assert.equal(rootTitle(`<svg>${many}<title>T</title></svg>`), 'T');
+  assert.equal(rootTitle('<svg><!-- a - b -- c --><title>T</title></svg>'), 'T');
   assert.deepEqual(['architecture.svg', 'floor-plan-b.svg', 'floor-plan.svg'].map(n => rootTitle(readFileSync(`diagrams/${n}`, 'utf8'))),
     ['Sample architecture: six services', 'Sample floor plan B: small flat with a study', 'Sample floor plan: small flat']);
 });
