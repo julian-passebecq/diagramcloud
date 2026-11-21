@@ -54,3 +54,9 @@ button:disabled{opacity:.5;cursor:default}
 .sh-mark-both{color:var(--sh-muted)}
 @media (prefers-color-scheme:dark){.sh-mark-a{color:#f0b860}.sh-mark-b{color:#c6a6f0}}
 .sh-picker{left:auto;right:auto}
+/* R998: Present. Picked slides in the tree; the slide status above Output. */
+.sh-node.picked{box-shadow:inset 3px 0 0 var(--sh-accent)}
+.sh-node.picked .sh-label::after{content:" \2713";color:var(--sh-accent)}
+.sh-deckbar{position:sticky;top:-8px;z-index:1;background:var(--sh-pane);padding:4px 0;display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13px}
+.sh-deckbar p{margin:0;font-weight:600}
+.sh-deckbar button{border-color:var(--sh-line);background:var(--sh-bg)}

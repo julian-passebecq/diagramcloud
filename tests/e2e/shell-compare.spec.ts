@@ -50,3 +50,29 @@ test('Compare A vs B shows both plans, marks each group, writes and copies the c
   await expect(page.getByRole('region',{name:/Option B/})).toHaveCount(0);
   expect(errors).toEqual([]);
 });
+
+// R998 (PR 174 review c): A changed in the tree during compare. Esc names the new A; picking B itself as A leaves compare cleanly.
+test('Changing A during compare: Esc names the current A, and choosing B as A leaves compare without a stray B stage',async({page})=>{
+  await page.goto('/shell.html');
+  const tree=page.getByRole('navigation',{name:'Diagrams'});
+  const out=page.getByRole('contentinfo',{name:'Output'});
+  await tree.getByRole('button',{name:'floor-plan.svg',exact:true}).click();
+  await page.getByRole('button',{name:'Compare A vs B'}).click();
+  await page.getByRole('menu',{name:'Compare floor-plan.svg with'}).getByRole('menuitem',{name:'floor-plan-b.svg'}).click();
+  await expect(page.getByRole('region',{name:'Option B: floor-plan-b.svg'})).toBeVisible();
+  await tree.getByRole('button',{name:'architecture.svg',exact:true}).click();
+  await expect(page.getByRole('region',{name:'Option A: architecture.svg'})).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(out.locator('li').last()).toHaveText('Exit compare: showing diagrams/architecture.svg alone.');
+  // Compare again, then pick B itself in the tree.
+  await page.getByRole('button',{name:'Compare A vs B'}).click();
+  await page.getByRole('menu',{name:'Compare architecture.svg with'}).getByRole('menuitem',{name:'floor-plan-b.svg'}).click();
+  await expect(page.getByRole('region',{name:'Option B: floor-plan-b.svg'})).toBeVisible();
+  await tree.getByRole('button',{name:'floor-plan-b.svg',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Compare A vs B'})).toBeVisible();
+  await expect(out).toContainText('Exit compare: showing diagrams/floor-plan-b.svg alone.');
+  await expect(page.locator('.sh-canvas.compare')).toHaveCount(0);
+  await expect(page.locator('.sh-stage[hidden]')).toHaveCount(1);
+  expect(await page.evaluate(()=>[...document.querySelectorAll('.sh-diagram')].map(h=>h.shadowRoot?.querySelectorAll('svg').length??0))).toEqual([1,0]);
+  await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button')).toHaveText(['Living room','Kitchen','Bathroom','Bedroom','Study','Doors']);
+});

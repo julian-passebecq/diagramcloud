@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {sanitizeSvg,STAGE_CSS} from './sanitize';
-import {RIBBON_BUTTONS,DEFAULT_SIZES,clampSize,diagramFiles,diagramGroups,cannotShow,missingViewBox,byteSize,formatSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,type PaneSizes,type DiagramGroup,type DiagramFile,type El} from './shellModel';
+import {RIBBON_BUTTONS,DEFAULT_SIZES,clampSize,diagramFiles,diagramGroups,cannotShow,missingViewBox,byteSize,formatSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,deckOrder,deckStep,deckKey,deckStatus,deckOutline,rootTitle,type PaneSizes,type DiagramGroup,type DiagramFile,type El} from './shellModel';
 
 // Every file of diagrams/ is bundled as text only: the build serves no diagram as a page, and the dev server answers /diagrams/ with CSP sandbox (R970).
 const FILES=diagramFiles(import.meta.glob<string>('/diagrams/*',{query:'?raw',import:'default',eager:true}),{});
@@ -8,7 +8,6 @@ const FILES=diagramFiles(import.meta.glob<string>('/diagrams/*',{query:'?raw',im
 const TEMPLATES=diagramFiles(import.meta.glob<string>('/templates/*.svg',{query:'?raw',import:'default',eager:true}),{});
 const where=(f:DiagramFile)=>f.pageOnly?`${f.name} (in this page only)`:`diagrams/${f.name}`;
 const hlOff=(root:ParentNode|null|undefined)=>root?.querySelectorAll('.sh-hl').forEach(e=>e.classList.remove('sh-hl'));
-/** Opens text as plain text in a new tab: shows the source, runs nothing (R970). */
 /** Draws a diagram file into a shadow root, sanitised (R970); returns its named groups, or null with the reason in Output. */
 function draw(box:ShadowRoot,file:DiagramFile,text:string,note:(line:string)=>void):DiagramGroup[]|null{
  const safe=sanitizeSvg(text);
@@ -21,6 +20,7 @@ function draw(box:ShadowRoot,file:DiagramFile,text:string,note:(line:string)=>vo
   if(vb)svg.setAttribute('viewBox',vb);}
  return diagramGroups(svg as unknown as El);
 }
+/** Opens text as plain text in a new tab: shows the source, runs nothing (R970). */
 const openText=(text:string)=>{const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);};
 
 /** DiagramCloud GUI shell: ribbon top, diagrams/ tree left, the shown SVG in the centre, its groups right, Output bottom. */
@@ -44,6 +44,10 @@ export function Shell(){
  const [drawnB,setDrawnB]=React.useState<string|null>(null); // the B file whose stage is drawn: no comparison before that
  const [activeRow,setActiveRow]=React.useState<string|null>(null);
  const hostB=React.useRef<HTMLDivElement>(null);
+ // R998: Present. picks = files Ctrl/Cmd-clicked in the tree; deck = the slide names while presenting.
+ const [picks,setPicks]=React.useState<string[]>([]);
+ const [deck,setDeck]=React.useState<string[]|null>(null);
+ const [slide,setSlide]=React.useState(0);
  const stageB=()=>{const h=hostB.current;return h?h.shadowRoot??h.attachShadow({mode:'open'}):null;};
  const textOf=(f:DiagramFile)=>edited.current.get(f.name)??f.text;
  // The diagram lives in a shadow root, so its own <style> styles the diagram and never the shell's panes (R970).
@@ -53,21 +57,27 @@ export function Shell(){
  const files=React.useMemo(()=>[...FILES,...added.filter(a=>!FILES.some(f=>f.name===a.name))].sort((a,b)=>a.name.localeCompare(b.name)),[added]);
  const file=files.find(f=>f.name===selected)??null;
  const reason=file?cannotShow(file):null;
+ const slideName=deck?deck[slide]??null:null;
+ const shown=deck?files.find(f=>f.name===slideName)??null:file; // what the centre draws: the slide while presenting, else A
+ const shownReason=shown?cannotShow(shown):null;
  const fileB=compareB===null?null:files.find(f=>f.name===compareB)??null;
- const comparing=!!(file&&!reason&&fileB&&drawnB===fileB.name);
+ const split=!!(file&&!reason&&fileB); // the side-by-side layout: B's stage is visible only with it
+ const comparing=split&&drawnB===fileB!.name;
  const rows=React.useMemo(()=>comparing?compareGroups(groups,groupsB):[],[comparing,groups,groupsB]);
  const comparison=React.useMemo(()=>comparing&&file&&fileB?comparisonText(rows,{name:where(file),bytes:byteSize(textOf(file))},{name:where(fileB),bytes:byteSize(textOf(fileB))}):[],[rows]);
 
  React.useEffect(()=>{
   const box=stage();if(!box)return;
   box.replaceChildren();setGroups([]);setActive(null);
-  if(!file)return;
-  if(reason){note(reason);return;}
-  const found=draw(box,file,textOf(file),note);
+  if(!shown)return;
+  if(shownReason){note(shownReason);return;}
+  const found=draw(box,shown,textOf(shown),note);
   if(!found)return;
   setGroups(found);
-  note(`Showing ${where(file)} (${formatSize(byteSize(file.text))}).`);
- },[file]);
+  if(!deck)note(`Showing ${where(shown)} (${formatSize(byteSize(shown.text))}).`);
+ },[shown]);
+ // A changed during compare: to nothing, to a file that cannot be shown, or to B itself. Leave compare, naming the new A.
+ React.useEffect(()=>{if(compareB!==null&&(!file||reason||file.name===compareB))exitCompare();},[file]);
 
  // Option B's stage: drawn the same way as A, in its own shadow root.
  React.useEffect(()=>{
@@ -81,12 +91,47 @@ export function Shell(){
  },[fileB]);
  React.useEffect(()=>{setActiveRow(null);},[file]);
  React.useEffect(()=>{if(comparison.length)setLog(l=>[...l,...comparison].slice(-50));},[comparison]);
- // Esc leaves compare (or closes the B picker).
- React.useEffect(()=>{
-  if(!compareB&&!picker)return;
-  const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape'){e.preventDefault();exitCompare();}};
-  window.addEventListener('keydown',onKey);return ()=>window.removeEventListener('keydown',onKey);
- },[compareB,picker]);
+ // Keys: in Present, Right/Space = next, Left = previous, Esc = leave; else Esc leaves compare (or closes the B picker).
+ // The listener reads the latest render through a ref, so it never names a file from an earlier render.
+ const onKey=React.useRef<(e:KeyboardEvent)=>void>(()=>{});
+ onKey.current=e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(deck){
+   if((e.target as Element|null)?.closest?.('[role=separator],input,textarea,select'))return; // a splitter keeps its arrows
+   const act=deckKey(e.key);if(!act)return;
+   e.preventDefault();
+   if(act==='exit')exitPresent();else setSlide(i=>deckStep(i,deck.length,act==='next'?1:-1));
+   return;
+  }
+  if(e.key==='Escape'&&(compareB!==null||picker)){e.preventDefault();exitCompare();}
+ };
+ React.useEffect(()=>{const h=(e:KeyboardEvent)=>onKey.current(e);window.addEventListener('keydown',h);return ()=>window.removeEventListener('keydown',h);},[]);
+ const startPresent=()=>{
+  const order=deckOrder(files.map(f=>f.name),picks);
+  const ok=order.filter(n=>{const f=files.find(x=>x.name===n);return !!f&&!cannotShow(f);});
+  const left=order.filter(n=>!ok.includes(n));
+  if(left.length)note(`Left out of the deck (cannot be shown): ${left.join(', ')}.`);
+  if(!ok.length){note('Present needs at least one diagram that can be shown.');return;}
+  setPicker(false);setMenu(false);setCompareB(null);hlOff(stage());setActive(null);
+  setDeck(ok);setSlide(0);
+  note(`Present: ${ok.length} slide(s) ${picks.length?'picked in the tree':'from diagrams/'}, in tree order. Right arrow or Space = next, Left = previous, Esc = leave.`);
+ };
+ const exitPresent=()=>{setDeck(null);note(`Left Present: showing ${file?where(file):'nothing'}.`);};
+ const outline=()=>deckOutline((deck??[]).map(n=>{const f=files.find(x=>x.name===n);return {name:n,title:f?rootTitle(textOf(f)):''};}));
+ const copyOutline=()=>{
+  const text=outline();
+  navigator.clipboard?.writeText(text).then(()=>note(`Copied the deck outline (${deck?.length??0} slide(s)) to the clipboard.`),()=>note('Could not copy: the browser refused clipboard access. Select the slide list in Navigation instead.'));
+ };
+ const clickTree=(e:React.MouseEvent,name:string)=>{
+  if(e.ctrlKey||e.metaKey){
+   const next=picks.includes(name)?picks.filter(n=>n!==name):[...picks,name];
+   setPicks(next);
+   note(next.length?`Picked for Present (${next.length}): ${deckOrder(files.map(f=>f.name),next).join(', ')}.`:'No diagram picked: Present shows every diagram in diagrams/.');
+   return;
+  }
+  if(picks.length)setPicks([]);
+  setSelected(name);
+ };
  const exitCompare=()=>{
   setPicker(false);if(compareB===null)return;
   setCompareB(null);hlOff(stage());
@@ -140,6 +185,7 @@ export function Shell(){
   note(`Renamed group ${g.label} to ${title.trim()} in the page; diagrams/${file.name} on disk is unchanged until you Save as.`);
  };
  const run=(id:typeof RIBBON_BUTTONS[number]['id'])=>{
+  if(id==='present'){if(deck)exitPresent();else startPresent();return;}
   if(id==='new'){setPicker(false);setMenu(!menu);return;}
   if(id==='compare'){
    if(compareB!==null){exitCompare();return;}
@@ -165,8 +211,8 @@ export function Shell(){
   else if(id==='fit'){setFit(!fit);note(fit?'Actual size.':'Zoomed to fit.');}
   else{openText(file.text);note(`Opened raw file ${where(file)} as plain text.`);}
  };
- const off=(id:string)=>id==='new'?false:id==='rename'?active===null||comparing:id==='copy'?!comparing:id==='compare'?compareB===null&&(!file||!!reason):!file||!!reason;
- const labelOf=(b:typeof RIBBON_BUTTONS[number])=>b.id==='compare'&&compareB!==null?'Exit compare':b.label;
+ const off=(id:string)=>deck?id!=='present':id==='present'?!files.some(f=>!cannotShow(f)):id==='new'?false:id==='rename'?active===null||comparing:id==='copy'?!comparing:id==='compare'?compareB===null&&(!file||!!reason):!file||!!reason;
+ const labelOf=(b:typeof RIBBON_BUTTONS[number])=>b.id==='compare'&&compareB!==null?'Exit compare':b.id==='present'&&deck?'Exit present':b.label;
 
  return <div className="sh-root" style={{gridTemplateColumns:`${sizes.left}px 6px 1fr 6px ${sizes.right}px`,gridTemplateRows:`auto 1fr 6px ${sizes.bottom}px`}}>
   <header className="sh-ribbon">
@@ -178,32 +224,36 @@ export function Shell(){
    {picker&&<ul className="sh-menu sh-picker" role="menu" aria-label={`Compare ${selected} with`}>{files.filter(f=>f.name!==selected).map(f=><li key={f.name} role="none"><button role="menuitem" onClick={()=>startCompare(f)}>{f.name}</button></li>)}</ul>}
   </header>
   <nav className="sh-left" aria-label="Diagrams"><h2>diagrams/</h2>
-   <ul role="tree">{files.map(f=><li key={f.name} role="treeitem" aria-selected={f.name===selected}>
-    <div className={`sh-node${f.name===selected?' on':''}`}><button className="sh-label" onClick={()=>setSelected(f.name)}>{f.name}</button></div>
-   </li>)}</ul>
+   <ul role="tree" aria-multiselectable={picks.length?true:undefined}>{files.map(f=>{const picked=picks.includes(f.name);
+    return <li key={f.name} role="treeitem" aria-selected={picks.length?picked:f.name===selected}>
+    <div className={`sh-node${f.name===selected?' on':''}${picked?' picked':''}`}><button className="sh-label" title="Ctrl/Cmd-click to pick it for Present" onClick={e=>clickTree(e,f.name)}>{f.name}</button></div>
+   </li>;})}</ul>
+   {picks.length>0&&<p className="sh-muted">{picks.length} picked for Present (Ctrl/Cmd-click to change).</p>}
    {!files.length&&<p className="sh-muted">Add an .svg file to diagrams/.</p>}
   </nav>
   <Splitter dir="col" column={2} label="Resize explorer" onDelta={d=>resize('left',d)}/>
-  <main className={`sh-canvas${fit?' fit':''}${file&&!reason&&fileB?' compare':''}`} aria-label="Diagram">
-   <section className="sh-stage" aria-label={comparing?`Option A: ${file?.name}`:undefined}>
+  <main className={`sh-canvas${fit||deck?' fit':''}${split?' compare':''}${deck?' present':''}`} aria-label="Diagram">
+   <section className="sh-stage" aria-label={deck&&slideName?`Slide ${slide+1}: ${slideName}`:comparing?`Option A: ${file?.name}`:undefined}>
     {comparing&&<h3 className="sh-stage-label"><b>A</b> {file?.name}</h3>}
-    <div ref={host} className={`sh-diagram${fit||comparing?' fit':''}`}/>
+    <div ref={host} className={`sh-diagram${fit||comparing||deck?' fit':''}`}/>
    </section>
-   <section className="sh-stage" aria-label={comparing?`Option B: ${fileB?.name}`:undefined} hidden={!fileB}>
+   <section className="sh-stage" aria-label={comparing?`Option B: ${fileB?.name}`:undefined} hidden={!split}>
     {comparing&&<h3 className="sh-stage-label"><b>B</b> {fileB?.name}</h3>}
     <div ref={hostB} className="sh-diagram fit"/>
    </section>
-   {(!file||reason)&&<p className="sh-muted">{reason??'Select a diagram in the tree.'}</p>}
+   {(!shown||shownReason)&&<p className="sh-muted">{shownReason??'Select a diagram in the tree.'}</p>}
   </main>
   <Splitter dir="col" column={4} label="Resize navigation" onDelta={d=>resize('right',-d)}/>
   <aside className="sh-right" aria-label="Navigation"><h2>Navigation</h2>
-   {comparing?<ul aria-label="Groups of A and B">{rows.map(r=><li key={r.key}><button className={r.key===activeRow?'on':''} aria-current={r.key===activeRow?'true':undefined} onClick={()=>pickRow(r)}>
+   {deck?<ul aria-label="Slides">{deck.map((n,i)=><li key={n}><button className={i===slide?'on':''} aria-current={i===slide?'true':undefined} onClick={()=>setSlide(i)}>{i+1}. {n}</button></li>)}</ul>:
+   comparing?<ul aria-label="Groups of A and B">{rows.map(r=><li key={r.key}><button className={r.key===activeRow?'on':''} aria-current={r.key===activeRow?'true':undefined} onClick={()=>pickRow(r)}>
     <span className="sh-row-label">{r.label}</span> <span className={`sh-mark sh-mark-${r.side==='both'?'both':r.side==='A only'?'a':'b'}`}>{r.side}</span></button></li>)}</ul>:
    <ul>{groups.map((g,i)=><li key={i}><button className={i===active?'on':''} aria-current={i===active?'true':undefined} title={g.id?`#${g.id}`:undefined} onClick={()=>pick(i)}>{g.label}</button></li>)}</ul>}
-   {file&&!reason&&!comparing&&!groups.length&&<p className="sh-muted">This diagram has no named groups (a &lt;g&gt; with an id or a title).</p>}
+   {!deck&&file&&!reason&&!comparing&&!groups.length&&<p className="sh-muted">This diagram has no named groups (a &lt;g&gt; with an id or a title).</p>}
   </aside>
   <Splitter dir="row" label="Resize bottom pane" onDelta={d=>resize('bottom',-d)}/>
-  <footer ref={output} className="sh-bottom" aria-label="Output"><h2>Output</h2><ol>{log.map((l,i)=><li key={i}>{l}</li>)}</ol></footer>
+  <footer ref={output} className="sh-bottom" aria-label="Output"><h2>Output</h2>
+   {deck&&slideName&&<div className="sh-deckbar"><p role="status">{deckStatus(slide,deck.length,slideName)}</p><button onClick={copyOutline}>Copy deck outline</button></div>}<ol>{log.map((l,i)=><li key={i}>{l}</li>)}</ol></footer>
  </div>;
 }
 

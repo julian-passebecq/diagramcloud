@@ -1,7 +1,7 @@
-/** Model of the DiagramCloud shell (R875, R958, R964, R993): diagram files from diagrams/, their groups, templates, pane sizes. */
+/** Model of the DiagramCloud shell (R875, R958, R964, R993, R998): diagram files from diagrams/, their groups, templates, pane sizes. */
 
 /** The ribbon has only buttons that work. */
-export const RIBBON_BUTTONS=[{id:'new',label:'New from template'},{id:'rename',label:'Rename group'},{id:'save',label:'Save as'},{id:'fit',label:'Zoom to fit'},{id:'raw',label:'Open raw file'},{id:'compare',label:'Compare A vs B'},{id:'copy',label:'Copy comparison'}] as const;
+export const RIBBON_BUTTONS=[{id:'new',label:'New from template'},{id:'rename',label:'Rename group'},{id:'save',label:'Save as'},{id:'fit',label:'Zoom to fit'},{id:'raw',label:'Open raw file'},{id:'compare',label:'Compare A vs B'},{id:'copy',label:'Copy comparison'},{id:'present',label:'Present'}] as const;
 
 /** Why a new diagram name is refused, or null when diagrams/<name>.svg may be created. */
 export function checkNewName(name:string,existing:readonly string[]):string|null{
@@ -78,7 +78,7 @@ export type CompareRow={key:string;label:string;side:CompareSide;a:number|null;b
  *  A name used twice on one side pairs with the same occurrence on the other side, so nothing is counted twice. */
 export function compareGroups(a:readonly {id:string;label:string}[],b:readonly {id:string;label:string}[]):CompareRow[]{
  const keys=(list:readonly {id:string;label:string}[])=>{const seen=new Map<string,number>();
-  return list.map(g=>{const base=g.id?`#${g.id}`:`title:${g.label}`;const n=seen.get(base)??0;seen.set(base,n+1);return n?`${base}~${n}`:base;});};
+  return list.map(g=>{const base=g.id?`#${g.id}`:`title:${g.label}`;const n=seen.get(base)??0;seen.set(base,n+1);return JSON.stringify([base,n]);});};
  const ka=keys(a),kb=keys(b);
  const inB=new Map(kb.map((k,i)=>[k,i]));const inA=new Set(ka);
  const rows:CompareRow[]=ka.map((key,i)=>{const j=inB.get(key);return {key,label:a[i].label,side:j===undefined?'A only':'both',a:i,b:j??null};});
@@ -92,3 +92,27 @@ export function comparisonText(rows:readonly CompareRow[],a:{name:string;bytes:n
  return [`Compare A = ${a.name} (${formatSize(a.bytes)}) with B = ${b.name} (${formatSize(b.bytes)}).`,
   `Only in A ${list('A only')}`,`Only in B ${list('B only')}`,`In both ${list('both')}`];
 }
+
+/** R998: the slides of a deck, in tree order: the picked files, or every file when none is picked. */
+export function deckOrder(tree:readonly string[],picked:readonly string[]):string[]{
+ const set=new Set(picked);
+ return picked.length?tree.filter(n=>set.has(n)):[...tree];
+}
+
+/** R998: the slide after a step of delta, kept inside the deck (no wrap); -1 for an empty deck. */
+export const deckStep=(index:number,count:number,delta:number)=>count<1?-1:Math.min(count-1,Math.max(0,index+delta));
+
+/** R998: what a key does in Present: Right arrow or Space = next, Left arrow = previous, Escape = leave. */
+export const deckKey=(key:string):'next'|'prev'|'exit'|null=>key==='ArrowRight'||key===' '||key==='Spacebar'?'next':key==='ArrowLeft'?'prev':key==='Escape'?'exit':null;
+
+/** R998: the bottom pane's line for the shown slide. */
+export const deckStatus=(index:number,count:number,name:string)=>`slide ${index+1} of ${count}: ${name}`;
+
+/** R998: the SVG's own <title>: the root element's first child (after blanks and comments), never a group's title; '' when none. */
+export function rootTitle(text:string):string{
+ const m=/^(?:\s|<\?xml[\s\S]*?\?>|<!--[\s\S]*?-->|<!DOCTYPE[^>]*>)*<svg(?:\s[^>]*)?>(?:\s|<!--[\s\S]*?-->)*<title>([^<]*)<\/title>/i.exec(text);
+ return m?.[1].trim().replace(/\s+/g,' ')??'';
+}
+
+/** R998: the deck outline copied as plain text: "n. file, title" per slide (just "n. file" without a title). */
+export const deckOutline=(slides:readonly {name:string;title:string}[])=>slides.map((s,i)=>`${i+1}. ${s.name}${s.title?`, ${s.title}`:''}`).join('\n');
