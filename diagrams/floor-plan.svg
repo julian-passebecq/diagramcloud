@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" font-family="system-ui,sans-serif" font-size="14">
+  <title>Sample floor plan: small flat</title>
+  <rect width="640" height="420" fill="#fdfcf9"/>
+  <g fill="#fff" stroke="#3a3f45" stroke-width="4">
+    <g id="living-room"><title>Living room</title><rect x="20" y="20" width="360" height="240"/><text x="200" y="145" text-anchor="middle" stroke="none" fill="#3a3f45">Living room · 28 m²</text></g>
+    <g id="kitchen"><title>Kitchen</title><rect x="380" y="20" width="240" height="160"/><text x="500" y="105" text-anchor="middle" stroke="none" fill="#3a3f45">Kitchen · 12 m²</text></g>
+    <g id="bathroom"><title>Bathroom</title><rect x="380" y="180" width="240" height="80"/><text x="500" y="225" text-anchor="middle" stroke="none" fill="#3a3f45">Bathroom · 6 m²</text></g>
+    <g id="bedroom"><title>Bedroom</title><rect x="20" y="260" width="300" height="140"/><text x="170" y="335" text-anchor="middle" stroke="none" fill="#3a3f45">Bedroom · 14 m²</text></g>
+    <g id="hall"><title>Hall</title><rect x="320" y="260" width="300" height="140"/><text x="470" y="335" text-anchor="middle" stroke="none" fill="#3a3f45">Hall · 9 m²</text></g>
+  </g>
+  <g id="doors" stroke="#fdfcf9" stroke-width="6"><title>Doors</title><path d="M320 300V350"/><path d="M200 260H250"/><path d="M440 260H490"/><path d="M450 400H520"/></g>
+</svg>

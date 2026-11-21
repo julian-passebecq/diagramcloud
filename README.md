@@ -56,6 +56,12 @@ npm run test:e2e
 
 The full CI also checks standalone CLI/MCP bundles and a Linux packaging dry run. [Release verification](docs/RELEASE.md) explains receipts, artifact checks and the additional visual/installed checks. A packaging dry run is not a published release.
 
+## Diagram shell
+
+The new, simple GUI shell lives apart from the 1.x studio: `shell.html` and `src/shell/`. Run `npm ci` once, then `npm run dev` and open <http://localhost:5173/shell.html>. The left tree lists the files of [`diagrams/`](diagrams/); click one to draw it in the centre. The right pane lists the diagram's top-level named groups (a `<g>` with an `id` or a `<title>`); click one to scroll to it and highlight it. The ribbon has two buttons: **Zoom to fit** (press again for actual size) and **Open raw file**. The Output pane says which file is shown and its size, or why a file cannot be shown.
+
+To add a diagram, put a self-contained `.svg` file (for example one made with the diagram-design skill) in `diagrams/` and reload the page. Give each part you want in the navigation a `<g id="...">`, ideally with a `<title>`. The SVG is sanitised before it is drawn (scripts and event handlers are removed). Only `.svg` is drawn; another file type is listed with the reason. Tests: `npx tsx --test tests/shell-model.test.ts` and `npx playwright test tests/e2e/shell-diagram.spec.ts`.
+
 ## First walkthrough
 
 Open the TotalEnergies example, choose **SQL quality checks**, then **Required fields**. The parent architecture stays visible while the child workflow and evidence open. These are authored explanations; sample numbers must not become verified employer results.

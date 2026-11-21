@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" width="760" height="360" font-family="system-ui,sans-serif" font-size="14">
+  <title>Sample architecture: six services</title>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#5b6470"/></marker></defs>
+  <rect width="760" height="360" fill="#fbfcfd"/>
+  <g id="edge" stroke="#5b6470" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <title>Connections</title>
+    <path d="M170 90H290"/><path d="M470 90H590"/><path d="M380 120V230"/><path d="M470 260H590"/><path d="M290 260H170"/>
+  </g>
+  <g id="client"><title>Web client</title><rect x="30" y="60" width="140" height="60" rx="8" fill="#e6f0fb" stroke="#0b63ce"/><text x="100" y="95" text-anchor="middle">Web client</text></g>
+  <g id="gateway"><title>API gateway</title><rect x="290" y="60" width="180" height="60" rx="8" fill="#e6f0fb" stroke="#0b63ce"/><text x="380" y="95" text-anchor="middle">API gateway</text></g>
+  <g id="auth"><title>Auth service</title><rect x="590" y="60" width="140" height="60" rx="8" fill="#fff4e0" stroke="#b26a00"/><text x="660" y="95" text-anchor="middle">Auth service</text></g>
+  <g id="orders"><title>Orders service</title><rect x="290" y="230" width="180" height="60" rx="8" fill="#e8f5ec" stroke="#1d7f3c"/><text x="380" y="265" text-anchor="middle">Orders service</text></g>
+  <g id="database"><title>Database</title><rect x="590" y="230" width="140" height="60" rx="8" fill="#f1ecfa" stroke="#6b3fb5"/><text x="660" y="265" text-anchor="middle">Database</text></g>
+  <g id="queue"><title>Event queue</title><rect x="30" y="230" width="140" height="60" rx="8" fill="#f1ecfa" stroke="#6b3fb5"/><text x="100" y="265" text-anchor="middle">Event queue</text></g>
+</svg>
