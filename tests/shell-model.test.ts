@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
-import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,formatSize,byteSize,type El} from '../src/shell/shellModel';
+import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,type El} from '../src/shell/shellModel';
 
 test('shell pane sizes stay inside their limits', () => {
   for (const pane of ['left', 'right', 'bottom'] as const) {
@@ -57,4 +57,12 @@ test('every sample in diagrams/ can be shown and its groups have unique ids', ()
     assert.ok(ids.length >= 5, name);
     assert.equal(new Set(ids).size, ids.length, name);
   }
+});
+
+test('an SVG without a viewBox gets one from its width and height so Zoom to fit scales it', () => {
+  assert.equal(missingViewBox(null, '300', '200'), '0 0 300 200');
+  assert.equal(missingViewBox('', '300px', '200px'), '0 0 300 200');
+  assert.equal(missingViewBox('0 0 10 10', '300', '200'), null);
+  assert.equal(missingViewBox(null, '50%', '200'), null);
+  assert.equal(missingViewBox(null, null, null), null);
 });
