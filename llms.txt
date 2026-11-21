@@ -12,6 +12,12 @@
 - [Readiness](src/intelligence/readiness.ts): "complete for the selected purpose" means `completeForPurpose` finds no `missing-required` gap for that purpose; never a completeness score.
 - [Contributor rules and current limits](AGENTS.md)
 
+## Design in the shell
+
+- Run `npm run dev`, open http://localhost:5173/shell.html, and write only `diagrams/<name>.svg` (never outside `diagrams/`): an added, changed or deleted file shows in the tree and the open centre within 2 s, without a reload, and Output logs each change.
+- Plain SVG with a `viewBox`, `width`, `height` and a root `<title>`; no script, event handler or external link (`sanitizeSvg` removes them). Each top-level `<g id>` with its own `<title>` is listed in the Navigation pane.
+- A deck: Ctrl/Cmd-click diagrams in the tree, then Present. Worked example and rules: [AGENTS.md](AGENTS.md) section "Design in the shell"; [live pick-up](src/shell/liveDiagrams.ts).
+
 ## Reference
 
 - [Document contract](src/core/model.ts): `validateDocument` is the gate; JSON Schema alone is not enough.

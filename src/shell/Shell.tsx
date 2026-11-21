@@ -1,9 +1,11 @@
 import * as React from 'react';
 import {sanitizeSvg,STAGE_CSS} from './sanitize';
-import {RIBBON_BUTTONS,DEFAULT_SIZES,clampSize,diagramFiles,diagramGroups,cannotShow,missingViewBox,byteSize,formatSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,deckOrder,deckStep,deckKey,deckStatus,deckOutline,rootTitle,type PaneSizes,type DiagramGroup,type DiagramFile,type El} from './shellModel';
+import {DIAGRAM_TEXTS,onDiagramsChange} from './liveDiagrams';
+import {RIBBON_BUTTONS,DEFAULT_SIZES,clampSize,diagramFiles,diagramGroups,cannotShow,missingViewBox,byteSize,formatSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,deckOrder,deckStep,deckKey,deckStatus,deckOutline,rootTitle,mergeLive,clockTime,type PaneSizes,type DiagramGroup,type DiagramFile,type El} from './shellModel';
 
 // Every file of diagrams/ is bundled as text only: the build serves no diagram as a page, and the dev server answers /diagrams/ with CSP sandbox (R970).
-const FILES=diagramFiles(import.meta.glob<string>('/diagrams/*',{query:'?raw',import:'default',eager:true}),{});
+// While `npm run dev` runs, liveDiagrams.ts reports each change to the folder (R1006); a built page keeps this list.
+const FILES=diagramFiles(DIAGRAM_TEXTS,{});
 // The three starting points of "New from template" (templates/*.svg).
 const TEMPLATES=diagramFiles(import.meta.glob<string>('/templates/*.svg',{query:'?raw',import:'default',eager:true}),{});
 const where=(f:DiagramFile)=>f.pageOnly?`${f.name} (in this page only)`:`diagrams/${f.name}`;
@@ -26,6 +28,8 @@ const openText=(text:string)=>{const url=URL.createObjectURL(new Blob([text],{ty
 /** DiagramCloud GUI shell: ribbon top, diagrams/ tree left, the shown SVG in the centre, its groups right, Output bottom. */
 export function Shell(){
  const [selected,setSelected]=React.useState<string|null>(FILES[0]?.name??null);
+ const [disk,setDisk]=React.useState<DiagramFile[]>(FILES); // diagrams/ as it is now: updated live in `npm run dev` (R1006)
+ const [removed,setRemoved]=React.useState<string|null>(null); // the open diagram, deleted from diagrams/ by a live change
  const [added,setAdded]=React.useState<DiagramFile[]>([]); // new diagrams; page-only when the page cannot write the folder
  const [menu,setMenu]=React.useState(false);
  const edited=React.useRef(new Map<string,string>()); // file name -> text after Rename group (page only)
@@ -55,7 +59,7 @@ export function Shell(){
  const stage=()=>{const h=host.current;return h?h.shadowRoot??h.attachShadow({mode:'open'}):null;};
  const note=(line:string)=>setLog(l=>l[l.length-1]===line?l:[...l.slice(-49),line]);
  const resize=(pane:keyof PaneSizes,delta:number)=>setSizes(s=>({...s,[pane]:clampSize(pane,s[pane]+delta)}));
- const files=React.useMemo(()=>[...FILES,...added.filter(a=>!FILES.some(f=>f.name===a.name))].sort((a,b)=>a.name.localeCompare(b.name)),[added]);
+ const files=React.useMemo(()=>[...disk,...added.filter(a=>!disk.some(f=>f.name===a.name))].sort((a,b)=>a.name.localeCompare(b.name)),[disk,added]);
  const file=files.find(f=>f.name===selected)??null;
  const reason=file?cannotShow(file):null;
  const slideName=deck?deck[slide]??null:null;
@@ -123,6 +127,28 @@ export function Shell(){
   canvas.current?.focus({preventScroll:true}); // off the Present button, so Space moves the deck at once
   note(`Present: ${ok.length} slide(s) ${picks.length?'picked in the tree':'from diagrams/'}, in tree order. Right arrow or Space = next, Left = previous, Esc = leave.`);
  };
+ // R1006: a live change to diagrams/. The tree follows the folder; the selection and open panes stay; the open diagram is
+ // redrawn when its file changed and named "removed" when it was deleted. Read through a ref: always the latest render.
+ const live=React.useRef<(texts:Record<string,string>)=>void>(()=>{});
+ live.current=texts=>{
+  const m=mergeLive(disk,diagramFiles(texts,{}),selected,clockTime(new Date()));
+  if(!m.changes.length)return;
+  const gone=new Set(m.changes.filter(c=>c.kind==='removed').map(c=>c.name));
+  for(const c of m.changes)edited.current.delete(c.name); // the file on disk wins over an in-page rename
+  setDisk(m.files);
+  setAdded(a=>a.filter(x=>x.pageOnly)); // a diagram saved to the folder is now in the folder list itself
+  if(m.open==='removed')setRemoved(selected);else if(m.open==='updated')setRemoved(null);
+  if(gone.size){
+   setPicks(p=>p.filter(n=>!gone.has(n)));
+   if(compareB!==null&&gone.has(compareB))setCompareB(null);
+   if(deck&&deck.some(n=>gone.has(n))){
+    const left=deck.filter(n=>!gone.has(n));const at=left.indexOf(deck[slide]);
+    if(left.length){setDeck(left);setSlide(at>=0?at:Math.min(slide,left.length-1));}else setDeck(null);
+   }
+  }
+  setLog(l=>[...l,...m.log].slice(-50));
+ };
+ React.useEffect(()=>onDiagramsChange(t=>live.current(t)),[]);
  const exitPresent=()=>{setDeck(null);note(`Left Present: showing ${file?where(file):'nothing'}.`);};
  const outline=()=>deckOutline((deck??[]).map(n=>{const f=files.find(x=>x.name===n);return {name:n,title:f?rootTitle(textOf(f)):''};}));
  const copyOutline=()=>{
@@ -139,7 +165,7 @@ export function Shell(){
    return;
   }
   if(picks.length)setPicks([]);
-  setSelected(name);
+  setSelected(name);setRemoved(null);
  };
  const exitCompare=()=>{
   setPicker(false);if(compareB===null)return;
@@ -250,7 +276,7 @@ export function Shell(){
     {comparing&&<h3 className="sh-stage-label"><b>B</b> {fileB?.name}</h3>}
     <div ref={hostB} className="sh-diagram fit"/>
    </section>
-   {(!shown||shownReason)&&<p className="sh-muted">{shownReason??'Select a diagram in the tree.'}</p>}
+   {(!shown||shownReason)&&<p className="sh-muted">{shownReason??(!deck&&removed&&removed===selected?`diagrams/${removed} was removed from the folder.`:'Select a diagram in the tree.')}</p>}
   </main>
   <Splitter dir="col" column={4} label="Resize navigation" onDelta={d=>resize('right',-d)}/>
   <aside className="sh-right" aria-label="Navigation"><h2>Navigation</h2>
