@@ -38,3 +38,6 @@ button:disabled{opacity:.5;cursor:default}
 .sh-right li button{width:100%;text-align:left}
 .sh-right li button.on{background:var(--sh-accent-bg);color:var(--sh-accent)}
 .sh-muted{color:var(--sh-muted)}
+.sh-ribbon{position:relative}
+.sh-menu{position:absolute;top:100%;left:110px;z-index:5;background:var(--sh-pane);border:1px solid var(--sh-line);border-radius:4px;padding:4px;box-shadow:0 4px 12px #0003}
+.sh-menu button{width:100%;text-align:left;white-space:nowrap}

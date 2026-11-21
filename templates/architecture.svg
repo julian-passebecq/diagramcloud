@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" width="720" height="340" font-family="system-ui,sans-serif" font-size="13">
+  <title>Architecture diagram</title>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#6b7280"/></marker></defs>
+  <rect width="720" height="340" fill="#fbfaf7"/>
+  <text x="24" y="32" font-size="11" letter-spacing="1.5" fill="#6b7280">ARCHITECTURE · TEMPLATE</text>
+  <g id="connections" stroke="#6b7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <title>Connections</title>
+    <path d="M184 120H268"/><path d="M452 120H536"/><path d="M360 150V214"/>
+  </g>
+  <g id="user"><title>User</title><rect x="24" y="90" width="160" height="60" rx="6" fill="#fff" stroke="#1f2937"/><text x="104" y="125" text-anchor="middle">User</text></g>
+  <g id="frontend"><title>Front end</title><rect x="268" y="90" width="184" height="60" rx="6" fill="#fff" stroke="#1f2937"/><text x="360" y="125" text-anchor="middle">Front end</text></g>
+  <g id="service"><title>Service</title><rect x="536" y="90" width="160" height="60" rx="6" fill="#fff" stroke="#1f2937"/><text x="616" y="125" text-anchor="middle">Service</text></g>
+  <g id="store"><title>Data store</title><rect x="268" y="214" width="184" height="60" rx="6" fill="#f3efe6" stroke="#b45309"/><text x="360" y="249" text-anchor="middle">Data store</text></g>
+  <text x="24" y="318" font-size="11" fill="#6b7280">Rename the boxes, then add your own.</text>
+</svg>
