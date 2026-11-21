@@ -1,15 +1,15 @@
 import * as React from 'react';
-import DOMPurify from 'dompurify';
+import {sanitizeSvg,STAGE_CSS} from './sanitize';
 import {RIBBON_BUTTONS,DEFAULT_SIZES,clampSize,diagramFiles,diagramGroups,cannotShow,missingViewBox,byteSize,formatSize,checkNewName,checkGroupTitle,svgTitle,type PaneSizes,type DiagramGroup,type DiagramFile,type El} from './shellModel';
 
-// Every file of diagrams/ is bundled as text (to draw it) and as a URL (to open the raw file).
-const FILES=diagramFiles(
- import.meta.glob<string>('/diagrams/*',{query:'?raw',import:'default',eager:true}),
- import.meta.glob<string>('/diagrams/*',{query:'?url&no-inline',import:'default',eager:true}));
+// Every file of diagrams/ is bundled as text only: the build serves no diagram as a page, and the dev server answers /diagrams/ with CSP sandbox (R970).
+const FILES=diagramFiles(import.meta.glob<string>('/diagrams/*',{query:'?raw',import:'default',eager:true}),{});
 // The three starting points of "New from template" (templates/*.svg).
 const TEMPLATES=diagramFiles(import.meta.glob<string>('/templates/*.svg',{query:'?raw',import:'default',eager:true}),{});
-const where=(f:DiagramFile)=>f.url.startsWith('blob:')?`${f.name} (in this page only)`:`diagrams/${f.name}`;
-const hlOff=(root:ParentNode|null)=>root?.querySelectorAll('.sh-hl').forEach(e=>e.classList.remove('sh-hl'));
+const where=(f:DiagramFile)=>f.pageOnly?`${f.name} (in this page only)`:`diagrams/${f.name}`;
+const hlOff=(root:ParentNode|null|undefined)=>root?.querySelectorAll('.sh-hl').forEach(e=>e.classList.remove('sh-hl'));
+/** Opens text as plain text in a new tab: shows the source, runs nothing (R970). */
+const openText=(text:string)=>{const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);};
 
 /** DiagramCloud GUI shell: ribbon top, diagrams/ tree left, the shown SVG in the centre, its groups right, Output bottom. */
 export function Shell(){
@@ -23,6 +23,8 @@ export function Shell(){
  const [sizes,setSizes]=React.useState<PaneSizes>(DEFAULT_SIZES);
  const [log,setLog]=React.useState<string[]>([FILES.length?`Found ${FILES.length} file(s) in diagrams/.`:'diagrams/ has no files.']);
  const host=React.useRef<HTMLDivElement>(null);
+ // The diagram lives in a shadow root, so its own <style> styles the diagram and never the shell's panes (R970).
+ const stage=()=>{const h=host.current;return h?h.shadowRoot??h.attachShadow({mode:'open'}):null;};
  const note=(line:string)=>setLog(l=>l[l.length-1]===line?l:[...l.slice(-49),line]);
  const resize=(pane:keyof PaneSizes,delta:number)=>setSizes(s=>({...s,[pane]:clampSize(pane,s[pane]+delta)}));
  const files=React.useMemo(()=>[...FILES,...added.filter(a=>!FILES.some(f=>f.name===a.name))].sort((a,b)=>a.name.localeCompare(b.name)),[added]);
@@ -30,11 +32,13 @@ export function Shell(){
  const reason=file?cannotShow(file):null;
 
  React.useEffect(()=>{
-  const box=host.current;if(!box)return;
+  const box=stage();if(!box)return;
   box.replaceChildren();setGroups([]);setActive(null);
   if(!file)return;
   if(reason){note(reason);return;}
-  box.innerHTML=DOMPurify.sanitize(edited.current.get(file.name)??file.text,{USE_PROFILES:{svg:true,svgFilters:true}});
+  const safe=sanitizeSvg(edited.current.get(file.name)??file.text);
+  box.innerHTML=`<style>${STAGE_CSS}</style>`+safe.html;
+  if(safe.refused.length)note(`Refused in ${file.name} (could load from outside or restyle the shell): ${safe.refused.join(', ')}.`);
   const svg=box.querySelector('svg');
   if(!svg){note(`${file.name} cannot be shown: the SVG did not survive parsing or sanitising.`);return;}
   if(!svg.getAttribute('viewBox')){const b=svg.getBBox();// fallback without width/height: the drawing's own bounds
@@ -45,7 +49,7 @@ export function Shell(){
  },[file]);
 
  const pick=(i:number)=>{
-  hlOff(host.current);
+  hlOff(stage());
   const el=groups[i].el as unknown as SVGGElement;
   el.classList.add('sh-hl');el.scrollIntoView({block:'center',inline:'center',behavior:'smooth'});
   setActive(i);note(`Highlighted ${groups[i].label}.`);
@@ -65,13 +69,12 @@ export function Shell(){
    if(out&&!out.ok){note(out.error);return;}
    saved=!!out?.ok;
   }catch{/* no dev server: page-only below */}
-  const url=saved?`diagrams/${name}.svg`:URL.createObjectURL(new Blob([t.text],{type:'image/svg+xml'}));
-  setAdded(a=>[...a,{name:`${name}.svg`,text:t.text,url}]);setSelected(`${name}.svg`);
+  setAdded(a=>[...a,{name:`${name}.svg`,text:t.text,url:`diagrams/${name}.svg`,pageOnly:!saved}]);setSelected(`${name}.svg`);
   note(saved?`Created diagrams/${name}.svg from the ${label.toLowerCase()} template.`:`${name}.svg lives in this page only: not saved to the diagrams/ folder yet (this page has no file access). Use Save as to download it.`);
  };
  // Change the selected group's <title> (and a label text that repeats it) in the shown SVG.
  const rename=()=>{
-  const g=active===null?null:groups[active];const svg=host.current?.querySelector('svg');
+  const g=active===null?null:groups[active];const svg=stage()?.querySelector('svg');
   if(!g||!svg||!file)return;
   const title=window.prompt(`New title for the group ${g.label}:`,g.label);
   if(title===null)return;
@@ -90,14 +93,15 @@ export function Shell(){
   if(!file)return;
   if(id==='rename')rename();
   else if(id==='save'){
-   const svg=host.current?.querySelector('svg');if(!svg)return;
+   const svg=stage()?.querySelector('svg');if(!svg)return;
    const copy=svg.cloneNode(true) as SVGSVGElement;hlOff(copy);
    const a=document.createElement('a');a.download=file.name;
    a.href=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}));a.click();
+   setTimeout(()=>URL.revokeObjectURL(a.href),60000); // the download has started; free the blob
    note(`Downloaded ${file.name} (Save as). Move it into diagrams/ to keep it there.`);
   }
   else if(id==='fit'){setFit(!fit);note(fit?'Actual size.':'Zoomed to fit.');}
-  else{window.open(file.url,'_blank','noopener');note(`Opened raw file ${where(file)}.`);}
+  else{openText(file.text);note(`Opened raw file ${where(file)} as plain text.`);}
  };
  const off=(id:string)=>id==='new'?false:id==='rename'?active===null:!file||!!reason;
 
@@ -117,7 +121,7 @@ export function Shell(){
   </nav>
   <Splitter dir="col" column={2} label="Resize explorer" onDelta={d=>resize('left',d)}/>
   <main className={`sh-canvas${fit?' fit':''}`} aria-label="Diagram">
-   <div ref={host} className="sh-diagram"/>
+   <div ref={host} className={`sh-diagram${fit?' fit':''}`}/>
    {(!file||reason)&&<p className="sh-muted">{reason??'Select a diagram in the tree.'}</p>}
   </main>
   <Splitter dir="col" column={4} label="Resize navigation" onDelta={d=>resize('right',-d)}/>

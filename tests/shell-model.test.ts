@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync} from 'node:fs';
+import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync,symlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,type El} from '../src/shell/shellModel';
-import {writeFromTemplate} from '../src/shell/diagramWriter';
+import {writeFromTemplate,diagramWriter} from '../src/shell/diagramWriter';
+import {keepHref,safeCss} from '../src/shell/sanitize';
 
 test('shell pane sizes stay inside their limits', () => {
   for (const pane of ['left', 'right', 'bottom'] as const) {
@@ -70,6 +71,8 @@ test('a new diagram name is refused when it exists or holds anything but letters
   for (const bad of ['../evil', 'a/b', 'a\\b', 'x.svg', '.hidden', 'two words', 'C:', 'é', 'a'.repeat(65), '%2e%2e'])
     assert.match(checkNewName(bad, have)!, /refused/, bad);
   assert.match(checkNewName('', have)!, /name/);
+  for (const device of ['con', 'NUL', 'Aux', 'prn', 'com1', 'LPT9']) assert.match(checkNewName(device, have)!, /refused/, device);
+  assert.equal(checkNewName('console', have), null);
   assert.equal(checkGroupTitle('Kitchen'), null);
   assert.match(checkGroupTitle('  ')!, /empty/);
   assert.match(checkGroupTitle('x'.repeat(81))!, /80/);
@@ -116,4 +119,99 @@ test('an SVG without a viewBox gets one from its width and height so Zoom to fit
   assert.equal(missingViewBox('0 0 10 10', '300', '200'), null);
   assert.equal(missingViewBox(null, '50%', '200'), null);
   assert.equal(missingViewBox(null, null, null), null);
+});
+
+test('R970: only in-diagram and inline-image hrefs stay; CSS is kept whole or refused whole, never rewritten', () => {
+  for (const ok of ['#a', ' #x', 'data:image/png;base64,AA', 'DATA:image/svg+xml,<svg/>']) assert.equal(keepHref(ok), true, ok);
+  for (const bad of ['https://x/y.png', '//x/y', 'javascript:alert(1)', 'data:text/html,<b>', 'foo.svg#a', '']) assert.equal(keepHref(bad), false, bad);
+  for (const ok of ['.a{fill:url(#grad)} .b{background:url( "data:image/png;base64,AA==" )}', 'fill:red;stroke:#333', 'Kitchen · 12 m²', 'body{background:red}',
+    '/* an ordinary comment */ .room{fill:#eef}'])
+    assert.equal(safeCss(ok), ok, ok);
+  for (const bad of [
+    'svg{background:url(https://x/a.png)}',
+    '/* url(# */url(https://x/a.png)',                 // comment
+    '--x:"url(#";svg{background:url(https://x/a)}',    // string
+    'svg{background:url(https://x/a.png',              // unclosed at end of input
+    'svg{background:ur\\l(https://x/a)}', '@im\\port "https://x/c.css";', // escapes
+    'svg{background:url(data:image/png;base64,%3Cx%3E)}', 'svg{background:url(data:image/png;base64,AA"https://x")}', // body not base64
+    '@scope{:scope{outline:5px solid red}}', '@SCOPE (svg){:scope{background:red}}', // reaches the host without :host
+    '@im@import x;port "https://x/c.css";',           // reassembly after a removal
+    'svg{background:image-seimage(t("https://x/a.png" 1x)}', 'background:image-set("https://x/a.png" 1x)',
+    'background:-webkit-image-set("https://x/a.png" 1x)', '@font-face{src:src("https://x/f.woff")}',
+    '@import "https://x/c.css";', ':host{position:fixed}', 'svg{background:url(data:image/png,AA)}', 'url(data:text/html;base64,AA)',
+  ]) assert.equal(safeCss(bad), null, bad);
+});
+
+// Drives the writer plugin's middlewares with fake requests (no server, no port).
+function writerHarness() {
+  const root = mkdtempSync(join(tmpdir(), 'dc-shell-host-'));
+  mkdirSync(join(root, 'diagrams')); mkdirSync(join(root, 'templates'));
+  writeFileSync(join(root, 'templates', 'flowchart.svg'), '<svg/>');
+  const routes: Record<string, any> = {};
+  (diagramWriter(root) as any).configureServer({middlewares: {use: (p: any, h?: any) => { if (typeof p === 'function') routes['*'] = p; else routes[p] = h; }}});
+  const post = (name: string, {host = 'localhost:5173', peer = '127.0.0.1', origin, type = 'application/json'}: {host?: string; peer?: string; origin?: string; type?: string} = {}) =>
+    new Promise<number>(done => {
+      const listeners: Record<string, (c?: string) => void> = {};
+      const headers: Record<string, string> = {host, 'content-type': type}; if (origin !== undefined) headers.origin = origin;
+      const req = {method: 'POST', headers, socket: {remoteAddress: peer}, on: (e: string, f: any) => { listeners[e] = f; }, destroy() {}};
+      const res = {statusCode: 0, setHeader() {}, end() { done(res.statusCode); }};
+      routes['/__shell/new'](req, res);
+      listeners.data?.(JSON.stringify({name, template: 'flowchart.svg'})); listeners.end?.();
+    });
+  return {root, routes, post};
+}
+
+test('R970: POST /__shell/new answers only a page opened on localhost, never another Host', async () => {
+  const {root, post} = writerHarness();
+  for (const host of ['evil.example', 'evil.example:5173', '192.168.1.20:5173', 'localhost.evil.example', ''])
+    assert.equal(await post('x', {host}), 403, host);
+  assert.equal(existsSync(join(root, 'diagrams', 'x.svg')), false);
+  for (const [host, name] of [['localhost:5173', 'a'], ['127.0.0.1:5173', 'b'], ['[::1]:5173', 'c']])
+    assert.equal(await post(name, {host, origin: `http://${host}`}), 200, host);
+  assert.deepEqual(readdirSync(join(root, 'diagrams')).sort(), ['a.svg', 'b.svg', 'c.svg']);
+});
+
+test('R970: POST /__shell/new refuses a peer that is not this machine', async () => {
+  const {root, post} = writerHarness();
+  for (const peer of ['192.168.1.20', '::ffff:10.0.0.2', '', '128.0.0.1']) assert.equal(await post('x', {peer}), 403, peer);
+  assert.equal(await post('ok6', {peer: '::1'}), 200);
+  assert.equal(await post('ok4', {peer: '::ffff:127.0.0.1'}), 200);
+  assert.deepEqual(readdirSync(join(root, 'diagrams')).sort(), ['ok4.svg', 'ok6.svg']);
+});
+
+test('R970: POST /__shell/new refuses an Origin that is not http://<Host>, and any type but exact application/json', async () => {
+  const {root, post} = writerHarness();
+  for (const origin of ['https://evil.example', 'http://localhost:9999', 'null', 'https://localhost:5173']) assert.equal(await post('x', {origin}), 403, origin);
+  for (const type of ['application/json-patch', 'application/jsonx', 'text/plain']) assert.equal(await post('x', {type}), 405, type);
+  assert.equal(existsSync(join(root, 'diagrams', 'x.svg')), false);
+});
+
+test('R970: the dev server sandboxes every file it serves from diagrams/ or templates/, however it is asked for', () => {
+  const {root, routes} = writerHarness();
+  for (const f of ['p.svg', 'p.svgz', 'p.html', 'p.htm', 'p.xhtml', 'p.xml', 'p.xht', 'noext', 'wrong.txt', 'x.svg.js'])
+    writeFileSync(join(root, 'diagrams', f), '<svg xmlns="http://www.w3.org/2000/svg"><script>document.title="ran"</script></svg>');
+  mkdirSync(join(root, 'src')); writeFileSync(join(root, 'src', 'main.ts'), ''); writeFileSync(join(root, 'shell.html'), '');
+  mkdirSync(join(root, 'diagrams-other')); writeFileSync(join(root, 'diagrams-other', 'p.svg'), '<svg/>');
+  let linked = false; // a symlink outside diagrams/ that points into it is judged by its target
+  try { symlinkSync(join(root, 'diagrams', 'p.html'), join(root, 'outside-link.html')); linked = true; } catch { /* no symlink right on this machine */ }
+  const headers = (url: string) => {
+    const set: Record<string, string> = {}; let passed = false;
+    routes['*']({url}, {setHeader: (k: string, v: string) => { set[k] = v; }}, () => { passed = true; });
+    assert.equal(passed, true, url);
+    return set;
+  };
+  const fs = '/@fs/' + root.replaceAll('\\', '/').replace(/^\//, '');
+  const served = ['/diagrams/p.svg', '/diagrams/P.SVG', '/templates/flowchart.svg', '/%64iagrams/p.svg', '/%74emplates/flowchart.svg',
+    '/diagrams/p%2Esvg', '/diagrams/p%2esvg?import', '/diagrams/p.svg?raw', '/diagrams/p.svg#x', fs + '/diagrams/p.svg', fs + '/DIAGRAMS/p.svg',
+    '/./diagrams/p.svg', '/src/../diagrams/p.svg', '/src/%2e%2e/diagrams/p.svg', '/diagrams\\p.svg', '/diagrams//p.svg', '/diagrams/%E0%A4%A.svg',
+    '/diagrams/p.svgz', '/diagrams/p.html', '/diagrams/p.htm', '/diagrams/p.xhtml', '/diagrams/p.xml', '/diagrams/p.xht', '/diagrams/noext',
+    '/diagrams/wrong.txt', '/diagrams/x.svg.js', '/diagrams/', '/diagrams', ...(linked ? ['/outside-link.html'] : [])];
+  if (process.platform === 'linux') served.splice(served.indexOf('/diagrams/P.SVG'), 1), served.splice(served.indexOf(fs + '/DIAGRAMS/p.svg'), 1);
+  for (const url of served) {
+    const set = headers(url);
+    assert.equal(set['Content-Security-Policy'], 'sandbox', url);
+    assert.equal(set['X-Content-Type-Options'], 'nosniff', url);
+  }
+  for (const url of ['/shell.html', '/src/main.ts', '/diagrams-other/p.svg', '/diagramsx.svg', '/', '/@fs/' + tmpdir().replaceAll('\\', '/').replace(/^\//, '') + '/elsewhere.svg'])
+    assert.equal(headers(url)['Content-Security-Policy'], undefined, url);
 });
