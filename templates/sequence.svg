@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" width="720" height="400" font-family="system-ui,sans-serif" font-size="13">
+  <title>Sequence diagram</title>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#6b7280"/></marker></defs>
+  <rect width="720" height="400" fill="#fbfaf7"/>
+  <text x="24" y="32" font-size="11" letter-spacing="1.5" fill="#6b7280">SEQUENCE · TEMPLATE</text>
+  <g id="client"><title>Client</title><path d="M140 96V356" stroke="#6b7280" stroke-dasharray="4 4"/><rect x="70" y="56" width="140" height="40" rx="6" fill="#fff" stroke="#1f2937"/><text x="140" y="81" text-anchor="middle">Client</text></g>
+  <g id="server"><title>Server</title><path d="M360 96V356" stroke="#6b7280" stroke-dasharray="4 4"/><rect x="290" y="56" width="140" height="40" rx="6" fill="#fff" stroke="#1f2937"/><rect x="354" y="128" width="12" height="172" fill="#f3efe6" stroke="#b45309"/><text x="360" y="81" text-anchor="middle">Server</text></g>
+  <g id="data-store"><title>Data store</title><path d="M580 96V356" stroke="#6b7280" stroke-dasharray="4 4"/><rect x="510" y="56" width="140" height="40" rx="6" fill="#f3efe6" stroke="#b45309"/><text x="580" y="81" text-anchor="middle">Data store</text></g>
+  <g id="message-1"><title>1. Request</title><path d="M140 140H352" stroke="#1f2937" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/><text x="247" y="132" text-anchor="middle">1. Request</text></g>
+  <g id="message-2"><title>2. Query</title><path d="M366 190H578" stroke="#1f2937" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/><text x="472" y="182" text-anchor="middle">2. Query</text></g>
+  <g id="message-3"><title>3. Rows</title><path d="M580 240H368" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="6 4" fill="none" marker-end="url(#arrow)"/><text x="472" y="232" text-anchor="middle">3. Rows</text></g>
+  <g id="message-4"><title>4. Response</title><path d="M354 290H142" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="6 4" fill="none" marker-end="url(#arrow)"/><text x="247" y="282" text-anchor="middle">4. Response</text></g>
+  <text x="24" y="384" font-size="11" fill="#6b7280">Solid arrow: a call. Dashed arrow: its reply. Time runs downward.</text>
+</svg>

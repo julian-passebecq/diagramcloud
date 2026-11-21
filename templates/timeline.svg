@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" width="760" height="300" font-family="system-ui,sans-serif" font-size="13">
+  <title>Timeline</title>
+  <rect width="760" height="300" fill="#fbfaf7"/>
+  <text x="24" y="32" font-size="11" letter-spacing="1.5" fill="#6b7280">TIMELINE · TEMPLATE</text>
+  <g id="axis" stroke="#1f2937" stroke-width="2"><title>Axis</title><path d="M40 150H720"/></g>
+  <g id="milestone-1"><title>Kick-off</title><text x="100" y="124" text-anchor="middle" font-size="11" fill="#6b7280">15 Jan</text><circle cx="100" cy="150" r="9" fill="#fff" stroke="#1f2937" stroke-width="2"/><text x="100" y="186" text-anchor="middle">Kick-off</text></g>
+  <g id="milestone-2"><title>Design</title><text x="240" y="124" text-anchor="middle" font-size="11" fill="#6b7280">01 Mar</text><circle cx="240" cy="150" r="9" fill="#fff" stroke="#1f2937" stroke-width="2"/><text x="240" y="186" text-anchor="middle">Design</text></g>
+  <g id="milestone-3"><title>First version</title><text x="380" y="124" text-anchor="middle" font-size="11" fill="#6b7280">15 Apr</text><circle cx="380" cy="150" r="9" fill="#fff" stroke="#1f2937" stroke-width="2"/><text x="380" y="186" text-anchor="middle">First version</text></g>
+  <g id="milestone-4"><title>Review</title><text x="520" y="124" text-anchor="middle" font-size="11" fill="#6b7280">01 Jun</text><circle cx="520" cy="150" r="9" fill="#fff" stroke="#1f2937" stroke-width="2"/><text x="520" y="186" text-anchor="middle">Review</text></g>
+  <g id="milestone-5"><title>Launch</title><text x="660" y="124" text-anchor="middle" font-size="11" fill="#6b7280">15 Jul</text><circle cx="660" cy="150" r="11" fill="#f3efe6" stroke="#b45309" stroke-width="2"/><text x="660" y="186" text-anchor="middle">Launch</text></g>
+  <text x="24" y="276" font-size="11" fill="#6b7280">Change the dates and names, then add your own milestones.</text>
+</svg>
