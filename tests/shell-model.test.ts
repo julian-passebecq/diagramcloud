@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,type El} from '../src/shell/shellModel';
 import {writeFromTemplate} from '../src/shell/diagramWriter';
+import {keepHref,stripOutsideUrls} from '../src/shell/sanitize';
 
 test('shell pane sizes stay inside their limits', () => {
   for (const pane of ['left', 'right', 'bottom'] as const) {
@@ -113,4 +114,14 @@ test('an SVG without a viewBox gets one from its width and height so Zoom to fit
   assert.equal(missingViewBox('0 0 10 10', '300', '200'), null);
   assert.equal(missingViewBox(null, '50%', '200'), null);
   assert.equal(missingViewBox(null, null, null), null);
+});
+
+test('R970: only in-diagram and inline-image hrefs stay; outside CSS url(), @import and :host are removed', () => {
+  for (const ok of ['#a', ' #x', 'data:image/png;base64,AA', 'DATA:image/svg+xml,<svg/>']) assert.equal(keepHref(ok), true, ok);
+  for (const bad of ['https://x/y.png', '//x/y', 'javascript:alert(1)', 'data:text/html,<b>', 'foo.svg#a', '']) assert.equal(keepHref(bad), false, bad);
+  assert.equal(stripOutsideUrls('svg{background:url( "https://x/a.png" )}'), 'svg{background:url(#)}');
+  assert.equal(stripOutsideUrls('.a{fill:url(#grad)} .b{background:url(data:image/png;base64,AA)}'), '.a{fill:url(#grad)} .b{background:url(data:image/png;base64,AA)}');
+  assert.equal(stripOutsideUrls('@import url(https://x/c.css);:host{position:fixed}'), ':not(*){position:fixed}');
+  assert.doesNotMatch(stripOutsideUrls('a{background:u\\72l(https://x)}'), /\\/);
+  assert.doesNotMatch(stripOutsideUrls('a{background:image-set("https://x/a.png" 1x)}'), /image-set\(/);
 });

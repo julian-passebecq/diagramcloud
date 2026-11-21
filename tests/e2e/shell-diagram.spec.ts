@@ -22,6 +22,6 @@ test('shell shows a diagram, its groups and the Output line, and switches file',
   if(process.env.SHELL_SHOTS)await page.screenshot({path:`${process.env.SHELL_SHOTS}/2-floor-plan.png`});
   const popup=page.waitForEvent('popup');
   await page.getByRole('button',{name:'Open raw file'}).click();
-  await expect((await popup)).toHaveURL(/floor-plan.*\.svg/);
+  await expect((await popup)).toHaveURL(/^blob:/); // plain text, never the SVG as a page (R970)
   expect(errors).toEqual([]);
 });

@@ -19,10 +19,7 @@ ul,ol{list-style:none;margin:0;padding:0}
 .sh-right{grid-column:5;grid-row:2/5}
 .sh-canvas{grid-column:3;grid-row:2;display:flex;flex-direction:column;align-items:safe center;justify-content:safe center;overflow:auto;padding:12px;color:var(--sh-muted);min-width:0;min-height:0;background-image:radial-gradient(var(--sh-line) 1px,transparent 1px);background-size:16px 16px}
 .sh-canvas p{margin:2px}
-.sh-diagram svg{display:block;max-width:none;box-shadow:0 1px 4px #0002}
 .sh-canvas.fit .sh-diagram{width:100%;height:100%}
-.sh-canvas.fit .sh-diagram svg{width:100%;height:100%}
-.sh-hl{filter:drop-shadow(0 0 3px var(--sh-accent)) drop-shadow(0 0 6px var(--sh-accent))}
 button:disabled{opacity:.5;cursor:default}
 .sh-bottom{grid-column:3;grid-row:4;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
 .sh-split{background:var(--sh-line);touch-action:none}
