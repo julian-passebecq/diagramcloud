@@ -93,18 +93,21 @@ test('writeFromTemplate copies into diagrams/ only, never overwrites, refuses pa
   assert.deepEqual(readdirSync(join(root, 'diagrams')).sort(), ['mine.svg', 'taken.svg']);
 });
 
-test('the three templates are original, safe and list their parts in the navigation', () => {
-  assert.deepEqual(readdirSync('templates').sort(), ['architecture.svg', 'floor-plan.svg', 'flowchart.svg']);
+test('the six templates are original, safe and list their parts in the navigation', () => {
+  assert.deepEqual(readdirSync('templates').sort(), ['architecture.svg', 'floor-plan.svg', 'flowchart.svg', 'org-chart.svg', 'sequence.svg', 'timeline.svg']);
   const want: Record<string, string[]> = {
     'architecture.svg': ['Connections', 'User', 'Front end', 'Service', 'Data store'],
     'floor-plan.svg': ['Room 1', 'Room 2', 'Room 3', 'Corridor', 'Doors', 'Scale'],
     'flowchart.svg': ['Arrows', 'Start', 'Step 1', 'Decision?', 'Step 2', 'Alternative', 'End'],
+    'org-chart.svg': ['Links', 'Head', 'Team A', 'Team B', 'Member A1', 'Member A2', 'Member B1', 'Member B2'],
+    'sequence.svg': ['Client', 'Server', 'Data store', '1. Request', '2. Query', '3. Rows', '4. Response'],
+    'timeline.svg': ['Axis', 'Kick-off', 'Design', 'First version', 'Review', 'Launch'],
   };
   for (const name of Object.keys(want)) {
     const text = readFileSync(`templates/${name}`, 'utf8');
     assert.equal(cannotShow({name, text, url: ''}), null, name);
-    assert.doesNotMatch(text, /<script|\son\w+=|href=/i, name);
-    assert.match(svgTitle(text, name), /^(Architecture diagram|Floor plan|Flowchart)$/);
+    assert.doesNotMatch(text, /<script|<style|<image|<foreignObject|\son\w+=|href=/i, name);
+    assert.match(svgTitle(text, name), /^(Architecture diagram|Floor plan|Flowchart|Org chart|Sequence diagram|Timeline)$/);
     const groups = [...text.matchAll(/<g id="([^"]+)"><title>([^<]+)<\/title>|<g id="([^"]+)"[^>]*>\s*<title>([^<]+)<\/title>/g)].map(m => m[2] ?? m[4]);
     assert.deepEqual(groups, want[name], name);
   }

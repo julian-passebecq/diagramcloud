@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 380" width="680" height="380" font-family="system-ui,sans-serif" font-size="13">
+  <title>Org chart</title>
+  <rect width="680" height="380" fill="#fbfaf7"/>
+  <text x="24" y="32" font-size="11" letter-spacing="1.5" fill="#6b7280">ORG CHART · TEMPLATE</text>
+  <g id="links" stroke="#6b7280" stroke-width="1.5" fill="none">
+    <title>Links</title>
+    <path d="M340 100V125H180V150M340 125H500V150"/><path d="M180 198V229H100V260M180 229H260V260"/><path d="M500 198V229H420V260M500 229H580V260"/>
+  </g>
+  <g id="head"><title>Head</title><rect x="260" y="52" width="160" height="48" rx="6" fill="#f3efe6" stroke="#b45309"/><text x="340" y="81" text-anchor="middle">Head</text></g>
+  <g id="team-a"><title>Team A</title><rect x="100" y="150" width="160" height="48" rx="6" fill="#fff" stroke="#1f2937"/><text x="180" y="179" text-anchor="middle">Team A</text></g>
+  <g id="team-b"><title>Team B</title><rect x="420" y="150" width="160" height="48" rx="6" fill="#fff" stroke="#1f2937"/><text x="500" y="179" text-anchor="middle">Team B</text></g>
+  <g id="member-a1"><title>Member A1</title><rect x="36" y="260" width="128" height="44" rx="6" fill="#fff" stroke="#1f2937"/><text x="100" y="287" text-anchor="middle">Member A1</text></g>
+  <g id="member-a2"><title>Member A2</title><rect x="196" y="260" width="128" height="44" rx="6" fill="#fff" stroke="#1f2937"/><text x="260" y="287" text-anchor="middle">Member A2</text></g>
+  <g id="member-b1"><title>Member B1</title><rect x="356" y="260" width="128" height="44" rx="6" fill="#fff" stroke="#1f2937"/><text x="420" y="287" text-anchor="middle">Member B1</text></g>
+  <g id="member-b2"><title>Member B2</title><rect x="516" y="260" width="128" height="44" rx="6" fill="#fff" stroke="#1f2937"/><text x="580" y="287" text-anchor="middle">Member B2</text></g>
+  <text x="24" y="356" font-size="11" fill="#6b7280">A root and two levels. Rename the boxes, then add your own.</text>
+</svg>

@@ -11,7 +11,7 @@ test('New from template lists three, refuses a taken name, shows a floor plan, a
   await expect(page.getByRole('button',{name:'Rename group'})).toBeDisabled();
   await page.getByRole('button',{name:'New from template'}).click();
   const menu=page.getByRole('menu',{name:'Templates'});
-  await expect(menu.getByRole('menuitem')).toHaveText(['Architecture diagram','Floor plan','Flowchart']);
+  await expect(menu.getByRole('menuitem')).toHaveText(['Architecture diagram','Floor plan','Flowchart','Org chart','Sequence diagram','Timeline']);
   if(process.env.SHELL_SHOTS)await page.screenshot({path:`${process.env.SHELL_SHOTS}/1-template-list.png`});
 
   page.once('dialog',d=>d.accept('floor-plan'));
