@@ -1,7 +1,22 @@
-/** Model of the DiagramCloud shell (R875, R958): diagram files from diagrams/, their groups, pane sizes. No backend. */
+/** Model of the DiagramCloud shell (R875, R958, R964): diagram files from diagrams/, their groups, templates, pane sizes. */
 
 /** The ribbon has only buttons that work. */
-export const RIBBON_BUTTONS=[{id:'fit',label:'Zoom to fit'},{id:'raw',label:'Open raw file'}] as const;
+export const RIBBON_BUTTONS=[{id:'new',label:'New from template'},{id:'rename',label:'Rename group'},{id:'save',label:'Save as'},{id:'fit',label:'Zoom to fit'},{id:'raw',label:'Open raw file'}] as const;
+
+/** Why a new diagram name is refused, or null when diagrams/<name>.svg may be created. */
+export function checkNewName(name:string,existing:readonly string[]):string|null{
+ if(!name)return 'Give the diagram a name.';
+ if(!/^[A-Za-z0-9_-]{1,64}$/.test(name))return `"${name}" is refused: use only letters, digits, dash and underscore (at most 64), no dots, slashes or spaces.`;
+ // Case-insensitive: macOS and Windows folders treat a.svg and A.svg as one file.
+ if(existing.some(n=>n.toLowerCase()===`${name}.svg`.toLowerCase()))return `diagrams/${name}.svg already exists: choose another name.`;
+ return null;
+}
+
+/** Why a group title is refused, or null. */
+export const checkGroupTitle=(title:string)=>!title.trim()?'A group title cannot be empty.':title.length>80?'A group title has at most 80 characters.':null;
+
+/** The diagram's own <title>, used as the template's name in the menu. */
+export const svgTitle=(text:string,fallback:string)=>/<title>([^<]+)<\/title>/.exec(text)?.[1].trim()||fallback;
 
 export type DiagramFile={name:string;text:string;url:string};
 

@@ -1,0 +1,30 @@
+/** Dev-server side of "New from template" (R964): copies templates/<t>.svg to diagrams/<name>.svg, never outside diagrams/. */
+import {readdirSync,readFileSync,writeFileSync} from 'node:fs';
+import {join,resolve,sep} from 'node:path';
+import type {Plugin} from 'vite';
+import {checkNewName} from './shellModel';
+
+export function writeFromTemplate(root:string,name:string,template:string):string{
+ const dir=resolve(root,'diagrams');const tdir=resolve(root,'templates');
+ if(!readdirSync(tdir).filter(n=>n.endsWith('.svg')).includes(template))throw new Error(`Unknown template "${template}".`);
+ const refused=checkNewName(name,readdirSync(dir));if(refused)throw new Error(refused);
+ const file=resolve(dir,`${name}.svg`);
+ if(!file.startsWith(dir+sep))throw new Error('Refused: the file would be outside diagrams/.');
+ writeFileSync(file,readFileSync(join(tdir,template)),{flag:'wx'}); // wx: never overwrite, even in a race
+ return `diagrams/${name}.svg`;
+}
+
+/** POST /__shell/new {name, template} while `npm run dev` runs. A built or previewed page has no such route. */
+export function diagramWriter(root=process.cwd()):Plugin{
+ return {name:'diagramcloud-shell-writer',apply:'serve',configureServer(server){
+  server.middlewares.use('/__shell/new',(req,res)=>{
+   const reply=(code:number,body:object)=>{res.statusCode=code;res.setHeader('content-type','application/json');res.end(JSON.stringify(body));};
+   // A JSON content type forces a CORS preflight, so another site cannot post here.
+   if(req.method!=='POST'||!String(req.headers['content-type']).startsWith('application/json'))return reply(405,{ok:false,error:'POST JSON only.'});
+   let body='';
+   req.on('data',c=>{body+=c;if(body.length>2048)req.destroy();});
+   req.on('end',()=>{try{const {name,template}=JSON.parse(body);reply(200,{ok:true,path:writeFromTemplate(root,String(name),String(template))});}
+    catch(e){reply(400,{ok:false,error:(e as Error).message});}});
+  });
+ }};
+}

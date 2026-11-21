@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" width="640" height="440" font-family="system-ui,sans-serif" font-size="13">
+  <title>Floor plan</title>
+  <rect width="640" height="440" fill="#fbfaf7"/>
+  <text x="20" y="28" font-size="11" letter-spacing="1.5" fill="#6b7280">FLOOR PLAN · TEMPLATE</text>
+  <g fill="#fff" stroke="#1f2937" stroke-width="4">
+    <g id="room-1"><title>Room 1</title><rect x="20" y="44" width="340" height="200"/><text x="190" y="148" text-anchor="middle" stroke="none" fill="#1f2937">Room 1</text></g>
+    <g id="room-2"><title>Room 2</title><rect x="360" y="44" width="260" height="200"/><text x="490" y="148" text-anchor="middle" stroke="none" fill="#1f2937">Room 2</text></g>
+    <g id="room-3"><title>Room 3</title><rect x="20" y="244" width="260" height="140"/><text x="150" y="318" text-anchor="middle" stroke="none" fill="#1f2937">Room 3</text></g>
+    <g id="corridor"><title>Corridor</title><rect x="280" y="244" width="340" height="140"/><text x="450" y="318" text-anchor="middle" stroke="none" fill="#1f2937">Corridor</text></g>
+  </g>
+  <g id="doors" stroke="#fbfaf7" stroke-width="6"><title>Doors</title><path d="M180 244H230"/><path d="M420 244H470"/><path d="M280 300V350"/><path d="M520 384H580"/></g>
+  <g id="scale" stroke="#1f2937" stroke-width="2" fill="#1f2937"><title>Scale</title><path d="M20 414H120M20 408V420M120 408V420"/><text x="130" y="418" stroke="none" font-size="11">2 m</text></g>
+</svg>
