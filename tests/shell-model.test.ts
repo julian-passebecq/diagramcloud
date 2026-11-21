@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync,symlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,type El} from '../src/shell/shellModel';
+import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,deckOrder,deckStep,deckKey,deckStatus,deckOutline,rootTitle,type El} from '../src/shell/shellModel';
 import {writeFromTemplate,diagramWriter} from '../src/shell/diagramWriter';
 import {keepHref,safeCss} from '../src/shell/sanitize';
 
@@ -16,7 +16,7 @@ test('shell pane sizes stay inside their limits', () => {
 });
 
 test('the ribbon has exactly the working buttons', () => {
-  assert.deepEqual(RIBBON_BUTTONS.map(b => b.label), ['New from template', 'Rename group', 'Save as', 'Zoom to fit', 'Open raw file', 'Compare A vs B', 'Copy comparison']);
+  assert.deepEqual(RIBBON_BUTTONS.map(b => b.label), ['New from template', 'Rename group', 'Save as', 'Zoom to fit', 'Open raw file', 'Compare A vs B', 'Copy comparison', 'Present']);
 });
 
 test('diagram files are listed by name, sorted, with their raw URL', () => {
@@ -242,4 +242,52 @@ test('R993: floor-plan-b.svg is the same flat with one room more (Study) and one
   assert.deepEqual(b.filter(x => !a.includes(x)), ['study']);
   const text = readFileSync('diagrams/floor-plan-b.svg', 'utf8');
   assert.doesNotMatch(text, /<style|href|<image|<script|<foreignObject|\son\w+=/i);
+});
+
+test('R998 (PR 174 review a): compareGroups gives every row its own key, also when an id spells the suffix of another key', () => {
+  const g = (id: string) => ({id, label: id});
+  const rows = compareGroups([g('r'), g('r'), g('r~1')], [g('r~1')]);
+  const keys = rows.map(r => r.key);
+  assert.equal(new Set(keys).size, keys.length, keys.join(' | '));
+  assert.deepEqual(rows.map(r => [r.label, r.side, r.a, r.b]), [['r', 'A only', 0, null], ['r', 'A only', 1, null], ['r~1', 'both', 2, 0]]);
+});
+
+test('R998: deckOrder keeps tree order, picked files only, or every file when none is picked', () => {
+  const tree = ['architecture.svg', 'floor-plan-b.svg', 'floor-plan.svg'];
+  assert.deepEqual(deckOrder(tree, []), tree);
+  assert.deepEqual(deckOrder(tree, ['floor-plan.svg', 'architecture.svg']), ['architecture.svg', 'floor-plan.svg']);
+  assert.deepEqual(deckOrder(tree, ['gone.svg']), []); // a pick no longer in the tree is not a slide
+  assert.deepEqual(deckOrder([], []), []);
+});
+
+test('R998: deckStep stays inside the deck and deckKey maps the Present keys', () => {
+  assert.equal(deckStep(0, 3, 1), 1);
+  assert.equal(deckStep(2, 3, 1), 2); // no wrap after the last slide
+  assert.equal(deckStep(0, 3, -1), 0); // no wrap before the first
+  assert.equal(deckStep(1, 3, -1), 0);
+  assert.equal(deckStep(0, 0, 1), -1);
+  assert.equal(deckStep(9, 3, 0), 2);
+  assert.deepEqual(['ArrowRight', ' ', 'ArrowLeft', 'Escape', 'Enter', 'a'].map(deckKey), ['next', 'next', 'prev', 'exit', null, null]);
+  assert.equal(deckStatus(0, 3, 'floor-plan.svg'), 'slide 1 of 3: floor-plan.svg');
+});
+
+test('R998: rootTitle reads the own title of the SVG, never a group title; the outline is one plain line per slide', () => {
+  assert.equal(rootTitle('<svg xmlns="x" viewBox="0 0 1 1">\n  <title> Plan  A </title><g><title>Room</title></g></svg>'), 'Plan A');
+  assert.equal(rootTitle('<?xml version="1.0"?>\n<!-- c --><svg><!-- c --><title>T</title></svg>'), 'T');
+  assert.equal(rootTitle('<svg><g><title>Room</title></g></svg>'), '');
+  assert.equal(rootTitle('<svg><rect/><title>Late</title></svg>'), '');
+  assert.equal(rootTitle('not svg'), '');
+  assert.equal(deckOutline([{name: 'a.svg', title: 'Plan A'}, {name: 'b.svg', title: ''}]), '1. a.svg, Plan A\n2. b.svg');
+  assert.equal(deckOutline([]), '');
+  // PR 178 review: consecutive comments never backtrack exponentially (the old pattern froze the tab at about 30).
+  const many = '<!-- c -->'.repeat(40);
+  for (const text of [`<svg>${many}<title>T</title></svg>`, `<svg>${many}<rect/></svg>`, `${many}<svg>${many}`, `<svg>${many}<!-- open`, `<?xml ${'?'.repeat(40)}`]) {
+    const t0 = performance.now();
+    rootTitle(text);
+    assert.ok(performance.now() - t0 < 50, `${text.slice(0, 30)}... took ${performance.now() - t0} ms`);
+  }
+  assert.equal(rootTitle(`<svg>${many}<title>T</title></svg>`), 'T');
+  assert.equal(rootTitle('<svg><!-- a - b -- c --><title>T</title></svg>'), 'T');
+  assert.deepEqual(['architecture.svg', 'floor-plan-b.svg', 'floor-plan.svg'].map(n => rootTitle(readFileSync(`diagrams/${n}`, 'utf8'))),
+    ['Sample architecture: six services', 'Sample floor plan B: small flat with a study', 'Sample floor plan: small flat']);
 });
