@@ -1,7 +1,7 @@
-/** Model of the DiagramCloud shell (R875, R958, R964): diagram files from diagrams/, their groups, templates, pane sizes. */
+/** Model of the DiagramCloud shell (R875, R958, R964, R993): diagram files from diagrams/, their groups, templates, pane sizes. */
 
 /** The ribbon has only buttons that work. */
-export const RIBBON_BUTTONS=[{id:'new',label:'New from template'},{id:'rename',label:'Rename group'},{id:'save',label:'Save as'},{id:'fit',label:'Zoom to fit'},{id:'raw',label:'Open raw file'}] as const;
+export const RIBBON_BUTTONS=[{id:'new',label:'New from template'},{id:'rename',label:'Rename group'},{id:'save',label:'Save as'},{id:'fit',label:'Zoom to fit'},{id:'raw',label:'Open raw file'},{id:'compare',label:'Compare A vs B'},{id:'copy',label:'Copy comparison'}] as const;
 
 /** Why a new diagram name is refused, or null when diagrams/<name>.svg may be created. */
 export function checkNewName(name:string,existing:readonly string[]):string|null{
@@ -69,3 +69,26 @@ export type PaneSizes={left:number;right:number;bottom:number};
 export const DEFAULT_SIZES:PaneSizes={left:240,right:220,bottom:140};
 export const LIMITS:Record<keyof PaneSizes,[number,number]>={left:[140,480],right:[140,420],bottom:[60,400]};
 export const clampSize=(pane:keyof PaneSizes,value:number)=>Math.min(LIMITS[pane][1],Math.max(LIMITS[pane][0],Math.round(value)));
+
+/** R993: one named group in the union of option A and option B. a / b are its index in each side's group list, or null. */
+export type CompareSide='A only'|'B only'|'both';
+export type CompareRow={key:string;label:string;side:CompareSide;a:number|null;b:number|null};
+
+/** Union of the named groups of A and B, matched by id (or by title when a group has no id), A's order first, then B's.
+ *  A name used twice on one side pairs with the same occurrence on the other side, so nothing is counted twice. */
+export function compareGroups(a:readonly {id:string;label:string}[],b:readonly {id:string;label:string}[]):CompareRow[]{
+ const keys=(list:readonly {id:string;label:string}[])=>{const seen=new Map<string,number>();
+  return list.map(g=>{const base=g.id?`#${g.id}`:`title:${g.label}`;const n=seen.get(base)??0;seen.set(base,n+1);return n?`${base}~${n}`:base;});};
+ const ka=keys(a),kb=keys(b);
+ const inB=new Map(kb.map((k,i)=>[k,i]));const inA=new Set(ka);
+ const rows:CompareRow[]=ka.map((key,i)=>{const j=inB.get(key);return {key,label:a[i].label,side:j===undefined?'A only':'both',a:i,b:j??null};});
+ kb.forEach((key,j)=>{if(!inA.has(key))rows.push({key,label:b[j].label,side:'B only',a:null,b:j});});
+ return rows;
+}
+
+/** R993: the short comparison written to Output and copied by Copy comparison. */
+export function comparisonText(rows:readonly CompareRow[],a:{name:string;bytes:number},b:{name:string;bytes:number}):string[]{
+ const list=(side:CompareSide)=>{const l=rows.filter(r=>r.side===side).map(r=>r.label);return `(${l.length}): ${l.length?l.join(', '):'none'}.`;};
+ return [`Compare A = ${a.name} (${formatSize(a.bytes)}) with B = ${b.name} (${formatSize(b.bytes)}).`,
+  `Only in A ${list('A only')}`,`Only in B ${list('B only')}`,`In both ${list('both')}`];
+}

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync,symlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,type El} from '../src/shell/shellModel';
+import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,compareGroups,comparisonText,type El} from '../src/shell/shellModel';
 import {writeFromTemplate,diagramWriter} from '../src/shell/diagramWriter';
 import {keepHref,safeCss} from '../src/shell/sanitize';
 
@@ -16,7 +16,7 @@ test('shell pane sizes stay inside their limits', () => {
 });
 
 test('the ribbon has exactly the working buttons', () => {
-  assert.deepEqual(RIBBON_BUTTONS.map(b => b.label), ['New from template', 'Rename group', 'Save as', 'Zoom to fit', 'Open raw file']);
+  assert.deepEqual(RIBBON_BUTTONS.map(b => b.label), ['New from template', 'Rename group', 'Save as', 'Zoom to fit', 'Open raw file', 'Compare A vs B', 'Copy comparison']);
 });
 
 test('diagram files are listed by name, sorted, with their raw URL', () => {
@@ -214,4 +214,32 @@ test('R970: the dev server sandboxes every file it serves from diagrams/ or temp
   }
   for (const url of ['/shell.html', '/src/main.ts', '/diagrams-other/p.svg', '/diagramsx.svg', '/', '/@fs/' + tmpdir().replaceAll('\\', '/').replace(/^\//, '') + '/elsewhere.svg'])
     assert.equal(headers(url)['Content-Security-Policy'], undefined, url);
+});
+
+test('R993: compareGroups marks the union of named groups A only, B only or both, matched by id', () => {
+  const g = (id: string, label = id) => ({id, label});
+  const rows = compareGroups([g('hall', 'Hall'), g('kitchen', 'Kitchen'), g('', 'Doors')], [g('kitchen', 'Kitchen (new)'), g('study', 'Study'), g('', 'Doors')]);
+  assert.deepEqual(rows.map(r => [r.label, r.side, r.a, r.b]), [['Hall', 'A only', 0, null], ['Kitchen', 'both', 1, 0], ['Doors', 'both', 2, 2], ['Study', 'B only', null, 1]]);
+  // a title-only group never matches an id that happens to spell the same word
+  assert.deepEqual(compareGroups([g('', 'x')], [g('x')]).map(r => r.side), ['A only', 'B only']);
+  // a name used twice pairs occurrence by occurrence, never twice with one group
+  assert.deepEqual(compareGroups([g('r'), g('r')], [g('r')]).map(r => [r.side, r.a, r.b]), [['both', 0, 0], ['A only', 1, null]]);
+  assert.deepEqual(compareGroups([], []), []);
+  assert.deepEqual(compareGroups([], [g('b')]).map(r => r.side), ['B only']);
+});
+
+test('R993: the comparison text lists only A, only B, both and the two sizes', () => {
+  const rows = compareGroups([{id: 'hall', label: 'Hall'}, {id: 'bed', label: 'Bedroom'}], [{id: 'bed', label: 'Bedroom'}, {id: 'study', label: 'Study'}]);
+  assert.deepEqual(comparisonText(rows, {name: 'diagrams/a.svg', bytes: 1536}, {name: 'diagrams/b.svg', bytes: 900}), [
+    'Compare A = diagrams/a.svg (1.5 KB) with B = diagrams/b.svg (900 B).', 'Only in A (1): Hall.', 'Only in B (1): Study.', 'In both (1): Bedroom.']);
+  assert.match(comparisonText([], {name: 'a', bytes: 0}, {name: 'b', bytes: 0})[1], /\(0\): none\./);
+});
+
+test('R993: floor-plan-b.svg is the same flat with one room more (Study) and one fewer (Hall), safe like the templates', () => {
+  const ids = (n: string) => [...readFileSync(`diagrams/${n}`, 'utf8').matchAll(/<g id="([^"]+)"/g)].map(m => m[1]);
+  const a = ids('floor-plan.svg'), b = ids('floor-plan-b.svg');
+  assert.deepEqual(a.filter(x => !b.includes(x)), ['hall']);
+  assert.deepEqual(b.filter(x => !a.includes(x)), ['study']);
+  const text = readFileSync('diagrams/floor-plan-b.svg', 'utf8');
+  assert.doesNotMatch(text, /<style|href|<image|<script|<foreignObject|\son\w+=/i);
 });

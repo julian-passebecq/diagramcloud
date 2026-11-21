@@ -5,7 +5,7 @@ test('shell shows a diagram, its groups and the Output line, and switches file',
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/shell.html');
   const tree=page.getByRole('navigation',{name:'Diagrams'});
-  await expect(tree.getByRole('button')).toHaveText(['architecture.svg','floor-plan.svg']);
+  await expect(tree.getByRole('button')).toHaveText(['architecture.svg','floor-plan-b.svg','floor-plan.svg']);
   await expect(page.locator('.sh-diagram svg')).toBeVisible();
   const nav=page.getByRole('complementary',{name:'Navigation'});
   await expect(nav.getByRole('button',{name:'API gateway'})).toBeVisible();
