@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-import {mkdtempSync,mkdirSync,writeFileSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,symlinkSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {request} from 'node:http';
@@ -14,12 +14,15 @@ const XHTML=`<html xmlns="http://www.w3.org/1999/xhtml"><body>${RUN}</body></htm
 const HTML=`<!doctype html><html><body>${RUN}</body></html>`;
 const FILES:Record<string,string>={'p.svg':SVG,'p.svgz':SVG,'p.html':HTML,'p.htm':HTML,'p.xhtml':XHTML,'p.xml':XHTML,'p.xht':XHTML,'noext':HTML,'wrong.txt':HTML};
 
-let server:ViteDevServer;let base='';let root='';
+let server:ViteDevServer;let base='';let root='';const linksOut:string[]=[];
 test.beforeAll(async()=>{
  root=mkdtempSync(join(tmpdir(),'dc-shell-dev-'));
  for(const d of ['diagrams','templates','other'])mkdirSync(join(root,d));
  for(const [f,t] of Object.entries(FILES))writeFileSync(join(root,'diagrams',f),t);
  writeFileSync(join(root,'templates','t.svg'),SVG);writeFileSync(join(root,'other','control.html'),HTML);
+ // R990: links INSIDE diagrams/ that point OUT, to a folder and to a file (the file link needs symlink rights on Windows).
+ try{symlinkSync(join(root,'other'),join(root,'diagrams','linkdir-out'),'junction');linksOut.push('/diagrams/linkdir-out/control.html','/diagrams/linkdir-out/control.html?x');}catch{/* no link right */}
+ try{symlinkSync(join(root,'other','control.html'),join(root,'diagrams','link-out.html'));linksOut.push('/diagrams/link-out.html','/diagrams/link-out.html?x');}catch{/* no file-symlink right */}
  server=await createServer({configFile:false,root,logLevel:'silent',plugins:[diagramWriter(root)],server:{host:'127.0.0.1',port:0,strictPort:false,hmr:false}});
  await server.listen();
  const addr=server.httpServer!.address() as {port:number};base=`http://127.0.0.1:${addr.port}`;
@@ -45,6 +48,20 @@ test('every spelling and markup extension of a diagrams/ file is served sandboxe
  }
  // The control: a file outside diagrams/ and templates/ gets no sandbox, so the check above is not vacuous.
  expect((await get('/other/control.html')).headers['content-security-policy']).toBeUndefined();
+});
+
+test('a link inside diagrams/ that points outside is served sandboxed and never sniffed, and runs no script (R990)', async ({page}) => {
+ expect(linksOut.length,'no link inside diagrams/ could be made').toBeGreaterThan(0);
+ const fs='/@fs/'+root.replaceAll('\\','/').replace(/^\//,'');
+ for(const path of [...linksOut,fs+linksOut[0]]){
+  const r=await get(path);
+  expect(r.status,path).toBe(200);
+  expect(r.body,path).toContain('data-ran'); // the outside file's own bytes, not a fallback page
+  expect(r.headers['content-security-policy'],path).toBe('sandbox');
+  expect(r.headers['x-content-type-options'],path).toBe('nosniff');
+  await page.goto(base+path,{waitUntil:'load'});await page.waitForTimeout(150);
+  expect(await page.evaluate(()=>document.documentElement?.getAttribute('data-ran')??'no'),path).toBe('no');
+ }
 });
 
 test('a malformed percent-encoding under diagrams/ is refused or sandboxed, never served bare (R990)', async () => {

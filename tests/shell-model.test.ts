@@ -194,6 +194,11 @@ test('R970: the dev server sandboxes every file it serves from diagrams/ or temp
   mkdirSync(join(root, 'diagrams-other')); writeFileSync(join(root, 'diagrams-other', 'p.svg'), '<svg/>');
   let linked = false; // a symlink outside diagrams/ that points into it is judged by its target
   try { symlinkSync(join(root, 'diagrams', 'p.html'), join(root, 'outside-link.html')); linked = true; } catch { /* no symlink right on this machine */ }
+  // R990: a link INSIDE diagrams/ that points outside is still served from diagrams/, so it is sandboxed too
+  mkdirSync(join(root, 'outdir')); writeFileSync(join(root, 'outdir', 'o.html'), '<script>document.title="ran"</script>');
+  const linkedOut: string[] = [];
+  try { symlinkSync(join(root, 'outdir'), join(root, 'diagrams', 'linkdir-out'), 'junction'); linkedOut.push('/diagrams/linkdir-out/o.html', '/diagrams/linkdir-out/o.html?x', '/diagrams/linkdir-out/'); } catch { /* no link right */ }
+  try { symlinkSync(join(root, 'outdir', 'o.html'), join(root, 'diagrams', 'link-out.html')); linkedOut.push('/diagrams/link-out.html', '/diagrams/link-out.html?x'); } catch { /* no file-symlink right (Windows without developer mode) */ }
   const headers = (url: string) => {
     const set: Record<string, string> = {}; let passed = false;
     routes['*']({url}, {setHeader: (k: string, v: string) => { set[k] = v; }}, () => { passed = true; });
@@ -207,14 +212,16 @@ test('R970: the dev server sandboxes every file it serves from diagrams/ or temp
     '/diagrams/p.svgz', '/diagrams/p.html', '/diagrams/p.htm', '/diagrams/p.xhtml', '/diagrams/p.xml', '/diagrams/p.xht', '/diagrams/noext',
     '/diagrams/wrong.txt', '/diagrams/x.svg.js', '/diagrams/', '/diagrams',
     // R990 (D12): Vite serves the path before ? or #, so a query or hash that walks out of diagrams/ must not count
-    '/diagrams/p.html?/../../x', '/diagrams/p.html?a=/../../shell.html', '/diagrams/p.html#/../../x', '/diagrams/p.svg?import&/../../src/main.ts', ...(linked ? ['/outside-link.html'] : [])];
+    '/diagrams/p.html?/../../x', '/diagrams/p.html?a=/../../shell.html', '/diagrams/p.html#/../../x', '/diagrams/p.svg?import&/../../src/main.ts', ...linkedOut, ...(linked ? ['/outside-link.html'] : [])];
+  if (linkedOut.length) served.push(fs + linkedOut[0]); // the same link through /@fs/
   if (process.platform === 'linux') served.splice(served.indexOf('/diagrams/P.SVG'), 1), served.splice(served.indexOf(fs + '/DIAGRAMS/p.svg'), 1);
   for (const url of served) {
     const set = headers(url);
     assert.equal(set['Content-Security-Policy'], 'sandbox', url);
     assert.equal(set['X-Content-Type-Options'], 'nosniff', url);
   }
-  for (const url of ['/shell.html', '/src/main.ts', '/diagrams-other/p.svg', '/diagramsx.svg', '/', '/@fs/' + tmpdir().replaceAll('\\', '/').replace(/^\//, '') + '/elsewhere.svg'])
+  assert.ok(linkedOut.length > 0, 'no link inside diagrams/ could be made: the R990 case is untested');
+  for (const url of ['/shell.html', '/src/main.ts', '/outdir/o.html', '/diagrams-other/p.svg', '/diagramsx.svg', '/', '/@fs/' + tmpdir().replaceAll('\\', '/').replace(/^\//, '') + '/elsewhere.svg'])
     assert.equal(headers(url)['Content-Security-Policy'], undefined, url);
 });
 
@@ -226,6 +233,8 @@ test('R990: a root reached through a link still sandboxes a missing or malformed
   try { symlinkSync(real, link, process.platform === 'win32' ? 'junction' : 'dir'); } catch { return; /* no link right on this machine */ }
   for (const url of ['/diagrams/p.svg', '/diagrams/missing.svg', '/diagrams/new/deeper.svg', '/diagrams/%E0%A4%A.svg', '/templates/missing.svg', '/diagrams/'])
     assert.equal(servesUserFile(link, url), true, url);
+  // a broken % code anywhere is sandboxed, never guessed (a malformed address cannot be judged)
+  for (const url of ['/src/%E0.ts', '/%E0%A4%A', '/shell.html%']) assert.equal(servesUserFile(real, url), true, url);
   for (const url of ['/src/main.ts', '/missing.svg', '/diagramsx/missing.svg'])
     assert.equal(servesUserFile(link, url), false, url);
 });
