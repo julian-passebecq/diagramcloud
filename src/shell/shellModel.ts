@@ -7,6 +7,8 @@ export const RIBBON_BUTTONS=[{id:'new',label:'New from template'},{id:'rename',l
 export function checkNewName(name:string,existing:readonly string[]):string|null{
  if(!name)return 'Give the diagram a name.';
  if(!/^[A-Za-z0-9_-]{1,64}$/.test(name))return `"${name}" is refused: use only letters, digits, dash and underscore (at most 64), no dots, slashes or spaces.`;
+ // Windows reserves these device names in every folder (CON.svg opens the console, not a file).
+ if(/^(con|prn|aux|nul|com\d|lpt\d)$/i.test(name))return `"${name}" is refused: Windows reserves that name for a device.`;
  // Case-insensitive: macOS and Windows folders treat a.svg and A.svg as one file.
  if(existing.some(n=>n.toLowerCase()===`${name}.svg`.toLowerCase()))return `diagrams/${name}.svg already exists: choose another name.`;
  return null;

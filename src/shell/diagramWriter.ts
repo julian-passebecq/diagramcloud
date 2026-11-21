@@ -14,12 +14,17 @@ export function writeFromTemplate(root:string,name:string,template:string):strin
  return `diagrams/${name}.svg`;
 }
 
+/** True when the Host header names this machine: localhost, 127.0.0.1 or [::1], with or without a port. */
+export const isLoopbackHost=(host:string|undefined)=>/^(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?$/i.test(host??'');
+
 /** POST /__shell/new {name, template} while `npm run dev` runs. A built or previewed page has no such route. */
 export function diagramWriter(root=process.cwd()):Plugin{
  return {name:'diagramcloud-shell-writer',apply:'serve',configureServer(server){
   server.middlewares.use('/__shell/new',(req,res)=>{
    const reply=(code:number,body:object)=>{res.statusCode=code;res.setHeader('content-type','application/json');res.end(JSON.stringify(body));};
    // A JSON content type forces a CORS preflight, so another site cannot post here.
+   // Only a page opened on this machine may write: a LAN visitor or a rebinding DNS name gets 403 (dev runs on 0.0.0.0).
+   if(!isLoopbackHost(req.headers.host))return reply(403,{ok:false,error:'Refused: New from template writes only for a page opened on localhost.'});
    if(req.method!=='POST'||!String(req.headers['content-type']).startsWith('application/json'))return reply(405,{ok:false,error:'POST JSON only.'});
    let body='';
    req.on('data',c=>{body+=c;if(body.length>2048)req.destroy();});

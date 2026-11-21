@@ -4,7 +4,7 @@ import {readFileSync,readdirSync,mkdtempSync,mkdirSync,writeFileSync,existsSync}
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {clampSize,DEFAULT_SIZES,LIMITS,RIBBON_BUTTONS,diagramFiles,diagramGroups,cannotShow,missingViewBox,formatSize,byteSize,checkNewName,checkGroupTitle,svgTitle,type El} from '../src/shell/shellModel';
-import {writeFromTemplate} from '../src/shell/diagramWriter';
+import {writeFromTemplate,diagramWriter} from '../src/shell/diagramWriter';
 import {keepHref,stripOutsideUrls} from '../src/shell/sanitize';
 
 test('shell pane sizes stay inside their limits', () => {
@@ -71,6 +71,8 @@ test('a new diagram name is refused when it exists or holds anything but letters
   for (const bad of ['../evil', 'a/b', 'a\\b', 'x.svg', '.hidden', 'two words', 'C:', 'é', 'a'.repeat(65), '%2e%2e'])
     assert.match(checkNewName(bad, have)!, /refused/, bad);
   assert.match(checkNewName('', have)!, /name/);
+  for (const device of ['con', 'NUL', 'Aux', 'prn', 'com1', 'LPT9']) assert.match(checkNewName(device, have)!, /refused/, device);
+  assert.equal(checkNewName('console', have), null);
   assert.equal(checkGroupTitle('Kitchen'), null);
   assert.match(checkGroupTitle('  ')!, /empty/);
   assert.match(checkGroupTitle('x'.repeat(81))!, /80/);
@@ -124,4 +126,25 @@ test('R970: only in-diagram and inline-image hrefs stay; outside CSS url(), @imp
   assert.equal(stripOutsideUrls('@import url(https://x/c.css);:host{position:fixed}'), ':not(*){position:fixed}');
   assert.doesNotMatch(stripOutsideUrls('a{background:u\\72l(https://x)}'), /\\/);
   assert.doesNotMatch(stripOutsideUrls('a{background:image-set("https://x/a.png" 1x)}'), /image-set\(/);
+});
+
+test('R970: POST /__shell/new answers only a page opened on localhost, never another Host', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'dc-shell-host-'));
+  mkdirSync(join(root, 'diagrams')); mkdirSync(join(root, 'templates'));
+  writeFileSync(join(root, 'templates', 'flowchart.svg'), '<svg/>');
+  let handler: any;
+  (diagramWriter(root) as any).configureServer({middlewares: {use: (_p: string, h: any) => { handler = h; }}});
+  const post = (host: string, name: string) => new Promise<number>(done => {
+    const listeners: Record<string, (c?: string) => void> = {};
+    const req = {method: 'POST', headers: {host, 'content-type': 'application/json'}, on: (e: string, f: any) => { listeners[e] = f; }, destroy() {}};
+    const res = {statusCode: 0, setHeader() {}, end() { done(res.statusCode); }};
+    handler(req, res);
+    listeners.data?.(JSON.stringify({name, template: 'flowchart.svg'})); listeners.end?.();
+  });
+  for (const host of ['evil.example', 'evil.example:5173', '192.168.1.20:5173', 'localhost.evil.example', ''])
+    assert.equal(await post(host, 'x'), 403, host);
+  assert.equal(existsSync(join(root, 'diagrams', 'x.svg')), false);
+  for (const [host, name] of [['localhost:5173', 'a'], ['127.0.0.1:5173', 'b'], ['[::1]:5173', 'c']])
+    assert.equal(await post(host, name), 200, host);
+  assert.deepEqual(readdirSync(join(root, 'diagrams')).sort(), ['a.svg', 'b.svg', 'c.svg']);
 });

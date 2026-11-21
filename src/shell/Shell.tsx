@@ -96,6 +96,7 @@ export function Shell(){
    const copy=svg.cloneNode(true) as SVGSVGElement;hlOff(copy);
    const a=document.createElement('a');a.download=file.name;
    a.href=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml'}));a.click();
+   setTimeout(()=>URL.revokeObjectURL(a.href),60000); // the download has started; free the blob
    note(`Downloaded ${file.name} (Save as). Move it into diagrams/ to keep it there.`);
   }
   else if(id==='fit'){setFit(!fit);note(fit?'Actual size.':'Zoomed to fit.');}
