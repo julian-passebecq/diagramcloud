@@ -1,6 +1,6 @@
 /** Dev-server side of "New from template" (R964): copies templates/<t>.svg to diagrams/<name>.svg, never outside diagrams/. */
 import {readdirSync,readFileSync,realpathSync,writeFileSync} from 'node:fs';
-import {join,resolve,sep} from 'node:path';
+import {basename,dirname,join,resolve,sep} from 'node:path';
 import type {Plugin} from 'vite';
 import {checkNewName} from './shellModel';
 
@@ -16,15 +16,21 @@ export function writeFromTemplate(root:string,name:string,template:string):strin
 
 /** True when the Host header names this machine: localhost, 127.0.0.1 or [::1], with or without a port. */
 export const isLoopbackHost=(host:string|undefined)=>/^(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?$/i.test(host??'');
-/** True when the file a dev request is served from lies under diagrams/ or templates/ (any extension, any spelling):
- *  the path is decoded, normalised, /@fs/ followed and symlinks resolved, so the check is on what is served. */
+/** True when a dev request is served from diagrams/ or templates/ (any extension, any spelling): the path is decoded,
+ *  normalised and /@fs/ followed; it counts when either that path or the file it resolves to (symlinks followed) lies there. */
 export function servesUserFile(root:string,url:string|undefined):boolean{
- let p=(url??'').split(/[?#]/)[0];try{p=decodeURIComponent(p);}catch{/* keep the raw path */}
+ let p=(url??'').split(/[?#]/)[0];
+ // A malformed percent-encoding cannot be judged: sandbox it rather than guess what Vite would serve (R990).
+ try{p=decodeURIComponent(p);}catch{return true;}
  p=p.replace(/\\/g,'/');
- const real=(f:string)=>{try{return realpathSync.native(f);}catch{return f;}};
- const file=real(p.startsWith('/@fs/')?resolve(p.slice(4).replace(/^\/([A-Za-z]:)/,'$1')):resolve(root,'.'+p));
+ // A file that does not exist (yet) is judged by its nearest existing folder, resolved like diagrams/ itself: a root
+ // reached through a link (macOS /var -> /private/var, a junction) otherwise compares two spellings of one place (R990).
+ const real=(f:string):string=>{try{return realpathSync.native(f);}catch{const up=dirname(f);return up===f?f:join(real(up),basename(f));}};
+ // Both the address as asked and the file it resolves to count: a link INSIDE diagrams/ to a file outside is still
+ // served from diagrams/ (R990), and a link outside that points into diagrams/ is judged by its target.
+ const asked=p.startsWith('/@fs/')?resolve(p.slice(4).replace(/^\/([A-Za-z]:)/,'$1')):resolve(root,'.'+p);const file=real(asked);
  const fold=(f:string)=>process.platform==='linux'?f:f.toLowerCase(); // Windows and macOS folders ignore case
- return ['diagrams','templates'].some(d=>{const dir=fold(real(resolve(root,d)));return fold(file)===dir||fold(file).startsWith(dir+sep);});
+ return ['diagrams','templates'].some(d=>[resolve(root,d),real(resolve(root,d))].some(x=>{const dir=fold(x);return [file,asked].some(f=>fold(f)===dir||fold(f).startsWith(dir+sep));}));
 }
 /** True when the TCP peer is this machine (IPv4, IPv6 or IPv4-mapped loopback). */
 export const isLoopbackPeer=(addr:string|undefined)=>/^(127\.\d+\.\d+\.\d+|::1|::ffff:127\.\d+\.\d+\.\d+)$/i.test(addr??'');
