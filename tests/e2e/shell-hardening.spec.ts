@@ -35,7 +35,8 @@ test('a diagram cannot fetch from outside: image href, link href and CSS url() a
 });
 
 test('Open raw file shows the source as plain text and runs nothing from it', async ({page}) => {
- await page.route(/\/assets\/floor-plan[^/]*\.svg$/,r=>r.fulfill({contentType:'image/svg+xml',
+ // Context-wide, so the raw-file tab (a new page) gets the probe too.
+ await page.context().route(/\/assets\/floor-plan[^/]*\.svg$/,r=>r.fulfill({contentType:'image/svg+xml',
   body:'<svg xmlns="http://www.w3.org/2000/svg" onload="localStorage.setItem(\'r970-probe\',\'ran\')"/>'}));
  await page.goto('/shell.html');
  await page.getByRole('navigation',{name:'Diagrams'}).getByRole('button',{name:'floor-plan.svg'}).click();
