@@ -124,14 +124,17 @@ test('an SVG without a viewBox gets one from its width and height so Zoom to fit
 test('R970: only in-diagram and inline-image hrefs stay; CSS is kept whole or refused whole, never rewritten', () => {
   for (const ok of ['#a', ' #x', 'data:image/png;base64,AA', 'DATA:image/svg+xml,<svg/>']) assert.equal(keepHref(ok), true, ok);
   for (const bad of ['https://x/y.png', '//x/y', 'javascript:alert(1)', 'data:text/html,<b>', 'foo.svg#a', '']) assert.equal(keepHref(bad), false, bad);
-  for (const ok of ['.a{fill:url(#grad)} .b{background:url( "data:image/png;base64,AA==" )}', 'fill:red;stroke:#333', 'Kitchen · 12 m²', 'body{background:red}'])
+  for (const ok of ['.a{fill:url(#grad)} .b{background:url( "data:image/png;base64,AA==" )}', 'fill:red;stroke:#333', 'Kitchen · 12 m²', 'body{background:red}',
+    '/* an ordinary comment */ .room{fill:#eef}'])
     assert.equal(safeCss(ok), ok, ok);
   for (const bad of [
     'svg{background:url(https://x/a.png)}',
     '/* url(# */url(https://x/a.png)',                 // comment
     '--x:"url(#";svg{background:url(https://x/a)}',    // string
     'svg{background:url(https://x/a.png',              // unclosed at end of input
-    'svg{background:ur\l(https://x/a)}', '@im\port "https://x/c.css";', // escapes
+    'svg{background:ur\\l(https://x/a)}', '@im\\port "https://x/c.css";', // escapes
+    'svg{background:url(data:image/png;base64,%3Cx%3E)}', 'svg{background:url(data:image/png;base64,AA"https://x")}', // body not base64
+    '@scope{:scope{outline:5px solid red}}', '@SCOPE (svg){:scope{background:red}}', // reaches the host without :host
     '@im@import x;port "https://x/c.css";',           // reassembly after a removal
     'svg{background:image-seimage(t("https://x/a.png" 1x)}', 'background:image-set("https://x/a.png" 1x)',
     'background:-webkit-image-set("https://x/a.png" 1x)', '@font-face{src:src("https://x/f.woff")}',
@@ -145,7 +148,7 @@ function writerHarness() {
   mkdirSync(join(root, 'diagrams')); mkdirSync(join(root, 'templates'));
   writeFileSync(join(root, 'templates', 'flowchart.svg'), '<svg/>');
   const routes: Record<string, any> = {};
-  (diagramWriter(root) as any).configureServer({middlewares: {use: (p: string, h: any) => { routes[p] = h; }}});
+  (diagramWriter(root) as any).configureServer({middlewares: {use: (p: any, h?: any) => { if (typeof p === 'function') routes['*'] = p; else routes[p] = h; }}});
   const post = (name: string, {host = 'localhost:5173', peer = '127.0.0.1', origin, type = 'application/json'}: {host?: string; peer?: string; origin?: string; type?: string} = {}) =>
     new Promise<number>(done => {
       const listeners: Record<string, (c?: string) => void> = {};
@@ -183,11 +186,16 @@ test('R970: POST /__shell/new refuses an Origin that is not http://<Host>, and a
   assert.equal(existsSync(join(root, 'diagrams', 'x.svg')), false);
 });
 
-test('R970: the dev server answers diagrams/ and templates/ as sandboxed documents', () => {
+test('R970: the dev server answers every SVG as a sandboxed document, whatever the path spelling', () => {
   const {routes} = writerHarness();
-  for (const dir of ['/diagrams/', '/templates/']) {
+  const csp = (url: string) => {
     const set: Record<string, string> = {}; let passed = false;
-    routes[dir]({}, {setHeader: (k: string, v: string) => { set[k] = v; }}, () => { passed = true; });
-    assert.equal(set['Content-Security-Policy'], 'sandbox', dir); assert.equal(passed, true);
-  }
+    routes['*']({url}, {setHeader: (k: string, v: string) => { set[k] = v; }}, () => { passed = true; });
+    assert.equal(passed, true, url);
+    return set['Content-Security-Policy'];
+  };
+  for (const url of ['/diagrams/x.svg', '/templates/flowchart.svg', '/%64iagrams/x.svg', '/%74emplates/x.svg', '/@fs/C:/repo/diagrams/x.svg',
+    '/./diagrams/x.svg', '/src/../diagrams/x.svg', '/diagrams/x.SVG?t=1', '/diagrams/x%2esvg', '/diagrams/%E0%A4%A.svg'])
+    assert.equal(csp(url), 'sandbox', url);
+  for (const url of ['/shell.html', '/src/shell/main.tsx', '/diagrams/x.svg.js']) assert.equal(csp(url), undefined, url);
 });

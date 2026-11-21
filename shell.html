@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- R970: whatever host serves this page, a diagram can never load an image, style sheet or font from outside. -->
+<meta http-equiv="Content-Security-Policy" content="img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'self'" />
 <title>DiagramCloud shell</title>
 </head>
 <body>

@@ -5,25 +5,39 @@ import {readFileSync} from 'node:fs';
 // into that bundled text on its way to the browser, escaped so it fits any JS string literal.
 const OUTSIDE='probe.invalid';
 const H='https://'+OUTSIDE;
-const PROBE='<style>body{background:red} svg{background-image:url('+H+'/css.png)}</style>'
+const PROBE='<style>svg{background-image:url('+H+'/css.png)}</style>'
  +'<image href='+H+'/img.png width=9 height=9 /><a id=probe-link xlink:href='+H+'/a><text>link</text></a>';
 const jsLiteral=(text:string)=>text.replace(/[\\"'`]/g,m=>'\\'+m);
 
-async function withProbe(page:Page,probe=PROBE){
+/** Shows the floor plan with a probe put in after its <title> (or after its </svg> with at='end'). The shell's own
+ *  <meta> CSP is taken out of the page unless keepMeta, so these probes test the sanitiser alone. */
+async function withProbe(page:Page,probe=PROBE,{at='start',keepMeta=false}:{at?:'start'|'end';keepMeta?:boolean}={}){
  const outside:string[]=[];
  await page.context().route(u=>u.hostname===OUTSIDE,r=>{outside.push(r.request().url());return r.abort();});
  await page.route(/\/assets\/shell-[^/]*\.js$/,async r=>{
-  const body=(await (await r.fetch()).text()).replace('small flat</title>','small flat</title>'+jsLiteral(probe));
+  const text=await (await r.fetch()).text();
+  const body=at==='start'?text.replace('small flat</title>','small flat</title>'+jsLiteral(probe))
+   :text.replace(/M450 400H520\\?"\/><\/g>[^<]{0,12}<\/svg>/,m=>m+jsLiteral(probe));
+  expect(body).not.toBe(text);
   await r.fulfill({body,contentType:'text/javascript'});
  });
+ if(!keepMeta)await withoutMetaCsp(page);
  await page.goto('/shell.html');
  await page.getByRole('navigation',{name:'Diagrams'}).getByRole('button',{name:'floor-plan.svg'}).click();
  await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'Kitchen'})).toBeVisible();
  return outside;
 }
 
+/** Serves shell.html without its <meta> CSP (and with the given response headers). */
+async function withoutMetaCsp(page:Page,headers:Record<string,string>={}){
+ await page.route(/\/shell\.html$/,async r=>{const res=await r.fetch();const html=await res.text();
+  const body=html.replace(/<meta http-equiv="Content-Security-Policy"[^>]*>/,'');expect(body).not.toBe(html);
+  await r.fulfill({response:res,body,headers:{...res.headers(),...headers}});});
+}
+
 test('a <style> in a diagram styles the diagram only, never the shell', async ({page}) => {
- await withProbe(page);
+ // No url() here, so the style is kept: only the shadow root keeps it off the shell.
+ await withProbe(page,'<style>body{background:red} .sh-left{background:red}</style>');
  await expect(page.locator('.sh-diagram svg')).toBeVisible();
  expect(await page.evaluate(()=>getComputedStyle(document.body).backgroundColor)).not.toBe('rgb(255, 0, 0)');
  expect(await page.evaluate(()=>getComputedStyle(document.querySelector('.sh-left')!).backgroundColor)).not.toBe('rgb(255, 0, 0)');
@@ -45,6 +59,8 @@ const BYPASSES:Record<string,string>={
  'backslash escape':'<style>svg{background-image:ur\\l('+H+'/escape.png)}</style>',
  '@import reassembled after a removal':'<style>@im@import x;port "'+H+'/import.css";</style>',
  'image-set reassembled after a removal':'<style>svg{background-image:image-seimage(t("'+H+'/imageset.png" 1x)}</style>',
+ 'child element inside <style>':'<style>svg{background-image:u<g>z</g>rl('+H+'/child.png)}</style>',
+ 'child element hiding @import':'<style>@im<g>z</g>port "'+H+'/child-import.css";</style>',
  'style attribute (comment, image-set)':'<rect x=120 width=50 height=50 style="filter:/* url(# */url('+H+'/attr-filter.svg#f);mask-image:image-set(\''+H+'/attr-mask.png\' 1x);cursor:/* url(# */url('+H+'/attr-cur.png),auto"/>',
 };
 for(const [family,probe] of Object.entries(BYPASSES))test(`no outside fetch through a ${family}`,async ({page}) => {
@@ -53,6 +69,20 @@ for(const [family,probe] of Object.entries(BYPASSES))test(`no outside fetch thro
  if(box)await page.mouse.move(box.x+box.width/2,box.y+box.height/2); // cursor rules load on hover
  await page.waitForTimeout(700);
  expect(outside).toEqual([]);
+ await expect(page.getByRole('contentinfo',{name:'Output'})).toContainText('Refused in floor-plan.svg');
+});
+
+test('a <style> after the </svg> cannot restyle the host through @scope', async ({page}) => {
+ await withProbe(page,'<style>@scope{:scope{outline:7px solid rgb(255, 0, 0);background:rgb(255, 0, 0)}}</style>',{at:'end'});
+ const host=await page.evaluate(()=>{const s=getComputedStyle(document.querySelector('.sh-diagram')!);return s.outlineStyle+' '+s.outlineColor+' '+s.backgroundColor;});
+ expect(host).not.toContain('rgb(255, 0, 0)');
+ await expect(page.getByRole('contentinfo',{name:'Output'})).toContainText('Refused in floor-plan.svg');
+});
+
+test('ordinary styling and comments are kept and nothing is reported', async ({page}) => {
+ await withProbe(page,'<style>/* rooms */ #kitchen rect{fill:rgb(1, 2, 3)}</style>');
+ await expect(page.locator('#kitchen rect')).toHaveCSS('fill','rgb(1, 2, 3)');
+ await expect(page.getByRole('contentinfo',{name:'Output'})).not.toContainText('Refused');
 });
 
 test('a diagram cannot paint over the shell: position:fixed stays inside the canvas', async ({page}) => {
@@ -62,15 +92,58 @@ test('a diagram cannot paint over the shell: position:fixed stays inside the can
  expect(top).toBe(true);
 });
 
-test('the shell works under the Content-Security-Policy that vercel.json sends for shell.html', async ({page}) => {
- const rule=JSON.parse(readFileSync('vercel.json','utf8')).headers.find((h:{source:string})=>h.source.startsWith('/shell'));
- const csp=rule.headers.find((h:{key:string})=>h.key==='Content-Security-Policy').value;
- const violations:string[]=[];page.on('console',m=>{if(/Content Security Policy/i.test(m.text()))violations.push(m.text());});
- await page.route(/\/shell\.html$/,async r=>{const res=await r.fetch();await r.fulfill({response:res,headers:{...res.headers(),'content-security-policy':csp}});});
+const vercelRule=()=>{const rule=JSON.parse(readFileSync('vercel.json','utf8')).headers.find((h:{source:string})=>new RegExp('^'+h.source+'$').test('/shell.html'));
+ return rule.headers.find((h:{key:string})=>h.key==='Content-Security-Policy').value as string;};
+/** Adds an outside image and an outside style sheet to the diagram's shadow root from the page itself: only a CSP stops them. */
+async function outsideLoads(page:Page){
+ const outside:string[]=[];
+ await page.context().route(u=>u.hostname===OUTSIDE,r=>{outside.push(r.request().url());return r.abort();});
+ return async()=>{
+  await page.evaluate(h=>{const sr=document.querySelector('.sh-diagram')!.shadowRoot!;
+   const i=document.createElement('img');i.src=h+'/csp-img.png';sr.appendChild(i);
+   const l=document.createElement('link');l.rel='stylesheet';l.href=h+'/csp-sheet.css';sr.appendChild(l);
+   },H);
+  await page.waitForTimeout(700);
+  return outside;
+ };
+}
+
+test('the vercel.json CSP for /shell.html alone stops outside images and style sheets', async ({page}) => {
+ await withoutMetaCsp(page,{'content-security-policy':vercelRule()});
+ const load=await outsideLoads(page);
  await page.goto('/shell.html');
  await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
+ expect(await load()).toEqual([]);
+});
+
+test('the <meta> CSP in shell.html alone stops outside images and style sheets, on any host', async ({page}) => {
+ const load=await outsideLoads(page);
+ await page.goto('/shell.html');
+ await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
+ expect(await load()).toEqual([]);
+});
+
+test('the control: without any CSP the same loads do leave the page', async ({page}) => {
+ await withoutMetaCsp(page);
+ const load=await outsideLoads(page);
+ await page.goto('/shell.html');
+ await expect(page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'API gateway'})).toBeVisible();
+ expect((await load()).length).toBe(2);
+});
+
+test('the shell works under both CSPs: highlight, Save as and Open raw file', async ({page}) => {
+ const violations:string[]=[];page.on('console',m=>{if(/Content Security Policy/i.test(m.text()))violations.push(m.text());});
+ await page.route(/\/shell\.html$/,async r=>{const res=await r.fetch();await r.fulfill({response:res,headers:{...res.headers(),'content-security-policy':vercelRule()}});});
+ await page.goto('/shell.html');
  await page.getByRole('complementary',{name:'Navigation'}).getByRole('button',{name:'Database'}).click();
  await expect(page.locator('#database')).toHaveClass(/sh-hl/);
+ const download=page.waitForEvent('download');
+ await page.getByRole('button',{name:'Save as'}).click();
+ expect((await download).suggestedFilename()).toBe('architecture.svg');
+ const popup=page.waitForEvent('popup');
+ await page.getByRole('button',{name:'Open raw file'}).click();
+ const raw=await popup;await raw.waitForLoadState();
+ await expect(raw.locator('body')).toContainText('<svg');
  expect(violations).toEqual([]);
 });
 

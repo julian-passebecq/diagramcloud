@@ -36,7 +36,9 @@ export function Shell(){
   box.replaceChildren();setGroups([]);setActive(null);
   if(!file)return;
   if(reason){note(reason);return;}
-  box.innerHTML=`<style>${STAGE_CSS}</style>`+sanitizeSvg(edited.current.get(file.name)??file.text);
+  const safe=sanitizeSvg(edited.current.get(file.name)??file.text);
+  box.innerHTML=`<style>${STAGE_CSS}</style>`+safe.html;
+  if(safe.refused.length)note(`Refused in ${file.name} (could load from outside or restyle the shell): ${safe.refused.join(', ')}.`);
   const svg=box.querySelector('svg');
   if(!svg){note(`${file.name} cannot be shown: the SVG did not survive parsing or sanitising.`);return;}
   if(!svg.getAttribute('viewBox')){const b=svg.getBBox();// fallback without width/height: the drawing's own bounds
