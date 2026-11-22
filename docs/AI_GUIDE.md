@@ -266,7 +266,8 @@ Project Evolution in Edit compares a selected previous authoring backup locally;
 | Auto layout | `src/core/layout.ts` |
 | Figures, suggestions, figure book, deck | `src/export/design/` |
 | Design brief | `src/core/designBrief.ts`, `skills/diagramcloud-design/SKILL.md` |
-| Contributor rules and current limits | `AGENTS.md` |
+| Contributor rules | `AGENTS.md` |
+| Current limits and per-module rules | `docs/LIMITS.md` |
 
 
 ### Continuation interfaces (unmerged candidate)

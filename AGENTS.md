@@ -1,6 +1,6 @@
 # DiagramCloud contributor and AI editing rules
 
-Start with README.md and docs/ARCHITECTURE.md. An agent that uses DiagramCloud (rather than changing it) starts with docs/AI_GUIDE.md; keep it true when commands, formats or figure types change (`tests/ai-guide.test.ts`). Extend this repo; never start a parallel notebook, diagram or portfolio app.
+Start with README.md, docs/ARCHITECTURE.md, docs/RELEASE.md, docs/RESEARCH.md and docs/ROADMAP.md. An agent that uses DiagramCloud (rather than changing it) starts with docs/AI_GUIDE.md; keep it true when commands, formats or figure types change (`tests/ai-guide.test.ts`). Extend this repo; never start a parallel notebook, diagram or portfolio app.
 
 ## Documents
 
@@ -18,6 +18,6 @@ Provider icons: record source and version/blob; a repo's MIT license does not co
 
 Before proposing a change, run TypeScript, unit tests, production build and browser tests (drilldown with parent kept, rejected imports unchanged, public redaction, storage conflicts, offline HTML export); inspect exported PPTX visually. Use a feature branch; do not overwrite another branch or claim CI passed without reading its result.
 
-## Status
+## Current limits
 
-Current limits and what shipped: the latest docs/release-*/RELEASE_NOTES.md and docs/product/V3_WORKSPACE.md. Keep tests/r4-crosswalk.test.ts passing; never mark a crosswalk row implemented without its test.
+Per-module rules and limits: docs/LIMITS.md; read it before touching a module. What shipped: the latest docs/release-*/RELEASE_NOTES.md and docs/product/V3_WORKSPACE.md. Keep tests/r4-crosswalk.test.ts passing; never mark a crosswalk row implemented without its test.
